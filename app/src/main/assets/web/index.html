@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ZaLo Marketplace Smart - سوق الجزائر الذكي</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tajawal Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #0b1528;
+            color: #f3f4f6;
+        }
+        .zalo-glass {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .zalo-glass-card {
+            background: rgba(15, 28, 54, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b1528;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #10b981;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #059669;
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        zalo: {
+                            navy: '#0b1528',
+                            navyLight: '#0f1c36',
+                            emerald: '#00875a',
+                            emeraldLight: '#10b981',
+                            emeraldDark: '#047857',
+                            gold: '#d4af37',
+                            goldLight: '#f3e5ab',
+                            goldDark: '#aa7c11'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="min-h-screen flex flex-col">
+
+    <!-- Top Global Header -->
+    <header class="sticky top-0 z-40 zalo-glass shadow-lg border-b border-white/10 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
+            
+            <!-- Brand Logo -->
+            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="switchTab('customer')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-zalo-gold to-zalo-goldDark p-[2px] flex items-center justify-center">
+                    <div class="w-full h-full rounded-[10px] bg-zalo-navy flex items-center justify-center">
+                        <i class="fa-solid fa-seedling text-zalo-gold text-lg"></i>
+                    </div>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black text-zalo-gold tracking-tight">ZaLo <span class="text-white text-base font-normal">Smart</span></h1>
+                    <p class="text-[10px] text-zalo-emeraldLight">سوق الجزائر الذكي متعدد البائعين</p>
+                </div>
+            </div>
+
+            <!-- Role Selector / Simulator -->
+            <div class="flex items-center gap-2 bg-zalo-navyLight/80 border border-white/10 rounded-full p-1 shadow-inner">
+                <span class="text-xs text-white/60 px-2 font-medium hidden sm:inline"><i class="fa-solid fa-users-cog text-zalo-gold"></i> المحاكاة:</span>
+                <button id="btn-role-customer" onclick="setRole('CUSTOMER')" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 bg-zalo-emerald text-white shadow">
+                    مستهلك 🛒
+                </button>
+                <button id="btn-role-merchant" onclick="setRole('MERCHANT')" class="text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 text-white/70 hover:text-white">
+                    تاجر محترف 🏬
+                </button>
+                <button id="btn-role-admin" onclick="setRole('ADMIN')" class="text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 text-white/70 hover:text-white">
+                    مدير النظام 🛡️
+                </button>
+            </div>
+
+            <!-- Icons Bar -->
+            <div class="flex items-center space-x-4 space-x-reverse">
+                <!-- Notifications -->
+                <div class="relative cursor-pointer" onclick="toggleNotificationsModal()">
+                    <i class="fa-regular fa-bell text-xl hover:text-zalo-gold transition"></i>
+                    <span id="notif-count" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4.5 h-4.5 py-0.5 rounded-full flex items-center justify-center hidden">0</span>
+                </div>
+
+                <!-- Shopping Cart -->
+                <div class="relative cursor-pointer" onclick="toggleCartDrawer()">
+                    <i class="fa-solid fa-cart-shopping text-xl text-zalo-emeraldLight hover:text-zalo-gold transition"></i>
+                    <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-zalo-gold text-zalo-navy text-[10px] font-bold w-4.5 h-4.5 py-0.5 rounded-full flex items-center justify-center z-10">0</span>
+                </div>
+
+                <!-- AI Companion Trigger -->
+                <button onclick="switchTab('ai-chat')" class="flex items-center gap-1.5 bg-gradient-to-r from-zalo-emerald to-zalo-emeraldLight hover:from-zalo-emeraldLight hover:to-zalo-emerald text-white px-3 py-1.5 rounded-xl font-bold text-xs transition duration-300 shadow">
+                    <i class="fa-solid fa-robot animate-bounce text-zalo-gold font-bold"></i>
+                    مساعد AI
+                </button>
+
+                <!-- Download Helper -->
+                <button onclick="openDownloadModal()" class="w-8 h-8 rounded-lg bg-zalo-navyLight/80 border border-white/20 hover:border-zalo-gold text-zalo-gold flex items-center justify-center transition" title="تحميل الملفات">
+                    <i class="fa-solid fa-cloud-arrow-down"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Dynamic Content Container -->
+    <main class="flex-grow max-w-7xl mx-auto px-4 py-6 w-full">
+        
+        <!-- ======================= 1. CUSTOMER PORTAL SCREEN ======================= -->
+        <section id="screen-customer" class="space-y-6">
+            <!-- Hero Banner -->
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl zalo-glass border border-white/10 p-6 sm:p-10 flex flex-col md:flex-row items-center gap-6">
+                <div class="absolute inset-0 bg-gradient-to-r from-zalo-navy via-zalo-navy/95 to-transparent z-0"></div>
+                <!-- Banner text -->
+                <div class="relative z-10 flex-1 space-y-4 text-center md:text-right">
+                    <span class="bg-zalo-gold/20 text-zalo-gold text-xs font-bold px-3 py-1.5 rounded-full border border-zalo-gold/30"><i class="fa-solid fa-bolt"></i> سوق العائلات الجزائرية الذكي</span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">كل ما تحتاجه للبيت الجزائري في مكان واحد وبأفضل الأسعار</h2>
+                    <p class="text-white/70 text-sm max-w-lg leading-relaxed">تصفح المنتجات من مختلف الولايات، تفاوض واشترِ بضمان الدفع عند الاستلام أو البريد الإلكتروني الذكي CCP و BaridiMob بالتواصل المباشر مع البائعين.</p>
+                    
+                    <!-- Quick Stats Badges -->
+                    <div class="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
+                        <span class="text-xs bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white/80"><i class="fa-solid fa-location-dot text-red-500"></i> تغطية 58 ولاية</span>
+                        <span class="text-xs bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white/80"><i class="fa-solid fa-handshake text-zalo-emeraldLight"></i> دفع معتمد CCP / الذهبية</span>
+                        <span class="text-xs bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white/80"><i class="fa-solid fa-truck-fast text-zalo-gold"></i> توصيل سريع وآمن</span>
+                    </div>
+                </div>
+                
+                <!-- Display Image -->
+                <div class="relative z-10 w-full max-w-[280px] md:max-w-[340px] flex items-center justify-center">
+                    <div class="absolute w-64 h-64 bg-zalo-emerald/10 rounded-full blur-2xl filter font-bold"></div>
+                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=500&q=80" alt="Ecom Banner" class="rounded-2xl shadow-lg border border-white/10 max-h-56 object-cover transform rotate-2 hover:rotate-0 transition duration-300">
+                </div>
+            </div>
+
+            <!-- Gemini AI Recommendations Banner -->
+            <div class="bg-gradient-to-l from-zalo-navyLight to-zalo-navy border border-zalo-emerald/30 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
+                <div class="flex items-start gap-4 flex-1">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-zalo-emerald to-zalo-emeraldLight flex items-center justify-center shrink-0 shadow-lg shadow-zalo-emerald/30">
+                        <i class="fa-solid fa-robot text-white text-xl animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-bold text-zalo-emeraldLight flex items-center gap-1.5">
+                            توصيات الذكاء الاصطناعي مخصصة لك
+                            <span class="text-[9px] bg-zalo-emerald/20 text-zalo-emeraldLight px-2 py-0.5 rounded-full border border-zalo-emerald/30">Gemini Active</span>
+                        </h3>
+                        <p id="ai-recom-text" class="text-xs sm:text-sm text-white/80 mt-1 leading-relaxed">
+                            جاري تحليل تفضيلاتك وموقعك لتقديم أفضل العروض...
+                        </p>
+                    </div>
+                </div>
+                <button onclick="refreshAiRecommendations()" class="text-xs font-bold text-zalo-gold bg-zalo-gold/10 hover:bg-zalo-gold/20 rounded-xl px-4 py-2 border border-zalo-gold/30 hover:border-zalo-gold transition duration-200 shrink-0 self-end md:self-center">
+                    <i class="fa-solid fa-arrows-rotate"></i> تحديث التوصيات
+                </button>
+            </div>
+
+            <!-- Filters Section -->
+            <div class="zalo-glass-card rounded-2xl p-4 flex flex-col sm:flex-row gap-4 justify-between items-center z-10 border border-white/5 font-bold">
+                <!-- Search -->
+                <div class="relative w-full sm:max-w-md">
+                    <span class="absolute inset-y-0 right-3 flex items-center text-white/40">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                    </span>
+                    <input type="text" id="filter-search" oninput="applyFilters()" placeholder="ابحث عن المنتجات أو الهواتف أو الملابس الشتوية الجزائرية..." class="w-full bg-zalo-navy border border-white/10 rounded-xl pr-10 pl-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:border-zalo-emerald transition">
+                </div>
+
+                <!-- Custom Filters (Category + Wilaya) -->
+                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
+                    <!-- Category -->
+                    <select id="filter-category" onchange="applyFilters()" class="bg-zalo-navy border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white/90 focus:outline-none focus:border-zalo-emerald flex-1 sm:flex-initial">
+                        <option value="ALL">جميع التصنيفات</option>
+                        <option value="ELECTRONICS">أجهزة إلكترونية</option>
+                        <option value="FASHION">أزياء وملابس</option>
+                        <option value="FOOD">خضار وأغذية طازجة</option>
+                        <option value="COSMETICS">مستحضرات تجميل</option>
+                        <option value="HOME">أدوات منزلية</option>
+                    </select>
+
+                    <!-- Wilaya -->
+                    <select id="filter-wilaya" onchange="applyFilters()" class="bg-zalo-navy border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white/90 focus:outline-none focus:border-zalo-emerald flex-1 sm:flex-initial">
+                        <option value="ALL">الجزائر كاملة (58 ولاية)</option>
+                        <option value="الجزائر">الجزائر (Algiers)</option>
+                        <option value="وهران">وهران (Oran)</option>
+                        <option value="قسنطينة">قسنطينة (Constantine)</option>
+                        <option value="عنابة">عنابة (Annaba)</option>
+                        <option value="سطيف">سطيف (Setif)</option>
+                        <option value="تيزي وزو">تيزي وزو (Tizi Ouzou)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Products List Section -->
+            <div>
+                <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-white">
+                    <span class="w-2.5 h-6 rounded bg-zalo-emerald"></span>
+                    كتالوج المنتجات المميزة
+                    <span id="product-count-badge" class="text-xs bg-zalo-navyLight text-white/50 px-3 py-1 rounded-full border border-white/10">0 متوفر</span>
+                </h3>
+
+                <!-- Loading Spinner if no products loaded -->
+                <div id="product-list-empty" class="hidden zalo-glass-card rounded-2xl p-10 text-center flex flex-col items-center justify-center">
+                    <i class="fa-solid fa-basket-shopping text-4xl text-white/20 mb-3 animate-bounce"></i>
+                    <p class="text-white/60 text-sm">عذراً، لم يتم العثور على أي منتج يطابق خيارات البحث الحالية.</p>
+                    <button onclick="resetFilters()" class="mt-4 text-xs font-bold text-zalo-emeraldLight hover:underline">إعادة ضبط المرشحات</button>
+                </div>
+
+                <!-- Products Grid -->
+                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                    <!-- Rendered dynamically by javascript -->
+                </div>
+            </div>
+
+            <!-- Customer orders and tickets tracker -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 border-t border-white/10">
+                
+                <!-- Placed Orders Panel -->
+                <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                    <h3 class="text-base font-bold flex items-center justify-between border-b border-white/10 pb-3 font-bold">
+                        <span><i class="fa-solid fa-receipt text-zalo-gold"></i> تتبع طلباتك المشتراة</span>
+                        <span class="text-xs font-normal text-white/50">تحديث فوري لطلب السلع</span>
+                    </h3>
+                    <div id="customer-orders-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                        <!-- Placed orders rendered dynamically -->
+                    </div>
+                </div>
+
+                <!-- Helpdesk tickets / Complaints -->
+                <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                    <h3 class="text-base font-bold flex items-center justify-between border-b border-white/10 pb-3 font-bold">
+                        <span><i class="fa-solid fa-headset text-zalo-emeraldLight"></i> الدعم الفني وحل النزاعات</span>
+                        <button onclick="openComplaintModal()" class="text-xs font-bold text-zalo-emeraldLight hover:text-white transition"><i class="fa-solid fa-circle-plus"></i> رفع شكوى جديدة</button>
+                    </h3>
+                    <div id="customer-complaints-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
+                        <!-- Complaints list -->
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ======================= 2. MERCHANT SCREEN ======================= -->
+        <section id="screen-merchant" class="hidden space-y-6">
+            
+            <!-- Dashboard Overview Badges -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 font-bold">
+                <!-- StatCard 1 -->
+                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-zalo-gold border border-white/5">
+                    <div>
+                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">إجمالي المبيعات</p>
+                        <h4 id="merchant-sales-total" class="text-2xl font-black text-white mt-1">0 DZD</h4>
+                        <p class="text-[10px] text-zalo-emeraldLight mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +12% هذا الأسبوع</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-zalo-gold/10 text-zalo-gold flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-wallet"></i>
+                    </div>
+                </div>
+                <!-- StatCard 2 -->
+                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-zalo-emerald border border-white/5">
+                    <div>
+                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">المنتجات النشطة</p>
+                        <h4 id="merchant-products-count" class="text-2xl font-black text-white mt-1">0</h4>
+                        <p class="text-[10px] text-white/40 mt-1">معروضة للزبائن بالمنصة</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-zalo-emerald/10 text-zalo-emeraldLight flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-box-open"></i>
+                    </div>
+                </div>
+                <!-- StatCard 3 -->
+                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-blue-500 border border-white/5">
+                    <div>
+                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">الطلب والتحصيل</p>
+                        <h4 id="merchant-orders-count" class="text-2xl font-black text-white mt-1">0</h4>
+                        <p class="text-[10px] text-blue-400 mt-1"><span id="merchant-pending-orders" class="font-bold">0</span> طلب معلق حالياً</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-truck-ramp-box"></i>
+                    </div>
+                </div>
+                <!-- StatCard 4 -->
+                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-purple-500 border border-white/5">
+                    <div>
+                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">الاشتراك والتمكين</p>
+                        <h4 id="merchant-sub-badge" class="text-lg font-black text-zalo-gold mt-1">جاري التحميل...</h4>
+                        <p class="text-[10px] text-white/40 mt-1">جدد لتجنب توقف متجرك</p>
+                    </div>
+                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl">
+                        <i class="fa-solid fa-address-card"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Merchant Store Settings / Setup Panel if no store exists -->
+            <div id="merchant-no-store-alert" class="hidden zalo-glass-card rounded-3xl p-6 border-zalo-gold/30 space-y-4">
+                <div class="flex items-start gap-4">
+                    <div class="w-12 h-12 rounded-2xl bg-zalo-gold/10 text-zalo-gold flex items-center justify-center shrink-0 text-2xl">
+                        <i class="fa-solid fa-store"></i>
+                    </div>
+                    <div class="space-y-1">
+                        <h3 class="text-lg font-bold text-white">تسجيل وتأسيس متجرك على منصة ZaLo</h3>
+                        <p class="text-xs text-white/70 leading-relaxed">لم تبدأ البيع معنا بعد! يجب عليك ملء استمارة تسجيل متجرك الجديد ليقوم المشرفون بمراجعته والموافقة عليه في غضون دقائق.</p>
+                    </div>
+                </div>
+                <!-- Store form -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10">
+                    <div>
+                        <label class="block text-xs font-bold text-white/80 mb-1">اسم المتجر بالعربية أو الأجنبية:</label>
+                        <input type="text" id="setup-store-name" placeholder="مثال: متجر الغروب للإلكترونيات" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white/80 mb-1">تخصص المتجر (التصنيف الرئيسي):</label>
+                        <select id="setup-store-cat" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold font-bold">
+                            <option value="ELECTRONICS">أجهزة إلكترونية وهواتف</option>
+                            <option value="FASHION">ملابس وأزياء ومستلزمات</option>
+                            <option value="FOOD">خضروات وفواكه ومواد غذائية</option>
+                            <option value="COSMETICS">تجميل وعناية شخصية</option>
+                            <option value="HOME">منزل ومطبخ وأثاث</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-white/80 mb-1">وصف المتجر ومميزاته للزبائن:</label>
+                        <textarea id="setup-store-desc" rows="2" placeholder="اكتب نبذة جذابة عن المتجر والمنتجات التي توفرها ومواعيد التوصيل..." class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold resize-none font-bold"></textarea>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white/80 mb-1">رقم الهاتف للتواصل المباشر:</label>
+                        <input type="tel" id="setup-store-phone" placeholder="مثال: 0555123456" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white/80 mb-1">رقم الواتساب الشخصي (WhatsApp):</label>
+                        <input type="tel" id="setup-store-whatsapp" placeholder="مثال: 213555123456" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white/80 mb-1">الولاية الجغرافية للمقر الرئيسي:</label>
+                        <select id="setup-store-wilaya" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold font-bold">
+                            <option value="الجزائر">الجزائر العاصمة (Algiers)</option>
+                            <option value="وهران">وهران (Oran)</option>
+                            <option value="قسنطينة">قسنطينة (Constantine)</option>
+                            <option value="عنابة">عنابة (Annaba)</option>
+                            <option value="سطيف">سطيف (Setif)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-white/80 mb-1">البلدية أو المقاطعة:</label>
+                        <input type="text" id="setup-store-commune" placeholder="مثال: المرسى، رويبة، بئر مراد رايس" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold font-bold">
+                    </div>
+                </div>
+                <button onclick="registerMerchantStore()" class="w-full bg-zalo-gold hover:bg-zalo-goldDark text-zalo-navy hover:text-white py-3 rounded-xl font-bold transition">
+                    تأسيس المتجر وإرساله للمراجعة الآن 🚀
+                </button>
+            </div>
+
+            <!-- Shop Manager panels (Layout with Tabs inside Merchant Portal) -->
+            <div id="merchant-has-store-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Add & Manage Products Section (2/3 columns) -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Products inventory list and quick addition -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-5">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                            <h3 class="text-base font-bold"><i class="fa-solid fa-boxes-stacked text-zalo-emeraldLight"></i> المنتجات بمتجرك</h3>
+                            <button onclick="openAddProductModal()" class="bg-zalo-emerald hover:bg-zalo-emeraldDark text-white px-3 py-1.5 rounded-xl font-bold text-xs transition font-bold"><i class="fa-solid fa-plus"></i> إضافة منتج جديد</button>
+                        </div>
+
+                        <!-- Products Inventory list table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-zalo-navyLight/60 text-white/60">
+                                    <tr>
+                                        <th class="p-3">المنتج</th>
+                                        <th class="p-3">السعر الرئيسي</th>
+                                        <th class="p-3">المخزون المتوفر</th>
+                                        <th class="p-3">مرات البيع</th>
+                                        <th class="p-3 text-center">إجراءات</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="merchant-products-table-body" class="divide-y divide-white/5 font-bold">
+                                    <!-- Dynamic rows loaded -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Store Orders Intake Panel -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-base font-bold border-b border-white/10 pb-3"><i class="fa-solid fa-truck-fast text-zalo-gold"></i> الطلبات الواردة لمتجرك لتجهيزها</h3>
+                        <div id="merchant-orders-list" class="space-y-4 max-h-96 overflow-y-auto pr-1">
+                            <!-- Dynamic orders that belong to this store -->
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Merchant AI Mentorship & Subscriptions side column -->
+                <div class="space-y-6">
+                    
+                    <!-- AI Assistant for merchants -->
+                    <div class="zalo-glass-card rounded-2xl p-4 flex flex-col h-[340px] border border-zalo-emerald/10 shadow-lg">
+                        <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-3">
+                            <span class="text-xs font-bold text-zalo-emeraldLight flex items-center gap-1.5 font-bold">
+                                <i class="fa-solid fa-brain-circuit"></i>
+                                مستشار التجار الذكي (Gemini)
+                            </span>
+                            <span id="merchant-ai-badge" class="text-[9px] bg-zalo-gold/15 text-zalo-gold px-2 py-0.5 rounded border border-zalo-gold/20 font-bold">باقة نشطة</span>
+                        </div>
+                        
+                        <!-- Chat history list -->
+                        <div id="merchant-ai-chat-history" class="flex-1 overflow-y-auto space-y-3 text-xs pr-1 mb-3">
+                            <!-- Dynamic messages -->
+                        </div>
+
+                        <!-- Chat entry -->
+                        <div class="flex gap-2 shrink-0">
+                            <input type="text" id="merchant-ai-chat-input" onkeydown="if(event.key === 'Enter') sendMerchantAiMessage()" placeholder="اسأل عن استراتيجية التسعير، أو اكتب وصف لمنتج..." class="flex-1 bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-zalo-emerald font-bold">
+                            <button onclick="sendMerchantAiMessage()" class="bg-zalo-emerald hover:bg-zalo-emeraldDark text-white w-9 h-9 rounded-xl flex items-center justify-center transition shrink-0">
+                                <i class="fa-regular fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Payment Subscriptions Panel -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4 font-bold">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 border-b border-white/10 pb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-gem text-zalo-gold"></i> ترقية حساب التاجر للمميز</span>
+                            <span id="current-subscription-status" class="text-[10px] text-zalo-gold font-bold">الخطة المجانية</span>
+                        </h3>
+                        <p class="text-xs text-white/70 leading-relaxed">قم بالترقية فوراً للحصول على وصول غير محدود للتحليلات الذكية وعرض عدد لا نهائي من السلع بالمتجر.</p>
+                        
+                        <div class="space-y-3">
+                            <div class="bg-zalo-navy/60 p-3 rounded-xl border border-white/5 relative overflow-hidden group">
+                                <div class="absolute -right-6 -bottom-6 text-white/5 text-4xl transform rotate-12 group-hover:scale-110 transition"><i class="fa-solid fa-store-slash"></i></div>
+                                <h4 class="text-xs font-bold text-white flex justify-between">
+                                    <span>باقة متجر مبسط (STARTER COMPACT)</span>
+                                    <span class="text-zalo-gold font-bold">1,500 DZD</span>
+                                </h4>
+                                <p class="text-[10px] text-white/60 mt-1 font-normal">منتجات محدودة بـ 15 منتج، تحليلات أساسية فقط بمحرك الويب.</p>
+                                <button onclick="selectUpgradePlan('STARTER_COMPACT', 1500)" class="mt-2.5 w-full bg-zalo-navy hover:bg-white/5 border border-white/15 text-white py-1.5 rounded-lg text-[10px] font-bold transition">دفع الترخيص ودفع CCP</button>
+                            </div>
+
+                            <div class="bg-zalo-navy/60 p-3 rounded-xl border border-zalo-gold/20 relative overflow-hidden group">
+                                <div class="absolute top-2 left-2 bg-zalo-gold text-zalo-navy font-black text-[9px] px-2 py-0.5 rounded">الأكثر مبيعاً ⭐</div>
+                                <h4 class="text-xs font-bold text-white flex justify-between">
+                                    <span>المرفوع والذكي (SMART ENTERPRISE)</span>
+                                    <span class="text-zalo-gold font-bold">4,500 DZD</span>
+                                </h4>
+                                <p class="text-[10px] text-white/60 mt-1 font-normal flex items-center gap-1"><i class="fa-solid fa-check text-zalo-emeraldLight"></i> وصول كلي لـ Gemini، تفعيل متجر كامل وإحصاءات دقيقة للبيانات.</p>
+                                <button onclick="selectUpgradePlan('SMART_ENTERPRISE', 4500)" class="mt-2.5 w-full bg-zalo-gold text-zalo-navy py-1.5 rounded-lg text-[10px] font-bold hover:bg-zalo-goldDark hover:text-white transition font-bold">دفع والترقية الآن</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Merchant Verification Documents upload workspace -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4 font-bold">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 border-b border-white/10 pb-2 flex items-center justify-between">
+                            <span><i class="fa-solid fa-id-card text-zalo-emeraldLight"></i> توثيق هوية التاجر للولاية 🛡️</span>
+                            <span id="merchant-verify-badge" class="text-[9px] bg-red-400/15 text-red-400 px-2.5 py-0.5 rounded-full border border-red-500/30 font-bold">غير موثق ❌</span>
+                        </h3>
+                        <p class="text-[10px] text-white/70 leading-relaxed font-normal">لضمان مكافحة الاحتيال وتنشيط الثقة المزدوجة بـ 58 ولاية، يرجى تقديم السجل وشهادة الهوية لتنشيط شارة <strong>بائع معتمد لدى سوق الجزائر</strong>.</p>
+                        
+                        <div id="merchant-verify-unverified-block" class="space-y-3 font-bold">
+                            <div>
+                                <label class="block text-[10px] font-bold text-white/80 mb-1">رقم السجل التجاري الإلكتروني:</label>
+                                <input type="text" id="verify-register-code" placeholder="مثال: 16/00-0984321B22" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-1.5 text-xs text-white focus:outline-none focus:border-zalo-emerald font-bold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-white/80 mb-1">رقم التعريف الوطني البيومتري NIN:</label>
+                                <input type="text" id="verify-nin-code" placeholder="مثال: 11029082938471" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-1.5 text-xs text-white focus:outline-none focus:border-zalo-emerald font-bold">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2 text-[10px]">
+                                <div class="bg-zalo-navy/50 p-2.5 rounded-xl border border-white/5 text-center cursor-pointer hover:bg-white/10 transition" onclick="simulateFileUpload('national_id')">
+                                    <i class="fa-solid fa-upload text-zalo-emeraldLight mb-1 text-xs block animate-pulse"></i>
+                                    <span id="lbl-id-file" class="text-white/60 font-semibold text-[9px] font-bold">بطاقة التعريف</span>
+                                </div>
+                                <div class="bg-zalo-navy/50 p-2.5 rounded-xl border border-white/5 text-center cursor-pointer hover:bg-white/10 transition" onclick="simulateFileUpload('commercial_register')">
+                                    <i class="fa-solid fa-file-pdf text-zalo-gold mb-1 text-xs block"></i>
+                                    <span id="lbl-cr-file" class="text-white/60 font-semibold text-[9px] font-bold">ملف الرقم السجلي</span>
+                                </div>
+                            </div>
+                            <button onclick="submitMerchantVerificationDocuments()" class="w-full bg-zalo-emerald hover:bg-zalo-emeraldDark text-white py-2 rounded-xl text-[10px] font-black transition shadow">
+                                إرسال الملفات للمصادقة التلقائية 🏢
+                            </button>
+                        </div>
+                        <div id="merchant-verify-submitted-block" class="hidden bg-zalo-navyLight/40 p-4 rounded-xl border border-zalo-gold/10 text-center text-xs space-y-1">
+                            <i class="fa-solid fa-hourglass-half text-zalo-gold text-lg animate-spin" style="animation-duration: 4s;"></i>
+                            <p class="font-bold text-white">الملفات الرسمية قيد التدقيق الإداري</p>
+                            <p class="text-[9px] text-white/50">يقوم وكيل المنصة الرئيسي بمطابقة رمز السجل التجاري البيومتري الآن لتنظيف وتفعيل حسابك.</p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================= 3. ADMIN PORTAL SCREEN ======================= -->
+        <section id="screen-admin" class="hidden space-y-6">
+            
+            <!-- Global Admin Quick Stats -->
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 font-bold">
+                <div class="zalo-glass-card rounded-xl p-4 text-center">
+                    <p class="text-[10px] text-white/50 uppercase font-medium">إجمالي المستخدمين المسجلين</p>
+                    <h3 id="admin-stat-users" class="text-xl font-bold text-white mt-1">0</h3>
+                </div>
+                <div class="zalo-glass-card rounded-xl p-4 text-center">
+                    <p class="text-[10px] text-white/50 uppercase font-medium">المتاجر قيد المراجعة</p>
+                    <h3 id="admin-stat-stores" class="text-xl font-bold text-zalo-gold mt-1">0</h3>
+                </div>
+                <div class="zalo-glass-card rounded-xl p-4 text-center">
+                    <p class="text-[10px] text-white/50 uppercase font-medium">الاشتراكات قيد المراجعة</p>
+                    <h3 id="admin-stat-subs" class="text-xl font-bold text-purple-400 mt-1">0</h3>
+                </div>
+                <div class="zalo-glass-card rounded-xl p-4 text-center">
+                    <p class="text-[10px] text-white/50 uppercase font-medium">الشكاوى المفتوحة زبائن</p>
+                    <h3 id="admin-stat-support" class="text-xl font-bold text-red-400 mt-1">0</h3>
+                </div>
+            </div>
+
+            <!-- Double Columns Dashboard layout -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                
+                <!-- Stores Moderation and payments (2/3) -->
+                <div class="lg:col-span-2 space-y-6">
+                    
+                    <!-- Store Approval Table -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-base font-bold border-b border-white/10 pb-3 flex items-center justify-between font-bold">
+                            <span><i class="fa-solid fa-store-slash text-zalo-gold"></i> طلبات المتاجر قيد الانتظار أو المعالجة</span>
+                            <span class="text-xs text-white/55 font-normal">يتطلب مراجعة المشرف لمنع السلبيات</span>
+                        </h3>
+                        <div class="overflow-x-auto font-bold">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-zalo-navyLight/70 text-white/60">
+                                    <tr>
+                                        <th class="p-3">اسم المتجر والوصف</th>
+                                        <th class="p-3">الموقع والمدينة</th>
+                                        <th class="p-3">التصنيف</th>
+                                        <th class="p-3">الحالة الحالية</th>
+                                        <th class="p-3 text-center">اتخاذ قرار</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-pending-stores-tbody" class="divide-y divide-white/5">
+                                    <!-- Dynamic rows from script -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Subscription Payments verification -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-base font-bold border-b border-white/10 pb-3 font-bold"><i class="fa-solid fa-gem text-purple-400"></i> معالجة طلبات دفع التراخيص والاشتراكات</h3>
+                        <div class="overflow-x-auto font-bold">
+                            <table class="w-full text-right text-xs font-bold">
+                                <thead class="bg-zalo-navyLight/70 text-white/60">
+                                    <tr>
+                                        <th class="p-3">التاجر / المتجر</th>
+                                        <th class="p-3">الباقة المحددة</th>
+                                        <th class="p-3">مبلغ التحويل</th>
+                                        <th class="p-3">مستند الدفع CCP</th>
+                                        <th class="p-3 text-center">الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-pending-subs-tbody" class="divide-y divide-white/5">
+                                    <!-- List of pending upgrades -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Merchant Document verification desk -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-base font-bold border-b border-white/10 pb-3 flex items-center justify-between font-bold">
+                            <span><i class="fa-solid fa-id-card text-zalo-emeraldLight"></i> طلبات توثيق السجلات والملفات الرسمية للتجار</span>
+                            <span class="text-xs text-white/55 font-normal font-normal">مطابقة الهويات لمنع الاختلال والتحايل</span>
+                        </h3>
+                        <div class="overflow-x-auto font-bold">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-zalo-navyLight/70 text-white/60">
+                                    <tr>
+                                        <th class="p-3">اسم التاجر والولاية</th>
+                                        <th class="p-3">رقم السجل التجاري</th>
+                                        <th class="p-3">رقم التعريف الوطني NIN</th>
+                                        <th class="p-3">مستندات الهوية والسجل</th>
+                                        <th class="p-3 text-center">الإجراء</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-pending-verifications-tbody" class="divide-y divide-white/5">
+                                    <!-- Pending merchant verification rows loaded -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                    <!-- Complaints Response Helpdesk -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-base font-bold border-b border-white/10 pb-3 font-bold"><i class="fa-solid fa-headset text-red-400"></i> مكتب معالجة شكاوى وحماية المستهلك</h3>
+                        <div class="overflow-x-auto font-bold">
+                            <table class="w-full text-right text-xs">
+                                <thead class="bg-zalo-navyLight/70 text-white/60">
+                                    <tr>
+                                        <th class="p-3">رقم الطلب / المشتكي</th>
+                                        <th class="p-3">رسالة وتفاصيل الشكوى والنزاع</th>
+                                        <th class="p-3">الحالة</th>
+                                        <th class="p-3 text-center">إغلاق وحل</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-complaints-tbody" class="divide-y divide-white/5">
+                                    <!-- Complaints database row -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Admin Audit Logs Stream and Platform configurations (1/3) -->
+                <div class="space-y-6">
+                    
+                    <!-- Audit Logs Panel -->
+                    <div class="zalo-glass-card rounded-2xl p-4 flex flex-col h-[380px]">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 border-b border-white/10 pb-2 mb-3 font-bold"><i class="fa-solid fa-terminal text-zalo-emeraldLight"></i> سجل التدقيق ومراقبة العمليات</h3>
+                        <div id="admin-audit-logs" class="flex-1 overflow-y-auto space-y-2.5 font-mono text-[10px] text-white/70 pr-1">
+                            <!-- Stream of log entries -->
+                        </div>
+                    </div>
+
+                    <!-- Config / Reset App simulator data -->
+                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
+                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 font-bold"><i class="fa-solid fa-sliders"></i> تهيئة وإعادة تعيين النظام</h3>
+                        <p class="text-xs text-white/60 leading-relaxed font-normal">تستعمل هذه الخيارات لتنظيف قاعدة البيانات وتجربة تدفق البيانات من البداية وبسرعة وموثوقية.</p>
+                        <button onclick="clearAndSeedAppDatabase()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 rounded-xl text-xs transition">
+                            <i class="fa-solid fa-rotate-left"></i> مسح البيانات والبدء كـ Seed جديد 
+                        </button>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ======================= 4. CHAT WITH AI COMPANION ======================= -->
+        <section id="screen-ai-chat" class="hidden max-w-3xl mx-auto">
+            <div class="zalo-glass-card rounded-2xl overflow-hidden flex flex-col h-[520px] shadow-2xl relative border border-white/10">
+                <!-- Chat top info -->
+                <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-zalo-emerald text-white flex items-center justify-center text-lg animate-pulse">
+                            <i class="fa-solid fa-robot font-bold"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-sm font-bold text-white">مساعد ZaLo الذكي (Gemini Web Companion)</h3>
+                            <p class="text-[10px] text-zalo-emeraldLight">متوفر للإجابة والتحليلات والترجمات مجاناً</p>
+                        </div>
+                    </div>
+                    <button onclick="clearChatHistory()" class="text-xs font-medium text-white/40 hover:text-white transition"><i class="fa-solid fa-trash-can"></i> مسح المحادثة</button>
+                </div>
+
+                <!-- Messages area -->
+                <div id="ai-chat-messages-container" class="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-xs">
+                    <!-- Loaded via js -->
+                </div>
+
+                <!-- Chat entry input -->
+                <div class="p-4 bg-zalo-navy/95 border-t border-white/10 shrink-0 flex gap-3">
+                    <input type="text" id="ai-chat-input-text" onkeydown="if(event.key === 'Enter') sendUserMessageToAssistant()" placeholder="مثال: اقترح علي وصفة تسويقية لبيع الهواتف، أو كيف أشتري من متجر النور..." class="flex-1 bg-zalo-navyLight border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-white/40 focus:outline-none focus:border-zalo-emerald font-bold">
+                    <button onclick="sendUserMessageToAssistant()" class="bg-zalo-emerald hover:bg-zalo-emeraldDark text-white w-12 h-12 rounded-xl flex items-center justify-center transition">
+                        <i class="fa-regular fa-paper-plane text-base"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer of conversion workspace -->
+    <footer class="zalo-glass mt-auto border-t border-white/5 py-6">
+        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
+            <div>
+                <p class="text-xs text-white/50">حقوق النشر &copy; 2026 سوق الجزائر الذكي ZaLo. تم بناؤه وتطويره بشكل مستقل ليعمل كـ HTML/CSS/JS متكامل.</p>
+                <p class="text-[10px] text-zalo-gold/60 mt-1">المنصة متوافقة تماماً مع أنظمة الويب، الجوال، وتطبيقات Android الكهروطبقية.</p>
+            </div>
+            <div class="flex items-center gap-2 font-bold">
+                <span class="text-xs text-zalo-emeraldLight font-semibold"><i class="fa-regular fa-circle-check text-xs font-bold"></i> 100% قابل للتحميل</span>
+                <span class="text-white/20 font-bold">|</span>
+                <button onclick="openDownloadModal()" class="text-xs font-bold text-zalo-gold hover:underline"><i class="fa-solid fa-download"></i> شرح تحميل الملفات ZIP</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ======================= POPUP MODALS ======================= -->
+
+    <!-- Shopping Cart Slide-out Drawer -->
+    <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity hidden" onclick="toggleCartDrawer()">
+        <!-- Slide element -->
+        <div class="absolute inset-y-0 left-0 max-w-md w-full bg-zalo-navyLight shadow-2xl p-5 flex flex-col border-r border-white/10 animate-fade-in" onclick="event.stopPropagation()">
+            <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
+                <h3 class="text-base font-extrabold flex items-center gap-2 text-white">
+                    <i class="fa-solid fa-cart-shopping text-zalo-emeraldLight"></i>
+                    سلة مشترياتك الحالية
+                </h3>
+                <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-full hover:bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition">
+                    <i class="fa-solid fa-xmark text-lg font-bold"></i>
+                </button>
+            </div>
+
+            <!-- Scrollable list of cart items -->
+            <div id="cart-items-container" class="flex-1 overflow-y-auto space-y-3 mb-4 font-bold">
+                <!-- Cart list inside JS -->
+            </div>
+
+            <!-- Totals & Checkout block -->
+            <div id="cart-totals-checkout-block" class="bg-zalo-navy/90 border border-white/15 rounded-2xl p-4 shrink-0 space-y-3">
+                <div class="space-y-1 text-xs">
+                    <div class="flex justify-between">
+                        <span class="text-white/50">مجموع السلع:</span>
+                        <span id="cart-subtotal" class="font-bold text-white">0 DZD</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-white/50">رسوم التوصيل:</span>
+                        <span id="cart-delivery-fee" class="font-bold text-white font-bold">400 DZD</span>
+                    </div>
+                    <div class="flex justify-between text-sm border-t border-white/10 pt-2 font-black text-zalo-gold mt-1">
+                        <span>المبلغ الإجمالي المستحق:</span>
+                        <span id="cart-grandtotal">0 DZD</span>
+                    </div>
+                </div>
+
+                <button onclick="openCheckoutModal()" class="w-full bg-zalo-emerald hover:bg-zalo-emeraldDark text-white py-2.5 rounded-xl font-bold text-xs transition shadow-lg font-bold">
+                    <i class="fa-solid fa-circle-check"></i> الانتقال لإتمام الطلب الآن
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Form Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleCheckoutModal()">
+        <div class="bg-zalo-navyLight max-w-lg w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2 font-bold"><i class="fa-solid fa-wallet text-zalo-gold"></i> معلومات الدفع والطلب</h3>
+                <button onclick="toggleCheckoutModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg font-bold"></i></button>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">اسم المستلم الذكي (الاسم الثلاثي):</label>
+                    <input type="text" id="chk-name" value="عبد الهادي نجم الدين" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">عنوان التسليم والشارع والمنزل بالتفصيل:</label>
+                    <input type="text" id="chk-address" placeholder="الشارع الرئيسي، حي المستقبل، مبنى 12، الطابق 2" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] text-white/70 font-semibold mb-1">الولاية:</label>
+                        <select id="chk-wilaya" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                            <option value="الجزائر">الجزائر (Algiers)</option>
+                            <option value="وهران">وهران (Oran)</option>
+                            <option value="قسنطينة">قسنطينة (Constantine)</option>
+                            <option value="سطيف">سطيف (Setif)</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-white/70 font-semibold mb-1">البلدية والمقاطعة الجارية:</label>
+                        <input type="text" id="chk-commune" value="المرسى" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">أسلوب وخيار الدفع:</label>
+                    <select id="chk-payment-method" onchange="updateCheckoutPaymentDetails()" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                        <option value="COD">الدفع عند الاستلام (Cash on Delivery)</option>
+                        <option value="BARIDIMOB">الدفع السريع (BaridiMob RIP)</option>
+                        <option value="CCP">التحويل البريدي التقليدي (CCP Card)</option>
+                    </select>
+                </div>
+
+                <!-- Payment provider accounts/QR placeholder -->
+                <div id="payment-details-info" class="bg-zalo-navy/80 border border-zalo-gold/20 rounded-xl p-3 flex items-start gap-3 text-[11px] leading-relaxed font-medium">
+                    <i class="fa-solid fa-money-bill-wave text-zalo-gold text-sm shrink-0 mt-0.5 font-bold"></i>
+                    <div>
+                        <span class="font-bold text-white block">الدفع عند الاستلام نقداً (COD)</span>
+                        أكد طلبك الآن وادفع القيمة الإجمالية عند وصول السلعة لباب منزلك مع عامل التوصيل في ولايتك.
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end gap-2 shrink-0">
+                <button onclick="toggleCheckoutModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl text-xs transition">إلغاء</button>
+                <button onclick="submitCheckoutOrder()" class="px-5 py-2 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white font-bold rounded-xl text-xs transition shadow-lg font-bold">تأكيد عملية الشراء 🚀</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Product Modal (Merchant only) -->
+    <div id="add-product-modal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleAddProductModal()">
+        <div class="bg-zalo-navyLight max-w-md w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2 font-bold"><i class="fa-solid fa-box-open text-zalo-emeraldLight"></i> إضافة سلعة جديدة للمتجر المعماري</h3>
+                <button onclick="toggleAddProductModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg font-bold"></i></button>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">اسم المنتج أو السلعة المعروضة:</label>
+                    <input type="text" id="prod-name" placeholder="مثال: سماعات بلوتوث مبرمجة سبيشال" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                </div>
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">وصف المنتج ومكوناته بالتفاصيل:</label>
+                    <textarea id="prod-desc" rows="3" placeholder="مواصفات تضمن للزبون الجودة وسرعة الرد والمسؤولية..." class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white resize-none font-bold"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-3 font-bold">
+                    <div>
+                        <label class="block text-[11px] text-white/70 font-semibold mb-1">سعر البيع (DZD):</label>
+                        <input type="number" id="prod-price" value="3500" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-white/70 font-semibold mb-1">الكمية المتوفرة (المخزون):</label>
+                        <input type="number" id="prod-stock" value="10" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">تصنيف المنتج الرئيسي:</label>
+                    <select id="prod-cat" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                        <option value="ELECTRONICS">أجهزة إلكترونية</option>
+                        <option value="FASHION">ملابس وأزياء</option>
+                        <option value="FOOD">خضار وأغذية</option>
+                        <option value="COSMETICS">مستحضرات تجميل</option>
+                        <option value="HOME">أدوات منزلية</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">رابط صورة عشوائية (افتراضي):</label>
+                    <input type="text" id="prod-img" value="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white/70 font-bold">
+                </div>
+            </div>
+
+            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end gap-2 shrink-0">
+                <button onclick="toggleAddProductModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl text-xs transition">إلغاء</button>
+                <button onclick="submitMerchantProduct()" class="px-5 py-2 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white font-bold rounded-xl text-xs transition shadow-lg">إضافة المنتج للجمهور 📦</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raise Complaint / Dispute Modal -->
+    <div id="complaint-modal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleComplaintModal()">
+        <div class="bg-zalo-navyLight max-w-md w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 border-b border-white/10 flex items-center justify-between">
+                <h3 class="text-sm font-bold text-white flex items-center gap-2 font-bold"><i class="fa-solid fa-circle-exclamation text-red-400"></i> رفع شكوى أو نزاع تجاري رسمي</h3>
+                <button onclick="toggleComplaintModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg font-bold"></i></button>
+            </div>
+
+            <div class="p-5 space-y-4 text-xs font-bold">
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">حدد الطلب المعني بالمشكلة:</label>
+                    <select id="comp-order-id" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white font-bold">
+                        <!-- Dynamic options based on customer orders -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[11px] text-white/70 font-semibold mb-1">اكتب في بضعة أسطر المشكلة ووسيلة الاتصال المناسبة لك:</label>
+                    <textarea id="comp-message" rows="4" placeholder="مثال: لم أستلم طلبي حتى الآن أو المنتج لا يطابق المواصفات المتفق عليها..." class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white resize-none font-bold"></textarea>
+                </div>
+            </div>
+
+            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end gap-2 shrink-0">
+                <button onclick="toggleComplaintModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl text-xs transition font-bold">إلغاء</button>
+                <button onclick="submitUserComplaint()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-xs transition shadow-lg font-bold">تقديم الشكوى للإدارة 🛡️</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Download & Export Helper modal -->
+    <div id="download-helper-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleDownloadModal()">
+        <div class="bg-zalo-navyLight max-w-xl w-full rounded-3xl border border-white/15 overflow-hidden shadow-2xl relative" onclick="event.stopPropagation()">
+            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-6 py-5 border-b border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-zalo-gold/10 text-zalo-gold flex items-center justify-center">
+                        <i class="fa-solid fa-cloud-arrow-down"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-sm font-extrabold text-white">تحميل ملفات المشروع (HTML/CSS)</h3>
+                        <p class="text-[10px] text-white/50">كيفية نقل وتحميل هذا المشروع ليعمل مستقلاً على جهازك</p>
+                    </div>
+                </div>
+                <button onclick="toggleDownloadModal()" class="text-white/60 hover:text-white transition font-bold"><i class="fa-solid fa-xmark text-lg font-bold"></i></button>
+            </div>
+
+            <div class="p-6 space-y-4 text-xs leading-relaxed font-bold">
+                <p class="text-white/80">
+                    تم تحويل مشروع <strong>ZaLo Smart Marketplace</strong> بالكامل من بيئة Android الثقيلة إلى تطبيق ويب مستقل فائق السرعة يعمل باستخدام <strong>HTML5, CSS (Tailwind) و JavaScript</strong> بدون الحاجة لإنترنت خارجي ومحلي كلياً!
+                </p>
+                
+                <h4 class="font-bold text-zalo-gold flex items-center gap-2 text-xs uppercase tracking-wide border-b border-white/5 pb-1 font-bold"><i class="fa-solid fa-download"></i> خطوات تحميل الملفات فوراً:</h4>
+                <ol class="list-decimal list-inside space-y-2 text-white/70">
+                    <li>اضغط على القائمة الجانبية أو <strong>رمز الترس / الإعدادات في AI Studio</strong> بالمتصفح على يسار الشاشة.</li>
+                    <li>اختر <strong>Export Project as ZIP</strong> (تصدير المشروع كملف مضغوط ZIP).</li>
+                    <li>بعد تحميل الملف المضغوط وفك الضغط عنه على حاسوبك، ستجد ملفات الويب مباشرة في مجلد:
+                        <code class="block bg-zalo-navy px-3 py-1.5 rounded-lg border border-white/10 text-zalo-gold text-[11px] font-mono mt-1 text-center font-bold">/web/</code>
+                    </li>
+                    <li>افتح ملف <code class="text-zalo-emeraldLight font-bold">index.html</code> مباشرة بنقرة مزدوجة في أي متصفح (كروم، فايرفوكس، إيدج) واستمتع بالمحاكاة الكاملة والتصميم!</li>
+                </ol>
+
+                <div class="bg-zalo-emerald/10 border border-zalo-emerald/30 p-4 rounded-2xl flex items-start gap-3">
+                    <i class="fa-solid fa-circle-info text-zalo-emeraldLight text-sm shrink-0 mt-0.5"></i>
+                    <p class="text-[11px] text-white/80 font-normal">
+                        <strong>ملاحظة هامة:</strong> لقد قمنا بدمج وبناء هذه الملفات مباشرة داخل تطبيق Android أيضاً، لكي تتمكن من تصفح ومحاكاة واجهات الويب مباشرة داخل <strong>الترس الرقمي / محاكي Android</strong> في المتصفح بكل سلاسة وتوافقية دون أي أعطال برمجية!
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end shrink-0">
+                <button onclick="toggleDownloadModal()" class="px-6 py-2.5 bg-zalo-gold hover:bg-zalo-goldDark text-zalo-navy hover:text-white font-bold rounded-xl text-xs transition shadow-lg">فهمت، شكراً جزيلاً!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript code controller is loaded underneath -->
+    <script src="app.js"></script>
+</body>
+</html>
