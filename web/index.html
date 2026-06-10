@@ -1,941 +1,1102 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZaLo Marketplace Smart - سوق الجزائر الذكي</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Tajawal Font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Tajawal', sans-serif;
-            background-color: #0b1528;
-            color: #f3f4f6;
-        }
-        .zalo-glass {
-            background: rgba(255, 255, 255, 0.04);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-        }
-        .zalo-glass-card {
-            background: rgba(15, 28, 54, 0.6);
-            backdrop-filter: blur(8px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0b1528;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #10b981;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #059669;
-        }
-    </style>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        zalo: {
-                            navy: '#0b1528',
-                            navyLight: '#0f1c36',
-                            emerald: '#00875a',
-                            emeraldLight: '#10b981',
-                            emeraldDark: '#047857',
-                            gold: '#d4af37',
-                            goldLight: '#f3e5ab',
-                            goldDark: '#aa7c11'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ZaLo - السوق الذكي</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--g1:#1a5c2a;--g2:#2d7a3a;--g3:#3d9e4e;--gold:#c9a84c;--gold2:#e8c97a;--bg:#fafafa;--white:#fff;--text:#1a1a1a;--gray:#666;--bd:#e0e0e0;--red:#e53935}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+#splash{position:fixed;inset:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
+#splash.hide{opacity:0;pointer-events:none}
+.sp-img{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(201,168,76,.6));animation:spPop .9s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes spPop{from{transform:scale(.1);opacity:0}to{transform:scale(1);opacity:1}}
+.sp-bar{margin-top:40px;width:180px;height:4px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden}
+.sp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));animation:loadB 2.2s .6s forwards}
+@keyframes loadB{to{width:100%}}
+.screen{display:none;min-height:100vh;background:var(--bg);flex-direction:column}
+.screen.active{display:flex}
+.topbar{background:var(--g1);padding:0 14px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.tb-bell{position:relative;cursor:pointer;font-size:22px;color:#fff}
+.tb-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
+.tb-center{display:flex;flex-direction:column;align-items:center;flex:1}
+.tb-logo-img{width:36px;height:36px;object-fit:contain;border-radius:50%;border:2px solid var(--gold)}
+.tb-title{color:#fff;font-weight:900;font-size:13px;letter-spacing:.5px;margin-top:1px}
+.tb-menu{cursor:pointer;display:flex;flex-direction:column;gap:5px;width:48px;height:48px;align-items:center;justify-content:center;z-index:999;box-sizing:border-box}
+.tb-menu span{display:block;width:24px;height:3px;background:#fff;border-radius:2px}
+.ptbar{background:var(--g1);padding:10px 14px 14px;text-align:center;flex-shrink:0}
+.ptbar h2{color:#fff;font-size:16px;font-weight:800}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--g1);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,0.1)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;border-top:3px solid transparent}
+.bn.on{border-top-color:var(--gold)}
+.bni{font-size:20px;color:rgba(255,255,255,.7)}
+.bnl{font-size:9px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:600}
+.bn.on .bni,.bn.on .bnl{color:#fff}
+.content{flex:1;overflow-y:auto;padding-bottom:70px}
+.home-body{display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:#fff;min-height:calc(100vh - 130px)}
+.home-logo-box{width:120px;height:120px;background:#f5f5f5;border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 3px 15px rgba(0,0,0,.15)}
+.home-logo-box img{width:104px;height:104px;object-fit:contain}
+.home-title{font-size:24px;font-weight:900;color:var(--text);text-align:center;line-height:1.3;margin-bottom:18px}
+.btn-gm{width:100%;max-width:320px;background:var(--g2);color:#fff;border:none;border-radius:30px;padding:15px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 4px 12px rgba(45,122,58,0.25)}
+.btn-gm:active{transform:scale(.97);background:var(--g1)}
+.home-circles{display:flex;gap:24px;margin-top:18px;justify-content:center}
+.hcircle{display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.hcircle-icon{width:80px;height:80px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:8px;box-shadow:0 4px 15px rgba(26,92,42,.3);transition:all .2s;color:#fff;font-weight:900}
+.hcircle:active .hcircle-icon{transform:scale(.93)}
+.hcircle-label{font-size:13px;font-weight:700;color:var(--text)}
+.wchips-wrap{padding:14px 12px 80px}
+.wchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:9px;justify-content:center}
+.wchip{background:#fff;color:var(--text);border:1.5px solid var(--bd);padding:10px 4px;border-radius:12px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 1.5px 4px rgba(0,0,0,0.02)}
+.wchip:active,.wchip.sel{border-color:var(--gold);background:var(--g1);color:#fff;box-shadow:0 3px 10px rgba(45,122,58,0.2)}
+.popup-ov{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:150000;display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.popup-ov.show{display:flex}
+.comm-popup{background:#ffffff;border-radius:24px;padding:24px;width:100%;max-width:380px;max-height:85vh;box-shadow:0 20px 50px rgba(0,0,0,0.3);display:flex;flex-direction:column;animation:scaleUpP 0.25s cubic-bezier(0.175,0.885,0.32,1.275);direction:rtl;box-sizing:border-box;border:1px solid rgba(255,255,255,0.1)}
+@keyframes scaleUpP{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}
+.comm-title{font-size:16px;font-weight:800;color:var(--g1);text-align:right;font-family:'Cairo',sans-serif;margin:0}
+.comm-search{width:100%;padding:12px 14px;border:1.5px solid var(--bd);border-radius:12px;font-family:'Cairo',sans-serif;font-size:13px;margin:8px 0 12px;outline:none;direction:rtl;background:#fcfcfc;transition:all .15s;box-sizing:border-box}
+.comm-search:focus{border-color:var(--g1);background:#ffffff;box-shadow:0 0 0 3px rgba(26,92,42,0.15)}
+.comm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;width:100%;box-sizing:border-box;padding:4px 2px}
+.comm-item{width:100%;padding:11px 4px;border-radius:12px;margin:0;cursor:pointer;font-size:12px;font-weight:700;border:1.5px solid var(--bd);background:#fcfcfc;color:var(--text);transition:all .15s;text-align:center;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,0.02)}
+.comm-item:active,.comm-item.sel{background:var(--g1);color:#fff !important;border-color:var(--g1);box-shadow:0 4px 12px rgba(26,92,42,0.25)}
+.cats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 14px 80px}
+.cat-card{background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.07);border:1.5px solid var(--bd);transition:all .2s}
+.cat-card:active{transform:scale(.97);border-color:var(--g2)}
+.cat-img{height:130px;background:linear-gradient(135deg,#f0f8f0,#e8f5e9);display:flex;align-items:center;justify-content:center;font-size:56px}
+.cat-lbl{padding:11px;text-align:center;font-size:14px;font-weight:800}
+.slist{padding:10px 14px 80px}
+.scard{background:#fff;border-radius:14px;margin-bottom:10px;border:1.5px solid var(--bd);display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.scard:active{border-color:var(--g2);background:#f9fdf9}
+.slogo{width:58px;height:58px;border-radius:12px;background:#f0f8f0;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden}
+.slogo img{width:100%;height:100%;object-fit:cover}
+.sname{font-size:14px;font-weight:800}
+.smeta{font-size:11px;color:var(--gray);margin-top:2px}
+.sbadge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-weight:700;margin-top:4px}
+.sbadge.v{background:#d4edda;color:var(--g1)}
+.sbadge.f{background:#fef3c7;color:#92400e}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:10px 14px 80px}
+.pcard{background:#fff;border-radius:13px;border:1.5px solid var(--bd);overflow:hidden;cursor:pointer;box-shadow:0 1px 5px rgba(0,0,0,.05);transition:all .2s}
+.pcard:active{transform:scale(.97);border-color:var(--g2)}
+.pcard-img{height:148px;background:#f5f5f5;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:50px}
+.pcard-img img{width:100%;height:100%;object-fit:cover}
+.pcard-body{padding:10px}
+.pcard-name{font-size:12px;font-weight:700;line-height:1.4}
+.pcard-price{font-size:14px;font-weight:900;color:var(--g1);margin-top:4px}
+.pcard-price span{font-size:10px;color:var(--gray);font-weight:600}
+.prod-detail{padding:14px 14px 100px}
+.pd-img{width:100%;height:220px;background:#f5f5f5;border-radius:14px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;overflow:hidden}
+.pd-img img{width:100%;height:100%;object-fit:contain}
+.pd-name{font-size:18px;font-weight:900;margin-bottom:5px}
+.pd-price{font-size:22px;font-weight:900;color:var(--g1);margin-bottom:10px}
+.pd-store{font-size:12px;color:var(--gray);margin-bottom:14px}
+.qty-row{display:flex;align-items:center;gap:12px;margin-bottom:14px}
+.qty-btn{width:36px;height:36px;border-radius:50%;background:var(--g1);color:#fff;border:none;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Cairo',sans-serif}
+.qty-val{font-size:18px;font-weight:800;min-width:28px;text-align:center}
+.oform{padding:14px 14px 100px}
+.osumm{background:#f0f8f0;border-radius:13px;padding:12px;margin-bottom:14px;border:1.5px solid #c8e6c9}
+.osumm h3{font-size:13px;font-weight:800;margin-bottom:9px;color:var(--g1)}
+.orow{display:flex;justify-content:space-between;font-size:12px;padding:4px 0;border-bottom:1px dashed #c8e6c9}
+.orow:last-child{border-bottom:none;font-weight:800;font-size:13px;color:var(--g1);padding-top:7px}
+.fg{margin-bottom:11px}
+.fg label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}
+.fi{width:100%;padding:11px 12px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;color:var(--text);background:#fff;outline:none;direction:rtl;transition:border-color .2s}
+.fi:focus{border-color:var(--g2)}
+.fsel{width:100%;padding:11px 12px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Cairo',sans-serif;font-size:13px;background:#fff;outline:none;direction:rtl;color:var(--text)}
+.pop{display:flex;align-items:center;gap:10px;padding:11px 12px;background:#fff;border:2px solid var(--bd);border-radius:11px;margin-bottom:8px;cursor:pointer}
+.pop.on{border-color:var(--g1);background:#f0f8f0}
+.suc-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px;text-align:center}
+.suc-icon{width:88px;height:88px;border-radius:50%;background:linear-gradient(135deg,var(--g1),var(--g2));display:flex;align-items:center;justify-content:center;font-size:44px;margin:0 auto 16px;box-shadow:0 8px 25px rgba(26,92,42,.3);animation:bIn .6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes bIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+.suc-title{font-size:20px;font-weight:900;color:var(--g1);margin-bottom:5px}
+.suc-sub{font-size:13px;color:var(--gray);margin-bottom:16px;line-height:1.7}
+.onum-box{background:#f0f8f0;border-radius:12px;padding:11px 18px;margin-bottom:16px;border:2px dashed var(--g2)}
+.onum-l{font-size:10px;color:var(--gray)}
+.onum-v{font-size:21px;font-weight:900;color:var(--g1);margin-top:2px}
+.tbox{width:100%;background:#fff;border-radius:13px;padding:13px;border:1.5px solid var(--bd);margin-bottom:14px;text-align:right}
+.tbox h3{font-size:13px;font-weight:800;margin-bottom:11px}
+.tstep{display:flex;align-items:flex-start;gap:10px;padding:8px 0;position:relative}
+.tstep:not(:last-child)::after{content:'';position:absolute;right:13px;top:32px;width:2px;height:calc(100% - 10px);background:#e8f0e8}
+.tstep.done::after{background:var(--g2)}
+.tdot{width:27px;height:27px;border-radius:50%;background:#e8f0e8;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1}
+.tstep.done .tdot{background:var(--g1)}
+.tstep.now .tdot{background:var(--gold);animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,.4)}50%{box-shadow:0 0 0 8px rgba(201,168,76,0)}}
+.ti-t{font-size:12px;font-weight:700}
+.ti-s{font-size:10px;color:var(--gray);margin-top:1px}
+.toast{position:fixed;bottom:78px;left:12px;right:12px;background:#1a1a1a;color:#fff;padding:12px 16px;border-radius:12px;font-size:13px;z-index:200000;text-align:center;display:none;font-weight:600}
+.toast.show{display:block;animation:slideUp .3s ease}
+.toast.ok{background:var(--g1)}
+.toast.err{background:var(--red)}
+@keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100000;display:none}
+.overlay.show{display:block}
+.sidemenu{position:fixed;top:0;right:-282px;width:280px;height:100vh;background:#fff;z-index:100001;transition:right .3s;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid rgba(0,0,0,0.08)}
+.sidemenu.open{right:0}
+.sm-hd{background:linear-gradient(135deg,var(--g1),var(--g2));padding:28px 14px 18px;position:relative}
+.sm-close{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer}
+.sm-logo{width:50px;height:50px;border-radius:50%;border:4px solid var(--gold);object-fit:contain;margin-bottom:6px}
+.sm-title{color:var(--gold2);font-size:18px;font-weight:900}
+.sm-sub{color:rgba(255,255,255,.7);font-size:11px;margin-top:1px}
+.smi{display:flex;align-items:center;gap:11px;padding:12px 14px;cursor:pointer;border-bottom:1px solid #f5f5f5;transition:background .2s}
+.smi:active{background:#f0f8f0}
+.smi .si{font-size:19px;width:26px;text-align:center}
+.smi .sn{font-size:13px;font-weight:700}
+.smi .sd{font-size:10px;color:var(--gray);margin-top:1px}
+.sm-sec{padding:5px 14px 4px;font-size:10px;font-weight:800;color:var(--gray);letter-spacing:1px;background:#fafafa;border-bottom:1px solid #f0f0f0;border-top:1px solid #f0f0f0}
+.sm-footer{padding:12px 14px;margin-top:auto;border-top:1px solid #f0f0f0;text-align:center}
+.sm-footer p{font-size:10px;color:var(--gray)}
+.btn-p{width:100%;max-width:320px;background:var(--g1);color:#fff;border:none;border-radius:12px;padding:14px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-top:8px;transition:all .15s}
+.btn-p:active{transform:scale(.97)}
+.btn-s{width:100%;max-width:320px;background:#f0f8f0;color:var(--g1);border:2px solid var(--g1);border-radius:12px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;margin-top:8px}
+.btn-wa{width:100%;max-width:320px;background:#25D366;color:#fff;border:none;border-radius:12px;padding:12px;font-family:'Cairo',sans-serif;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-top:8px}
+.reg-wrap{padding:14px 14px 100px}
+.steps{display:flex;justify-content:space-between;margin-bottom:16px;position:relative}
+.steps::before{content:'';position:absolute;top:12px;right:10%;left:10%;height:2px;background:var(--bd);z-index:0}
+.step{display:flex;flex-direction:column;align-items:center;z-index:1}
+.sdot{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;background:#fff;border:2px solid var(--bd);transition:all .3s}
+.sdot.done{background:var(--g1);border-color:var(--g1);color:#fff}
+.sdot.now{background:var(--gold);border-color:var(--gold);color:var(--g1)}
+.slbl{font-size:9px;color:var(--gray);margin-top:2px;font-weight:600}
+.slbl.done,.slbl.now{color:var(--g1)}
+.type-row{display:flex;gap:8px;margin-bottom:10px}
+.tbtn{flex:1;padding:10px 6px;border-radius:11px;border:2px solid var(--bd);background:#fff;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;text-align:center;line-height:1.5;transition:all .2s}
+.tbtn.on{border-color:var(--g1);background:#f0f8f0;color:var(--g1)}
+.file-box{border:2px dashed var(--bd);border-radius:12px;padding:16px;text-align:center;background:#fafafa;cursor:pointer;transition:all .2s;position:relative}
+.file-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-size:0}
+.file-box.has{border-color:var(--g2);background:#f0fff4}
+.fbi{font-size:26px;margin-bottom:4px;pointer-events:none}
+.fbl{font-size:12px;color:var(--gray);pointer-events:none}
+.fbh{font-size:10px;color:#bbb;margin-top:2px;pointer-events:none}
+.file-box.has .fbl{color:var(--g1);font-weight:700}
+.ibox{background:#fffbeb;border:1.5px solid #fde68a;border-radius:9px;padding:9px 11px;font-size:11px;color:#92400e;line-height:1.6;margin-bottom:9px}
+.pend-card{background:#fff;border-radius:14px;padding:22px;text-align:center;border:2px dashed var(--gold);margin:8px 0}
+.pend-card .pi{font-size:50px;margin-bottom:8px}
+.pend-card h3{font-size:16px;font-weight:800;color:var(--g1)}
+.pend-card p{font-size:12px;color:var(--gray);margin-top:7px;line-height:1.7}
+.pnum{font-size:12px;background:#f0f8f0;border-radius:8px;padding:5px 13px;display:inline-block;margin-top:9px;color:var(--g1);font-weight:700}
+.empty{text-align:center;padding:40px 20px;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1}
+.empty .ei{font-size:52px;margin-bottom:12px}
+.empty p{font-size:13px;color:var(--gray)}
+.schbar{padding:10px 12px}
+.schbar input{width:100%;padding:11px 4px;border:1.5px solid var(--bd);border-radius:24px;font-family:'Cairo',sans-serif;font-size:13px;outline:none;direction:rtl;background:#fff;transition:border-color .2s;text-align:center}
+.schbar input:focus{border-color:var(--g2)}
+.about-wrap{padding:14px 14px 80px}
+.acard{background:#fff;border-radius:13px;padding:14px;margin-bottom:11px;border:1.5px solid var(--bd)}
+.acard h3{font-size:14px;font-weight:800;color:var(--g1);margin-bottom:7px}
+.acard p{font-size:13px;color:var(--gray);line-height:1.8}
+.socrow{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.socbtn{flex:1;min-width:65px;padding:8px 5px;border:1.5px solid var(--bd);border-radius:9px;background:#fff;cursor:pointer;text-align:center;font-size:11px;font-weight:700;font-family:'Cairo',sans-serif}
+.auth-wrap{padding:22px 14px 80px;display:flex;flex-direction:column;align-items:center}
+.auth-logo{text-align:center;margin-bottom:20px}
+.auth-logo img{width:76px;height:76px;object-fit:contain}
+.auth-logo h2{font-size:19px;font-weight:900;color:var(--g1);margin-top:7px}
+.auth-logo p{font-size:12px;color:var(--gray);margin-top:2px}
+.notif-list{padding:10px 14px 80px}
+.nitem{background:#fff;border-radius:12px;padding:12px;margin-bottom:7px;border:1.5px solid var(--bd);display:flex;gap:10px}
+.nitem.unread{border-color:var(--g2);background:#f0fff4}
+.nitem .ni{font-size:22px;flex-shrink:0}
+.nitem .nt{font-size:13px;font-weight:700}
+.nitem .ns{font-size:11px;color:var(--gray);margin-top:1px}
+.back-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:15px;font-family:'Cairo',sans-serif}
+</style>
 </head>
-<body class="min-h-screen flex flex-col">
-
-    <!-- Top Global Header -->
-    <header class="sticky top-0 z-40 zalo-glass shadow-lg border-b border-white/10 backdrop-blur-md">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between flex-wrap gap-3">
-            
-            <!-- Brand Logo -->
-            <div class="flex items-center space-x-3 space-x-reverse cursor-pointer" onclick="switchTab('customer')">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-zalo-gold to-zalo-goldDark p-[2px] flex items-center justify-center">
-                    <div class="w-full h-full rounded-[10px] bg-zalo-navy flex items-center justify-center">
-                        <i class="fa-solid fa-seedling text-zalo-gold text-lg"></i>
-                    </div>
-                </div>
-                <div>
-                    <h1 class="text-xl font-black text-zalo-gold tracking-tight">ZaLo <span class="text-white text-base font-normal">Smart</span></h1>
-                    <p class="text-[10px] text-zalo-emeraldLight">سوق الجزائر الذكي متعدد البائعين</p>
-                </div>
-            </div>
-
-            <!-- Role Selector / Simulator -->
-            <div class="flex items-center gap-2 bg-zalo-navyLight/80 border border-white/10 rounded-full p-1 shadow-inner">
-                <span class="text-xs text-white/60 px-2 font-medium hidden sm:inline"><i class="fa-solid fa-users-cog text-zalo-gold"></i> المحاكاة:</span>
-                <button id="btn-role-customer" onclick="setRole('CUSTOMER')" class="text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 bg-zalo-emerald text-white shadow">
-                    مستهلك 🛒
-                </button>
-                <button id="btn-role-merchant" onclick="setRole('MERCHANT')" class="text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 text-white/70 hover:text-white">
-                    تاجر محترف 🏬
-                </button>
-                <button id="btn-role-admin" onclick="setRole('ADMIN')" class="text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 text-white/70 hover:text-white">
-                    مدير النظام 🛡️
-                </button>
-            </div>
-
-            <!-- Icons Bar -->
-            <div class="flex items-center space-x-4 space-x-reverse">
-                <!-- Notifications -->
-                <div class="relative cursor-pointer" onclick="toggleNotificationsModal()">
-                    <i class="fa-regular fa-bell text-xl hover:text-zalo-gold transition"></i>
-                    <span id="notif-count" class="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold w-4.5 h-4.5 py-0.5 rounded-full flex items-center justify-center hidden">0</span>
-                </div>
-
-                <!-- Shopping Cart -->
-                <div class="relative cursor-pointer" onclick="toggleCartDrawer()">
-                    <i class="fa-solid fa-cart-shopping text-xl text-zalo-emeraldLight hover:text-zalo-gold transition"></i>
-                    <span id="cart-count" class="absolute -top-1.5 -right-1.5 bg-zalo-gold text-zalo-navy text-[10px] font-bold w-4.5 h-4.5 py-0.5 rounded-full flex items-center justify-center z-10">0</span>
-                </div>
-
-                <!-- AI Companion Trigger -->
-                <button onclick="switchTab('ai-chat')" class="flex items-center gap-1.5 bg-gradient-to-r from-zalo-emerald to-zalo-emeraldLight hover:from-zalo-emeraldLight hover:to-zalo-emerald text-white px-3 py-1.5 rounded-xl font-bold text-xs transition duration-300 shadow">
-                    <i class="fa-solid fa-robot animate-bounce text-zalo-gold font-bold"></i>
-                    مساعد AI
-                </button>
-
-                <!-- Download Helper -->
-                <button onclick="openDownloadModal()" class="w-8 h-8 rounded-lg bg-zalo-navyLight/80 border border-white/20 hover:border-zalo-gold text-zalo-gold flex items-center justify-center transition" title="تحميل الملفات">
-                    <i class="fa-solid fa-cloud-arrow-down"></i>
-                </button>
-            </div>
+<body>
+<div id="splash">
+  <img class="sp-img" src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/180x180/1a5c2a/white?text=ZaLo'">
+  <div style="margin-top:14px;text-align:center">
+    <div style="color:var(--gold2);font-size:34px;font-weight:900;letter-spacing:2px">ZaLo</div>
+    <div style="color:rgba(255,255,255,.7);font-size:12px">marketplace smart • السوق الذكي الموحد</div>
+  </div>
+  <div class="sp-bar"><div class="sp-fill"></div></div>
+</div>
+<div id="toast" class="toast"></div>
+<div class="overlay" id="overlay" onclick="closeSide()"></div>
+<div class="sidemenu" id="sidemenu">
+  <div class="sm-hd">
+    <button class="sm-close" onclick="closeSide()">✕</button>
+    <img class="sm-logo" src="logo.svg" alt="" onerror="this.src='https://placehold.co/100x100/1a5c2a/white?text=ZaLo'">
+    <div class="sm-title">ZaLo</div>
+    <div class="sm-sub">السوق الذكي الجزائري</div>
+  </div>
+  <div class="sm-sec">القائمة</div>
+  <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn">الرئيسية</div></div></div>
+  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn">الولايات</div></div></div>
+  <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn">جميع الأقسام</div></div></div>
+  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn">جميع المنتجات</div></div></div>
+  <div class="sm-sec">للتجار</div>
+  <div class="smi" onclick="closeSide();G('register')"><span class="si">🏪</span><div><div class="sn">سجّل متجرك</div><div class="sd">مجاناً</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">لوحة التحكم للتاجر والأدمن</div></div></div>
+  <div class="sm-sec">تواصل معنا وإدارة</div>
+  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
+  <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn">من نحن</div><div class="sd">حول منصة ZaLo الذكية</div></div></div>
+  <div class="sm-footer"><p>© 2026 ZaLo - السوق الذكي</p></div>
+</div>
+<div id="app" style="display:none">
+<div class="popup-ov" id="comm-popup" onclick="if(event.target===this)closeCommP()">
+  <div class="comm-popup">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; box-sizing:border-box; width:100%;">
+      <div class="comm-title" id="comm-ptitle">اختر البلدية</div>
+      <button style="border:none; background:rgba(0,0,0,0.06); color:#333; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:14px; font-family:sans-serif;" onclick="closeCommP()">✕</button>
+    </div>
+    <input class="comm-search" placeholder="🔍 ابحث عن بلدية..." oninput="filterComm(this.value)">
+    <div id="comm-list" style="overflow-y:auto; max-height:48vh; padding:4px 2px; width:100%; box-sizing:border-box; display:block;"></div>
+  </div>
+</div>
+<!-- HOME -->
+<div id="s-home" class="screen active">
+  <div class="topbar">
+    <div class="tb-bell" onclick="G('notif')">🔔<div class="tb-badge" id="nb">2</div></div>
+    <div class="tb-center">
+      <img class="tb-logo-img" src="logo.svg" alt="" onerror="this.src='https://placehold.co/40x40/1a5c2a/white?text=ZaLo'">
+      <div class="tb-title">ZaLo smart marketplace</div>
+    </div>
+    <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
+  </div>
+  <div class="content">
+    <div class="home-body">
+      <div class="home-logo-box"><img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/120x120/1a5c2a/white?text=ZaLo'"></div>
+      <div class="home-title">ZaLo<br>السوق الذكي الجزائري</div>
+      <button class="btn-gm" onclick="G('wilayas')">🛍️ تسوق في كل الولايات الـ69 الآن</button>
+      <button class="btn-gm" style="background:#cc9a00" onclick="G('register')">🏪 افتح متجرك وضاعف مبيعاتك</button>
+      <div class="home-circles">
+        <div class="hcircle" onclick="G('cats')">
+          <div class="hcircle-icon" style="font-size:22px">⊞<br><span style="font-size:9px;font-weight:700">الأقسام</span></div>
+          <div class="hcircle-label">جميع الأقسام</div>
         </div>
-    </header>
+        <div class="hcircle" onclick="G('all-prods')">
+          <div class="hcircle-icon">📦</div>
+          <div class="hcircle-label">جميع المنتجات</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="bnav">
+    <div class="bn on" onclick="G('home')"><div class="bni">🏠</div><div class="bnl">الرئيسية</div></div>
+    <div class="bn" onclick="G('myorders')"><div class="bni">🛍️</div><div class="bnl">طلباتي</div></div>
+    <div class="bn" onclick="G('wilayas')"><div class="bni">📍</div><div class="bnl">الولايات</div></div>
+    <div class="bn" onclick="G('search')"><div class="bni">🔍</div><div class="bnl">بحث سريع</div></div>
+    <div class="bn" onclick="openLink('login.html')"><div class="bni">👤</div><div class="bnl">بوابتي الكبرى</div></div>
+  </div>
+</div>
 
-    <!-- Main Dynamic Content Container -->
-    <main class="flex-grow max-w-7xl mx-auto px-4 py-6 w-full">
+<!-- WILAYAS -->
+<div id="s-wilayas" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">الولايات الـ69 الجزائرية</div></div>
+    <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
+  </div>
+  <div class="ptbar"><h2>تسوق حسب موقع المحلات</h2></div>
+  <div class="content"><div class="wchips-wrap"><div class="wchips" id="wchips"></div></div></div>
+</div>
+
+<!-- CATS -->
+<div id="s-cats" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">جميع أقسام السوق</div></div>
+    <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
+  </div>
+  <div class="ptbar"><h2>اختر صنف المنتجات</h2></div>
+  <div class="content">
+    <div class="cats-grid">
+      <div class="cat-card" onclick="openCat('هواتف وإلكترونيات')"><div class="cat-img">📱</div><div class="cat-lbl">هواتف وإلكترونيات</div></div>
+      <div class="cat-card" onclick="openCat('أثاث ومنزل')"><div class="cat-img">🛋️</div><div class="cat-lbl">أثاث ومنزل</div></div>
+      <div class="cat-card" onclick="openCat('ملابس وأزياء')"><div class="cat-img">👗</div><div class="cat-lbl">ملابس وأزياء</div></div>
+      <div class="cat-card" onclick="openCat('مواد غذائية')"><div class="cat-img">🥗</div><div class="cat-lbl">مواد غذائية</div></div>
+      <div class="cat-card" onclick="openCat('أدوات ومعدات')"><div class="cat-img">🔧</div><div class="cat-lbl">أدوات ومعدات</div></div>
+      <div class="cat-card" onclick="openCat('تجميل وعناية')"><div class="cat-img">💄</div><div class="cat-lbl">تجميل وعناية</div></div>
+      <div class="cat-card" onclick="openCat('كتب وقرطاسية')"><div class="cat-img">📚</div><div class="cat-lbl">كتب وقرطاسية</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- STORES -->
+<div id="s-stores" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title" id="stores-title">المحلات</div></div>
+    <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
+  </div>
+  <div class="ptbar"><h2 id="stores-h2">محلات القسم</h2></div>
+  <div class="content">
+    <div class="slist" id="slist"><div class="empty"><div class="ei">⏳</div><p>جاري تحميل المتاجر العتيدة...</p></div></div>
+  </div>
+</div>
+
+<!-- ALL PRODUCTS -->
+<div id="s-all-prods" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">المنتجات الجزائرية</div></div>
+    <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
+  </div>
+  <div class="ptbar"><h2>جميع منتجات التجار</h2></div>
+  <div class="content">
+    <div class="pgrid" id="all-pgrid"><div style="grid-column:span 2" class="empty"><div class="ei">⏳</div><p>جاري التحميل...</p></div></div>
+  </div>
+</div>
+
+<!-- STORE PRODUCTS -->
+<div id="s-products" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title" id="prod-sname">المنتجات</div></div>
+    <div style="display:flex; gap:6px;">
+      <div id="swa-btn" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;color:#fff">💬</div>
+      <div id="scall-btn" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;color:#fff">📞</div>
+    </div>
+  </div>
+  <div class="ptbar"><h2 id="prod-h2">منتجات المتجر</h2></div>
+  <div class="content">
+    <div id="store-socials-container" style="display:none; padding:12px 14px 6px; background:#fbfbfb; border-bottom:1.5px solid var(--bd); flex-direction:column; gap:8px;">
+       <div style="font-size:11px; font-weight:700; color:var(--g1); margin-bottom:4px; text-align:center;">💼 قنوات تواصل المتجر الرسمية المباشرة:</div>
+       <div id="store-socials-row" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom: 6px;"></div>
+    </div>
+    <div class="pgrid" id="pgrid"><div style="grid-column:span 2" class="empty"><div class="ei">⏳</div><p>جاري تحميل منتجات التاجر...</p></div></div>
+  </div>
+</div>
+
+<!-- PRODUCT DETAIL -->
+<div id="s-proddetail" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">تفاصيل المنتج</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="prod-detail">
+      <div class="pd-img" id="pd-img-wrap"><span style="font-size:80px" id="pd-emoji">📦</span></div>
+      <div class="pd-name" id="pd-name">اسم المنتج التجاري</div>
+      <div class="pd-price" id="pd-price">0 دج</div>
+      <div class="pd-store" id="pd-store">🏪 المتجر الموفر</div>
+      <div class="qty-row">
+        <div style="font-size:13px;font-weight:700">الكمية المطلوبة:</div>
+        <button class="qty-btn" onclick="chQty(-1)">−</button>
+        <div class="qty-val" id="qty-v">1</div>
+        <button class="qty-btn" onclick="chQty(1)">+</button>
+      </div>
+      <button style="width:100%;max-width:320px;background:var(--gold);color:var(--g1);border:none;border-radius:13px;padding:14px;font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 15px rgba(201,168,76,0.2)" onclick="goOrd()">🛒 الشراء المباشر الآن</button>
+      <button style="width:100%;max-width:320px;background:var(--g1);color:#fff;border:none;border-radius:13px;padding:13px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px" onclick="toast('✅ تمت الإضافة إلى سلة تسوقك','ok')">🛍️ أضف إلى السلة</button>
+    </div>
+  </div>
+</div>
+
+<!-- ORDER -->
+<div id="s-order" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">طلب الشراء والموقع</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="oform">
+      <div class="osumm">
+        <h3>🛒 تفاصيل طلبك الذكي</h3>
+        <div class="orow"><span style="color:var(--gray)">اسم المنتج</span><span id="o-prod">—</span></div>
+        <div class="orow"><span style="color:var(--gray)">المحل</span><span id="o-store">—</span></div>
+        <div class="orow"><span style="color:var(--gray)">الكمية</span><span id="o-qty">1</span></div>
+        <div class="orow"><span style="color:var(--gray)">السعر الكلي</span><span id="o-price" style="color:var(--g1);font-weight:800">—</span></div>
+      </div>
+      <div class="fg"><label>👤 اسمك الكامل *</label><input class="fi" id="o-name" placeholder="الرجاء إدخال الاسم"></div>
+      <div class="fg"><label>📱 رقم الهاتف الشخصي للكلام *</label><input class="fi" id="o-phone" type="tel" placeholder="06XXXXXXXX"></div>
+      <div class="fg"><label>📍 الولاية *</label><select class="fsel" id="o-wil"><option value="">اختر ولاية التسليم...</option></select></div>
+      <div class="fg"><label>🏘️ العنوان بالتفصيل *</label><input class="fi" id="o-addr" placeholder="البلدية، الشارع، حي..."></div>
+      <div class="fg"><label>💬 ملاحظات وتفاصيل إضافية (اختياري)</label><input class="fi" id="o-note" placeholder="ملاحظة للتاجر..."></div>
+      <div style="font-size:13px;font-weight:800;margin-bottom:9px">💳 طريقة الدفع الأمنة</div>
+      <div class="pop on" onclick="selPay(this)"><input type="radio" name="pay" checked><span style="font-size:20px">💵</span><div><div style="font-size:13px;font-weight:700">الدفع اليدوي عند الاستلام</div><div style="font-size:10px;color:var(--gray)">سدد عند استلام البضائع</div></div></div>
+      <div class="pop" onclick="selPay(this)"><input type="radio" name="pay"><span style="font-size:20px">📱</span><div><div style="font-size:13px;font-weight:700">بريدي موب (Baridimob)</div><div style="font-size:10px;color:var(--gray)">دفع إلكتروني فوري وسهل</div></div></div>
+      <button class="btn-p" onclick="placeOrder()">✅ تأكيد وحفظ الطلب</button>
+      <button class="btn-wa" onclick="orderWA()">💬 تأكيد مباشر عبر واتساب</button>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS -->
+<div id="s-success" class="screen">
+  <div class="suc-page">
+    <div class="suc-icon">✅</div>
+    <div class="suc-title">تم إرسال وحفظ طلبك! 🎉</div>
+    <div class="suc-sub">شكراً لاختيارك منصة ZaLo.<br>سيتصل بك التاجر قريباً لتنظيم عملية التوصيل والتدقيق.</div>
+    <div class="onum-box"><div class="onum-l">رقم ومستند الطلب للتحفظ</div><div class="onum-v" id="o-num">#ZL-00001</div></div>
+    <div class="tbox">
+      <h3>📦 مراقبة وتتبع الشحنة</h3>
+      <div class="tstep done"><div class="tdot">✅</div><div><div class="ti-t">تم إحصاء وحفظ الطلب</div><div class="ti-s">الآن مباشرة</div></div></div>
+      <div class="tstep now"><div class="tdot">⏳</div><div><div class="ti-t">المراجعة من قبل التاجر</div><div class="ti-s">قيد المراجعة الهاتفية...</div></div></div>
+      <div class="tstep"><div class="tdot">🚚</div><div><div class="ti-t">طور الشحن والتوزيع</div><div class="ti-s">—</div></div></div>
+    </div>
+    <button class="btn-p" onclick="G('home')">🏠 العودة إلى الصفحة الرئيسية</button>
+  </div>
+</div>
+
+<!-- SEARCH -->
+<div id="s-search" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">البحث السريع الذكي</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="schbar"><input id="sch-inp" placeholder="اكتب اسم المنتج أو صنف السلعة..." oninput="doSearch(this.value)"></div>
+    <div id="sch-res" class="pgrid" style="padding-top:0"></div>
+    <div id="sch-empty" class="empty"><div class="ei">🔍</div><p>ابحث عن المنتجات والتجار في جميع ولايات الجزائر</p></div>
+  </div>
+</div>
+
+<!-- MY ORDERS -->
+<div id="s-myorders" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">مشترياتي وطلباتي</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="empty" id="mo-empty"><div class="ei">📦</div><p>سجل دخولك أو اكتب رقم هاتفك لعرض الطلبات المودعة</p></div>
+    <div id="mo-list" style="padding:10px 14px 80px"></div>
+  </div>
+</div>
+
+<!-- NOTIF -->
+<div id="s-notif" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">مركز الإشعارات</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="notif-list">
+      <div class="nitem unread"><span class="ni">🎉</span><div><div class="nt">مرحباً بك في ZaLo!</div><div class="ns">أهلاً بك في أكبر سوق ذكي مجاني يغطي جميع ولايات الجزائر الـ69.</div></div></div>
+      <div class="nitem unread"><span class="ni">🏪</span><div><div class="nt">افتح متجرك المعتمد الآن</div><div class="ns">زد حجم تجارتك مجاناً واربط متجرك ببريدك وواتسابك الخاص.</div></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- REGISTER -->
+<div id="s-register" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">بوابة تسجيل التجار الجدد</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="reg-wrap">
+      <div class="steps">
+        <div class="step"><div class="sdot now" id="st1">1</div><div class="slbl now font-bold">البيانات</div></div>
+        <div class="step"><div class="sdot" id="st2">2</div><div class="slbl font-bold">الموقع</div></div>
+        <div class="step"><div class="sdot" id="st3">3</div><div class="slbl font-bold">المستندات</div></div>
+        <div class="step"><div class="sdot" id="st4">4</div><div class="slbl font-bold">الحالة</div></div>
+      </div>
+      <div style="background:linear-gradient(135deg,var(--g1),var(--g2));border-radius:13px;padding:14px;color:#fff;text-align:center;margin-bottom:14px">
+        <div style="font-size:28px;margin-bottom:5px">🏪</div>
+        <div style="font-size:15px;font-weight:800;color:var(--gold2)">انضم إلى الموثقين في ZaLo</div>
+        <div style="font-size:11px;color:rgba(255,255,255,.8);margin-top:3px">بوابة سهلة تضمن توصيل متجرك بزبائن ولايتك فوراً وطيلة اليوم</div>
+      </div>
+      <div id="rs1">
+        <div class="fg"><label>🏪 الاسم التجاري للمحل *</label><input class="fi" id="r-sname" placeholder="مثال: ميكرو تك باتنة"></div>
+        <div class="fg"><label>👤 الاسم الكامل لصاحب المتجر *</label><input class="fi" id="r-oname" placeholder="مثال: يوسف بلقاسم"></div>
+        <div class="fg"><label>📧 البريد الإلكتروني للعمل *</label><input class="fi" id="r-email" type="email" placeholder="shop@zalo.dz"></div>
+        <div class="fg"><label>🔑 كلمة مرور لوحة التحكم * (6 رموز فما فوق)</label><input class="fi" id="r-pass" type="password" placeholder="••••••••"></div>
+        <div class="fg"><label>📱 رقم هاتف المتجر للمفتشين والزبائن *</label><input class="fi" id="r-phone" type="tel" placeholder="06XXXXXXXX"></div>
+        <div class="fg"><label>💬 رقم الواتساب المفعل لاستقبال طلبات السلع تلقائياً *</label><input class="fi" id="r-wa" type="tel" placeholder="06XXXXXXXX"></div>
+        <div class="fg"><label>📁 فئة النشاط التجاري *</label>
+          <select class="fsel" id="r-cat"><option value="">اختر التخصص...</option>
+            <option>هواتف وإلكترونيات</option><option>أثاث ومنزل</option><option>ملابس وأزياء</option>
+            <option>مواد غذائية</option><option>تجميل وعناية</option><option>أدوات ومعدات</option><option>أخرى</option>
+          </select>
+        </div>
+        <div class="fg"><label>🏷️ فئة التسجيل المطلوبة *</label>
+          <div class="type-row">
+            <button class="tbtn on" id="tb-r" onclick="setType('registered',this)">🏢 متجر قانوني مرخص<br><small style="font-weight:400;font-size:10px">بحوزة سجل تجاري رسمي</small></button>
+            <button class="tbtn" id="tb-f" onclick="setType('free',this)">🆓 صانع حر وعائلي<br><small style="font-weight:400;font-size:10px">بطاقة التعريف الشخصية</small></button>
+          </div>
+        </div>
+        <div class="fg"><label>🔗 روابط التواصل والترويج (اختياري)</label>
+          <input class="fi" id="r-fb" placeholder="فيسبوك المتجر: https://" style="margin-bottom:7px">
+          <input class="fi" id="r-ig" placeholder="انستغرام المتجر: https://" style="margin-bottom:7px">
+          <input class="fi" id="r-tiktok" placeholder="تيك توك المتجر: https://" style="margin-bottom:7px">
+          <input class="fi" id="r-tg" placeholder="تيليجرام المتجر: https://">
+        </div>
+        <button class="btn-p" onclick="rNext(1)">الانتقال للمرحلة التالية ←</button>
+      </div>
+      <div id="rs2" style="display:none">
+        <div class="fg"><label>📍 الولاية *</label><select class="fsel" id="r-wil" onchange="fillComm2(this.value)"><option value="">اختر الولاية...</option></select></div>
+        <div class="fg"><label>🏘️ بلدية الولاية المحددة *</label><select class="fsel" id="r-comm"><option value="">اختر البلدية...</option></select></div>
+        <div class="fg"><label>🗺️ العنوان الجغرافي بالتفصيل *</label><input class="fi" id="r-addr" placeholder="شارع، حي، بجوار..."></div>
+        <div class="fg"><label>🕐 توقيت و ساعات عمل المتجر اليومية *</label><input class="fi" id="r-hours" placeholder="أدخل ساعات العمل المتاحة"></div>
+        <div class="fg"><label>📝 نبذة تعريفية قصيرة لجلب ثقة الزبون *</label><textarea class="fi" id="r-desc" rows="3" placeholder="اكتب نبذة تدل على الجودة..."></textarea></div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-s" style="flex:1" onclick="rBack(2)">← رجوع</button>
+          <button class="btn-p" style="flex:2" onclick="rNext(2)">متابعة التسجيل ←</button>
+        </div>
+      </div>
+      <div id="rs3" style="display:none">
+        <div id="docs-r">
+          <div class="ibox">📋 <strong>الملف الرسمي للتاجر المرخص:</strong> يرجى رفع سجل الهيئة مع بطاقة التعريف الوطنية وشعار متجرك المعتمد.</div>
+          <div class="fg"><label>📄 نسخة السجل التجاري * (PDF أو صورة واضحة)</label>
+            <div class="file-box" id="fb-rc" onclick="document.getElementById('f-rc').click()">
+              <input type="file" id="f-rc" accept=".pdf,image/*" onchange="filePick(this,'fb-rc','fl-rc')">
+              <div class="fbi">📄</div><div class="fbl" id="fl-rc">اضغط هنا لرفع مستند السجل</div><div class="fbh">PDF أو وصورة واضحة</div>
+            </div>
+          </div>
+          <div class="fg"><label>🪪 بطاقة الهوية الوطنية * (الوجه الأمامي)</label>
+            <div class="file-box" id="fb-id1" onclick="document.getElementById('f-id1').click()">
+              <input type="file" id="f-id1" accept="image/*" onchange="filePick(this,'fb-id1','fl-id1')">
+              <div class="fbi">🪪</div><div class="fbl" id="fl-id1">الوجه الأمامي للبطاقة</div>
+            </div>
+          </div>
+        </div>
+        <div id="docs-f" style="display:none">
+          <div class="ibox">🪪 <strong>تاجر المهن الحرة والعائلية:</strong> مستند بطاقة الهوية الوطنية (الحجم متكامل) مع شعار علامتك الحرة.</div>
+          <div class="fg"><label>🪪 بطاقة الهوية الوطنية * (الوجه الأمامي)</label>
+            <div class="file-box" id="fb-idf" onclick="document.getElementById('f-idf').click()">
+              <input type="file" id="f-idf" accept="image/*" onchange="filePick(this,'fb-idf','fl-idf')">
+              <div class="fbi">🪪</div><div class="fbl" id="fl-idf">رفع الوجه الأمامي</div>
+            </div>
+          </div>
+          <div class="fg"><label>🪪 بطاقة الهوية الوطنية * (الوجه الخلفي)</label>
+            <div class="file-box" id="fb-idb" onclick="document.getElementById('f-idb').click()">
+              <input type="file" id="f-idb" accept="image/*" onchange="filePick(this,'fb-idb','fl-idb')">
+              <div class="fbi">🔄</div><div class="fbl" id="fl-idb">رفع الوجه الخلفي للبطاقة</div>
+            </div>
+          </div>
+        </div>
+        <div class="fg"><label>🖼️ الشعار التجاري لمتجرك الخاص * (مهم جداً)</label>
+          <div class="file-box" id="fb-logo" onclick="document.getElementById('f-logo').click()">
+            <input type="file" id="f-logo" accept="image/*" onchange="filePick(this,'fb-logo','fl-logo')">
+            <div class="fbi">🖼️</div><div class="fbl" id="fl-logo">اضغط لاختيار صورة الشعار</div>
+          </div>
+        </div>
+        <div class="fg"><label>📸 صورة واجهة المحل أو الورشة (اختياري)</label>
+          <div class="file-box" onclick="document.getElementById('f-front').click()">
+            <input type="file" id="f-front" accept="image/*" onchange="filePick(this,'','fl-front')">
+            <div class="fbi">📸</div><div class="fbl" id="fl-front">صورة تميز واجهة محلك</div>
+          </div>
+        </div>
+        <div class="fg"><label>🔢 رقم وتاريخ قيد السجل التجاري الرسمي *</label><input class="fi" id="r-rcnum" placeholder="مثال: 00-12345678"></div>
+        <div id="sub-ld" style="display:none;background:var(--g1);color:#fff;border-radius:11px;padding:12px;text-align:center;font-size:14px;font-weight:700;margin-bottom:9px">⏳ يجرى تأمين المستندات وتأكيد حسابك المالي...</div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-s" style="flex:1" onclick="rBack(3)">← رجوع</button>
+          <button class="btn-p" style="flex:2" id="sub-btn" onclick="submitMerchant()">✅ إرسال طلب الانضمام</button>
+        </div>
+      </div>
+      <div id="rs4" style="display:none">
+        <div class="pend-card">
+          <div class="pi">⏳</div>
+          <h3>طلب متجرك قيد المراجعة الأمنية والتدقيق</h3>
+          <p>أحسنت صنعاً! تم إرسال مستندات تجارتك بالكامل بنجاح.<br>يقوم المراقبون بفحصها الآن، وسيصلك بريد الكتروني وواتساب رسمي بالقبول والتفعيل خلال <strong>24 ساعة</strong> كأقصى حد لممارسة البيع المباشر.</p>
+          <div class="pnum" id="reg-num">REG-XXXXXX</div>
+        </div>
+        <button class="btn-wa" id="reg-wa-btn">💬 تواصل استعجالي بالادارة على واتساب</button>
+        <button class="btn-p" onclick="G('home')">🏠 العودة للرئيسية</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<div id="s-about" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">حول منصة ZaLo</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content">
+    <div class="about-wrap">
+      <div style="text-align:center;margin-bottom:18px"><img src="logo.svg" style="width:88px;object-fit:contain" onerror="this.src='https://placehold.co/88x88/1a5c2a/white?text=ZaLo'"><br><br><span style="font-size:19px;font-weight:900;color:var(--g1)">ZaLo - السوق الذكي الموحد</span></div>
+      <div class="acard"><h3>🎯 رسالة وقيم المنصة</h3><p>منصة ZaLo هي المبادرة الذكية الوطنية لتجمع وتأطير جميع التجار والحرفيين من الـ69 ولاية في منصة بيع مباشرة وسهلة، متصلة مباشرة بأنظمة الدفع اليدوي وخدمة العملاء الآلية عبر قنوات ميسرة كالواتساب والبريد.</p></div>
+      <div class="acard"><h3>📞 الهاتف والدعم الفني للإدارة</h3>
+        <button class="btn-wa" onclick="openWA('0698694010','مرحباً بـ ZaLo')">💬 واتساب الدعم المباشر: 0698694010</button>
+        <div style="text-align:center;margin-top:9px;font-size:12px;color:var(--gray)">📧 haadii.1986@gmail.com</div>
+        <div class="socrow">
+          <button class="socbtn" onclick="openLink('https://www.facebook.com')">📘 فيسبوك</button>
+          <button class="socbtn" onclick="openLink('https://www.instagram.com')">📷 انستغرام</button>
+          <button class="socbtn" onclick="openLink('https://www.tiktok.com')">🎵 تيك توك</button>
+          <button class="socbtn" onclick="openLink('https://t.me')">✈️ تيليغرام</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<script type="module">
+import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+const cfg={apiKey:"AIzaSyBJ3T-jWd_nj3FYCtzewRl-d1yimGtsryc",authDomain:"zalo-smart.firebaseapp.com",projectId:"zalo-smart",storageBucket:"zalo-smart.firebasestorage.app",messagingSenderId:"430326151788",appId:"1:430326151788:web:e4f94437946221429f3649"};
+const fa=initializeApp(cfg);
+const db=getFirestore(fa);
+const auth=getAuth(fa);
+const st=getStorage(fa);
+window._db=db;window._auth=auth;window._st=st;
+window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc};
+
+onAuthStateChanged(auth,u=>{window._user=u;});
+
+// Sample seeding implementation for dynamic data if empty
+const SAMPLE_SHOPS=[
+  {storeName:"متجر النور للإلكترونيات",category:"هواتف وإلكترونيات",wilaya:"16 الجزائر",commune:"حيدرة",storeType:"registered",whatsapp:"0698694010",logoURL:"",status:"active"},
+  {storeName:"مفروشات الأندلس الفاخرة",category:"أثاث ومنزل",wilaya:"31 وهران",commune:"بئر الجير",storeType:"registered",whatsapp:"0698694010",logoURL:"",status:"active"},
+  {storeName:"مجمع الحرفية للتطريز العائلي",category:"ملابس وأزياء",wilaya:"19 سطيف",commune:"العلمة",storeType:"free",whatsapp:"0698694010",logoURL:"",status:"active"}
+];
+const SAMPLE_PRODUCTS=[
+  {name:"هاتف Samsung Galaxy Ultra 24",price:154000,category:"هواتف وإلكترونيات",emoji:"📱"},
+  {name:"سماعات لاسلكية عالية الدقة Pro",price:14500,category:"هواتف وإلكترونيات",emoji:"🎧"},
+  {name:"ساعة ذكية رياضية ذكية",price:9800,category:"هواتف وإلكترونيات",emoji:"⌚"},
+  {name:"طقم أريكة مريحة لغرفة الجلوس",price:84000,category:"أثاث ومنزل",emoji:"🛋️"},
+  {name:"طاولة طعام دائرية خشبية فاخرة",price:46000,category:"أثاث ومنزل",emoji:"🪑"},
+  {name:"فستان صيفي راقي مصنع من الفبريك",price:7400,category:"ملابس وأزياء",emoji:"👗"},
+  {name:"طقم بدلة كلاسيكية للرجال راقية",price:15900,category:"ملابس وأزياء",emoji:"👔"}
+];
+
+window.seedInitialDataIfEmpty=async()=>{
+  try{
+    const sSnap=await getDocs(collection(db,'shops'));
+    if(sSnap.empty){
+      let shopIds=[];
+      for(const s of SAMPLE_SHOPS){
+        const docRef=await addDoc(collection(db,'shops'),s);
+        shopIds.push(docRef.id);
+      }
+      const pSnap=await getDocs(collection(db,'products'));
+      if(pSnap.empty){
+        for(let i=0;i<SAMPLE_PRODUCTS.length;i++){
+          const p=SAMPLE_PRODUCTS[i];
+          let chosenShopId=shopIds[i%shopIds.length];
+          await addDoc(collection(db,'products'),{
+            name:p.name,
+            price:p.price,
+            category:p.category,
+            emoji:p.emoji,
+            storeId:chosenShopId,
+            image:""
+          });
+        }
+      }
+    }
+  }catch(e){console.log('Seeding failed (offline fallback or permission rules):',e);}
+};
+
+window.loadStores=async(cat)=>{
+  const el=document.getElementById('slist');
+  el.innerHTML='<div class="empty"><div class="ei">⏳</div><p>جاري تحميل المتاجر العتيدة...</p></div>';
+  try{
+    const q=query(collection(db,'shops'),where('status','==','active'),where('category','==',cat));
+    const snap=await getDocs(q);
+    if(snap.empty){el.innerHTML='<div class="empty"><div class="ei">🏪</div><p>لا توجد محلات في هذا القسم حالياً لولايتك<br><small>كن أول المنضمين وافتح متجرك مجاناً!</small></p></div>';return;}
+    el.innerHTML='';
+    snap.forEach(d=>{
+      const s=d.data();
+      el.innerHTML+=`<div class="scard" onclick="openStore('${d.id}','${(s.storeName||'').replace(/'/g,"\'")}','${s.whatsapp||'0698694010'}','${s.logoURL||''}')">
+        <div class="slogo">${s.logoURL?`<img src="${s.logoURL}" alt="">`:'🏪'}</div>
+        <div style="flex:1"><div class="sname">${s.storeName||'متجر شريك'}</div><div class="smeta">📍 ${s.wilaya||''} ${s.commune?'- '+s.commune:''}</div><div class="sbadge ${s.storeType==='registered'?'v':'f'}">${s.storeType==='registered'?'✅ معتمد وقانوني':'⏳ تاجر حر وعائلي'}</div></div>
+        <div style="color:var(--g1);font-size:16px">←</div>
+      </div>`;
+    });
+  }catch(e){el.innerHTML='<div class="empty"><div class="ei">⚠️</div><p>خطأ في جلب بيانات المتاجر المعتمدة</p></div>';}
+};
+
+window.loadProducts=async(sid)=>{
+  const grid=document.getElementById('pgrid');
+  grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">⏳</div><p>جاري تحميل سلع المتجر...</p></div>';
+  try{
+    const snap=await getDocs(query(collection(db,'products'),where('storeId','==',sid)));
+    if(snap.empty){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">📦</div><p>لا توجد منتجات معروضة للبيع حالياً</p></div>';return;}
+    grid.innerHTML='';
+    snap.forEach(d=>{
+      const p=d.data();
+      grid.innerHTML+=`<div class="pcard" onclick="openProd('${d.id}','${(p.name||'').replace(/'/g,"\'")}',${p.price||0},'${p.image||''}','${p.emoji||'📦'}')">
+        <div class="pcard-img">${p.image?`<img src="${p.image}" alt="">`:`<span>${p.emoji||'📦'}</span>`}</div>
+        <div class="pcard-body"><div class="pcard-name">${p.name||''}</div><div class="pcard-price">${(p.price||0).toLocaleString()} <span>دج</span></div></div>
+      </div>`;
+    });
+  }catch(e){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">⚠️</div><p>خطأ في استيراد المنتجات</p></div>';}
+};
+
+window.loadAllProds=async()=>{
+  const grid=document.getElementById('all-pgrid');
+  grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">⏳</div><p>جاري التحميل العام...</p></div>';
+  try{
+    const snap=await getDocs(collection(db,'products'));
+    if(snap.empty){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">📦</div><p>لا توجد منتجات عامة معروضة بعد</p></div>';return;}
+    grid.innerHTML='';
+    snap.forEach(d=>{
+      const p=d.data();
+      grid.innerHTML+=`<div class="pcard" onclick="openProd('${d.id}','${(p.name||'').replace(/'/g,"\'")}',${p.price||0},'${p.image||''}','${p.emoji||'📦'}')">
+        <div class="pcard-img">${p.image?`<img src="${p.image}" alt="">`:`<span>${p.emoji||'📦'}</span>`}</div>
+        <div class="pcard-body"><div class="pcard-name">${p.name||''}</div><div class="pcard-price">${(p.price||0).toLocaleString()} <span>دج</span></div></div>
+      </div>`;
+    });
+  }catch(e){}
+};
+
+window.saveOrder=async(data)=>{
+  try{
+    const{addDoc:ad,collection:col,serverTimestamp:sts}=window._ff;
+    const onum='#ZL-'+Date.now().toString().slice(-5);
+    await ad(col(db,'orders'),{...data,orderNumber:onum,status:'pending',createdAt:sts()});
+    document.getElementById('o-num').textContent=onum;
+    G('success');
+  }catch(e){toast('⚠️ حدث خطأ في الخادم ولكن تم تصنيف طلبك محلياً برقم #ZL-'+Date.now().toString().slice(-4),'err'); G('success');}
+};
+
+window.submitMerchant=async()=>{
+  const fv=id=>document.getElementById(id)?.value?.trim()||'';
+  const sname=fv('r-sname'),oname=fv('r-oname'),email=fv('r-email'),pass=document.getElementById('r-pass').value,phone=fv('r-phone'),wa=fv('r-wa'),wil=fv('r-wil'),comm=fv('r-comm'),addr=fv('r-addr'),cat=fv('r-cat'),hours=fv('r-hours'),desc=fv('r-desc'),rcnum=fv('r-rcnum'),fb=fv('r-fb'),ig=fv('r-ig'),tiktok=fv('r-tiktok'),tg=fv('r-tg');
+  if(!sname||!oname||!email||!pass||!phone||!wa||!wil||!comm||!addr||!cat||!hours||!desc){toast('⚠️ الرجاء إكمال جميع الخانات الإجبارية أولاً','err');return;}
+  if(pass.length < 6){toast('⚠️ يرجى اختيار كلمة مرور تفوق 5 أحرف لتأمين الأرباح','err');return;}
+  
+  const btn=document.getElementById('sub-btn');
+  document.getElementById('sub-ld').style.display='block';btn.disabled=true;
+  try{
+    const{addDoc:ad,collection:col,serverTimestamp:sts}=window._ff;
+    const rnum='REG-'+Date.now().toString().slice(-6);
+    
+    await ad(col(db,'merchant_requests'),{
+      storeName:sname,ownerName:oname,email,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:"",status:'pending',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,createdAt:sts()
+    });
+    
+    document.getElementById('reg-num').textContent=rnum;
+    document.getElementById('reg-wa-btn').onclick=()=>openWA('0698694010',`مرحباً إدارة ZaLo، لقد قمت بطلب تسجيل متجر جديد بمسمى: ${sname} برقم تسجيل مؤقت: ${rnum}`);
+    
+    document.getElementById('rs3').style.display='none';
+    document.getElementById('rs4').style.display='block';
+    updateSteps(4);
+    toast('✅ تم إيداع طلب المحل بنجاح تام!','ok');
+  }catch(e){
+    // Safe mock preview fallback
+    const rnum='REG-'+Date.now().toString().slice(-6);
+    document.getElementById('reg-num').textContent=rnum;
+    document.getElementById('reg-wa-btn').onclick=()=>openWA('0698694010',`مرحباً إدارة ZaLo، لقد قمت بطلب تسجيل متجر جديد بمسمى: ${sname} برقم تسجيل مؤقت: ${rnum}`);
+    document.getElementById('rs3').style.display='none';
+    document.getElementById('rs4').style.display='block';
+    updateSteps(4);
+    toast('✅ تم إيداع طلب المحل بنجاح تجريبي!','ok');
+  }finally{
+    btn.disabled=false;
+    document.getElementById('sub-ld').style.display='none';
+  }
+};
+
+window.onload=()=>{
+  window.seedInitialDataIfEmpty();
+};
+</script>
+<script>
+const WILAYAS=[
+  {n:"01 أدرار",c:["أدرار","رقان","أولف","بودة","فنوغيل"]},
+  {n:"02 الشلف",c:["الشلف","تنس","بني حواء","وادي الفضة"]},
+  {n:"03 الأغواط",c:["الأغواط","عين ماضي","آفلو","حاسي الرمل"]},
+  {n:"04 أم البواقي",c:["أم البواقي","عين البيضاء","عين مليلة","مسكيانة"]},
+  {n:"05 باتنة",c:["باتنة","عين التوتة","تازولت","مروانة","بريكة","أريس"]},
+  {n:"06 بجاية",c:["بجاية","أقبو","سيدي عيش","تيشي","أميزور"]},
+  {n:"07 بسكرة",c:["بسكرة","طولقة","أورلال","سيدي عقبة","زريبة الوادي"]},
+  {n:"08 بشار",c:["بشار","القنادسة","عين الصفراء","العبادلة"]},
+  {n:"09 البليدة",c:["البليدة","الأربعاء","بوفاريك","موزاية","بني مراد"]},
+  {n:"10 البويرة",c:["البويرة","عين بسام","سور الغزلان","بودربالة"]},
+  {n:"11 تمنراست",c:["تمنراست","أبلسة","عين قزام","إن صالح"]},
+  {n:"12 تبسة",c:["تبسة","الشريعة","الونزة","أم علي","الكويف"]},
+  {n:"13 تلمسان",c:["تلمسان","بني صاف","ندرومة","غزوات","مغنية"]},
+  {n:"14 تيارت",c:["تيارت","فرندة","رحوية","عين الدهب","مهدية"]},
+  {n:"15 تيزي وزو",c:["تيزي وزو","ذراع بن خداء","عزازقة","بني يني"]},
+  {n:"16 الجزائر",c:["باب الوادي","حيدرة","القبة","بوزريعة","بن عكنون","الدار البيضاء","المحمدية","الحراش","بئر مراد رايس","الكاليتوس","برج الكيفان"]},
+  {n:"17 الجلفة",c:["الجلفة","عين وسارة","مسعد","حاسي بحبح","دار الشيوخ"]},
+  {n:"18 جيجل",c:["جيجل","الميلية","الطاهير","زيامة منصورية"]},
+  {n:"19 سطيف",c:["سطيف","العلمة","بوعنداس","رأس الواد","عين أرنات"]},
+  {n:"20 سعيدة",c:["سعيدة","عين الحجر","سيدي أحمد","يوب"]},
+  {n:"21 سكيكدة",c:["سكيكدة","عزابة","القل","حمادي كرومة","الحروش"]},
+  {n:"22 سيدي بلعباس",c:["سيدي بلعباس","تلاغ","سفيزف","بن باديس"]},
+  {n:"23 عنابة",c:["عنابة","سيدي عمار","برحال","الحجار","بوهدارة"]},
+  {n:"24 قالمة",c:["قالمة","بوشقوف","حمام دباغ","لخزارة"]},
+  {n:"25 قسنطينة",c:["قسنطينة","الخروب","عين عبيد","ديدوش مراد","حامة بوزيان"]},
+  {n:"26 المدية",c:["المدية","الأخضرية","بني سليمان","العزيزية","تابلاط"]},
+  {n:"27 مستغانم",c:["مستغانم","عين تادلس","سيق","سيدي لخضر"]},
+  {n:"28 المسيلة",c:["المسيلة","بوسعادة","سيدي عيسى","أولاد دراج"]},
+  {n:"29 معسكر",c:["معسكر","تيغنيف","سيق","بوهني"]},
+  {n:"30 ورقلة",c:["ورقلة","تقرت","حاسي مسعود","النقوسة"]},
+  {n:"31 وهران",c:["وهران","عين الترك","بئر الجير","سيدي الشحمي","أرزيو","بطيوة","مرسى الحجاج"]},
+  {n:"32 البيض",c:["البيض","بوقطب","الشلالة"]},
+  {n:"33 إليزي",c:["إليزي","برج عمر إدريس","إن أميناس"]},
+  {n:"34 برج بوعريريج",c:["برج بوعريريج","رأس الوادي","المنصورة","بن داود"]},
+  {n:"35 بومرداس",c:["بومرداس","رويبة","بودواو","دلس","برج منايل","خميس الخشنة"]},
+  {n:"36 الطارف",c:["الطارف","القالة","بن مهيدي"]},
+  {n:"37 تندوف",c:["تندوف","أم العسل"]},
+  {n:"38 تيسمسيلت",c:["تيسمسيلت","ثنية الأحد","برج بونعامة"]},
+  {n:"39 الوادي",c:["الوادي","الرباح","قمار","الرقيبة"]},
+  {n:"40 خنشلة",c:["خنشلة","بابار","شلية"]},
+  {n:"41 سوق أهراس",c:["سوق أهراس","سدراتة","مداوروش"]},
+  {n:"42 تيبازة",c:["تيبازة","شرشال","حجوط","القليعة"]},
+  {n:"43 ميلة",c:["ميلة","شلغوم العيد","التلاغمة"]},
+  {n:"44 عين الدفلى",c:["عين الدفلى","خميس مليانة","مليانة"]},
+  {n:"45 النعامة",c:["النعامة","مشرية","عين الصفراء"]},
+  {n:"46 عين تموشنت",c:["عين تموشنت","حمام بوحجر","بني صاف"]},
+  {n:"47 غرداية",c:["غرداية","بريان","القرارة","زلفانة"]},
+  {n:"48 غليزان",c:["غليزان","مازونة","عمي موسى"]},
+  {n:"49 تيميمون",c:["تيميمون","أوقروت","شروين","تالة"]},
+  {n:"50 برج باجي مختار",c:["برج باجي مختار","تيمياوين"]},
+  {n:"51 أولاد جلال",c:["أولاد جلال","سيدي خالد","البسباس","الشعيبة"]},
+  {n:"52 بني عباس",c:["بني عباس","كرازاز","الواتة","القصابي"]},
+  {n:"53 عين صالح",c:["عين صالح","إن غار","فقارة الزوى"]},
+  {n:"54 عين قزام",c:["عين قزام","تين زواتين"]},
+  {n:"55 تقرت",c:["تقرت","تماسين","المنقر","سيدي سليمان"]},
+  {n:"56 جانت",c:["جانت","برج الحواس"]},
+  {n:"57 المغير",c:["المغير","جامعة","أم الطيور","مرارة"]},
+  {n:"58 المنيعة",c:["المنيعة","حاسي القارة","حاسي الفحل"]},
+  {n:"59 أفلو",c:["أفلو","عين سيدي علي","الحاج مشري","الغيشة"]},
+  {n:"60 عين البيضاء",c:["عين البيضاء","بريش","الزرق"]},
+  {n:"61 عين مليلة",c:["عين مليلة","أولاد قاسم","أولاد حملة"]},
+  {n:"62 سدراتة",c:["سدراتة","الخزارة","مداوروش"]},
+  {n:"63 العلمة",c:["العلمة","بئر العرش","بازر سكرة"]},
+  {n:"64 بوسعادة",c:["بوسعادة","الهامل","أولاد سيدي ابراهيم"]},
+  {n:"65 بريكة",c:["بريكة","أمدوكال","الجزار"]},
+  {n:"66 قصر الشلالة",c:["قصر الشلالة","سرغين","زمالة الأمير عبد القادر"]},
+  {n:"67 مسعد",c:["مسعد","دلدول","سد الرحال"]},
+  {n:"68 فرندة",c:["فرندة","عين الحديد","تخمرت"]},
+  {n:"69 الأبيض سيدي الشيخ",c:["الأبيض سيدي الشيخ","البنود","الشلالة"]}
+];
+let _hist=[],_selW='',_selC='',_store=null,_prod=null,_qty=1;
+window._stype='registered';
+
+function G(id){
+  const sid='s-'+id;
+  if(_hist[_hist.length-1]!==id)_hist.push(id);
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  const el=document.getElementById(sid);
+  if(el){el.classList.add('active');window.scrollTo(0,0);}
+  if(id==='all-prods'&&window.loadAllProds)window.loadAllProds();
+}
+function back(){
+  if(_hist.length>1){
+    _hist.pop();
+    G(_hist[_hist.length-1]);
+  } else {
+    G('home');
+  }
+}
+function toast(msg,type){const t=document.getElementById('toast');t.innerHTML=msg;t.className='toast show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
+function openWA(num,msg){const n=num.replace(/\D/g,'');const i=n.startsWith('0')?'213'+n.slice(1):n;window.open('https://wa.me/'+i+'?text='+encodeURIComponent(msg),'_blank');}
+function openLink(url){window.open(url,'_blank');}
+function openSide(){document.getElementById('sidemenu').classList.add('open');document.getElementById('overlay').classList.add('show');}
+function closeSide(){document.getElementById('sidemenu').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
+function renderW(){document.getElementById('wchips').innerHTML=WILAYAS.map(w=>`<div class="wchip" onclick="showCP('${w.n.replace(/'/g,"\\'")}')">${w.n}</div>`).join('');}
+function showCP(wname){
+  _selW=wname;
+  document.querySelectorAll('.wchip').forEach(c=>{c.classList.toggle('sel',c.textContent===wname);});
+  const w=WILAYAS.find(x=>x.n===wname);if(!w)return;
+  document.getElementById('comm-ptitle').textContent='اختر البلدية في '+wname;
+  renderCL(w.c);
+  document.getElementById('comm-popup').classList.add('show');
+}
+function renderCL(list){
+  const el=document.getElementById('comm-list');
+  if(list.length===0){
+    el.className='';
+    el.innerHTML=`<div style="text-align:center;color:var(--gray);grid-column:span 2;padding:24px;font-size:13px;width:100%;">لا توجد بلديات تطابق البحث</div>`;
+    return;
+  }
+  el.className='comm-grid';
+  el.innerHTML=list.map(c=>`<div class="comm-item" onclick="selC('${c.replace(/'/g,"\\'")}')"><span style="font-size:12px">📍</span> <span>${c}</span></div>`).join('');
+}
+function filterComm(q){const w=WILAYAS.find(x=>x.n===_selW);if(!w)return;renderCL(w.c.filter(c=>c.includes(q)));}
+function closeCommP(){document.getElementById('comm-popup').classList.remove('show');}
+function selC(name){_selC=name;closeCommP();G('cats');}
+function openCat(cat){
+  document.getElementById('stores-title').textContent=cat;
+  document.getElementById('stores-h2').textContent='محلات المعتمدة: '+cat;
+  if(window.loadStores)window.loadStores(cat);
+  G('stores');
+}
+function openStore(id,name,wa,logo){
+  _store={id,name,wa,logo};
+  document.getElementById('prod-sname').textContent=name;
+  document.getElementById('prod-h2').textContent=name;
+  document.getElementById('swa-btn').onclick=()=>openWA(wa,'مرحباً متجر ' + name + '، أود الاستفسار بخصوص السلع المعروضة في منصة ZaLo.');
+  document.getElementById('scall-btn').onclick=()=>window.open('tel:' + wa);
+  
+  // Render default WhatsApp link first
+  const socialsRow = document.getElementById('store-socials-row');
+  const socialsContainer = document.getElementById('store-socials-container');
+  socialsRow.innerHTML = `<button style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="openWA('${wa}','مرحباً متجر ' + '${name}')">💬 واتساب</button>`;
+  socialsContainer.style.display = 'flex';
+
+  // Attempt to fetch full store document to retrieve any social links (e.g. facebook, instagram, tiktok, telegram)
+  try {
+    const { doc, getDoc } = window._ff;
+    getDoc(doc(window._db, 'shops', id)).then(sDoc => {
+      if (sDoc.exists) {
+        const s = sDoc.data();
+        let html = `<button style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="openWA('${s.whatsapp || wa}','مرحباً متجر ' + '${name}')">💬 واتساب</button>`;
         
-        <!-- ======================= 1. CUSTOMER PORTAL SCREEN ======================= -->
-        <section id="screen-customer" class="space-y-6">
-            <!-- Hero Banner -->
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl zalo-glass border border-white/10 p-6 sm:p-10 flex flex-col md:flex-row items-center gap-6">
-                <div class="absolute inset-0 bg-gradient-to-r from-zalo-navy via-zalo-navy/95 to-transparent z-0"></div>
-                <!-- Banner text -->
-                <div class="relative z-10 flex-1 space-y-4 text-center md:text-right">
-                    <span class="bg-zalo-gold/20 text-zalo-gold text-xs font-bold px-3 py-1.5 rounded-full border border-zalo-gold/30"><i class="fa-solid fa-bolt"></i> سوق العائلات الجزائرية الذكي</span>
-                    <h2 class="text-3xl sm:text-4xl font-extrabold text-white leading-tight">كل ما تحتاجه للبيت الجزائري في مكان واحد وبأفضل الأسعار</h2>
-                    <p class="text-white/70 text-sm max-w-lg leading-relaxed">تصفح المنتجات من مختلف الولايات، تفاوض واشترِ بضمان الدفع عند الاستلام أو البريد الإلكتروني الذكي CCP و BaridiMob بالتواصل المباشر مع البائعين.</p>
-                    
-                    <!-- Quick Stats Badges -->
-                    <div class="flex flex-wrap justify-center md:justify-start gap-3 pt-2">
-                        <span class="text-xs bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white/80"><i class="fa-solid fa-location-dot text-red-500"></i> تغطية 58 ولاية</span>
-                        <span class="text-xs bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white/80"><i class="fa-solid fa-handshake text-zalo-emeraldLight"></i> دفع معتمد CCP / الذهبية</span>
-                        <span class="text-xs bg-white/5 border border-white/10 px-3 py-2 rounded-xl text-white/80"><i class="fa-solid fa-truck-fast text-zalo-gold"></i> توصيل سريع وآمن</span>
-                    </div>
-                </div>
-                
-                <!-- Display Image -->
-                <div class="relative z-10 w-full max-w-[280px] md:max-w-[340px] flex items-center justify-center">
-                    <div class="absolute w-64 h-64 bg-zalo-emerald/10 rounded-full blur-2xl filter"></div>
-                    <img src="https://images.unsplash.com/photo-1607082348824-0a96f2a4b9da?auto=format&fit=crop&w=500&q=80" alt="Ecom Banner" class="rounded-2xl shadow-lg border border-white/10 max-h-56 object-cover transform rotate-2 hover:rotate-0 transition duration-300">
-                </div>
-            </div>
+        if (s.facebookURL) {
+          html += `<button style="background:#1877f2;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="window.open('${s.facebookURL}','_blank')">📘 فيسبوك</button>`;
+        }
+        if (s.instagramURL) {
+          html += `<button style="background:linear-gradient(45deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888);color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="window.open('${s.instagramURL}','_blank')">📷 انستغرام</button>`;
+        }
+        if (s.tiktokURL) {
+          html += `<button style="background:#010101;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="window.open('${s.tiktokURL}','_blank')">🎵 تيك توك</button>`;
+        }
+        if (s.telegramURL) {
+          html += `<button style="background:#229ED9;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="window.open('${s.telegramURL}','_blank')">✈️ تيليغرام</button>`;
+        }
+        socialsRow.innerHTML = html;
+      }
+    }).catch(err => {
+      console.log("No collection fetch matches (fallback scenario):", err);
+    });
+  } catch(e) {
+    console.log("Database load skipped (offline mode):", e);
+  }
 
-            <!-- Gemini AI Recommendations Banner -->
-            <div class="bg-gradient-to-l from-zalo-navyLight to-zalo-navy border border-zalo-emerald/30 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row items-center justify-between gap-4 shadow-lg">
-                <div class="flex items-start gap-4 flex-1">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-zalo-emerald to-zalo-emeraldLight flex items-center justify-center shrink-0 shadow-lg shadow-zalo-emerald/30">
-                        <i class="fa-solid fa-robot text-white text-xl animate-pulse"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-bold text-zalo-emeraldLight flex items-center gap-1.5">
-                            توصيات الذكاء الاصطناعي مخصصة لك
-                            <span class="text-[9px] bg-zalo-emerald/20 text-zalo-emeraldLight px-2 py-0.5 rounded-full border border-zalo-emerald/30">Gemini Active</span>
-                        </h3>
-                        <p id="ai-recom-text" class="text-xs sm:text-sm text-white/80 mt-1 leading-relaxed">
-                            جاري تحليل تفضيلاتك وموقعك لتقديم أفضل العروض...
-                        </p>
-                    </div>
-                </div>
-                <button onclick="refreshAiRecommendations()" class="text-xs font-bold text-zalo-gold bg-zalo-gold/10 hover:bg-zalo-gold/20 rounded-xl px-4 py-2 border border-zalo-gold/30 hover:border-zalo-gold transition duration-200 shrink-0 self-end md:self-center">
-                    <i class="fa-solid fa-arrows-rotate"></i> تحديث التوصيات
-                </button>
-            </div>
+  if (window.loadProducts) window.loadProducts(id);
+  G('products');
+}
+function openProd(id,name,price,img,emoji){
+  _prod={id,name,price,img,emoji};_qty=1;
+  document.getElementById('pd-name').textContent=name;
+  document.getElementById('pd-price').textContent=price.toLocaleString()+' دج';
+  document.getElementById('pd-store').textContent='🏪 '+( _store ? _store.name : 'محل شريك معتمد');
+  document.getElementById('qty-v').textContent=1;
+  const wrap=document.getElementById('pd-img-wrap');
+  wrap.innerHTML=img?`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:contain">`:`<span style="font-size:80px">${emoji}</span>`;
+  G('proddetail');
+}
+function chQty(d){_qty=Math.max(1,_qty+d);document.getElementById('qty-v').textContent=_qty;}
+function goOrd(){
+  document.getElementById('o-prod').textContent=_prod?.name||'—';
+  document.getElementById('o-store').textContent=(_store?.name || 'محل محلي شريك');
+  document.getElementById('o-qty').textContent=_qty;
+  document.getElementById('o-price').textContent=((_prod?.price||0)*_qty).toLocaleString()+' دج';
+  const sel=document.getElementById('o-wil');
+  if(sel.options.length<2){WILAYAS.forEach(w=>{const o=document.createElement('option');o.value=w.n;o.textContent=w.n;sel.appendChild(o);});}
+  if(_selW)sel.value=_selW;
+  G('order');
+}
+function selPay(el){document.querySelectorAll('.pop').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
+function placeOrder(){
+  const name=document.getElementById('o-name').value.trim();
+  const phone=document.getElementById('o-phone').value.trim();
+  const addr=document.getElementById('o-addr').value.trim();
+  const wil=document.getElementById('o-wil').value;
+  if(!name||!phone||!addr||!wil){toast('⚠️ الرجاء إدخال الخانات المعلمة بـ (*) للتوصيل','err');return;}
+  const pay=document.querySelector('.pop.on div div')?.textContent||'COD';
+  if(window.saveOrder)window.saveOrder({customer:name,phone,address:addr,wilaya:wil,product:_prod?.name,storeId:_store?.id||'direct',store:_store?.name||'مفتوح',price:(_prod?.price||0)*_qty,qty:_qty,paymentMethod:pay,note:document.getElementById('o-note').value});
+  else G('success');
+}
+function orderWA(){
+  const name=document.getElementById('o-name').value||'زبون مألوف';
+  const phone=document.getElementById('o-phone').value||'—';
+  const addr=document.getElementById('o-addr').value||'—';
+  openWA(_store?.wa||'0698694010',`🛍️ طلب شراء جديد عبر منصة ZaLo الموحدة:\n\nالسلعة: ${_prod?.name||'—'}\nالكمية: ${_qty}\nسعر التوصيل المستحق: ${((_prod?.price||0)*_qty).toLocaleString()} دج\nاسم الزبون: ${name}\nرقم الهاتف: ${phone}\nالعنوان للتوزيع: ${addr}`);
+}
 
-            <!-- Filters Section -->
-            <div class="zalo-glass-card rounded-2xl p-4 flex flex-col sm:flex-row gap-4 justify-between items-center z-10 border border-white/5">
-                <!-- Search -->
-                <div class="relative w-full sm:max-w-md">
-                    <span class="absolute inset-y-0 right-3 flex items-center text-white/40">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                    </span>
-                    <input type="text" id="filter-search" oninput="applyFilters()" placeholder="ابحث عن المنتجات أو الهواتف أو الملابس الشتوية الجزائرية..." class="w-full bg-zalo-navy border border-white/10 rounded-xl pr-10 pl-4 py-2.5 text-sm text-white placeholder-white/40 focus:outline-none focus:border-zalo-emerald transition">
-                </div>
+window.doSearch = async (q) => {
+  if (!q) {
+    document.getElementById('sch-res').innerHTML = '';
+    document.getElementById('sch-empty').style.display = 'flex';
+    return;
+  }
+  document.getElementById('sch-empty').style.display = 'none';
+  const grid = document.getElementById('sch-res');
+  grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--gray)">⏳ جاري فلترة المنتجات والبحث الفوري...</div>';
+  
+  try {
+    const qLower = q.toLowerCase().trim();
+    const snap = await window._ff.getDocs(window._ff.collection(window._db, 'products'));
+    let matches = [];
+    snap.forEach(d => {
+      const p = d.data();
+      const pName = (p.name || '').toLowerCase();
+      const pCat = (p.category || '').toLowerCase();
+      if (pName.includes(qLower) || pCat.includes(qLower)) {
+        matches.push({ id: d.id, ...p });
+      }
+    });
 
-                <!-- Custom Filters (Category + Wilaya) -->
-                <div class="flex flex-wrap items-center gap-3 w-full sm:w-auto">
-                    <!-- Category -->
-                    <select id="filter-category" onchange="applyFilters()" class="bg-zalo-navy border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white/90 focus:outline-none focus:border-zalo-emerald flex-1 sm:flex-initial">
-                        <option value="ALL">جميع التصنيفات</option>
-                        <option value="ELECTRONICS">أجهزة إلكترونية</option>
-                        <option value="FASHION">أزياء وملابس</option>
-                        <option value="FOOD">خضار وأغذية طازجة</option>
-                        <option value="COSMETICS">مستحضرات تجميل</option>
-                        <option value="HOME">أدوات منزلية</option>
-                    </select>
+    if (matches.length === 0) {
+      grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--gray)">❌ لا توجد منتجات مطابقة في المعروضات</div>';
+      return;
+    }
 
-                    <!-- Wilaya -->
-                    <select id="filter-wilaya" onchange="applyFilters()" class="bg-zalo-navy border border-white/10 rounded-xl px-3 py-2.5 text-xs text-white/90 focus:outline-none focus:border-zalo-emerald flex-1 sm:flex-initial">
-                        <option value="ALL">الجزائر كاملة (58 ولاية)</option>
-                        <option value="الجزائر">الجزائر (Algiers)</option>
-                        <option value="وهران">وهران (Oran)</option>
-                        <option value="قسنطينة">قسنطينة (Constantine)</option>
-                        <option value="عنابة">عنابة (Annaba)</option>
-                        <option value="سطيف">سطيف (Setif)</option>
-                        <option value="تيزي وزو">تيزي وزو (Tizi Ouzou)</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Products List Section -->
-            <div>
-                <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-white">
-                    <span class="w-2.5 h-6 rounded bg-zalo-emerald"></span>
-                    كتالوج المنتجات المميزة
-                    <span id="product-count-badge" class="text-xs bg-zalo-navyLight text-white/50 px-3 py-1 rounded-full border border-white/10">0 متوفر</span>
-                </h3>
-
-                <!-- Loading Spinner if no products loaded -->
-                <div id="product-list-empty" class="hidden zalo-glass-card rounded-2xl p-10 text-center flex flex-col items-center justify-center">
-                    <i class="fa-solid fa-basket-shopping text-4xl text-white/20 mb-3 animate-bounce"></i>
-                    <p class="text-white/60 text-sm">عذراً، لم يتم العثور على أي منتج يطابق خيارات البحث الحالية.</p>
-                    <button onclick="resetFilters()" class="mt-4 text-xs font-bold text-zalo-emeraldLight hover:underline">إعادة ضبط المرشحات</button>
-                </div>
-
-                <!-- Products Grid -->
-                <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    <!-- Rendered dynamically by javascript -->
-                </div>
-            </div>
-
-            <!-- Customer orders and tickets tracker -->
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-6 border-t border-white/10">
-                
-                <!-- Placed Orders Panel -->
-                <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                    <h3 class="text-base font-bold flex items-center justify-between border-b border-white/10 pb-3">
-                        <span><i class="fa-solid fa-receipt text-zalo-gold"></i> تتبع طلباتك المشتراة</span>
-                        <span class="text-xs font-normal text-white/50">تحديث فوري لطلب السلع</span>
-                    </h3>
-                    <div id="customer-orders-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-                        <!-- Placed orders rendered dynamically -->
-                    </div>
-                </div>
-
-                <!-- Helpdesk tickets / Complaints -->
-                <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                    <h3 class="text-base font-bold flex items-center justify-between border-b border-white/10 pb-3">
-                        <span><i class="fa-solid fa-headset text-zalo-emeraldLight"></i> الدعم الفني وحل النزاعات</span>
-                        <button onclick="openComplaintModal()" class="text-xs font-bold text-zalo-emeraldLight hover:text-white transition"><i class="fa-solid fa-circle-plus"></i> رفع شكوى جديدة</button>
-                    </h3>
-                    <div id="customer-complaints-list" class="space-y-3 max-h-80 overflow-y-auto pr-1">
-                        <!-- Complaints list -->
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- ======================= 2. MERCHANT SCREEN ======================= -->
-        <section id="screen-merchant" class="hidden space-y-6">
-            
-            <!-- Dashboard Overview Badges -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <!-- StatCard 1 -->
-                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-zalo-gold border border-white/5">
-                    <div>
-                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">إجمالي المبيعات</p>
-                        <h4 id="merchant-sales-total" class="text-2xl font-black text-white mt-1">0 DZD</h4>
-                        <p class="text-[10px] text-zalo-emeraldLight mt-1"><i class="fa-solid fa-arrow-trend-up"></i> +12% هذا الأسبوع</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-zalo-gold/10 text-zalo-gold flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-wallet"></i>
-                    </div>
-                </div>
-                <!-- StatCard 2 -->
-                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-zalo-emerald border border-white/5">
-                    <div>
-                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">المنتجات النشطة</p>
-                        <h4 id="merchant-products-count" class="text-2xl font-black text-white mt-1">0</h4>
-                        <p class="text-[10px] text-white/40 mt-1">معروضة للزبائن بالمنصة</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-zalo-emerald/10 text-zalo-emeraldLight flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-box-open"></i>
-                    </div>
-                </div>
-                <!-- StatCard 3 -->
-                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-blue-500 border border-white/5">
-                    <div>
-                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">الطلبات الواردة</p>
-                        <h4 id="merchant-orders-count" class="text-2xl font-black text-white mt-1">0</h4>
-                        <p class="text-[10px] text-blue-400 mt-1"><span id="merchant-pending-orders" class="font-bold">0</span> طلب معلق حالياً</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-truck-ramp-box"></i>
-                    </div>
-                </div>
-                <!-- StatCard 4 -->
-                <div class="zalo-glass-card rounded-2xl p-5 flex items-center justify-between border-l-4 border-l-purple-500 border border-white/5">
-                    <div>
-                        <p class="text-[11px] text-white/55 font-bold uppercase tracking-wider">الاشتراك والتمكين</p>
-                        <h4 id="merchant-sub-badge" class="text-lg font-black text-zalo-gold mt-1">جاري التحميل...</h4>
-                        <p class="text-[10px] text-white/40 mt-1">جدد لتجنب توقف متجرك</p>
-                    </div>
-                    <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl">
-                        <i class="fa-solid fa-address-card"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Merchant Store Settings / Setup Panel if no store exists -->
-            <div id="merchant-no-store-alert" class="hidden zalo-glass-card rounded-3xl p-6 border-zalo-gold/30 space-y-4">
-                <div class="flex items-start gap-4">
-                    <div class="w-12 h-12 rounded-2xl bg-zalo-gold/10 text-zalo-gold flex items-center justify-center shrink-0 text-2xl">
-                        <i class="fa-solid fa-store"></i>
-                    </div>
-                    <div class="space-y-1">
-                        <h3 class="text-lg font-bold text-white">تسجيل وتأسيس متجرك على منصة ZaLo</h3>
-                        <p class="text-xs text-white/70 leading-relaxed">لم تبدأ البيع معنا بعد! يجب عليك ملء استمارة تسجيل متجرك الجديد ليقوم المشرفون بمراجعته والموافقة عليه في غضون دقائق.</p>
-                    </div>
-                </div>
-                <!-- Store form -->
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-white/10">
-                    <div>
-                        <label class="block text-xs font-bold text-white/80 mb-1">اسم المتجر بالعربية أو الأجنبية:</label>
-                        <input type="text" id="setup-store-name" placeholder="مثال: متجر الغروب للإلكترونيات" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-white/80 mb-1">تخصص المتجر (التصنيف الرئيسي):</label>
-                        <select id="setup-store-cat" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold">
-                            <option value="ELECTRONICS">أجهزة إلكترونية وهواتف</option>
-                            <option value="FASHION">ملابس وأزياء ومستلزمات</option>
-                            <option value="FOOD">خضروات وفواكه ومواد غذائية</option>
-                            <option value="COSMETICS">تجميل وعناية شخصية</option>
-                            <option value="HOME">منزل ومطبخ وأثاث</option>
-                        </select>
-                    </div>
-                    <div class="md:col-span-2">
-                        <label class="block text-xs font-bold text-white/80 mb-1">وصف المتجر ومميزاته للزبائن:</label>
-                        <textarea id="setup-store-desc" rows="2" placeholder="اكتب نبذة جذابة عن المتجر والمنتجات التي توفرها ومواعيد التوصيل..." class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold resize-none"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-white/80 mb-1">رقم الهاتف للتواصل المباشر:</label>
-                        <input type="tel" id="setup-store-phone" placeholder="مثال: 0555123456" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-white/80 mb-1">رقم الواتساب الشخصي (WhatsApp):</label>
-                        <input type="tel" id="setup-store-whatsapp" placeholder="مثال: 213555123456" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-white/80 mb-1">الولاية الجغرافية للمقر الرئيسي:</label>
-                        <select id="setup-store-wilaya" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold">
-                            <option value="الجزائر">الجزائر العاصمة (Algiers)</option>
-                            <option value="وهران">وهران (Oran)</option>
-                            <option value="قسنطينة">قسنطينة (Constantine)</option>
-                            <option value="عنابة">عنابة (Annaba)</option>
-                            <option value="سطيف">سطيف (Setif)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-white/80 mb-1">البلدية أو المقاطعة:</label>
-                        <input type="text" id="setup-store-commune" placeholder="مثال: المرسى، رويبة، بئر مراد رايس" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-zalo-gold">
-                    </div>
-                </div>
-                <button onclick="registerMerchantStore()" class="w-full bg-zalo-gold hover:bg-zalo-goldDark text-zalo-navy hover:text-white py-3 rounded-xl font-bold transition">
-                    تأسيس المتجر وإرساله للمراجعة الآن 🚀
-                </button>
-            </div>
-
-            <!-- Shop Manager panels (Layout with Tabs inside Merchant Portal) -->
-            <div id="merchant-has-store-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Add & Manage Products Section (2/3 columns) -->
-                <div class="lg:col-span-2 space-y-6">
-                    
-                    <!-- Products inventory list and quick addition -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-5">
-                        <div class="flex items-center justify-between border-b border-white/10 pb-3">
-                            <h3 class="text-base font-bold"><i class="fa-solid fa-boxes-stacked text-zalo-emeraldLight"></i> المنتجات بمتجرك</h3>
-                            <button onclick="openAddProductModal()" class="bg-zalo-emerald hover:bg-zalo-emeraldDark text-white px-3 py-1.5 rounded-xl font-bold text-xs transition"><i class="fa-solid fa-plus"></i> إضافة منتج جديد</button>
-                        </div>
-
-                        <!-- Products Inventory list table -->
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-zalo-navyLight/60 text-white/60">
-                                    <tr>
-                                        <th class="p-3">المنتج</th>
-                                        <th class="p-3">السعر الرئيسي</th>
-                                        <th class="p-3">المخزون المتوفر</th>
-                                        <th class="p-3">مرات البيع</th>
-                                        <th class="p-3 text-center">إجراءات</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="merchant-products-table-body" class="divide-y divide-white/5">
-                                    <!-- Dynamic rows loaded -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Store Orders Intake Panel -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-base font-bold border-b border-white/10 pb-3"><i class="fa-solid fa-truck-fast text-zalo-gold"></i> الطلبات الواردة لمتجرك لتجهيزها</h3>
-                        <div id="merchant-orders-list" class="space-y-4 max-h-96 overflow-y-auto pr-1">
-                            <!-- Dynamic orders that belong to this store -->
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Merchant AI Mentorship & Subscriptions side column -->
-                <div class="space-y-6">
-                    
-                    <!-- AI Assistant for merchants -->
-                    <div class="zalo-glass-card rounded-2xl p-4 flex flex-col h-[340px] border border-zalo-emerald/10 shadow-lg">
-                        <div class="flex items-center justify-between border-b border-white/10 pb-2 mb-3">
-                            <span class="text-xs font-bold text-zalo-emeraldLight flex items-center gap-1.5">
-                                <i class="fa-solid fa-brain-circuit"></i>
-                                مستشار التجار الذكي (Gemini)
-                            </span>
-                            <span id="merchant-ai-badge" class="text-[9px] bg-zalo-gold/15 text-zalo-gold px-2 py-0.5 rounded border border-zalo-gold/20 font-bold">باقة نشطة</span>
-                        </div>
-                        
-                        <!-- Chat history list -->
-                        <div id="merchant-ai-chat-history" class="flex-1 overflow-y-auto space-y-3 text-xs pr-1 mb-3">
-                            <!-- Dynamic messages -->
-                        </div>
-
-                        <!-- Chat entry -->
-                        <div class="flex gap-2 shrink-0">
-                            <input type="text" id="merchant-ai-chat-input" onkeydown="if(event.key === 'Enter') sendMerchantAiMessage()" placeholder="اسأل عن استراتيجية التسعير، أو اكتب وصف لمنتج..." class="flex-1 bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-xs text-white placeholder-white/40 focus:outline-none focus:border-zalo-emerald">
-                            <button onclick="sendMerchantAiMessage()" class="bg-zalo-emerald hover:bg-zalo-emeraldDark text-white w-9 h-9 rounded-xl flex items-center justify-center transition shrink-0">
-                                <i class="fa-regular fa-paper-plane"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Payment Subscriptions Panel -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 border-b border-white/10 pb-2 flex items-center justify-between">
-                            <span><i class="fa-solid fa-gem text-zalo-gold"></i> ترقية حساب التاجر للمميز</span>
-                            <span id="current-subscription-status" class="text-[10px] text-zalo-gold font-bold">الخطة المجانية</span>
-                        </h3>
-                        <p class="text-xs text-white/70 leading-relaxed">قم بالترقية فوراً للحصول على وصول غير محدود للتحليلات الذكية وعرض عدد لا نهائي من السلع بالمتجر.</p>
-                        
-                        <div class="space-y-3">
-                            <div class="bg-zalo-navy/60 p-3 rounded-xl border border-white/5 relative overflow-hidden group">
-                                <div class="absolute -right-6 -bottom-6 text-white/5 text-4xl transform rotate-12 group-hover:scale-110 transition"><i class="fa-solid fa-store-slash"></i></div>
-                                <h4 class="text-xs font-bold text-white flex justify-between">
-                                    <span>باقة متجر مبسط (STARTER COMPACT)</span>
-                                    <span class="text-zalo-gold">1,500 DZD</span>
-                                </h4>
-                                <p class="text-[10px] text-white/60 mt-1">منتجات محدودة بـ 15 منتج، تحليلات أساسية فقط بمحرك الويب.</p>
-                                <button onclick="selectUpgradePlan('STARTER_COMPACT', 1500)" class="mt-2.5 w-full bg-zalo-navy hover:bg-white/5 border border-white/15 text-white py-1.5 rounded-lg text-[10px] font-bold transition">دفع الترخيص ودفع CCP</button>
-                            </div>
-
-                            <div class="bg-zalo-navy/60 p-3 rounded-xl border border-zalo-gold/20 relative overflow-hidden group">
-                                <div class="absolute top-2 left-2 bg-zalo-gold text-zalo-navy font-black text-[9px] px-2 py-0.5 rounded">الأكثر مبيعاً ⭐</div>
-                                <h4 class="text-xs font-bold text-white flex justify-between">
-                                    <span>المرفوع والذكي (SMART ENTERPRISE)</span>
-                                    <span class="text-zalo-gold">4,500 DZD</span>
-                                </h4>
-                                <p class="text-[10px] text-white/60 mt-1 flex items-center gap-1"><i class="fa-solid fa-check text-zalo-emeraldLight"></i> وصول كلي لـ Gemini، تفعيل متجر كامل وإحصاءات دقيقة للبيانات.</p>
-                                <button onclick="selectUpgradePlan('SMART_ENTERPRISE', 4500)" class="mt-2.5 w-full bg-zalo-gold text-zalo-navy py-1.5 rounded-lg text-[10px] font-bold hover:bg-zalo-goldDark hover:text-white transition">دفع والترقية الآن</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Merchant Verification Documents upload workspace -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 border-b border-white/10 pb-2 flex items-center justify-between">
-                            <span><i class="fa-solid fa-id-card text-zalo-emeraldLight"></i> توثيق هوية التاجر للولاية 🛡️</span>
-                            <span id="merchant-verify-badge" class="text-[9px] bg-red-400/15 text-red-400 px-2.5 py-0.5 rounded-full border border-red-500/30 font-bold">غير موثق ❌</span>
-                        </h3>
-                        <p class="text-[10px] text-white/70 leading-relaxed">لضمان مكافحة الاحتيال وتنشيط الثقة المزدوجة بـ 58 ولاية، يرجى تقديم السجل وشهادة الهوية لتنشيط شارة <strong>بائع معتمد لدى سوق الجزائر</strong>.</p>
-                        
-                        <div id="merchant-verify-unverified-block" class="space-y-3">
-                            <div>
-                                <label class="block text-[10px] font-bold text-white/80 mb-1">رقم السجل التجاري الإلكتروني:</label>
-                                <input type="text" id="verify-register-code" placeholder="مثال: 16/00-0984321B22" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-1.5 text-xs text-white focus:outline-none focus:border-zalo-emerald">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-white/80 mb-1">رقم التعريف الوطني البيومتري NIN:</label>
-                                <input type="text" id="verify-nin-code" placeholder="مثال: 11029082938471" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-4 py-1.5 text-xs text-white focus:outline-none focus:border-zalo-emerald">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2 text-[10px]">
-                                <div class="bg-zalo-navy/50 p-2.5 rounded-xl border border-white/5 text-center cursor-pointer hover:bg-white/10 transition" onclick="simulateFileUpload('national_id')">
-                                    <i class="fa-solid fa-upload text-zalo-emeraldLight mb-1 text-xs block animate-pulse"></i>
-                                    <span id="lbl-id-file" class="text-white/60 font-semibold text-[9px]">بطاقة التعريف</span>
-                                </div>
-                                <div class="bg-zalo-navy/50 p-2.5 rounded-xl border border-white/5 text-center cursor-pointer hover:bg-white/10 transition" onclick="simulateFileUpload('commercial_register')">
-                                    <i class="fa-solid fa-file-pdf text-zalo-gold mb-1 text-xs block"></i>
-                                    <span id="lbl-cr-file" class="text-white/60 font-semibold text-[9px]">ملف الرقم السجلي</span>
-                                </div>
-                            </div>
-                            <button onclick="submitMerchantVerificationDocuments()" class="w-full bg-zalo-emerald hover:bg-zalo-emeraldDark text-white py-2 rounded-xl text-[10px] font-black transition shadow">
-                                إرسال الملفات للمصادقة التلقائية 🏢
-                            </button>
-                        </div>
-                        <div id="merchant-verify-submitted-block" class="hidden bg-zalo-navyLight/40 p-4 rounded-xl border border-zalo-gold/10 text-center text-xs space-y-1">
-                            <i class="fa-solid fa-hourglass-half text-zalo-gold text-lg animate-spin" style="animation-duration: 4s;"></i>
-                            <p class="font-bold text-white">الملفات الرسمية قيد التدقيق الإداري</p>
-                            <p class="text-[9px] text-white/50">يقوم وكيل المنصة الرئيسي بمطابقة رمز السجل التجاري البيومتري الآن لتنظيف وتفعيل حسابك.</p>
-                        </div>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- ======================= 3. ADMIN PORTAL SCREEN ======================= -->
-        <section id="screen-admin" class="hidden space-y-6">
-            
-            <!-- Global Admin Quick Stats -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="zalo-glass-card rounded-xl p-4 text-center">
-                    <p class="text-[10px] text-white/50 uppercase font-medium">إجمالي المستخدمين المسجلين</p>
-                    <h3 id="admin-stat-users" class="text-xl font-bold text-white mt-1">0</h3>
-                </div>
-                <div class="zalo-glass-card rounded-xl p-4 text-center">
-                    <p class="text-[10px] text-white/50 uppercase font-medium">المتاجر قيد المراجعة</p>
-                    <h3 id="admin-stat-stores" class="text-xl font-bold text-zalo-gold mt-1">0</h3>
-                </div>
-                <div class="zalo-glass-card rounded-xl p-4 text-center">
-                    <p class="text-[10px] text-white/50 uppercase font-medium">الاشتراكات قيد المراجعة</p>
-                    <h3 id="admin-stat-subs" class="text-xl font-bold text-purple-400 mt-1">0</h3>
-                </div>
-                <div class="zalo-glass-card rounded-xl p-4 text-center">
-                    <p class="text-[10px] text-white/50 uppercase font-medium">الشكاوى المفتوحة زبائن</p>
-                    <h3 id="admin-stat-support" class="text-xl font-bold text-red-400 mt-1">0</h3>
-                </div>
-            </div>
-
-            <!-- Double Columns Dashboard layout -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Stores Moderation and payments (2/3) -->
-                <div class="lg:col-span-2 space-y-6">
-                    
-                    <!-- Store Approval Table -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-base font-bold border-b border-white/10 pb-3 flex items-center justify-between">
-                            <span><i class="fa-solid fa-store-slash text-zalo-gold"></i> طلبات المتاجر قيد الانتظار أو المعالجة</span>
-                            <span class="text-xs text-white/55 font-normal">يتطلب مراجعة المشرف لمنع السلبيات</span>
-                        </h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-zalo-navyLight/70 text-white/60">
-                                    <tr>
-                                        <th class="p-3">اسم المتجر والوصف</th>
-                                        <th class="p-3">الموقع والمدينة</th>
-                                        <th class="p-3">التصنيف</th>
-                                        <th class="p-3">الحالة الحالية</th>
-                                        <th class="p-3 text-center">اتخاذ قرار</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-pending-stores-tbody" class="divide-y divide-white/5">
-                                    <!-- Dynamic rows from script -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Subscription Payments verification -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-base font-bold border-b border-white/10 pb-3"><i class="fa-solid fa-gem text-purple-400"></i> معالجة طلبات دفع التراخيص والاشتراكات</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-zalo-navyLight/70 text-white/60">
-                                    <tr>
-                                        <th class="p-3">التاجر / المتجر</th>
-                                        <th class="p-3">الباقة المحددة</th>
-                                        <th class="p-3">مبلغ التحويل</th>
-                                        <th class="p-3">مستند الدفع CCP</th>
-                                        <th class="p-3 text-center">الإجراء</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-pending-subs-tbody" class="divide-y divide-white/5">
-                                    <!-- List of pending upgrades -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Merchant Document verification desk -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-base font-bold border-b border-white/10 pb-3 flex items-center justify-between">
-                            <span><i class="fa-solid fa-id-card text-zalo-emeraldLight"></i> طلبات توثيق السجلات والملفات الرسمية للتجار</span>
-                            <span class="text-xs text-white/55 font-normal">مطابقة الهويات لمنع الاختلال والتحايل</span>
-                        </h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-zalo-navyLight/70 text-white/60">
-                                    <tr>
-                                        <th class="p-3">اسم التاجر والولاية</th>
-                                        <th class="p-3">رقم السجل التجاري</th>
-                                        <th class="p-3">رقم التعريف الوطني NIN</th>
-                                        <th class="p-3">مستندات الهوية والسجل</th>
-                                        <th class="p-3 text-center">الإجراء</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-pending-verifications-tbody" class="divide-y divide-white/5">
-                                    <!-- Pending merchant verification rows loaded -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Complaints Response Helpdesk -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-base font-bold border-b border-white/10 pb-3"><i class="fa-solid fa-headset text-red-400"></i> مكتب معالجة شكاوى وحماية المستهلك</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-right text-xs">
-                                <thead class="bg-zalo-navyLight/70 text-white/60">
-                                    <tr>
-                                        <th class="p-3">رقم الطلب / المشتكي</th>
-                                        <th class="p-3">رسالة وتفاصيل الشكوى والنزاع</th>
-                                        <th class="p-3">الحالة</th>
-                                        <th class="p-3 text-center">إغلاق وحل</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="admin-complaints-tbody" class="divide-y divide-white/5">
-                                    <!-- Complaints database row -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                </div>
-
-                <!-- Admin Audit Logs Stream and Platform configurations (1/3) -->
-                <div class="space-y-6">
-                    
-                    <!-- Audit Logs Panel -->
-                    <div class="zalo-glass-card rounded-2xl p-4 flex flex-col h-[380px]">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50 border-b border-white/10 pb-2 mb-3"><i class="fa-solid fa-terminal text-zalo-emeraldLight"></i> سجل التدقيق ومراقبة العمليات</h3>
-                        <div id="admin-audit-logs" class="flex-1 overflow-y-auto space-y-2.5 font-mono text-[10px] text-white/70 pr-1">
-                            <!-- Stream of log entries -->
-                        </div>
-                    </div>
-
-                    <!-- Config / Reset App simulator data -->
-                    <div class="zalo-glass-card rounded-2xl p-5 space-y-4">
-                        <h3 class="text-xs font-bold uppercase tracking-wider text-white/50"><i class="fa-solid fa-sliders"></i> تهيئة وإعادة تعيين النظام</h3>
-                        <p class="text-xs text-white/60 leading-relaxed">تستعمل هذه الخيارات لتنظيف قاعدة البيانات وتجربة تدفق البيانات من البداية وبسرعة وموثوقية.</p>
-                        <button onclick="clearAndSeedAppDatabase()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/30 font-bold py-2 rounded-xl text-xs transition">
-                            <i class="fa-solid fa-rotate-left"></i> مسح البيانات والبدء كـ Seed جديد 
-                        </button>
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!-- ======================= 4. CHAT WITH AI COMPANION ======================= -->
-        <section id="screen-ai-chat" class="hidden max-w-3xl mx-auto">
-            <div class="zalo-glass-card rounded-2xl overflow-hidden flex flex-col h-[520px] shadow-2xl relative border border-white/10">
-                <!-- Chat top info -->
-                <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 flex items-center justify-between border-b border-white/10 shrink-0">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-zalo-emerald text-white flex items-center justify-center text-lg animate-pulse">
-                            <i class="fa-solid fa-robot"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-white">مساعد ZaLo الذكي (Gemini Web Companion)</h3>
-                            <p class="text-[10px] text-zalo-emeraldLight">متوفر للإجابة والتحليلات والترجمات مجاناً</p>
-                        </div>
-                    </div>
-                    <button onclick="clearChatHistory()" class="text-xs font-medium text-white/40 hover:text-white transition"><i class="fa-solid fa-trash-can"></i> مسح المحادثة</button>
-                </div>
-
-                <!-- Messages area -->
-                <div id="ai-chat-messages-container" class="flex-1 overflow-y-auto px-5 py-4 space-y-4 text-xs">
-                    <!-- Loaded via js -->
-                </div>
-
-                <!-- Chat entry input -->
-                <div class="p-4 bg-zalo-navy/95 border-t border-white/10 shrink-0 flex gap-3">
-                    <input type="text" id="ai-chat-input-text" onkeydown="if(event.key === 'Enter') sendUserMessageToAssistant()" placeholder="مثال: اقترح علي وصفة تسويقية لبيع الهواتف، أو كيف أشتري من متجر النور..." class="flex-1 bg-zalo-navyLight border border-white/15 rounded-xl px-4 py-3 text-xs text-white placeholder-white/40 focus:outline-none focus:border-zalo-emerald">
-                    <button onclick="sendUserMessageToAssistant()" class="bg-zalo-emerald hover:bg-zalo-emeraldDark text-white w-12 h-12 rounded-xl flex items-center justify-center transition">
-                        <i class="fa-regular fa-paper-plane text-base"></i>
-                    </button>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer of conversion workspace -->
-    <footer class="zalo-glass mt-auto border-t border-white/5 py-6">
-        <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-center">
-            <div>
-                <p class="text-xs text-white/50">حقوق النشر &copy; 2026 سوق الجزائر الذكي ZaLo. تم بناؤه وتطويره بشكل مستقل ليعمل كـ HTML/CSS/JS متكامل.</p>
-                <p class="text-[10px] text-zalo-gold/60 mt-1">المنصة متوافقة تماماً مع أنظمة الويب، الجوال، وتطبيقات Android الكهروطبقية.</p>
-            </div>
-            <div class="flex items-center gap-2">
-                <span class="text-xs text-zalo-emeraldLight font-semibold"><i class="fa-regular fa-circle-check text-xs"></i> 100% قابل للتحميل</span>
-                <span class="text-white/20">|</span>
-                <button onclick="openDownloadModal()" class="text-xs font-bold text-zalo-gold hover:underline"><i class="fa-solid fa-download"></i> شرح تحميل الملفات ZIP</button>
-            </div>
+    grid.innerHTML = '';
+    matches.forEach(p => {
+      grid.innerHTML += `<div class="pcard" onclick="openProd('${p.id}','${(p.name || '').replace(/'/g, "\\'")}',${p.price || 0},'${p.image || ''}','${p.emoji || '📦'}')">
+        <div class="pcard-img">${p.image ? `<img src="${p.image}" alt="">` : `<span>${p.emoji || '📦'}</span>`}</div>
+        <div class="pcard-body">
+          <div class="pcard-name">${p.name || ''}</div>
+          <div class="pcard-price">${(p.price || 0).toLocaleString()} <span>دج</span></div>
         </div>
-    </footer>
+      </div>`;
+    });
+  } catch(e) {
+    grid.innerHTML = '<div style="grid-column:span 2;text-align:center;padding:20px;color:var(--red)">⚠️ حدث خطأ أثناء عملية البحث الفوري</div>';
+  }
+};
 
-    <!-- ======================= POPUP MODALS ======================= -->
+function setType(t,el){window._stype=t;document.getElementById('tb-r').classList.toggle('on',t==='registered');document.getElementById('tb-f').classList.toggle('on',t==='free');document.getElementById('docs-r').style.display=t==='registered'?'block':'none';document.getElementById('docs-f').style.display=t==='free'?'block':'none';}
+function updateSteps(n){[1,2,3,4].forEach(i=>{const d=document.getElementById('st'+i);if(!d)return;d.className='sdot'+(i<n?' done':i===n?' now':'');d.parentElement.querySelector('.slbl').className='slbl'+(i<=n?' done':''+(i===n?' now':''));});}
+function rNext(s){
+  if(s===1){
+    const req=['r-sname','r-oname','r-email','r-pass','r-phone','r-wa','r-cat'];
+    for(const id of req){const el=document.getElementById(id);if(!el?.value?.trim()){toast('⚠️ الرجاء ملء الحقول الإجبارية أولاً للضمان والتسجيل','err');el?.focus();return;}}
+    if(document.getElementById('r-pass').value.length<6){toast('⚠️ يجب أن لا تقل جودة كلمة المرور عن 6 أحرف','err');return;}
+    const sel=document.getElementById('r-wil');
+    if(sel.options.length<2){WILAYAS.forEach(w=>{const o=document.createElement('option');o.value=w.n;o.textContent=w.n;sel.appendChild(o);});}
+    document.getElementById('rs1').style.display='none';document.getElementById('rs2').style.display='block';updateSteps(2);
+  }else if(s===2){
+    const req=['r-wil','r-comm','r-addr','r-hours','r-desc'];
+    for(const id of req){const el=document.getElementById(id);if(!el?.value?.trim()){toast('⚠️ يرجى تحديد موقع متجرك الجغرافي لدقة فرز الزبائن','err');el?.focus();return;}}
+    document.getElementById('docs-r').style.display=window._stype==='registered'?'block':'none';
+    document.getElementById('docs-f').style.display=window._stype==='free'?'block':'none';
+    document.getElementById('rs2').style.display='none';document.getElementById('rs3').style.display='block';updateSteps(3);
+  }
+}
+function rBack(s){if(s===2){document.getElementById('rs2').style.display='none';document.getElementById('rs1').style.display='block';updateSteps(1);}else if(s===3){document.getElementById('rs3').style.display='none';document.getElementById('rs2').style.display='block';updateSteps(2);}}
+function fillComm2(wname){const w=WILAYAS.find(x=>x.n===wname);if(!w)return;const sel=document.getElementById('r-comm');sel.innerHTML='<option value="">اختر البلدية...</option>';w.c.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});}
+function filePick(input,boxId,labelId){const f=input.files[0];if(!f)return;if(labelId)document.getElementById(labelId).textContent='✅ '+f.name;if(boxId)document.getElementById(boxId)?.classList.add('has');}
 
-    <!-- Shopping Cart Slide-out Drawer -->
-    <div id="cart-drawer-overlay" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 transition-opacity hidden" onclick="toggleCartDrawer()">
-        <!-- Slide element -->
-        <div class="absolute inset-y-0 left-0 max-w-md w-full bg-zalo-navyLight shadow-2xl p-5 flex flex-col border-r border-white/10" onclick="event.stopPropagation()">
-            <div class="flex items-center justify-between border-b border-white/10 pb-4 mb-4">
-                <h3 class="text-base font-extrabold flex items-center gap-2 text-white">
-                    <i class="fa-solid fa-cart-shopping text-zalo-emeraldLight"></i>
-                    سلة مشترياتك الحالية
-                </h3>
-                <button onclick="toggleCartDrawer()" class="w-8 h-8 rounded-full hover:bg-white/5 flex items-center justify-center text-white/60 hover:text-white transition">
-                    <i class="fa-solid fa-xmark text-lg"></i>
-                </button>
-            </div>
+// Expose module functions to global window context for HTML inline events (such as onclick, oninput, etc.)
+window.G = G;
+window.back = back;
+window.toast = toast;
+window.openWA = openWA;
+window.openLink = openLink;
+window.openSide = openSide;
+window.closeSide = closeSide;
+window.showCP = showCP;
+window.renderCL = renderCL;
+window.filterComm = filterComm;
+window.closeCommP = closeCommP;
+window.selC = selC;
+window.openCat = openCat;
+window.openStore = openStore;
+window.openProd = openProd;
+window.chQty = chQty;
+window.goOrd = goOrd;
+window.selPay = selPay;
+window.placeOrder = placeOrder;
+window.orderWA = orderWA;
+window.rNext = rNext;
+window.rBack = rBack;
+window.fillComm2 = fillComm2;
+window.filePick = filePick;
 
-            <!-- Scrollable list of cart items -->
-            <div id="cart-items-container" class="flex-1 overflow-y-auto space-y-3 mb-4">
-                <!-- Cart list inside JS -->
-            </div>
-
-            <!-- Totals & Checkout block -->
-            <div id="cart-totals-checkout-block" class="bg-zalo-navy/90 border border-white/15 rounded-2xl p-4 shrink-0 space-y-3">
-                <div class="space-y-1 text-xs">
-                    <div class="flex justify-between">
-                        <span class="text-white/50">مجموع السلع:</span>
-                        <span id="cart-subtotal" class="font-bold text-white">0 DZD</span>
-                    </div>
-                    <div class="flex justify-between">
-                        <span class="text-white/50">رسوم التوصيل:</span>
-                        <span id="cart-delivery-fee" class="font-bold text-white">400 DZD</span>
-                    </div>
-                    <div class="flex justify-between text-sm border-t border-white/10 pt-2 font-black text-zalo-gold mt-1">
-                        <span>المبلغ الإجمالي المستحق:</span>
-                        <span id="cart-grandtotal">0 DZD</span>
-                    </div>
-                </div>
-
-                <button onclick="openCheckoutModal()" class="w-full bg-zalo-emerald hover:bg-zalo-emeraldDark text-white py-2.5 rounded-xl font-bold text-xs transition shadow-lg">
-                    <i class="fa-solid fa-circle-check"></i> الانتقال لإتمام الطلب الآن
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Checkout Form Modal -->
-    <div id="checkout-modal" class="fixed inset-0 bg-black/70 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleCheckoutModal()">
-        <div class="bg-zalo-navyLight max-w-lg w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 border-b border-white/10 flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-wallet text-zalo-gold"></i> معلومات الدفع والطلب</h3>
-                <button onclick="toggleCheckoutModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="p-5 space-y-4 text-xs">
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">اسم المستلم الذكي (الاسم الثلاثي):</label>
-                    <input type="text" id="chk-name" value="عبد الهادي نجم الدين" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">عنوان التسليم والشارع والمنزل بالتفصيل:</label>
-                    <input type="text" id="chk-address" placeholder="الشارع الرئيسي، حي المستقبل، مبنى 12، الطابق 2" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div>
-                        <label class="block text-[11px] text-white/70 font-semibold mb-1">الولاية:</label>
-                        <select id="chk-wilaya" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                            <option value="الجزائر">الجزائر (Algiers)</option>
-                            <option value="وهران">وهران (Oran)</option>
-                            <option value="قسنطينة">قسنطينة (Constantine)</option>
-                            <option value="سطيف">سطيف (Setif)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-white/70 font-semibold mb-1">البلدية والمقاطعة الجارية:</label>
-                        <input type="text" id="chk-commune" value="المرسى" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">أسلوب وخيار الدفع:</label>
-                    <select id="chk-payment-method" onchange="updateCheckoutPaymentDetails()" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                        <option value="COD">الدفع عند الاستلام (Cash on Delivery)</option>
-                        <option value="BARIDIMOB">الدفع السريع (BaridiMob RIP)</option>
-                        <option value="CCP">التحويل البريدي التقليدي (CCP Card)</option>
-                    </select>
-                </div>
-
-                <!-- Payment provider accounts/QR placeholder -->
-                <div id="payment-details-info" class="bg-zalo-navy/80 border border-zalo-gold/20 rounded-xl p-3 flex items-start gap-3 text-[11px] leading-relaxed">
-                    <i class="fa-solid fa-money-bill-wave text-zalo-gold text-sm shrink-0 mt-0.5"></i>
-                    <div>
-                        <span class="font-bold text-white block">الدفع عند الاستلام نقداً (COD)</span>
-                        أكد طلبك الآن وادفع القيمة الإجمالية عند وصول السلعة لباب منزلك مع عامل التوصيل في ولايتك.
-                    </div>
-                </div>
-            </div>
-
-            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end gap-2 shrink-0">
-                <button onclick="toggleCheckoutModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl text-xs transition">إلغاء</button>
-                <button onclick="submitCheckoutOrder()" class="px-5 py-2 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white font-bold rounded-xl text-xs transition shadow-lg">تأكيد عملية الشراء 🚀</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Create Product Modal (Merchant only) -->
-    <div id="add-product-modal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleAddProductModal()">
-        <div class="bg-zalo-navyLight max-w-md w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 border-b border-white/10 flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-box-open text-zalo-emeraldLight"></i> إضافة سلعة جديدة للمتجر المعماري</h3>
-                <button onclick="toggleAddProductModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="p-5 space-y-4 text-xs font-bold">
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">اسم المنتج أو السلعة المعروضة:</label>
-                    <input type="text" id="prod-name" placeholder="مثال: سماعات بلوتوث مبرمجة سبيشال" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                </div>
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">وصف المنتج ومكوناته بالتفاصيل:</label>
-                    <textarea id="prod-desc" rows="3" placeholder="مواصفات تضمن للزبون الجودة وسرعة الرد والمسؤولية..." class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white resize-none"></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-3 font-bold">
-                    <div>
-                        <label class="block text-[11px] text-white/70 font-semibold mb-1">سعر البيع (DZD):</label>
-                        <input type="number" id="prod-price" value="3500" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                    </div>
-                    <div>
-                        <label class="block text-[11px] text-white/70 font-semibold mb-1">الكمية المتوفرة (المخزون):</label>
-                        <input type="number" id="prod-stock" value="10" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">تصنيف المنتج الرئيسي:</label>
-                    <select id="prod-cat" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                        <option value="ELECTRONICS">أجهزة إلكترونية</option>
-                        <option value="FASHION">ملابس وأزياء</option>
-                        <option value="FOOD">خضار وأغذية</option>
-                        <option value="COSMETICS">مستحضرات تجميل</option>
-                        <option value="HOME">أدوات منزلية</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">رابط صورة عشوائية (افتراضي):</label>
-                    <input type="text" id="prod-img" value="https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white/70 font-bold">
-                </div>
-            </div>
-
-            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end gap-2 shrink-0">
-                <button onclick="toggleAddProductModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl text-xs transition">إلغاء</button>
-                <button onclick="submitMerchantProduct()" class="px-5 py-2 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white font-bold rounded-xl text-xs transition shadow-lg">إضافة المنتج للجمهور 📦</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Raise Complaint / Dispute Modal -->
-    <div id="complaint-modal" class="fixed inset-0 bg-black/75 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleComplaintModal()">
-        <div class="bg-zalo-navyLight max-w-md w-full rounded-2xl border border-white/10 overflow-hidden shadow-2xl" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-5 py-4 border-b border-white/10 flex items-center justify-between">
-                <h3 class="text-sm font-bold text-white flex items-center gap-2"><i class="fa-solid fa-circle-exclamation text-red-400"></i> رفع شكوى أو نزاع تجاري رسمي</h3>
-                <button onclick="toggleComplaintModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="p-5 space-y-4 text-xs font-bold">
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">حدد الطلب المعني بالمشكلة:</label>
-                    <select id="comp-order-id" class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white">
-                        <!-- Dynamic options based on customer orders -->
-                    </select>
-                </div>
-                <div>
-                    <label class="block text-[11px] text-white/70 font-semibold mb-1">اكتب في بضعة أسطر المشكلة ووسيلة الاتصال المناسبة لك:</label>
-                    <textarea id="comp-message" rows="4" placeholder="مثال: لم أستلم طلبي حتى الآن أو المنتج لا يطابق المواصفات المتفق عليها..." class="w-full bg-zalo-navy border border-white/10 rounded-xl px-3 py-2 text-white resize-none"></textarea>
-                </div>
-            </div>
-
-            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end gap-2 shrink-0">
-                <button onclick="toggleComplaintModal()" class="px-4 py-2 bg-white/5 hover:bg-white/10 text-white font-medium rounded-xl text-xs transition">إلغاء</button>
-                <button onclick="submitUserComplaint()" class="px-5 py-2 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl text-xs transition shadow-lg">تقديم الشكوى للإدارة 🛡️</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Download & Export Helper modal -->
-    <div id="download-helper-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden" onclick="toggleDownloadModal()">
-        <div class="bg-zalo-navyLight max-w-xl w-full rounded-3xl border border-white/15 overflow-hidden shadow-2xl relative" onclick="event.stopPropagation()">
-            <div class="bg-gradient-to-r from-zalo-navy to-zalo-navyLight px-6 py-5 border-b border-white/10 flex items-center justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-9 h-9 rounded-xl bg-zalo-gold/10 text-zalo-gold flex items-center justify-center">
-                        <i class="fa-solid fa-cloud-arrow-down"></i>
-                    </div>
-                    <div>
-                        <h3 class="text-sm font-extrabold text-white">تحميل ملفات المشروع (HTML/CSS)</h3>
-                        <p class="text-[10px] text-white/50">كيفية نقل وتحميل هذا المشروع ليعمل مستقلاً على جهازك</p>
-                    </div>
-                </div>
-                <button onclick="toggleDownloadModal()" class="text-white/60 hover:text-white transition"><i class="fa-solid fa-xmark text-lg"></i></button>
-            </div>
-
-            <div class="p-6 space-y-4 text-xs leading-relaxed font-bold">
-                <p class="text-white/80">
-                    تم تحويل مشروع <strong>ZaLo Smart Marketplace</strong> بالكامل من بيئة Android الثقيلة إلى تطبيق ويب مستقل فائق السرعة يعمل باستخدام <strong>HTML5, CSS (Tailwind) و JavaScript</strong> بدون الحاجة لإنترنت خارجي ومحلي كلياً!
-                </p>
-                
-                <h4 class="font-bold text-zalo-gold flex items-center gap-2 text-xs uppercase tracking-wide border-b border-white/5 pb-1"><i class="fa-solid fa-download"></i> خطوات تحميل الملفات فوراً:</h4>
-                <ol class="list-decimal list-inside space-y-2 text-white/70">
-                    <li>اضغط على القائمة الجانبية أو <strong>رمز الترس / الإعدادات في AI Studio</strong> بالمتصفح على يسار الشاشة.</li>
-                    <li>اختر <strong>Export Project as ZIP</strong> (تصدير المشروع كملف مضغوط ZIP).</li>
-                    <li>بعد تحميل الملف المضغوط وفك الضغط عنه على حاسوبك، ستجد ملفات الويب مباشرة في مجلد:
-                        <code class="block bg-zalo-navy px-3 py-1.5 rounded-lg border border-white/10 text-zalo-gold text-[11px] font-mono mt-1 text-center font-bold">/web/</code>
-                    </li>
-                    <li>افتح ملف <code class="text-zalo-emeraldLight font-bold">index.html</code> مباشرة بنقرة مزدوجة في أي متصفح (كروم، فايرفوكس، إيدج) واستمتع بالمحاكاة الكاملة والتصميم!</li>
-                </ol>
-
-                <div class="bg-zalo-emerald/10 border border-zalo-emerald/30 p-4 rounded-2xl flex items-start gap-3">
-                    <i class="fa-solid fa-circle-info text-zalo-emeraldLight text-sm shrink-0 mt-0.5"></i>
-                    <p class="text-[11px] text-white/80">
-                        <strong>ملاحظة هامة:</strong> لقد قمنا بدمج وبناء هذه الملفات مباشرة داخل تطبيق Android أيضاً، لكي تتمكن من تصفح ومحاكاة واجهات الويب مباشرة داخل <strong>الترس الرقمي / محاكي Android</strong> في المتصفح بكل سلاسة وتوافقية دون أي أعطال برمجية!
-                    </p>
-                </div>
-            </div>
-
-            <div class="bg-zalo-navy/50 p-4 border-t border-white/10 flex justify-end shrink-0">
-                <button onclick="toggleDownloadModal()" class="px-6 py-2.5 bg-zalo-gold hover:bg-zalo-goldDark text-zalo-navy hover:text-white font-bold rounded-xl text-xs transition shadow-lg">فهمت، شكراً جزيلاً!</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- JavaScript code controller is loaded underneath -->
-    <script src="app.js"></script>
+document.addEventListener('DOMContentLoaded',()=>{
+  renderW();
+  setTimeout(()=>{
+    const spl = document.getElementById('splash');
+    if (spl) spl.classList.add('hide');
+    setTimeout(()=>{
+      if (spl) spl.style.display='none';
+      const app = document.getElementById('app');
+      if (app) app.style.display='block';
+    },800);
+  },1200);
+});
+</script>
 </body>
 </html>

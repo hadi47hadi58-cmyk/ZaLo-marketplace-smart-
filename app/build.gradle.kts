@@ -120,3 +120,14 @@ dependencies {
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
 }
+
+// Automatically copy master web assets from root ./web directory to app/src/main/assets/web on every build
+val copyWebAssets by tasks.registering(Copy::class) {
+    from(file("${rootDir}/web"))
+    into(file("${projectDir}/src/main/assets/web"))
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+tasks.matching { it.name.startsWith("preBuild") }.configureEach {
+    dependsOn(copyWebAssets)
+}

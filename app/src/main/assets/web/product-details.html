@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفاصيل السلعة - ZaLo Market</title>
+    <!-- Tailwind CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tajawal Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #0b1528;
+            color: #f3f4f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- Global Header -->
+    <header class="sticky top-0 z-50 bg-[#0f1c36]/90 border-b border-white/10 w-full py-4 px-6 flex justify-between items-center backdrop-blur-md">
+        <a href="index.html" class="flex items-center gap-1.5 text-xs text-[#D4AF37] hover:text-white transition">
+            <i class="fa-solid fa-arrow-right"></i>
+            <span>رجوع للمتجر</span>
+        </a>
+        <h1 class="text-base font-black text-white font-bold">معلومات وتفاصيل السلعة</h1>
+        <div class="flex items-center gap-2">
+            <div id="product-detail-store-badge" class="bg-slate-800 text-[#D4AF37] text-[10px] font-bold px-2.5 py-1 rounded-full border border-slate-700">
+                <i class="fa-solid fa-store ml-1"></i> <span id="product-detail-store-name">...</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 w-full max-w-4xl mx-auto px-6 py-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-right bg-[#0f1c36]/50 border border-slate-700/50 rounded-[32px] p-6 shadow-2xl">
+            
+            <!-- Left Pane: Product Media Gallery -->
+            <div class="space-y-4">
+                <img id="product-detail-image" src="" class="w-full h-80 object-cover rounded-2xl animate-fade-in border border-slate-700/50 shadow-inner" alt="">
+                <!-- Carousel Thumbnails -->
+                <div id="product-detail-thumbs" class="flex gap-3 justify-center">
+                    <!-- Loaded dynamically via app.js -->
+                </div>
+            </div>
+
+            <!-- Right Pane: Details & Configuration -->
+            <div class="flex flex-col justify-between space-y-6">
+                <div class="space-y-3">
+                    <h2 id="product-detail-name" class="text-2xl font-black text-white font-bold">Galaxy A07</h2>
+                    <p id="product-detail-price" class="text-3xl font-black text-[#D4AF37] font-bold">22,000 دج</p>
+                    <hr class="border-slate-700/50">
+                    <p class="text-xs text-slate-400 font-bold">الوصف والتفاصيل المعتمدة:</p>
+                    <p id="product-detail-desc" class="text-sm text-slate-300 leading-relaxed font-semibold">...</p>
+                </div>
+
+                <!-- Call to action shortcuts -->
+                <div class="grid grid-cols-2 gap-3">
+                    <a id="btn-call-merchant" href="" class="bg-gradient-to-tr from-sky-400 to-[#00AEEF] hover:scale-105 active:scale-95 text-slate-950 font-black text-xs py-3 rounded-full text-center shadow-lg transition">
+                        <i class="fa-solid fa-phone-flip ml-1"></i> اتصال مباشر
+                    </a>
+                    <a id="btn-whatsapp-merchant" href="" target="_blank" class="bg-[#25D366] hover:bg-[#20ba5a] hover:scale-105 active:scale-95 text-white font-black text-xs py-3 rounded-full text-center shadow-lg transition">
+                        <i class="fa-brands fa-whatsapp ml-1"></i> واتساب التاجر
+                    </a>
+                </div>
+
+                <!-- Dynamic Order Configuration Section -->
+                <div class="bg-slate-900/60 border border-slate-700/40 rounded-2xl p-4 space-y-4">
+                    <h3 class="text-xs font-black text-white"><i class="fa-solid fa-truck-fast text-[#D4AF37]"></i> تأكيد وحجز الطلبية للمنطقة</h3>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <label class="block text-[10px] text-slate-300 font-bold mb-1">طريقة الدفع المناسبة:</label>
+                            <select id="order-payment-method" class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl py-2 px-3 focus:outline-none" onchange="toggleOrderReceiptField(this.value)">
+                                <option value="COD">الدفع عند الاستلام (COD)</option>
+                                <option value="BaridiMob">عبر بريدي موب (BaridiMob) / CCP</option>
+                            </select>
+                        </div>
+
+                        <!-- Optional CCP receipt upload simulation -->
+                        <div id="receipt-upload-group" class="p-3 bg-amber-500/5 border border-amber-500/20 rounded-xl space-y-2" style="display: none;">
+                            <p class="text-[10px] text-amber-500 leading-tight">يرجى تحويل المبلغ للحساب الجاري (المركب في البريد) وإرفاق نسخة إلكترونية لوثيقة المعاملة:</p>
+                            <input id="order-receipt" type="file" class="w-full text-[10px] text-slate-300 bg-slate-950 p-2 rounded-lg border border-slate-800">
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] text-slate-300 font-bold mb-1">عنوان وتفصيل التوصيل الجغرافي:</label>
+                            <input id="order-address" type="text" class="w-full bg-slate-950 border border-slate-800 text-xs text-white rounded-xl py-2.5 px-3 focus:outline-none" placeholder="مثال: حي ميعاد، المنيعة (بالقرب من الثانوية)">
+                        </div>
+                    </div>
+
+                    <button id="btn-submit-order" class="w-full bg-gradient-to-tr from-amber-500 to-[#D4AF37] hover:scale-105 active:scale-95 text-slate-950 font-black text-sm py-3.5 rounded-xl text-center shadow-2xl font-bold transition">
+                        تأكيد طلب المنتج الآن <i class="fa-solid fa-cart-shopping mr-1"></i>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="border-t border-slate-800/60 py-4 text-center text-xs text-slate-500 bg-slate-950/40">
+        <p>© 2026 ZaLo Market - السوق الذكي متعدد البائعين.</p>
+    </footer>
+
+    <!-- Shared JS Engine -->
+    <script src="app.js"></script>
+    <script>
+        function toggleOrderReceiptField(val) {
+            let el = document.getElementById("receipt-upload-group");
+            if (val === "BaridiMob") {
+                el.style.display = "block";
+            } else {
+                el.style.display = "none";
+            }
+        }
+    </script>
+</body>
+</html>

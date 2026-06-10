@@ -1,0 +1,37 @@
+# ZaLo Market - GitHub Actions Pipeline Configuration
+name: Deploy ZaLo Market to Firebase Hosting
+
+on:
+  push:
+    branches:
+      - main  # Triggers when code is pushed to your main branch
+
+jobs:
+  build_and_deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout codebase
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Setup Node Environments (if using build scripts like React)
+      - name: Setup Node.js Build Engine
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      # Step 3: Package install & build compilation (uncomment if you add package managers)
+      # - name: Install Dependencies & Compile Build
+      #   run: |
+      #     npm install
+      #     npm run build
+
+      # Step 4: Deploy assets to Firebase Hosting using CLI credentials
+      - name: Deploy to Firebase Hosting Service
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: '${{ secrets.GITHUB_TOKEN }}'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_ZALOMARKET_SMART }}'
+          channelId: live
+          projectId: zalomarket-smart

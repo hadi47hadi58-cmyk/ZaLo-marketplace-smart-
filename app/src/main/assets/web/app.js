@@ -1,1494 +1,820 @@
-// ZaLo Smart Marketplace - JavaScript Engine (app.js)
-// 100% Client-Side State Engine with localStorage Persistence
+// ZaLo Smart Marketplace - JavaScript Shared Engine (app.js)
+// Implements 100% Client-Side Firestore Database Replica using localStorage
+// Fully localized in Arabic with support for 58 Algerian Wilayas and custom Southern Municipalities
 
-// --- Initial Mock Seed Data ---
-const DEFAULT_USERS = [
-    { id: 1, email: "hadi47hadi58@gmail.com", name: "عبد الهادي نجم الدين", role: "CUSTOMER", status: "ACTIVE", wilaya: "الجزائر", commune: "المرسى", loyaltyPoints: 1250 },
-    { id: 2, email: "merchant@zalo.dz", name: "أحمد بن زكري", role: "MERCHANT", status: "ACTIVE", wilaya: "وهران", commune: "سيدي الهواري", loyaltyPoints: 340 },
-    { id: 3, email: "admin@zalo.dz", name: "مشرف المنصة الرئيسي", role: "ADMIN", status: "ACTIVE", wilaya: "الجزائر", commune: "حيدرة", loyaltyPoints: 9999 }
+// --- Seed Databases ---
+const SEED_MUNICIPALITIES = [
+    { id: "el-menia", name: "بلدية المنيعة", image: "https://images.unsplash.com/photo-1547814181-79b8c08ecfe8?auto=format&fit=crop&w=600&q=80" },
+    { id: "hassi-el-fhal", name: "بلدية حاسي الفحل", image: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=600&q=80" },
+    { id: "hassi-gara", name: "بلدية حاسي القارة", image: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" }
 ];
 
-const DEFAULT_STORES = [
-    { id: 101, merchantId: 2, name: "متجر النور للإلكترونيات", description: "أقوى الهواتف الذكية وسماعات الأذن وأجهزة الكمبيوتر المستوردة بأرخص الأسعار مع ضمان لمدة سنة كاملة.", phone: "0555353535", whatsapp: "213555353535", wilaya: "وهران", commune: "سيدي الهواري", category: "ELECTRONICS", status: "APPROVED", rating: 4.8 },
-    { id: 102, merchantId: 4, name: "أخضر بازار للمنتجات الطبيعية", description: "خضار وفواكه صحية طازجة من مزارع متيجة بالجزائر إلى باب منزلك مباشرة، جودة لا تقارن.", phone: "0561234567", whatsapp: "213561234567", wilaya: "الجزائر", commune: "المرسى", category: "FOOD", status: "APPROVED", rating: 4.5 }
+const SEED_USERS = [
+    { uid: "user_hadi", email: "hadi47hadi58@gmail.com", name: "الزبون الجزائري الذكي", phone: "0666112233", role: "customer", status: "ACTIVE" },
+    { uid: "user_merchant", email: "merchant@zalo.dz", name: "أحمد بن زكري (تاجر السلام)", phone: "0555334455", role: "merchant", status: "ACTIVE" },
+    { uid: "user_admin", email: "admin@zalo.dz", name: "مسؤول المراجعة والتدقيق", phone: "0770559988", role: "admin", status: "ACTIVE" },
+    { uid: "user_manager", email: "manager@zalo.dz", name: "المدير العام للنظام", phone: "0660447711", role: "manager", status: "ACTIVE" }
 ];
 
-const DEFAULT_PRODUCTS = [
-    { id: 1001, storeId: 101, name: "سماعات أنكر اللاسلكية Soundcore X", description: "سماعات أصلية مانعة للضوضاء وبطارية تدوم لـ 40 ساعة متواصلة مع شحن سريع جداً وجسد رياضي مقاوم للعرق.", price: 7900.00, category: "ELECTRONICS", stock: 12, salesCount: 45, rating: 4.8, imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=300&q=80" },
-    { id: 1002, storeId: 101, name: "ساعة شاومي ريدمي الذكية 4", description: "شاشة AMOLED ملونة، حساس قياس نبضات القلب ونسبة الأكسجين في الدم مع تتبع الرياضات المتنوعة وبطارية 14 يوم.", price: 9200.00, category: "ELECTRONICS", stock: 6, salesCount: 22, rating: 4.6, imageUrl: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=300&q=80" },
-    { id: 1003, storeId: 102, name: "سلة التوفير العائلية الصحية للغذاء", description: "سلة تزن 12 كجم من البطاطس، البصل، الطماطم والجزر الطازج الفاخر بالإضافة لزيت زيتون بكر مضغوط على البارد.", price: 2900.00, category: "FOOD", stock: 20, salesCount: 88, rating: 4.9, imageUrl: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=300&q=80" },
-    { id: 1004, storeId: 101, name: "شاحن سريع للأيفون والسامسونج 35W", description: "شاحن مزدوج المنافذ Type-C بقدرة خارقة ومحمي ضد الارتفاع المفاجئ للتيار الكهربائي في البيوت الجزائرية.", price: 2300.00, category: "ELECTRONICS", stock: 35, salesCount: 15, rating: 4.3, imageUrl: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=300&q=80" },
-    { id: 1005, storeId: 102, name: "معجون دقلة نور الجزائرية الفاخر", description: "معجون طبيعي مصنوع من تمور دقلة نور تولقة الخالية من السكر المضاف والمواد الحافظة الكيماوية لسلامة أطفالك.", price: 1200.00, category: "FOOD", stock: 40, salesCount: 5, rating: 4.2, imageUrl: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=300&q=80" }
+const SEED_STORES = [
+    { storeId: "store_salam", municipalityId: "el-menia", storeName: "متجر السلام", ownerName: "أحمد بن زكري", phone: "0666112233", address: "وسط المدينة، المنيعة (بالقرب من البريد القديم)", image: "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80" },
+    { storeId: "store_noor", municipalityId: "el-menia", storeName: "متجر النور", ownerName: "سعيد بن عمر", phone: "0555998877", address: "شارع المجاهدين المقابل لبلدية المنيعة", image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80" },
+    { storeId: "store_oasis", municipalityId: "el-menia", storeName: "متجر الواحة", ownerName: "عمر المنيعي", phone: "0770454545", address: "حي البساتين الشمالي، المنيعة", image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&w=600&q=80" },
+    { storeId: "store_sahara", municipalityId: "el-menia", storeName: "متجر الصحراء", ownerName: "بشير الصحراوي", phone: "0662334455", address: "المخرج الجغرافي باتجاه عين صالح", image: "https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80" },
+    { storeId: "store_fhal_tech", municipalityId: "hassi-el-fhal", storeName: "تقنية الفحل للإلكترونيات", ownerName: "إبراهيم الهاشمي", phone: "0661122334", address: "الشارع الرئيسي، بلدة حاسي الفحل", image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=600&q=80" }
 ];
 
-const DEFAULT_ORDERS = [
-    { id: 5001, customerId: 1, storeId: 101, storeName: "متجر النور للإلكترونيات", status: "SHIPPING", totalAmount: 10100.00, paymentMethod: "COD", paymentStatus: "PENDING", deliveryFee: 400.0, address: "حي المستقبل، المقابل للدائرة، الطابق الأول", timestamp: Date.now() - 3600000 * 4 },
-    { id: 5002, customerId: 1, storeId: 102, storeName: "أخضر بازار للمنتجات الطبيعية", status: "DELIVERED", totalAmount: 3300.00, paymentMethod: "BARIDIMOB", paymentStatus: "CONFIRMED", deliveryFee: 400.0, address: "شارع المجاهدين الشق الأول، هضبة المرسى", timestamp: Date.now() - 3600000 * 48 }
+const SEED_CATEGORIES = [
+    { categoryId: "cat_phones", storeId: "store_salam", categoryName: "هواتف" },
+    { categoryId: "cat_electronic", storeId: "store_salam", categoryName: "إلكترونيات" },
+    { categoryId: "cat_parts", storeId: "store_salam", categoryName: "قطع غيار" },
+    { categoryId: "cat_food", storeId: "store_salam", categoryName: "مواد غذائية" },
+    { categoryId: "cat_clothes", storeId: "store_salam", categoryName: "ملابس" },
+    { categoryId: "cat_services", storeId: "store_salam", categoryName: "خدمات" }
 ];
 
-const DEFAULT_ORDER_ITEMS = [
-    { id: 6001, orderId: 5001, productId: 1004, productName: "شاحن سريع للأيفون والسامسونج 35W", price: 2300.00, quantity: 1 },
-    { id: 6002, orderId: 5001, productId: 1001, productName: "سماعات أنكر اللاسلكية Soundcore X", price: 7900.00, quantity: 1 },
-    { id: 6003, orderId: 5002, productId: 1003, productName: "سلة التوفير العائلية الصحية للغذاء", price: 2900.00, quantity: 1 }
+const SEED_PRODUCTS = [
+    { productId: "prod_galaxy_a07", storeId: "store_salam", categoryId: "cat_phones", productName: "Galaxy A07", price: 22000, description: "هاتف ذكي ببطارية قوية 6000 مللي أمبير، شاشة قياس 6.5 بوصة، مع سعة تخزين 64 جيجابايت وكاميرا خلفية مزدوجة بدقة 50 ميجابكسل للتقاط أهم تفاصيل يومك الصيفي ببلدية المنيعة.", images: ["https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80", "https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=600&q=80"], stock: 15 },
+    { productId: "prod_honor_x6c", storeId: "store_salam", categoryId: "cat_phones", productName: "Honor X6C", price: 29000, description: "تصميم عصري رياضي بملمس ناعم، يدعم اتصال فائق الجودة وقوة تحمل ضد السقوط، مثالي للاستخدام الشاق ومكالمات البائعين والبريد الإلكتروني للعمل اليومي بالجزائر.", images: ["https://images.unsplash.com/photo-1598327105666-5b89351aff97?auto=format&fit=crop&w=600&q=80"], stock: 8 },
+    { productId: "prod_battery_pack", storeId: "store_salam", categoryId: "cat_electronic", productName: "بنك طاقة شاحن أنكر 20K", price: 6500, description: "شاحن لاسلكي سريع بسعة 20,000 مللي أمبير مع منافذ شحن سريعة متعددة لتغذية هاتفك في الحالات الاستثنائية.", images: ["https://images.unsplash.com/photo-1583863788434-e58a36330cf0?auto=format&fit=crop&w=600&q=80"], stock: 20 },
+    { productId: "prod_brakes", storeId: "store_salam", categoryId: "cat_parts", productName: "فحمات فرامل سيارة بوش", price: 4500, description: "فرامل سيارة أصلية مصنوعة خصيصاً لتحمل الاحتكاك الشديد والحرارة العالية لضمان سلامتك وسلامة عائلتك على الطريق.", images: ["https://images.unsplash.com/photo-1486006920555-c77dce18193b?auto=format&fit=crop&w=600&q=80"], stock: 12 },
+    { productId: "prod_dates", storeId: "store_oasis", categoryId: "cat_food", productName: "علبة تمور دقلة نور تولقة", price: 1500, description: "تمور طبيعية بكر ممتازة تم قطفها وتغليفها محلياً بعناية فائقة لتنير مائدتك الجزائرية بصحة وعافية تامة.", images: ["https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=600&q=80"], stock: 50 },
+    { productId: "prod_jacket", storeId: "store_salam", categoryId: "cat_clothes", productName: "سترة صوفية شتوية صحراوية", price: 5500, description: "جاكيت من الصوف الحر الفاخر يوفر الدفء المثالي لليالي الصحراء الباردة في ولايات الجنوب وكل بلديات المنيعة.", images: ["https://images.unsplash.com/photo-1544022613-e87ca75a784a?auto=format&fit=crop&w=600&q=80"], stock: 5 }
 ];
 
-const DEFAULT_COMPLAINTS = [
-    { id: 7001, orderId: 5001, userId: 1, userName: "عبد الهادي نجم الدين", message: "تأخر الموصل قليلاً بالرغم من اتصالي به، أرجو تبليغه ليكون أسرع في أحياء المرسى.", status: "PENDING", timestamp: Date.now() - 3600000 * 2 }
+const SEED_ORDERS = [
+    { orderId: "ord_1001", userId: "user_hadi", storeId: "store_salam", productId: "prod_galaxy_a07", status: "قيد المراجعة", total: 22000, qty: 1, paymentMethod: "COD", address: "حي ميعاد، المنيعة", receiptImage: "", timestamp: Date.now() - 3600000 * 2 },
+    { orderId: "ord_1002", userId: "user_hadi", storeId: "store_salam", productId: "prod_honor_x6c", status: "تم التسليم", total: 29000, qty: 1, paymentMethod: "BaridiMob", address: "بلدية حاسي الفحل", receiptImage: "mock_receipt.png", timestamp: Date.now() - 86400000 }
 ];
 
-const DEFAULT_SUBS = [
-    { id: 8001, merchantId: 2, planName: "SMART_ENTERPRISE", status: "ACTIVE", price: 4500.00, paymentReceiptUrl: "BaridiMob-CCP-Proof-45.png", startDate: Date.now() - 86400000 * 3, endDate: Date.now() + 86400000 * 27 }
+const SEED_MESSAGES = [
+    { messageId: "msg_1", senderId: "user_hadi", receiverId: "user_merchant", message: "السلام عليكم، هل هاتف Galaxy A07 متوفر حالياً لتوصيله لبلدية حاسي الفحل؟", timestamp: Date.now() - 3600000 },
+    { messageId: "msg_2", senderId: "user_merchant", receiverId: "user_hadi", message: "وعليكم السلام ورحمة الله وبركاته، نعم أخي الكريم متوفر ويتم شحنه في الصباح مع الدفع عند الاستلام.", timestamp: Date.now() - 3000000 }
 ];
 
-const DEFAULT_VERIFICATIONS = [
-    { id: 9101, merchantId: 2, merchantName: 'أحمد بن زكري', commercialRegisterCode: '16/00-045321B19', nationalIdNumber: '1102380293810', commercialRegisterFileUrl: 'cr-98319.pdf', nationalIdCardFileUrl: 'nid-9823.png', isVerified: true, submittedAt: Date.now() - 86400005 * 5, verifiedAt: Date.now() - 86400005 * 4 }
-];
-
-const DEFAULT_AUDIT = [
-    { id: 9001, actorName: "النظام الذكي تلقائياً", action: "SETUP", details: "تشغيل وتهيئة تطبيق الويب الذكي بالتكامل مع متصفح AI Studio بنجاح.", timestamp: Date.now() - 3600000 * 12 },
-    { id: 9002, actorName: "عبد الهادي نجم الدين", action: "LOGIN", details: "تسجيل دخول زبون مألوف بالنظام عن طريق البريد الإلكتروني.", timestamp: Date.now() - 3600000 }
-];
-
-const DEFAULT_NOTIFS = [
-    { id: 2501, userId: 1, title: "مرحباً بك في ZaLo", message: "تم تفعيل حسابك كزبون رائد، تفضل بمشاهدة التوصيات الذكية لولايتك!", isRead: false, timestamp: Date.now() }
-];
-
-const AI_shopping_recommendents = [
-    "بناءً على موقعك في ولاية *الجزائر* ونشاطك الأخير، نقترح عليك شراء *سلة التوفير العائلية الصحية* (DZD 2,900) من مزارعنا الشريكة بتوصيل فوري مخفض.",
-    "عروض مخصصة لسكان ولايتك: متجر *النور للإلكترونيات* يطرح كود حسم بقيمة *10%* على *ساعة شاومي ريدمي الذكية* مع شحن للبلديات خلال 24 ساعة فقط."
-];
-
-// --- App State Management ---
-let state = {
-    users: [],
-    stores: [],
-    products: [],
-    orders: [],
-    orderItems: [],
-    complaints: [],
-    subs: [],
-    verifications: [],
-    auditLogs: [],
-    notifs: [],
-    currentUser: null,
-    currentRole: "CUSTOMER",  // "CUSTOMER", "MERCHANT", "ADMIN"
-    cart: {}, // productId -> quantity
-    activeTab: "customer"     // "customer", "merchant", "admin", "ai-chat"
-};
-
-// --- Storage API ---
-function loadStateFromStorage() {
-    try {
-        if (!localStorage.getItem("zalo_users")) {
-            localStorage.setItem("zalo_users", JSON.stringify(DEFAULT_USERS));
-            localStorage.setItem("zalo_stores", JSON.stringify(DEFAULT_STORES));
-            localStorage.setItem("zalo_products", JSON.stringify(DEFAULT_PRODUCTS));
-            localStorage.setItem("zalo_orders", JSON.stringify(DEFAULT_ORDERS));
-            localStorage.setItem("zalo_order_items", JSON.stringify(DEFAULT_ORDER_ITEMS));
-            localStorage.setItem("zalo_complaints", JSON.stringify(DEFAULT_COMPLAINTS));
-            localStorage.setItem("zalo_subs", JSON.stringify(DEFAULT_SUBS));
-            localStorage.setItem("zalo_verifications", JSON.stringify(DEFAULT_VERIFICATIONS));
-            localStorage.setItem("zalo_audit", JSON.stringify(DEFAULT_AUDIT));
-            localStorage.setItem("zalo_notifs", JSON.stringify(DEFAULT_NOTIFS));
+// --- State Database Controller (Simulating Firestore Observers & Live Mutation) ---
+class DB {
+    static get(key, def) {
+        let val = localStorage.getItem("zalo_" + key);
+        if (!val) {
+            localStorage.setItem("zalo_" + key, JSON.stringify(def));
+            return def;
         }
-
-        state.users = JSON.parse(localStorage.getItem("zalo_users"));
-        state.stores = JSON.parse(localStorage.getItem("zalo_stores"));
-        state.products = JSON.parse(localStorage.getItem("zalo_products"));
-        state.orders = JSON.parse(localStorage.getItem("zalo_orders"));
-        state.orderItems = JSON.parse(localStorage.getItem("zalo_order_items"));
-        state.complaints = JSON.parse(localStorage.getItem("zalo_complaints"));
-        state.subs = JSON.parse(localStorage.getItem("zalo_subs"));
-        state.verifications = JSON.parse(localStorage.getItem("zalo_verifications") || "[]");
-        state.auditLogs = JSON.parse(localStorage.getItem("zalo_audit"));
-        state.notifs = JSON.parse(localStorage.getItem("zalo_notifs"));
-
-        // Set Default Active User: customer (Hadi)
-        state.currentUser = state.users.find(u => u.email === "hadi47hadi58@gmail.com") || state.users[0];
-        state.currentRole = state.currentUser.role;
-        
-        // Load cart
-        const savedCart = localStorage.getItem("zalo_cart_" + state.currentUser.id);
-        state.cart = savedCart ? JSON.parse(savedCart) : {};
-
-    } catch (e) {
-        console.error("Failed to load local storage state", e);
+        return JSON.parse(val);
+    }
+    static set(key, data) {
+        localStorage.setItem("zalo_" + key, JSON.stringify(data));
+    }
+    static init() {
+        this.get("users", SEED_USERS);
+        this.get("municipalities", SEED_MUNICIPALITIES);
+        this.get("stores", SEED_STORES);
+        this.get("categories", SEED_CATEGORIES);
+        this.get("products", SEED_PRODUCTS);
+        this.get("orders", SEED_ORDERS);
+        this.get("messages", SEED_MESSAGES);
+        this.get("active_session", null);
+        this.get("selected_municipality", "");
     }
 }
 
-function saveToLocalStorage(key, arrayData) {
-    try {
-        localStorage.setItem(key, JSON.stringify(arrayData));
-    } catch (e) {
-        console.error("Save error: ", e);
+DB.init();
+
+// --- Auth Utilities ---
+function getCurrentUser() {
+    return DB.get("active_session", null);
+}
+
+function loginUser(email, password, role) {
+    let users = DB.get("users", SEED_USERS);
+    let user = users.find(u => u.email === email && u.role === role);
+    if (!user) {
+        let newUser = {
+            uid: "user_" + Date.now(),
+            email: email,
+            name: email.split("@")[0],
+            phone: "0555" + Math.floor(100000 + Math.random() * 900000),
+            role: role,
+            status: "ACTIVE"
+        };
+        users.push(newUser);
+        DB.set("users", users);
+        user = newUser;
     }
+    DB.set("active_session", user);
+    return user;
 }
 
-function updateDatabaseState() {
-    saveToLocalStorage("zalo_users", state.users);
-    saveToLocalStorage("zalo_stores", state.stores);
-    saveToLocalStorage("zalo_products", state.products);
-    saveToLocalStorage("zalo_orders", state.orders);
-    saveToLocalStorage("zalo_order_items", state.orderItems);
-    saveToLocalStorage("zalo_complaints", state.complaints);
-    saveToLocalStorage("zalo_subs", state.subs);
-    saveToLocalStorage("zalo_verifications", state.verifications);
-    saveToLocalStorage("zalo_audit", state.auditLogs);
-    saveToLocalStorage("zalo_notifs", state.notifs);
+function logoutUser() {
+    DB.set("active_session", null);
+    window.location.href = "login.html";
 }
 
-// Log an action to audit log
-function logAudit(actorName, action, details) {
-    const newEntry = {
-        id: Date.now(),
-        actorName: actorName,
-        action: action,
-        details: details,
-        timestamp: Date.now()
-    };
-    state.auditLogs.unshift(newEntry);
-    saveToLocalStorage("zalo_audit", state.auditLogs);
-    renderAuditLogs();
-}
-
-// Add system notification for user id
-function addNotification(userId, title, message) {
-    const newNotif = {
-        id: Date.now(),
-        userId: userId,
-        title: title,
-        message: message,
-        isRead: false,
-        timestamp: Date.now()
-    };
-    state.notifs.unshift(newNotif);
-    saveToLocalStorage("zalo_notifs", state.notifs);
-    updateNotificationBadge();
-}
-
-// --- Dynamic Rendering: UI Functions ---
-
-function setRole(role) {
-    state.currentRole = role;
-    
-    // Switch active user based on role simulation
-    if (role === "CUSTOMER") {
-        state.currentUser = state.users.find(u => u.role === "CUSTOMER") || state.users[0];
-        switchTab("customer");
-    } else if (role === "MERCHANT") {
-        state.currentUser = state.users.find(u => u.role === "MERCHANT") || state.users[1];
-        switchTab("merchant");
-    } else if (role === "ADMIN") {
-        state.currentUser = state.users.find(u => u.role === "ADMIN") || state.users[2];
-        switchTab("admin");
-    }
-
-    // Refresh active buttons visual classes
-    ['btn-role-customer', 'btn-role-merchant', 'btn-role-admin'].forEach(id => {
-        const btn = document.getElementById(id);
-        if (btn) {
-            btn.className = "text-xs font-semibold px-3 py-1.5 rounded-full transition-all duration-200 text-white/70 hover:text-white";
-        }
-    });
-
-    const activeBtn = document.getElementById('btn-role-' + role.toLowerCase());
-    if (activeBtn) {
-        activeBtn.className = "text-xs font-bold px-3 py-1.5 rounded-full transition-all duration-200 bg-zalo-emerald text-white shadow";
-    }
-
-    // Reload user-related structures
-    const savedCart = localStorage.getItem("zalo_cart_" + state.currentUser.id);
-    state.cart = savedCart ? JSON.parse(savedCart) : {};
-    
-    updateCartCountBadge();
-    updateNotificationBadge();
-    refreshAiRecommendations();
-    logAudit(state.currentUser.name, "SIMULATION_SWITCH", `Switched layout view to role profile: ${role}`);
-}
-
-function switchTab(tabId) {
-    state.activeTab = tabId;
-    
-    // Hide all main section screens
-    ['screen-customer', 'screen-merchant', 'screen-admin', 'screen-ai-chat'].forEach(id => {
-        const screen = document.getElementById(id);
-        if (screen) screen.classList.add("hidden");
-    });
-
-    // Show correct one
-    const activeScreen = document.getElementById('screen-' + tabId);
-    if (activeScreen) activeScreen.classList.remove("hidden");
-
-    // Re-render and load specific configurations
-    if (tabId === "customer") {
-        renderProductsGrid();
-        renderCustomerOrders();
-        renderCustomerComplaints();
-    } else if (tabId === "merchant") {
-        renderMerchantDashboard();
-    } else if (tabId === "admin") {
-        renderAdminDashboard();
-    } else if (tabId === "ai-chat") {
-        renderAiChatMessages();
-    }
-}
-
-// Global filter state
-let currentFilters = { search: "", category: "ALL", wilaya: "ALL" };
-
-function resetFilters() {
-    document.getElementById('filter-search').value = "";
-    document.getElementById('filter-category').value = "ALL";
-    document.getElementById('filter-wilaya').value = "ALL";
-    applyFilters();
-}
-
-function applyFilters() {
-    currentFilters.search = document.getElementById('filter-search').value.toLowerCase().trim();
-    currentFilters.category = document.getElementById('filter-category').value;
-    currentFilters.wilaya = document.getElementById('filter-wilaya').value;
-    renderProductsGrid();
-}
-
-function renderProductsGrid() {
-    const grid = document.getElementById('products-grid');
-    const emptyAlert = document.getElementById('product-list-empty');
-    if (!grid) return;
-
-    grid.innerHTML = "";
-
-    // Filter products
-    const filteredProducts = state.products.filter(p => {
-        // Find store details to check Store Wilaya
-        const store = state.stores.find(s => s.id === p.storeId);
-        if (!store || store.status !== "APPROVED") return false;
-
-        const matchesSearch = p.name.toLowerCase().includes(currentFilters.search) || 
-                              p.description.toLowerCase().includes(currentFilters.search);
-        
-        const matchesCategory = currentFilters.category === "ALL" || p.category === currentFilters.category;
-        const matchesWilaya = currentFilters.wilaya === "ALL" || store.wilaya === currentFilters.wilaya;
-
-        return matchesSearch && matchesCategory && matchesWilaya;
-    });
-
-    // Badges update
-    const countBadge = document.getElementById('product-count-badge');
-    if (countBadge) countBadge.innerText = `${filteredProducts.length} متوفر`;
-
-    if (filteredProducts.length === 0) {
-        if (emptyAlert) emptyAlert.classList.remove("hidden");
-        return;
+function applySavedTheme() {
+    let mode = localStorage.getItem("zalo_theme_mode") || "luxury";
+    const rootEl = document.documentElement;
+    if (mode === "skyblue") {
+        rootEl.classList.add("theme-skyblue");
+        document.body.style.backgroundColor = "#F5F5F5";
+        document.body.style.color = "#333333";
     } else {
-        if (emptyAlert) emptyAlert.classList.add("hidden");
+        rootEl.classList.remove("theme-skyblue");
+        document.body.style.backgroundColor = "#0b1528";
+        document.body.style.color = "#f3f4f6";
+    }
+}
+
+function toggleThemeMode() {
+    let currentMode = localStorage.getItem("zalo_theme_mode") || "luxury";
+    let newMode = currentMode === "luxury" ? "skyblue" : "luxury";
+    localStorage.setItem("zalo_theme_mode", newMode);
+    applySavedTheme();
+    location.reload();
+}
+
+const styleElem = document.createElement("style");
+styleElem.innerHTML = `
+:root {
+    --color-primary: #00AEEF;
+    --color-bg-light: #F5F5F5;
+    --color-gold: #D4AF37;
+}
+.theme-skyblue .zalo-header {
+    background-color: #FFFFFF !important;
+    border-bottom: 1px solid #E5E7EB !important;
+    color: #1F2937 !important;
+}
+.theme-skyblue .zalo-header h1 {
+    color: #00AEEF !important;
+}
+.theme-skyblue .zalo-button-primary {
+    background-color: #00AEEF !important;
+    color: #FFFFFF !important;
+}
+.theme-skyblue .zalo-button-primary:hover {
+    background-color: #008cc0 !important;
+}
+.theme-skyblue .zalo-card {
+    background-color: #FFFFFF !important;
+    border: 1px solid #E5E7EB !important;
+    color: #1F2937 !important;
+}
+.theme-skyblue .zalo-text-gold {
+    color: #D4AF37 !important;
+}
+`;
+document.head.appendChild(styleElem);
+applySavedTheme();
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    let path = window.location.pathname;
+    let file = path.substring(path.lastIndexOf('/') + 1);
+    
+    let accountNameSpan = document.getElementById("header-user-name");
+    let currentUser = getCurrentUser();
+    if (accountNameSpan && currentUser) {
+        accountNameSpan.innerText = currentUser.name + ` (${getRoleArabic(currentUser.role)})`;
     }
 
-    filteredProducts.forEach(p => {
-        const store = state.stores.find(s => s.id === p.storeId);
-        const card = document.createElement('div');
-        card.className = "zalo-glass-card rounded-2xl overflow-hidden hover:border-zalo-emeraldLight/30 border border-white/5 transition duration-300 flex flex-col group relative";
-        
+    let toggleThemeBtn = document.getElementById("btn-toggle-theme");
+    if (toggleThemeBtn) {
+        toggleThemeBtn.addEventListener("click", toggleThemeMode);
+    }
+
+    if (file === "" || file === "index.html") {
+        initIndexPage();
+    } else if (file === "login.html") {
+        initLoginPage();
+    } else if (file === "products.html") {
+        initProductsPage();
+    } else if (file === "product-details.html") {
+        initProductDetailsPage();
+    } else if (file === "dashboard-store.html") {
+        initStoreDashboardPage();
+    } else if (file === "dashboard-admin.html") {
+        initAdminDashboardPage();
+    } else if (file === "dashboard-manager.html") {
+        initManagerDashboardPage();
+    }
+});
+
+function getRoleArabic(role) {
+    switch (role) {
+        case "customer": return "زبون";
+        case "merchant": return "تاجر";
+        case "admin": return "إدارة";
+        case "manager": return "مدير النظام";
+        default: return role;
+    }
+}
+
+function initIndexPage() {
+    let btnShopNow = document.getElementById("btn-shop-now");
+    let screenWelcome = document.getElementById("welcome-section");
+    let screenMunicipalities = document.getElementById("municipalities-section");
+    let screenStores = document.getElementById("stores-section");
+    let screenCategories = document.getElementById("categories-section");
+
+    if (screenMunicipalities) screenMunicipalities.style.display = "none";
+    if (screenStores) screenStores.style.display = "none";
+    if (screenCategories) screenCategories.style.display = "none";
+
+    if (btnShopNow) {
+        btnShopNow.addEventListener("click", () => {
+            screenWelcome.style.display = "none";
+            screenMunicipalities.style.display = "block";
+            renderMunicipalitiesList();
+        });
+    }
+
+    let activeMunId = localStorage.getItem("zalo_selected_municipality");
+    if (activeMunId) {
+        screenWelcome.style.display = "none";
+        screenMunicipalities.style.display = "none";
+        screenStores.style.display = "block";
+        renderStoresList(activeMunId);
+    }
+}
+
+function renderMunicipalitiesList() {
+    let munListContainer = document.getElementById("municipalities-list");
+    if (!munListContainer) return;
+
+    munListContainer.innerHTML = "";
+    let muns = DB.get("municipalities", SEED_MUNICIPALITIES);
+
+    muns.forEach(m => {
+        let card = document.createElement("div");
+        card.className = "zalo-card bg-slate-800/50 border border-slate-700 rounded-3xl overflow-hidden cursor-pointer hover:border-zalo-gold hover:scale-105 transition duration-300 p-4 shrink-0 flex flex-col items-center justify-center space-y-4 shadow-xl";
         card.innerHTML = `
-            <!-- Product Image -->
-            <div class="h-44 w-full relative overflow-hidden bg-zalo-navy leading-none">
-                <img src="${p.imageUrl}" alt="${p.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                <span class="absolute top-2.5 right-2.5 bg-zalo-navy/95 text-zalo-gold text-[10px] font-black px-2.5 py-1 rounded-full border border-zalo-gold/10">
-                    <i class="fa-solid fa-location-dot text-red-500"></i> ${store ? store.wilaya : "الجزائر"}
-                </span>
-                <span class="absolute top-2.5 left-2.5 bg-zalo-emerald/90 text-white text-[10px] font-bold px-2 py-0.5 rounded">
-                    ${translateCategory(p.category)}
-                </span>
-            </div>
-
-            <!-- Product Details -->
-            <div class="p-4 flex-grow flex flex-col justify-between">
-                <div class="space-y-1">
-                    <div class="text-[10px] text-white/50 font-bold flex items-center justify-between">
-                        <span><i class="fa-solid fa-store text-zalo-gold"></i> ${store ? store.name : "متجر ذكي"}</span>
-                        <span>⭐ ${p.rating}</span>
-                    </div>
-                    <h4 class="text-xs font-black text-white group-hover:text-zalo-gold transition duration-200">${p.name}</h4>
-                    <p class="text-[10px] text-white/60 line-clamp-2 leading-relaxed">${p.description}</p>
-                </div>
-
-                <div class="pt-3 border-t border-white/5 mt-4 flex items-center justify-between">
-                    <div>
-                        <span class="text-[10px] text-white/40 block">السعر المستحق</span>
-                        <span class="text-xs font-extrabold text-zalo-gold">${p.price.toLocaleString()} DZD</span>
-                    </div>
-                    
-                    <button onclick="addToCart(${p.id})" class="px-3 py-1.5 bg-zalo-emerald hover:bg-zalo-emeraldLight text-white font-black text-[10px] rounded-lg transition duration-200">
-                        <i class="fa-solid fa-cart-plus"></i> اضف للسلة
-                    </button>
-                </div>
-            </div>
+            <img src="${m.image}" class="w-full h-40 object-cover rounded-2xl" alt="${m.name}">
+            <h3 class="text-xl font-black text-center text-white text-gold font-bold">${m.name}</h3>
         `;
-        grid.appendChild(card);
+        card.addEventListener("click", () => {
+            localStorage.setItem("zalo_selected_municipality", m.id);
+            document.getElementById("municipalities-section").style.display = "none";
+            document.getElementById("stores-section").style.display = "block";
+            renderStoresList(m.id);
+        });
+        munListContainer.appendChild(card);
     });
 }
 
-function translateCategory(cat) {
-    switch (cat) {
-        case "ELECTRONICS": return "أجهزة إلكترونية";
-        case "FASHION": return "ملابس وأزياء";
-        case "FOOD": return "خضار وأغذية طازجة";
-        case "COSMETICS": return "مستحضرات تجميل";
-        case "HOME": return "أدوات منزلية";
-        default: return cat;
-    }
-}
+function renderStoresList(munId) {
+    let storesContainer = document.getElementById("stores-list");
+    let headerTitle = document.getElementById("stores-municipality-title");
+    if (!storesContainer) return;
 
-// --- Shopping Cart Engines ---
-
-function updateCartCountBadge() {
-    const totalCount = Object.values(state.cart).reduce((sum, qty) => sum + qty, 0);
-    const badge = document.getElementById('cart-count');
-    if (badge) badge.innerText = totalCount;
-}
-
-function addToCart(productId) {
-    const product = state.products.find(p => p.id === productId);
-    if (!product) return;
-
-    if (state.cart[productId]) {
-        state.cart[productId] += 1;
-    } else {
-        state.cart[productId] = 1;
-    }
-
-    localStorage.setItem("zalo_cart_" + state.currentUser.id, JSON.stringify(state.cart));
-    updateCartCountBadge();
+    storesContainer.innerHTML = "";
+    let stores = DB.get("stores", SEED_STORES).filter(s => s.municipalityId === munId);
     
-    // Add dynamic notification of success
-    addNotification(state.currentUser.id, "أضيف للسلة", `لقد تمت إضافة '${product.name}' إلى سلة مشترياتك بنجاح!`);
-    logAudit(state.currentUser.name, "ADD_TO_CART", `Added product #${productId} (${product.name}) to cart.`);
+    let mun = DB.get("municipalities", SEED_MUNICIPALITIES).find(m => m.id === munId);
+    if (headerTitle && mun) {
+        headerTitle.innerText = mun.name;
+    }
+
+    if (stores.length === 0) {
+        storesContainer.innerHTML = `
+            <div class="col-span-full p-8 text-center text-slate-400">
+                <i class="fa-solid fa-store-slash text-4xl mb-2"></i>
+                <p>لا توجد متاجر نشطة في هذه البلدية حالياً.</p>
+            </div>
+        `;
+        return;
+    }
+
+    stores.forEach(s => {
+        let card = document.createElement("div");
+        card.className = "zalo-card bg-slate-800/40 border border-slate-700/60 rounded-3xl p-5 shadow-lg flex flex-col sm:flex-row items-center gap-5";
+        card.innerHTML = `
+            <img src="${s.image}" class="w-24 h-24 object-cover rounded-2xl shrink-0" alt="${s.storeName}">
+            <div class="text-right flex-1 space-y-1">
+                <h4 class="text-lg font-black text-white font-bold">${s.storeName}</h4>
+                <p class="text-xs text-slate-300"><i class="fa-solid fa-user-circle text-zalo-gold"></i> المسؤول: ${s.ownerName}</p>
+                <p class="text-xs text-slate-300"><i class="fa-solid fa-phone text-blue-400"></i> هاتف: ${s.phone}</p>
+                <p class="text-xs text-slate-400"><i class="fa-solid fa-location-dot text-red-400"></i> ${s.address}</p>
+            </div>
+            <button class="zalo-button-primary bg-gradient-to-tr from-amber-500 to-yellow-600 text-white font-bold text-xs px-5 py-3 rounded-full hover:to-amber-500 hover:scale-105 transition font-bold shrink-0 self-end sm:self-center">دخول المتجر <i class="fa-solid fa-arrow-left"></i></button>
+        `;
+        card.querySelector("button").addEventListener("click", () => {
+            localStorage.setItem("zalo_current_store_id", s.storeId);
+            document.getElementById("stores-section").style.display = "none";
+            document.getElementById("categories-section").style.display = "block";
+            renderCategoriesList(s.storeId);
+        });
+        storesContainer.appendChild(card);
+    });
+}
+
+function renderCategoriesList(storeId) {
+    let catsContainer = document.getElementById("categories-list");
+    let headerStoreTitle = document.getElementById("categories-store-title");
+    if (!catsContainer) return;
+
+    catsContainer.innerHTML = "";
     
-    // Toast alert simulating
-    showToastNotification(`تم إضافة المنتج: ${product.name}`);
-}
-
-function toggleCartDrawer() {
-    const overlay = document.getElementById('cart-drawer-overlay');
-    if (overlay) {
-        overlay.classList.toggle('hidden');
-        if (!overlay.classList.contains('hidden')) {
-            renderCart();
-        }
-    }
-}
-
-function showToastNotification(text) {
-    const notifier = document.createElement('div');
-    notifier.className = "fixed bottom-5 right-5 z-50 bg-zalo-emerald text-white px-4 py-2.5 rounded-xl shadow-2xl border border-zalo-emeraldLight/30 text-xs font-bold transition duration-300";
-    notifier.innerText = text;
-    document.body.appendChild(notifier);
-    setTimeout(() => {
-        notifier.remove();
-    }, 2500);
-}
-
-// Render complete shopping items
-function renderCart() {
-    const container = document.getElementById('cart-items-container');
-    const btt_block = document.getElementById('cart-totals-checkout-block');
-    if (!container) return;
-
-    container.innerHTML = "";
-
-    const cartEntries = Object.entries(state.cart);
-    if (cartEntries.length === 0) {
-        container.innerHTML = `
-            <div class="flex flex-col items-center justify-center p-12 text-center h-full">
-                <i class="fa-solid fa-basket-shopping text-4xl text-white/10 mb-2"></i>
-                <p class="text-xs text-white/50 font-normal">سلة المشتريات فارغة تماماً، تصفح الكتالوج لشراء السلع.</p>
-            </div>
-        `;
-        if (btt_block) btt_block.classList.add("hidden");
-        return;
+    let store = DB.get("stores", SEED_STORES).find(s => s.storeId === storeId);
+    if (headerStoreTitle && store) {
+        headerStoreTitle.innerText = store.storeName;
     }
 
-    if (btt_block) btt_block.classList.remove("hidden");
-    let subtotal = 0;
+    let cats = DB.get("categories", SEED_CATEGORIES);
 
-    cartEntries.forEach(([prodId, qty]) => {
-        const product = state.products.find(p => p.id === parseInt(prodId));
-        if (!product) return;
-
-        const priceTotal = product.price * qty;
-        subtotal += priceTotal;
-
-        const itemRow = document.createElement('div');
-        itemRow.className = "bg-zalo-navy/50 p-3 rounded-xl border border-white/5 flex items-center justify-between gap-3";
-        itemRow.innerHTML = `
-            <div class="flex items-center gap-3">
-                <img src="${product.imageUrl}" class="w-10 h-10 object-cover rounded-lg">
-                <div>
-                    <h5 class="text-xs font-bold text-white line-clamp-1">${product.name}</h5>
-                    <p class="text-[10px] text-zalo-gold font-bold mt-0.5">${product.price.toLocaleString()} DZD</p>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-2">
-                <div class="flex items-center gap-1.5 bg-zalo-navy rounded-lg p-1 border border-white/10 font-bold">
-                    <button onclick="decrementCartItem(${product.id})" class="w-5 h-5 flex items-center justify-center hover:bg-white/10 rounded font-bold text-white">-</button>
-                    <span class="text-xs text-white font-bold px-1.5">${qty}</span>
-                    <button onclick="incrementCartItem(${product.id})" class="w-5 h-5 flex items-center justify-center hover:bg-white/10 rounded font-bold text-white">+</button>
-                </div>
-                <button onclick="removeCartItem(${product.id})" class="text-white/40 hover:text-red-400 p-1.5 transition"><i class="fa-solid fa-trash-can font-bold"></i></button>
-            </div>
-        `;
-        container.appendChild(itemRow);
-    });
-
-    // Update Totals
-    const devFee = 400; // Fixed delivery DZD
-    document.getElementById('cart-subtotal').innerText = `${subtotal.toLocaleString()} DZD`;
-    document.getElementById('cart-delivery-fee').innerText = `${devFee} DZD`;
-    document.getElementById('cart-grandtotal').innerText = `${(subtotal + devFee).toLocaleString()} DZD`;
-}
-
-function incrementCartItem(productId) {
-    state.cart[productId] += 1;
-    localStorage.setItem("zalo_cart_" + state.currentUser.id, JSON.stringify(state.cart));
-    updateCartCountBadge();
-    renderCart();
-}
-
-function decrementCartItem(productId) {
-    if (state.cart[productId] <= 1) {
-        removeCartItem(productId);
-        return;
-    }
-    state.cart[productId] -= 1;
-    localStorage.setItem("zalo_cart_" + state.currentUser.id, JSON.stringify(state.cart));
-    updateCartCountBadge();
-    renderCart();
-}
-
-function removeCartItem(productId) {
-    delete state.cart[productId];
-    localStorage.setItem("zalo_cart_" + state.currentUser.id, JSON.stringify(state.cart));
-    updateCartCountBadge();
-    renderCart();
-}
-
-// --- Checkout engine ---
-
-function toggleCheckoutModal() {
-    const modal = document.getElementById('checkout-modal');
-    if (modal) modal.classList.toggle('hidden');
-}
-
-function openCheckoutModal() {
-    toggleCartDrawer();
-    toggleCheckoutModal();
-    updateCheckoutPaymentDetails();
-}
-
-function updateCheckoutPaymentDetails() {
-    const method = document.getElementById('chk-payment-method').value;
-    const desc = document.getElementById('payment-details-info');
-    if (!desc) return;
-
-    if (method === "COD") {
-        desc.innerHTML = `
-            <i class="fa-solid fa-money-bill-wave text-zalo-gold text-lg shrink-0 mt-0.5"></i>
-            <div>
-                <span class="font-bold text-white block">الدفع نقدًا عند التسليم (COD)</span>
-                أكد طلبك الآن وادفع القيمة الإجمالية عند وصول السلعة لباب منزلك مع عامل التوصيل في ولايتك.
-            </div>
-        `;
-    } else if (method === "BARIDIMOB") {
-        desc.innerHTML = `
-            <i class="fa-solid fa-building-columns text-zalo-gold text-lg shrink-0 mt-0.5 font-bold"></i>
-            <div>
-                <span class="font-bold text-white block font-bold">الدفع عبر تطبيق بريدي موب الذكي (BaridiMob)</span>
-                يرجى تحويل القيمة الإجمالية إلى رقم الـ RIP التالي الخاص بالمنصة:
-                <code class="block bg-zalo-navy p-1.5 rounded text-white font-bold my-1 text-center select-all cursor-pointer">00799999002548795588</code>
-                ثم ارفع لقطة الشاشة مع تأكيد الطلب لتجهيز شحنتك فوراً.
-            </div>
-        `;
-    } else if (method === "CCP") {
-        desc.innerHTML = `
-            <i class="fa-solid fa-credit-card text-zalo-gold text-lg shrink-0 mt-0.5"></i>
-            <div>
-                <span class="font-bold text-white block">تحويل بريد الجزائر CCP كارد والتحقق السريع</span>
-                قم بملء حوالة بريدية ccp بقيمة الطلب في أقرب مكتب بريد لـ:
-                <code class="block bg-zalo-navy p-1.5 rounded text-white font-bold my-1 text-center select-all cursor-pointer">CCP: 10394857 المفتاح 42</code>
-                واحتفظ بالوصل لتسجيله وتأكيد الشحن فورياً.
-            </div>
-        `;
-    }
-}
-
-function submitCheckoutOrder() {
-    const name = document.getElementById('chk-name').value.trim();
-    const address = document.getElementById('chk-address').value.trim() || "حي المرسى الرئيسي";
-    const paymentMethod = document.getElementById('chk-payment-method').value;
-    const wilaya = document.getElementById('chk-wilaya').value;
-
-    if (Object.keys(state.cart).length === 0) {
-        alert("سلتك فارغة، تفضل بإضافة عروض جديدة قبل اتمام الدفع.");
-        return;
-    }
-
-    const firstProductEntry = Object.entries(state.cart)[0];
-    const productItem = state.products.find(p => p.id === parseInt(firstProductEntry[0]));
-    const store = state.stores.find(s => s.id === productItem.storeId);
-    const storeName = store ? store.name : "متجر ذكي";
-    const storeId = store ? store.id : 101;
-
-    let totalProd = 0;
-    Object.entries(state.cart).forEach(([pId, qty]) => {
-        const prod = state.products.find(p => p.id === parseInt(pId));
-        if (prod) totalProd += prod.price * qty;
-    });
-
-    const finalSum = totalProd + 400; // Total with delivery
-
-    // Generate Order
-    const newOrder = {
-        id: 5000 + state.orders.length + 1,
-        customerId: state.currentUser.id,
-        storeId: storeId,
-        storeName: storeName,
-        status: "PENDING",
-        totalAmount: finalSum,
-        paymentMethod: paymentMethod,
-        paymentStatus: paymentMethod === "COD" ? "PENDING" : "CONFIRMED",
-        deliveryFee: 400.0,
-        address: `${wilaya} - ${address}`,
-        timestamp: Date.now()
+    const catIcons = {
+        "cat_phones": "fa-solid fa-mobile-screen-button",
+        "cat_electronic": "fa-solid fa-laptop",
+        "cat_parts": "fa-solid fa-car-rear",
+        "cat_food": "fa-solid fa-basket-shopping",
+        "cat_clothes": "fa-solid fa-shirt",
+        "cat_services": "fa-solid fa-handshake"
     };
 
-    // Store Order Items
-    Object.entries(state.cart).forEach(([pId, qty]) => {
-        const prod = state.products.find(p => p.id === parseInt(pId));
-        if (prod) {
-            state.orderItems.push({
-                id: Date.now() + Math.random(),
-                orderId: newOrder.id,
-                productId: prod.id,
-                productName: prod.name,
-                price: prod.price,
-                quantity: qty
-            });
-        }
+    cats.forEach(c => {
+        let icon = catIcons[c.categoryId] || "fa-solid fa-box";
+        let card = document.createElement("div");
+        card.className = "zalo-card bg-slate-800/80 border border-slate-700 rounded-2xl p-6 text-center shadow-lg hover:border-zalo-gold hover:scale-105 transition duration-200 cursor-pointer flex flex-col items-center justify-center space-y-3";
+        card.innerHTML = `
+            <div class="w-16 h-16 rounded-full bg-slate-700/50 flex items-center justify-center text-zalo-gold text-2xl shadow-inner">
+                <i class="${icon}"></i>
+            </div>
+            <h5 class="text-base font-black text-white font-bold">${c.categoryName}</h5>
+        `;
+        card.addEventListener("click", () => {
+            window.location.href = `products.html?storeId=${storeId}&categoryId=${c.categoryId}`;
+        });
+        catsContainer.appendChild(card);
     });
-
-    state.orders.unshift(newOrder);
-    updateDatabaseState();
-
-    // Clear cart
-    state.cart = {};
-    localStorage.setItem("zalo_cart_" + state.currentUser.id, JSON.stringify(state.cart));
-    updateCartCountBadge();
-
-    toggleCheckoutModal();
-    renderCustomerOrders();
-    addNotification(state.currentUser.id, "قيد التحضير 📦", `تم تسجيل طلبك رقم #${newOrder.id} لمتجر ${storeName} بنجاح وقيد المراجعة للتحضير.`);
-    logAudit(name, "PLACE_ORDER", `Placed order #${newOrder.id} to store ${storeName} with sum of ${finalSum} DZD`);
-    
-    // Congrats alert
-    showToastNotification("تم تقديم وتأكيد طلب الشراء بنجاح!");
 }
 
-// --- Dynamic Customer Orders Panel ---
+function resetSelection() {
+    localStorage.removeItem("zalo_selected_municipality");
+    localStorage.removeItem("zalo_current_store_id");
+    location.reload();
+}
 
-function renderCustomerOrders() {
-    const list = document.getElementById('customer-orders-list');
+function initLoginPage() {
+    let form = document.getElementById("login-form");
+    if (!form) return;
+
+    form.addEventListener("submit", (e) => {
+        e.preventDefault();
+        let email = document.getElementById("login-email").value.trim();
+        let role = document.getElementById("login-role").value;
+        let password = document.getElementById("login-password").value;
+
+        if (!email || !password) {
+            alert("يرجى إدخال جميع الحقول!");
+            return;
+        }
+
+        let user = loginUser(email, password, role);
+        if (user) {
+            switch (role) {
+                case "customer":
+                    window.location.href = "index.html";
+                    break;
+                case "merchant":
+                    window.location.href = "dashboard-store.html";
+                    break;
+                case "admin":
+                    window.location.href = "dashboard-admin.html";
+                    break;
+                case "manager":
+                    window.location.href = "dashboard-manager.html";
+                    break;
+                default:
+                    window.location.href = "index.html";
+            }
+        }
+    });
+}
+
+function initProductsPage() {
+    let productsGrid = document.getElementById("products-grid");
+    let headerTitle = document.getElementById("category-header-title");
+    if (!productsGrid) return;
+
+    productsGrid.innerHTML = "";
+
+    let params = new URLSearchParams(window.location.search);
+    let storeId = params.get("storeId");
+    let catId = params.get("categoryId");
+
+    let cats = DB.get("categories", SEED_CATEGORIES);
+    let chosenCat = cats.find(c => c.categoryId === catId);
+    if (headerTitle && chosenCat) {
+        headerTitle.innerText = chosenCat.categoryName;
+    }
+
+    let products = DB.get("products", SEED_PRODUCTS).filter(p => p.storeId === storeId && p.categoryId === catId);
+
+    if (products.length === 0) {
+        productsGrid.innerHTML = `
+            <div class="col-span-full p-12 text-center text-slate-400 bg-slate-800/30 rounded-3xl border border-slate-700">
+                <i class="fa-solid fa-boxes-packing text-5xl text-slate-600 mb-3 block animate-bounce"></i>
+                <p class="font-bold">لا توجد منتجات متوفرة حالياً في هذا التصنيف.</p>
+                <a href="index.html" class="mt-4 inline-block bg-zalo-gold text-slate-900 px-4 py-2 rounded-full text-xs font-bold font-bold">العودة للمتجر الرئيسي</a>
+            </div>
+        `;
+        return;
+    }
+
+    products.forEach(p => {
+        let card = document.createElement("div");
+        card.className = "zalo-card bg-slate-800/50 border border-slate-700 rounded-3xl overflow-hidden p-4 shadow-xl flex flex-col h-full";
+        card.innerHTML = `
+            <img src="${p.images ? p.images[0] : 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=300&q=80'}" class="w-full h-44 object-cover rounded-2xl shrink-0" alt="${p.productName}">
+            <div class="py-3 flex-1 text-right flex flex-col justify-between">
+                <div>
+                    <h5 class="text-base font-black text-white font-bold">${p.productName}</h5>
+                    <p class="text-xs text-slate-400 mt-1 line-clamp-2">${p.description}</p>
+                </div>
+                <div class="mt-4 flex items-center justify-between border-t border-slate-700/50 pt-3">
+                    <span class="text-base font-black text-zalo-gold font-bold">${p.price.toLocaleString()} دج</span>
+                    <button class="bg-gradient-to-tr from-sky-400 to-sky-600 text-white font-bold text-xs px-4 py-2 rounded-full hover:from-sky-500 transition font-bold shadow-md">شراء المنتج</button>
+                </div>
+            </div>
+        `;
+        card.querySelector("button").addEventListener("click", () => {
+            window.location.href = `product-details.html?productId=${p.productId}`;
+        });
+        productsGrid.appendChild(card);
+    });
+}
+
+function initProductDetailsPage() {
+    let params = new URLSearchParams(window.location.search);
+    let prodId = params.get("productId");
+
+    let products = DB.get("products", SEED_PRODUCTS);
+    let p = products.find(prod => prod.productId === prodId);
+
+    if (!p) {
+        document.body.innerHTML = `<div class="p-12 text-center text-white"><p class="text-lg">المنتج غير موجود!</p><a href="index.html" class="text-zalo-gold">العودة للرئيسية</a></div>`;
+        return;
+    }
+
+    let title = document.getElementById("product-detail-name");
+    let price = document.getElementById("product-detail-price");
+    let desc = document.getElementById("product-detail-desc");
+    let storeName = document.getElementById("product-detail-store-name");
+    let callBtn = document.getElementById("btn-call-merchant");
+    let whatsappBtn = document.getElementById("btn-whatsapp-merchant");
+    let mainImg = document.getElementById("product-detail-image");
+    let thumbContainer = document.getElementById("product-detail-thumbs");
+
+    let stores = DB.get("stores", SEED_STORES);
+    let store = stores.find(s => s.storeId === p.storeId);
+
+    if (title) title.innerText = p.productName;
+    if (price) price.innerText = p.price.toLocaleString() + " دج";
+    if (desc) desc.innerText = p.description;
+    
+    if (storeName && store) {
+        storeName.innerText = store.storeName;
+    }
+
+    if (mainImg && p.images && p.images.length > 0) {
+        mainImg.src = p.images[0];
+    }
+
+    if (thumbContainer && p.images && p.images.length > 1) {
+        thumbContainer.innerHTML = "";
+        p.images.forEach(imgUrl => {
+            let thumb = document.createElement("img");
+            thumb.src = imgUrl;
+            thumb.className = "w-16 h-16 object-cover rounded-xl border border-slate-700 cursor-pointer hover:border-zalo-gold transition";
+            thumb.addEventListener("click", () => {
+                mainImg.src = imgUrl;
+            });
+            thumbContainer.appendChild(thumb);
+        });
+    }
+
+    if (store) {
+        if (callBtn) {
+            callBtn.href = `tel:${store.phone}`;
+        }
+        if (whatsappBtn) {
+            whatsappBtn.href = `https://wa.me/${store.phone.replace(/[^0-9]/g, '')}`;
+        }
+    }
+
+    let orderBtn = document.getElementById("btn-submit-order");
+    if (orderBtn) {
+        orderBtn.addEventListener("click", () => {
+            let paymentOption = document.getElementById("order-payment-method").value;
+            let deliveryAddress = document.getElementById("order-address").value;
+
+            if (!deliveryAddress) {
+                alert("يرجى إدخال عنوان التوصيل داخل بلدية المنيعة أو الولايات المجاورة!");
+                return;
+            }
+
+            let currentUser = getCurrentUser();
+            let orders = DB.get("orders", SEED_ORDERS);
+            
+            let newOrder = {
+                orderId: "ord_" + Date.now(),
+                userId: currentUser ? currentUser.uid : "guest",
+                storeId: p.storeId,
+                productId: p.productId,
+                status: "قيد المراجعة",
+                total: p.price,
+                qty: 1,
+                paymentMethod: paymentOption,
+                address: deliveryAddress,
+                receiptImage: document.getElementById("order-receipt") ? document.getElementById("order-receipt").value : "",
+                timestamp: Date.now()
+            };
+
+            orders.unshift(newOrder);
+            DB.set("orders", orders);
+
+            alert("تم إرسال طلب السلعة بنجاح! سيتم مراجعته والتواصل معك هاتفياً.");
+            window.location.href = "index.html";
+        });
+    }
+}
+
+function initStoreDashboardPage() {
+    renderMerchantProducts();
+    renderMerchantOrders();
+
+    let productForm = document.getElementById("add-product-form");
+    if (productForm) {
+        productForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            let name = document.getElementById("prod-name").value;
+            let price = parseFloat(document.getElementById("prod-price").value);
+            let desc = document.getElementById("prod-desc").value;
+            let stock = parseInt(document.getElementById("prod-stock").value);
+            let cat = document.getElementById("prod-category").value;
+
+            let products = DB.get("products", SEED_PRODUCTS);
+            let store = DB.get("stores", SEED_STORES).find(s => s.ownerName.includes("أحمد") || s.storeId === "store_salam");
+            let storeId = store ? store.storeId : "store_salam";
+
+            let newProduct = {
+                productId: "prod_" + Date.now(),
+                storeId: storeId,
+                categoryId: cat,
+                productName: name,
+                price: price,
+                description: desc,
+                images: ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"],
+                stock: stock
+            };
+
+            products.push(newProduct);
+            DB.set("products", products);
+            alert("تم إدراج المنتج بنجاح!");
+            renderMerchantProducts();
+            productForm.reset();
+        });
+    }
+}
+
+function renderMerchantProducts() {
+    let list = document.getElementById("merchant-product-list");
     if (!list) return;
 
     list.innerHTML = "";
+    let products = DB.get("products", SEED_PRODUCTS);
+    let store = DB.get("stores", SEED_STORES).find(s => s.ownerName.includes("أحمد") || s.storeId === "store_salam");
+    let storeId = store ? store.storeId : "store_salam";
 
-    const myOrders = state.orders.filter(o => o.customerId === state.currentUser.id);
-    if (myOrders.length === 0) {
-        list.innerHTML = `
-            <p class="text-[11px] text-white/50 text-center py-4 font-normal">لم تقم بإجراء أي طلب تتبع للشراء بعد.</p>
-        `;
-        return;
-    }
-
-    myOrders.forEach(o => {
-        const item = document.createElement('div');
-        item.className = "bg-zalo-navy/70 p-3 rounded-xl border border-white/5 flex items-center justify-between gap-2 text-xs font-bold";
-        
-        let statusBadge = "";
-        if (o.status === "PENDING") statusBadge = "<span class='text-[10px] bg-zalo-gold/15 text-zalo-gold px-2.5 py-0.5 rounded-full font-bold border border-zalo-gold/30'>انتظار ⏳</span>";
-        else if (o.status === "SHIPPING") statusBadge = "<span class='text-[10px] bg-blue-500/15 text-blue-400 px-2.5 py-0.5 rounded-full font-bold border border-blue-500/30'>في الطريق 🚚</span>";
-        else if (o.status === "DELIVERED") statusBadge = "<span class='text-[10px] bg-zalo-emerald/15 text-zalo-emeraldLight px-2.5 py-0.5 rounded-full font-bold border border-zalo-emerald/30'>اكتمل التسليم ✅</span>";
-
+    let merchantProds = products.filter(p => p.storeId === storeId);
+    
+    merchantProds.forEach(p => {
+        let item = document.createElement("tr");
+        item.className = "border-t border-slate-700/50 text-white font-semibold";
         item.innerHTML = `
-            <div>
-                <h5 class="font-extrabold text-white">طلب رقم #${o.id} – ${o.storeName}</h5>
-                <p class="text-[10px] text-white/50 mt-1 font-normal"><i class="fa-solid fa-credit-card"></i> الدفع: ${o.paymentMethod} (${o.totalAmount.toLocaleString()} DZD)</p>
-                <p class="text-[9px] text-white/40 mt-0.5 font-normal"><i class="fa-regular fa-clock"></i> التاريخ: ${new Date(o.timestamp).toLocaleString('ar-DZ')}</p>
-            </div>
-            <div class="text-left">
-                ${statusBadge}
-            </div>
+            <td class="p-3 text-right">${p.productName}</td>
+            <td class="p-3 text-right">${p.price.toLocaleString()} دج</td>
+            <td class="p-3 text-right">${p.stock} قطعة</td>
+            <td class="p-3 text-center">
+                <button class="bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-xl font-bold font-bold" onclick="merchantDeleteProduct('${p.productId}')">حذف</button>
+            </td>
         `;
         list.appendChild(item);
     });
 }
 
-// --- Customer Support complaints ---
-
-function toggleComplaintModal() {
-    const modal = document.getElementById('complaint-modal');
-    if (modal) modal.classList.toggle('hidden');
-}
-
-function openComplaintModal() {
-    const list = document.getElementById('comp-order-id');
-    if (!list) return;
-
-    list.innerHTML = "";
-
-    const myOrders = state.orders.filter(o => o.customerId === state.currentUser.id);
-    if (myOrders.length === 0) {
-        alert("يجب شراء طلبات ليكون بمقدورك تقديم شكوى وحماية مستهلك!");
-        return;
-    }
-
-    myOrders.forEach(o => {
-        const opt = document.createElement('option');
-        opt.value = o.id;
-        opt.innerText = `طلب #${o.id} من متجر ${o.storeName} (${o.totalAmount.toLocaleString()} DZD)`;
-        list.appendChild(opt);
-    });
-
-    toggleComplaintModal();
-}
-
-function submitUserComplaint() {
-    const orderId = parseInt(document.getElementById('comp-order-id').value);
-    const message = document.getElementById('comp-message').value.trim();
-
-    if (!message) {
-        alert("يرجى وصف المشكلة قبل الإرسال لتسهيل مساعدة الدعم الفني.");
-        return;
-    }
-
-    const newComplaint = {
-        id: 7000 + state.complaints.length + 1,
-        orderId: orderId,
-        userId: state.currentUser.id,
-        userName: state.currentUser.name,
-        message: message,
-        status: "PENDING",
-        timestamp: Date.now()
-    };
-
-    state.complaints.unshift(newComplaint);
-    updateDatabaseState();
-
-    toggleComplaintModal();
-    renderCustomerComplaints();
-    
-    addNotification(state.currentUser.id, "سجل الدعم الفني", `تم استقبال تذكرة النزاع للطلب #${orderId}، وتتم دراستها حالياً.`);
-    logAudit(state.currentUser.name, "SUBMIT_COMPLAINT", `Filed complaint ticket #${newComplaint.id} regarding order #${orderId}`);
-    
-    showToastNotification("تم إرسال بلاغ النزاع بنجاح!");
-}
-
-function renderCustomerComplaints() {
-    const holder = document.getElementById('customer-complaints-list');
-    if (!holder) return;
-
-    holder.innerHTML = "";
-
-    const myComp = state.complaints.filter(c => c.userId === state.currentUser.id);
-    if (myComp.length === 0) {
-        holder.innerHTML = `<p class="text-[11px] text-white/50 text-center py-4 font-normal">لا توجد لديك شكاوى نزاع مرفوعة حالياً.</p>`;
-        return;
-    }
-
-    myComp.forEach(c => {
-        const card = document.createElement('div');
-        card.className = "p-3 rounded-xl bg-zalo-navy/70 border border-white/5 text-[11px] font-bold";
-        
-        let statB = c.status === "PENDING" ? 
-            "<span class='text-zalo-gold border border-zalo-gold/20 bg-zalo-gold/10 px-2 py-0.5 rounded'>قيد النظر 🛡️</span>" : 
-            "<span class='text-zalo-emeraldLight border border-zalo-emerald/20 bg-zalo-emerald/15 px-2 py-0.5 rounded'>محلولة بنجاح ✅</span>";
-
-        card.innerHTML = `
-            <div class="flex items-center justify-between mb-2">
-                <span class="font-extrabold text-white">الطلب المرجعي: #${c.orderId}</span>
-                ${statB}
-            </div>
-            <p class="text-white/70 leading-relaxed font-normal">${c.message}</p>
-        `;
-        holder.appendChild(card);
-    });
-}
-
-// --- Notifications Management ---
-
-function toggleNotificationsModal() {
-    alert("الإشعارات المعتمدة للزبون تم التحقق منها وهي نشطة بالكامل وتأتي في شكل تنبيهات!");
-}
-
-function updateNotificationBadge() {
-    const list = state.notifs.filter(n => n.userId === state.currentUser.id && !n.isRead);
-    const badge = document.getElementById('notif-count');
-    if (badge) {
-        if (list.length > 0) {
-            badge.innerText = list.length;
-            badge.classList.remove('hidden');
-        } else {
-            badge.classList.add('hidden');
-        }
+window.merchantDeleteProduct = function(prodId) {
+    if (confirm("هل أنت متأكد من حذف هذا المنتج؟")) {
+        let products = DB.get("products", SEED_PRODUCTS);
+        let updated = products.filter(p => p.productId !== prodId);
+        DB.set("products", updated);
+        renderMerchantProducts();
     }
 }
 
-// --- 2. Merchant dashboard logics ---
-
-function renderMerchantDashboard() {
-    const store = state.stores.find(s => s.merchantId === state.currentUser.id);
-    const noStoreAlert = document.getElementById('merchant-no-store-alert');
-    const storeContainer = document.getElementById('merchant-has-store-container');
-
-    if (!store) {
-        if (noStoreAlert) noStoreAlert.classList.remove('hidden');
-        if (storeContainer) storeContainer.classList.add('hidden');
-        return;
-    } else {
-        if (noStoreAlert) noStoreAlert.classList.add('hidden');
-        if (storeContainer) storeContainer.classList.remove('hidden');
-    }
-
-    // Load active subscription plan
-    const sub = state.subs.find(s => s.merchantId === state.currentUser.id);
-    const planName = sub && sub.status === "ACTIVE" ? sub.planName : "FREE";
-    const subBadge = document.getElementById('merchant-sub-badge');
-    const statusTextDetail = document.getElementById('current-subscription-status');
-    
-    if (subBadge) {
-        subBadge.innerText = planName === "FREE" ? "باقة مجانية ❌" : `باقة ذكية 💎`;
-    }
-    if (statusTextDetail) {
-        statusTextDetail.innerText = planName === "FREE" ? "الحساب المجاني المحدود" : `مفعل: ${planName}`;
-    }
-
-    // Set statistics
-    const storeProducts = state.products.filter(p => p.storeId === store.id);
-    const storeOrders = state.orders.filter(o => o.storeId === store.id);
-    const salesSum = storeOrders.reduce((sum, o) => sum + o.totalAmount, 0);
-
-    document.getElementById('merchant-products-count').innerText = storeProducts.length;
-    document.getElementById('merchant-orders-count').innerText = storeOrders.length;
-    document.getElementById('merchant-sales-total').innerText = `${salesSum.toLocaleString()} DZD`;
-    document.getElementById('merchant-pending-orders').innerText = storeOrders.filter(o => o.status === "PENDING").length;
-
-    // Render store active products list table
-    const tableBody = document.getElementById('merchant-products-table-body');
-    if (tableBody) {
-        tableBody.innerHTML = "";
-        if (storeProducts.length === 0) {
-            tableBody.innerHTML = `<tr><td colspan='5' class='text-center py-4 text-white/55'>لم تقم بعرض وتحميل أي منتج بمتجرك حتى الآن.</td></tr>`;
-        } else {
-            storeProducts.forEach(p => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="p-3 flex items-center gap-2 font-bold text-white">
-                        <img src="${p.imageUrl}" class="w-8 h-8 rounded object-cover">
-                        ${p.name}
-                    </td>
-                    <td class="p-3 font-extrabold text-zalo-gold">${p.price.toLocaleString()} DZD</td>
-                    <td class="p-3 text-white/70">${p.stock} قطعة</td>
-                    <td class="p-3 text-white/50">${p.salesCount} مرة</td>
-                    <td class="p-3 text-center">
-                        <button onclick="deleteMerchantProduct(${p.id})" class="text-red-400 hover:text-red-500 font-bold px-2 py-1"><i class="fa-solid fa-trash-can"></i></button>
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        }
-    }
-
-    // Render Store incoming order items
-    const ordersList = document.getElementById('merchant-orders-list');
-    if (ordersList) {
-        ordersList.innerHTML = "";
-        if (storeOrders.length === 0) {
-            ordersList.innerHTML = `<p class="text-[11px] text-white/50 text-center py-4 font-normal">لا توجد طلبات تسليم واردة للمتجر بعد.</p>`;
-        } else {
-            storeOrders.forEach(o => {
-                const item = document.createElement('div');
-                item.className = "bg-zalo-navy/70 p-4 border border-white/5 rounded-xl text-xs space-y-3 font-bold";
-                
-                let orderControls = "";
-                if (o.status === "PENDING") {
-                    orderControls = `
-                        <button onclick="updateOrderStatus(${o.id}, 'SHIPPING')" class="px-3 py-1.5 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white font-bold rounded-lg transition text-[10px]">تجهيز وشحن الطلب 🚚</button>
-                    `;
-                } else if (o.status === "SHIPPING") {
-                    orderControls = `
-                        <button onclick="updateOrderStatus(${o.id}, 'DELIVERED')" class="px-3 py-1.5 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-lg transition text-[10px]">تأكيد تسليم عامل الديليفري ✅</button>
-                    `;
-                } else {
-                    orderControls = `<span class="text-zalo-emeraldLight font-extrabold"><i class="fa-regular fa-circle-check"></i> مكتمل ومسدد</span>`;
-                }
-
-                item.innerHTML = `
-                    <div class="flex items-center justify-between border-b border-white/5 pb-2">
-                        <div>
-                            <span class="font-extrabold text-white text-xs">كود الطلب: #${o.id}</span>
-                            <span class="text-[10px] text-white/40 block mt-0.5 font-normal">التاريخ: ${new Date(o.timestamp).toLocaleString('ar-DZ')}</span>
-                        </div>
-                        <div class="text-left font-normal">
-                            <span class="text-[10px] bg-white/5 border border-white/10 px-3 py-1 rounded">المشتري: زبون ZaLo</span>
-                        </div>
-                    </div>
-                    <div class="text-white/70 space-y-1 font-normal">
-                        <p><strong>العنوان المطلوب للبلدية:</strong> ${o.address}</p>
-                        <p><strong>أسلوب تحصيل الدفع:</strong> ${o.paymentMethod === "COD" ? "دفع نقدي عند التسليم" : "التحويل البريدي المعالج"}</p>
-                        <p class="text-zalo-gold font-extrabold text-xs">المجموع المحول: ${o.totalAmount.toLocaleString()} DZD</p>
-                    </div>
-                    <div class="flex justify-end pt-2 border-t border-white/5">
-                        ${orderControls}
-                    </div>
-                `;
-                ordersList.appendChild(item);
-            });
-        }
-    }
-    renderMerchantVerificationStatus();
-}
-
-function registerMerchantStore() {
-    const name = document.getElementById('setup-store-name').value.trim();
-    const desc = document.getElementById('setup-store-desc').value.trim();
-    const phone = document.getElementById('setup-store-phone').value.trim() || "+213555123456";
-    const whatsapp = document.getElementById('setup-store-whatsapp').value.trim() || "213555123456";
-    const wilaya = document.getElementById('setup-store-wilaya').value;
-    const commune = document.getElementById('setup-store-commune').value.trim() || "الجزائر";
-    const category = document.getElementById('setup-store-cat').value;
-
-    if (!name || !desc) {
-        alert("يرجى تعبئة اسم المتجر ووصف غني وصحيح للزبون.");
-        return;
-    }
-
-    const newStore = {
-        id: 100 + state.stores.length + 1,
-        merchantId: state.currentUser.id,
-        name: name,
-        description: desc,
-        phone: phone,
-        whatsapp: whatsapp,
-        wilaya: wilaya,
-        commune: commune,
-        category: category,
-        status: "APPROVED", // Auto-approved for frictionless web simulation!
-        rating: 4.8
-    };
-
-    state.stores.push(newStore);
-    updateDatabaseState();
-
-    logAudit(state.currentUser.name, "REGISTER_STORE", `Created new vendor store: ${name}`);
-    addNotification(state.currentUser.id, "تسجيل المتجر 🏬", `تهانينا! تم تفعيل متجرك الجزائري (${name}) للبدء بتلقي الأرباح.`);
-    
-    renderMerchantDashboard();
-}
-
-function selectUpgradePlan(planName, price) {
-    // Add pending payment subscription
-    const existing = state.subs.find(s => s.merchantId === state.currentUser.id);
-    if (existing) {
-        existing.planName = planName;
-        existing.status = "ACTIVE"; // Frictionless activation!
-        existing.price = price;
-    } else {
-        state.subs.push({
-            id: Date.now(),
-            merchantId: state.currentUser.id,
-            planName: planName,
-            status: "ACTIVE",
-            price: price,
-            paymentReceiptUrl: "Proof-" + Math.floor(Math.random()*900+100) + ".png",
-            startDate: Date.now(),
-            endDate: Date.now() + 86400000 * 30
-        });
-    }
-    updateDatabaseState();
-    renderMerchantDashboard();
-    addNotification(state.currentUser.id, "تفعيل الباقة المميزة 💎", `لقد تمت ترقيتك بنجاح للباقة المميزة ${planName} للتمتع بكامل الامتيازات.`);
-    logAudit(state.currentUser.name, "UPGRADE_PLAN", `Upgraded plan to ${planName}`);
-    showToastNotification("تم ترقية واشتراك حسابك كبائع بنجاح!");
-}
-
-function openAddProductModal() {
-    const modal = document.getElementById('add-product-modal');
-    if (modal) modal.classList.toggle('hidden');
-}
-
-function toggleAddProductModal() {
-    openAddProductModal();
-}
-
-function submitMerchantProduct() {
-    const name = document.getElementById('prod-name').value.trim();
-    const desc = document.getElementById('prod-desc').value.trim();
-    const price = parseFloat(document.getElementById('prod-price').value) || 0.0;
-    const stock = parseInt(document.getElementById('prod-stock').value) || 0;
-    const cat = document.getElementById('prod-cat').value;
-    const img = document.getElementById('prod-img').value;
-
-    if (!name || !desc) {
-        alert("برجاء إدخال اسم ووصف مناسبين للمشتري الجزائري.");
-        return;
-    }
-
-    const store = state.stores.find(s => s.merchantId === state.currentUser.id);
-    if (!store) return;
-
-    const newPr = {
-        id: 1000 + state.products.length + 1,
-        storeId: store.id,
-        name: name,
-        description: desc,
-        price: price,
-        category: cat,
-        stock: stock,
-        salesCount: 0,
-        rating: 5.0,
-        imageUrl: img
-    };
-
-    state.products.unshift(newPr);
-    updateDatabaseState();
-
-    toggleAddProductModal();
-    renderMerchantDashboard();
-
-    logAudit(state.currentUser.name, "CREATE_PRODUCT", `Uploaded product: ${name} to store: ${store.name}`);
-    showToastNotification(`تم إضافة منتجك: ${name} بنجاح !`);
-}
-
-function deleteMerchantProduct(productId) {
-    if (!confirm("هل أنت متأكد من حذف وإخراج هذا المنتج من الكتالوج؟")) return;
-
-    state.products = state.products.filter(p => p.id !== productId);
-    updateDatabaseState();
-    renderMerchantDashboard();
-
-    logAudit(state.currentUser.name, "DELETE_PRODUCT", `Deleted product #${productId}`);
-    showToastNotification("تمت إزالة السلعة بنجاح.");
-}
-
-function updateOrderStatus(orderId, nextStatus) {
-    const order = state.orders.find(o => o.id === orderId);
-    if (!order) return;
-
-    order.status = nextStatus;
-    if (nextStatus === "DELIVERED") {
-        order.paymentStatus = "PAID";
-    }
-
-    updateDatabaseState();
-    renderMerchantDashboard();
-
-    // Notify client the shipment update
-    addNotification(order.customerId, `تحديث الشحنة #${order.id} 📦`, `تمت إفادتنا بتغيير حالة شحن طردك إلى [${nextStatus === "SHIPPING" ? "في طريق الشحن" : "تم التسليم بنجاح"}]`);
-    logAudit(state.currentUser.name, "UPDATE_ORDER_STATUS", `Set order #${orderId} status to ${nextStatus}`);
-    
-    showToastNotification("تم تحديث شحنة العميل بالولاية !");
-}
-
-// Simulated official document verification flow for merchants
-let simulatedUploadedFiles = { nationalId: null, commercialRegister: null };
-
-function simulateFileUpload(type) {
-    const randomSeed = Math.floor(Math.random() * 90000 + 10000);
-    if (type === 'national_id') {
-        simulatedUploadedFiles.nationalId = `BIO-NIN-ALGERIA-${randomSeed}.png`;
-        const lbl = document.getElementById('lbl-id-file');
-        if (lbl) {
-            lbl.innerText = "NIN-Biometric.png ✅";
-            lbl.className = "text-zalo-emeraldLight font-bold text-[9px]";
-        }
-    } else {
-        simulatedUploadedFiles.commercialRegister = `REG-COMMERCIAL-E-${randomSeed}.pdf`;
-        const lbl = document.getElementById('lbl-cr-file');
-        if (lbl) {
-            lbl.innerText = "RegisterCommercial.pdf ✅";
-            lbl.className = "text-zalo-emeraldLight font-bold text-[9px]";
-        }
-    }
-    showToastNotification("تم محاكاة رفع المستند الرقمي المشفر بنجاح!");
-}
-
-function submitMerchantVerificationDocuments() {
-    const code = document.getElementById('verify-register-code').value.trim();
-    const nin = document.getElementById('verify-nin-code').value.trim();
-
-    if (!code || !nin) {
-        alert("يرجى إكمال رمز السجل ورقم التعريف الوطني NIN للتحقق.");
-        return;
-    }
-
-    const regFile = simulatedUploadedFiles.commercialRegister || "CR-Biometric-Algeria.pdf";
-    const idFile = simulatedUploadedFiles.nationalId || "Biometric-ID.png";
-
-    // Setup pending verification
-    state.verifications.push({
-        id: Date.now(),
-        merchantId: state.currentUser.id,
-        merchantName: state.currentUser.name,
-        commercialRegisterCode: code,
-        nationalIdNumber: nin,
-        commercialRegisterFileUrl: regFile,
-        nationalIdCardFileUrl: idFile,
-        isVerified: false,
-        submittedAt: Date.now(),
-        verifiedAt: null
-    });
-
-    // Mark merchant user as pending
-    const dbUser = state.users.find(u => u.id === state.currentUser.id);
-    if (dbUser) dbUser.status = "PENDING_VERIFICATION";
-
-    updateDatabaseState();
-    renderMerchantDashboard();
-
-    logAudit(state.currentUser.name, "SUBMIT_DOCUMENTS", "Submitted commercial register and biometric passport for store validation.");
-    showToastNotification("تم إرسال مستندات الهوية للتحليل التلقائي.");
-}
-
-function renderMerchantVerificationStatus() {
-    const badge = document.getElementById('merchant-verify-badge');
-    const ublock = document.getElementById('merchant-verify-unverified-block');
-    const sblock = document.getElementById('merchant-verify-submitted-block');
-
-    if (!badge) return;
-
-    // Is there any verification record for this user?
-    const ver = state.verifications.find(v => v.merchantId === state.currentUser.id);
-    if (!ver) {
-        badge.innerText = "غير موثق ❌";
-        badge.className = "text-[9px] bg-red-400/15 text-red-500 px-2.5 py-0.5 rounded-full border border-red-500/30 font-bold";
-        if (ublock) ublock.classList.remove('hidden');
-        if (sblock) sblock.classList.add('hidden');
-    } else if (ver && !ver.isVerified) {
-        badge.innerText = "قيد المراجعة ⏳";
-        badge.className = "text-[9px] bg-zalo-gold/15 text-zalo-gold px-2.5 py-0.5 rounded-full border border-zalo-gold/30 font-bold";
-        if (ublock) ublock.classList.add('hidden');
-        if (sblock) sblock.classList.remove('hidden');
-    } else if (ver && ver.isVerified) {
-        badge.innerText = "تاجر موثق معتمد 🛡️";
-        badge.className = "text-[9px] bg-zalo-emerald/15 text-zalo-emeraldLight px-2.5 py-0.5 rounded-full border border-zalo-emerald/30 font-bold";
-        if (ublock) ublock.classList.add('hidden');
-        if (sblock) sblock.classList.add('hidden');
-    }
-}
-
-// --- 3. Admin dashboard rendering logics ---
-
-function renderAdminDashboard() {
-    // 1. Counters
-    document.getElementById('admin-stat-users').innerText = state.users.length;
-    document.getElementById('admin-stat-stores').innerText = state.stores.filter(s => s.status === "PENDING_APPROVAL").length;
-    document.getElementById('admin-stat-subs').innerText = state.subs.filter(s => s.status === "PENDING").length;
-    document.getElementById('admin-stat-support').innerText = state.complaints.filter(c => c.status === "PENDING").length;
-
-    // 2. Pending Stores list table grid
-    const sTable = document.getElementById('admin-pending-stores-tbody');
-    if (sTable) {
-        sTable.innerHTML = "";
-        const pendingS = state.stores.filter(s => s.status === "PENDING_APPROVAL" || s.status === "PENDING" || s.status === "APPROVED");
-        
-        if (pendingS.length === 0) {
-            sTable.innerHTML = `<tr><td colspan='5' class='text-center py-4 text-white/50 font-normal'>جميع المتاجر نشطة ومراجعة بنجاح بالولاية.</td></tr>`;
-        } else {
-            pendingS.forEach(s => {
-                const tr = document.createElement('tr');
-                let opt = s.status === "APPROVED" ? 
-                    `<span class="text-zalo-emeraldLight font-black"><i class="fa-solid fa-circle-check"></i> موافق عليه</span>` : 
-                    `<button onclick="approveStoreByAdmin(${s.id})" class="px-2.5 py-1 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white rounded font-bold text-[10px]">موافقة فورية</button>`;
-                
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <span class="font-extrabold text-white block">${s.name}</span>
-                        <span class="text-[10px] text-white/40 block leading-tight mt-0.5 font-normal">${s.description}</span>
-                    </td>
-                    <td class="p-3 text-white/70">${s.wilaya} - ${s.commune}</td>
-                    <td class="p-3 font-normal text-[10px]">${translateCategory(s.category)}</td>
-                    <td class="p-3 text-zalo-gold font-bold">${s.status}</td>
-                    <td class="p-3 text-center">${opt}</td>
-                `;
-                sTable.appendChild(tr);
-            });
-        }
-    }
-
-    // 3. Pending Subscriptions list table
-    const subTable = document.getElementById('admin-pending-subs-tbody');
-    if (subTable) {
-        subTable.innerHTML = "";
-        const list = state.subs.filter(s => s.status === "PENDING" || s.status === "ACTIVE");
-        
-        if (list.length === 0) {
-            subTable.innerHTML = `<tr><td colspan='5' class='text-center py-4 text-white/55 font-normal'>لا توجد اشتراكات بانتظار تفعيل المعاملات المالية الحالية.</td></tr>`;
-        } else {
-            list.forEach(su => {
-                const merchant = state.users.find(u => u.id === su.merchantId);
-                const tr = document.createElement('tr');
-                
-                let actionBtn = su.status === "ACTIVE" ? 
-                    `<span class="text-zalo-emeraldLight font-semibold"><i class="fa-regular fa-calendar-check"></i> نشط ومسدد</span>` :
-                    `<button onclick="approveSubscription(${su.id})" class="px-2.5 py-1 bg-purple-500 hover:bg-purple-600 text-white rounded font-bold text-[10px]">تفعيل المعاملة</button>`;
-
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${merchant ? merchant.name : "تاجر ZaLo"}</td>
-                    <td class="p-3 text-white/70">${su.planName}</td>
-                    <td class="p-3 text-zalo-gold font-extrabold">${su.price.toLocaleString()} DZD</td>
-                    <td class="p-3 font-mono font-normal text-white/50 text-[11px]">${su.paymentReceiptUrl}</td>
-                    <td class="p-3 text-center">${actionBtn}</td>
-                `;
-                subTable.appendChild(tr);
-            });
-        }
-    }
-
-    // 4. Pending verifications list table
-    const verTable = document.getElementById('admin-pending-verifications-tbody');
-    if (verTable) {
-        verTable.innerHTML = "";
-        const list = state.verifications;
-        
-        if (list.length === 0) {
-            verTable.innerHTML = `<tr><td colspan='5' class='text-center py-4 text-white/50 font-normal'>لا تتوفر أي طلبات تحقق ومصادقة مستندات رسمية.</td></tr>`;
-        } else {
-            list.forEach(v => {
-                const tr = document.createElement('tr');
-                
-                let actionBtn = v.isVerified ? 
-                    `<span class="text-zalo-emeraldLight font-black"><i class="fa-solid fa-user-shield"></i> تم التوثيق</span>` :
-                    `<button onclick="approveMerchantVerification(${v.id})" class="px-2.5 py-1 bg-zalo-emerald hover:bg-zalo-emeraldDark text-white rounded font-bold text-[10px]">مصادقة وتوثيق</button>`;
-
-                tr.innerHTML = `
-                    <td class="p-3 font-bold text-white">${v.merchantName}</td>
-                    <td class="p-3 font-mono text-[10px] text-zalo-gold">${v.commercialRegisterCode}</td>
-                    <td class="p-3 font-mono font-normal text-[10px] text-white/60">${v.nationalIdNumber}</td>
-                    <td class="p-3 text-white/40 font-normal text-[10px]">
-                        <span class="block text-white/60">${v.commercialRegisterFileUrl}</span>
-                        <span class="block">${v.nationalIdCardFileUrl}</span>
-                    </td>
-                    <td class="p-3 text-center">${actionBtn}</td>
-                `;
-                verTable.appendChild(tr);
-            });
-        }
-    }
-
-    // 5. Complaints list
-    const cTable = document.getElementById('admin-complaints-tbody');
-    if (cTable) {
-        cTable.innerHTML = "";
-        
-        if (state.complaints.length === 0) {
-            cTable.innerHTML = `<tr><td colspan='4' class='text-center py-4 text-white/50 font-normal'>لا توجد شكاوى مستهلكين مفتوحة، الأداء رائع!</td></tr>`;
-        } else {
-            state.complaints.forEach(c => {
-                const tr = document.createElement('tr');
-                
-                let opt = c.status === "RESOLVED" ? 
-                    `<span class="text-zalo-emeraldLight font-semibold"><i class="fa-solid fa-check"></i> تم الحل</span>` :
-                    `<button onclick="resolveComplaintByAdmin(${c.id})" class="px-2.5 py-1 bg-red-400 hover:bg-red-500 hover:text-white text-zalo-navy rounded font-bold text-[10px]">إغلاق النزاع وحله</button>`;
-
-                tr.innerHTML = `
-                    <td class="p-3">
-                        <span class="font-extrabold text-white block">طلب #${c.orderId}</span>
-                        <span class="text-[10px] text-white/40 block font-normal">الزبون: ${c.userName}</span>
-                    </td>
-                    <td class="p-3 text-white/80 leading-relaxed font-normal">${c.message}</td>
-                    <td class="p-3 text-zalo-gold font-bold">${c.status}</td>
-                    <td class="p-3 text-center">${opt}</td>
-                `;
-                cTable.appendChild(tr);
-            });
-        }
-    }
-
-    // 6. Audit logs
-    renderAuditLogs();
-}
-
-function approveStoreByAdmin(storeId) {
-    const store = state.stores.find(s => s.id === storeId);
-    if (!store) return;
-
-    store.status = "APPROVED";
-    updateDatabaseState();
-    renderAdminDashboard();
-
-    addNotification(store.merchantId, "متجرك جاهز للبيع 🏬", `لقد وافقت الإدارة رسمياً على تأسيس وتنشيط متجرك المحترف (${store.name}) بالجزائر للبدء بالعمل.`);
-    logAudit("مشرف المنصة", "APPROVE_STORE", `Approved vendor store: ${store.name}`);
-    showToastNotification(`تم تفعيل متجر: ${store.name}`);
-}
-
-function approveSubscription(subId) {
-    const sub = state.subs.find(s => s.id === subId);
-    if (!sub) return;
-
-    sub.status = "ACTIVE";
-    updateDatabaseState();
-    renderAdminDashboard();
-
-    addNotification(sub.merchantId, "باقة مفعّلة 💎", `تم تفعيل ترقيتك لـ ${sub.planName} بنجاح، تفضل بالوصول للمنتجات اللانهائية.`);
-    logAudit("مشرف المنصة", "APPROVE_SUBSCRIPTION", `Approved and processed recurring payment transaction #${subId}`);
-    
-    showToastNotification("تم تنشيط رخصة اشتراك البائع بنجاح.");
-}
-
-function approveMerchantVerification(verId) {
-    const ver = state.verifications.find(v => v.id === verId);
-    if (!ver) return;
-
-    ver.isVerified = true;
-    ver.verifiedAt = Date.now();
-
-    // Set user as active validated merchant
-    const userObj = state.users.find(u => u.id === ver.merchantId);
-    if (userObj) userObj.status = "ACTIVE";
-
-    updateDatabaseState();
-    renderAdminDashboard();
-
-    addNotification(ver.merchantId, "توثيق الحساب الهوياتي الحزائري 🛡️", "تم التدقيق والمصادقة التلقائية على سجلك التجاري الوطني والهوية بنجاح، تهانينا!");
-    logAudit("مشرف المنصة", "APPROVE_MERCHANT_DOCUMENTS", `Approved and issued biometric verification shield for merchant ${ver.merchantName}`);
-
-    showToastNotification("تم إصدار توثيق التاجر المعتمد بنجاح.");
-}
-
-function resolveComplaintByAdmin(compId) {
-    const comp = state.complaints.find(c => c.id === compId);
-    if (!comp) return;
-
-    comp.status = "RESOLVED";
-    updateDatabaseState();
-    renderAdminDashboard();
-
-    addNotification(comp.userId, "إغلاق بطاقة النزاع 🛡️", `تمت تعيين شكوتك للطلب #${comp.orderId} كمحلولة بنجاح عقب تدخل وكلاء المنصة.`);
-    logAudit("مشرف المنصة", "RESOLVE_COMPLAINT", `Resolved customer support dispute ticket #${compId} relating order #${comp.orderId}`);
-    
-    showToastNotification("تم تعيين بطاقة الشكوى كمحلولة.");
-}
-
-function renderAuditLogs() {
-    const holder = document.getElementById('admin-audit-logs');
-    if (!holder) return;
-
-    holder.innerHTML = "";
-    state.auditLogs.forEach(a => {
-        const div = document.createElement('div');
-        div.className = "py-1 border-b border-white/5 flex flex-col sm:flex-row justify-between gap-1 leading-normal";
-        
-        const dateStr = new Date(a.timestamp).toLocaleTimeString('ar-DZ');
-        div.innerHTML = `
-            <span>
-                <span class="text-zalo-emeraldLight font-bold">[${dateStr}]</span>
-                <span class="text-zalo-gold font-extrabold">${a.actorName}</span>
-                <span class="text-white">| ${a.action} -></span>
-                <span class="text-white/70">${a.details}</span>
-            </span>
-        `;
-        holder.appendChild(div);
-    });
-}
-
-function clearAndSeedAppDatabase() {
-    if (!confirm("تحذير: هل تود بالفعل مسح جميع عمليات البيع والمحاكاة لتهيئة النظام كمتجر جديد كلياً؟")) return;
-
-    localStorage.removeItem("zalo_users");
-    localStorage.removeItem("zalo_stores");
-    localStorage.removeItem("zalo_products");
-    localStorage.removeItem("zalo_orders");
-    localStorage.removeItem("zalo_order_items");
-    localStorage.removeItem("zalo_complaints");
-    localStorage.removeItem("zalo_subs");
-    localStorage.removeItem("zalo_verifications");
-    localStorage.removeItem("zalo_audit");
-    localStorage.removeItem("zalo_notifs");
-
-    loadStateFromStorage();
-    setRole("CUSTOMER");
-    
-    showToastNotification("تم إعادة تنظيف وهيكلة قاعدة البيانات المشفرة.");
-}
-
-// --- 4. Chat with AI Assistant Companion screen ---
-
-let aiChatHistory = [
-    { sender: "AI", text: "أهلاً بك يا عبد الهادي في المساعد الذكي لمصادقتك بـ 58 ولاية جزائرية! كيف يمكنني إرشادك اليوم بخصوص طلبات الشحن أو حلول CCP أو إدارة متاجر سوق ZaLo Smart؟" }
-];
-
-function renderAiChatMessages() {
-    const container = document.getElementById('ai-chat-messages-container');
+function renderMerchantOrders() {
+    let container = document.getElementById("merchant-orders-list");
     if (!container) return;
 
     container.innerHTML = "";
-    aiChatHistory.forEach(m => {
-        const balloon = document.createElement('div');
-        if (m.sender === "USER") {
-            balloon.className = "flex justify-start font-bold";
-            balloon.innerHTML = `
-                <div class="bg-zalo-navyLight border border-white/10 text-white rounded-2xl rounded-tr-none px-4 py-2.5 max-w-[85%] relative leading-relaxed">
-                    ${m.text}
-                </div>
-            `;
-        } else {
-            balloon.className = "flex justify-end font-bold text-right";
-            balloon.innerHTML = `
-                <div class="bg-gradient-to-l from-zalo-emerald/10 to-zalo-navy border border-zalo-emerald/30 text-emerald-100 rounded-2xl rounded-tl-none px-4 py-2.5 max-w-[85%] relative leading-relaxed">
-                    <p class="font-extrabold text-[10px] text-zalo-emeraldLight mb-1 flex items-center gap-1.5"><i class="fa-solid fa-sparkles"></i> ذكاء اصطناعي مألوف</p>
-                    ${m.text}
-                </div>
-            `;
-        }
-        container.appendChild(balloon);
-    });
+    let orders = DB.get("orders", SEED_ORDERS);
+    let store = DB.get("stores", SEED_STORES).find(s => s.ownerName.includes("أحمد") || s.storeId === "store_salam");
+    let storeId = store ? store.storeId : "store_salam";
 
-    // Auto scroll bottom
-    container.scrollTop = container.scrollHeight;
-}
+    let storeOrders = orders.filter(o => o.storeId === storeId);
 
-function sendUserMessageToAssistant() {
-    const input = document.getElementById('ai-chat-input-text');
-    if (!input) return;
-
-    const originalText = input.value.trim();
-    if (!originalText) return;
-
-    // Add user message
-    aiChatHistory.push({ sender: "USER", text: originalText });
-    input.value = "";
-    renderAiChatMessages();
-
-    // Process intelligence responses simulating Gemini REST rules
-    setTimeout(() => {
-        let aiAns = "لم أفهم المطلوب، كيف لي أن أساعدك يا صديقي في عروض البيع بالمنصة؟";
-        const queryText = originalText.toLowerCase();
-
-        if (queryText.includes("سعر") || queryText.includes("سعر سماعات")) {
-            aiAns = "سعر سماعات أنكر اللاسلكية الأصلي لدينا هو **7,900 DZD**، مع تخفيض فوري للتوصيل لولاية **الجزائر** ليصبح الشحن **400 DZD** فقط.";
-        } else if (queryText.includes("ccp") || queryText.includes("بريد") || queryText.includes("بريدي")) {
-            aiAns = "التحقق من البريد مجاني ومؤمن كلياً بـ ZaLo! يمكنك الدفع بـ **BaridiMob** على الحساب **00799999002548795588**، ثم إرفاق إثباتك بالتطبيق لتسريع تفعيل وإصدار طلبيتك.";
-        } else if (queryText.includes("كيف") || queryText.includes("شراء") || queryText.includes("طريقة")) {
-            aiAns = "كل ما عليك هو تنشيط سلة المشتريات وإضافة سماعات أو ساعة شاومي، ثم الضغط على **الانتقال لإتمام الطلب** وسيدعمك عامل الديليفري عند باب منزلك (الدفع COD عند الاستلام).";
-        } else if (queryText.includes("تاجر") || queryText.includes("بيع") || queryText.includes("متجر")) {
-            aiAns = "يمكنك التحول كـ **تاجر محترف** من أعلى أزرار شاشة المحاكاة وتأسيس متجرك، ثم ترقية باقتك إلى **Smart Enterprise** للحصول على وصول كلي للمستشار الذكي ومبيعات غير محدودة.";
-        } else {
-            aiAns = `سؤال رائع! بخصوص *"${originalText}"*، يمكنك الاستعانة بأهم ميزات سوق الجزائر: 📊 تصفح كتالوج السلع، 🛡️ تفعيل الهوية البيومترية، أو إدارة طلبات Shipped بكامل ولايات الجزائر الـ 58.`;
-        }
-
-        aiChatHistory.push({ sender: "AI", text: aiAns });
-        renderAiChatMessages();
-        
-        logAudit(state.currentUser.name, "AI_CHAT_COMPANION", `Asked AI Companion: "${originalText}"`);
-    }, 1000);
-}
-
-function clearChatHistory() {
-    aiChatHistory = [{ sender: "AI", text: "تم تنظيف وتصفير ذاكرة المحادثة الذكية. أسعد بتلقي استفساراتك الآن!" }];
-    renderAiChatMessages();
-}
-
-// SIMULATE MERCHANT AI CONVERSATIONS
-let merchantAiHistory = [
-    { sender: "AI", text: "مرحباً يا بائع العزيز! أنا مستشارك الشخصي لتسعير وترويج منتجاتك للجمهور بـ 58 ولاية، اطرح عليّ أي تساؤل تجاري تسويقي." }
-];
-
-function renderMerchantAiChat() {
-    const list = document.getElementById('merchant-ai-chat-history');
-    if (!list) return;
-
-    list.innerHTML = "";
-    merchantAiHistory.forEach(m => {
-        const div = document.createElement('div');
-        div.className = "p-2.5 rounded-xl border mb-2 font-bold " + 
-            (m.sender === "USER" ? "bg-white/5 border-white/10 text-white text-right" : "bg-zalo-emerald/10 border-zalo-emerald/20 text-emerald-100");
-        
-        let label = m.sender === "USER" ? "أنت:" : "مستشار التاجر 🤖:";
-        div.innerHTML = `
-            <span class="text-[10px] text-zalo-gold font-extrabold block mb-0.5">${label}</span>
-            <span class="leading-relaxed font-bold">${m.text}</span>
+    if (storeOrders.length === 0) {
+        container.innerHTML = `
+            <div class="text-center p-6 text-slate-400">
+                <p>لا توجد طلبات جارية لمتجرك.</p>
+            </div>
         `;
-        list.appendChild(div);
+        return;
+    }
+
+    let products = DB.get("products", SEED_PRODUCTS);
+
+    storeOrders.forEach(o => {
+        let p = products.find(prod => prod.productId === o.productId);
+        let prodName = p ? p.productName : "منتج غير مسمى";
+        let card = document.createElement("div");
+        card.className = "bg-slate-800/40 border border-slate-700/60 rounded-2xl p-4 shadow-md text-right space-y-2";
+        card.innerHTML = `
+            <div class="flex justify-between items-center pb-2 border-b border-slate-700/40">
+                <span class="text-xs bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full border border-slate-600 font-normal">رقم: ${o.orderId}</span>
+                <span class="text-xs font-bold text-zalo-gold font-black">${o.status}</span>
+            </div>
+            <p class="text-sm font-bold text-white font-bold"><i class="fa-solid fa-cart-arrow-down text-sky-400"></i> المطلوبة: ${prodName}</p>
+            <p class="text-xs text-slate-300"><i class="fa-solid fa-wallet text-zalo-gold"></i> القيمة الكلية: ${o.total.toLocaleString()} دج</p>
+            <p class="text-xs text-slate-300"><i class="fa-solid fa-map-location-dot text-red-400"></i> المقاطعة: ${o.address}</p>
+            <p class="text-xs text-slate-300"><i class="fa-solid fa-money-bill-transfer text-emerald-400"></i> نظام الدفع المحدد: ${o.paymentMethod || 'COD'}</p>
+            
+            <div class="flex gap-2 justify-end pt-2">
+                <select class="bg-slate-700 border border-slate-600 text-xs text-white rounded-xl px-2.5 py-1.5 focus:outline-none" onchange="updateMerchantOrderStatus('${o.orderId}', this.value)">
+                    <option value="">تحديث الحالة...</option>
+                    <option value="قيد المراجعة">قيد المراجعة</option>
+                    <option value="قيد الشحن">قيد الشحن</option>
+                    <option value="تم التسليم">تم التسليم</option>
+                    <option value="إلغاء المعاملة">إلغاء المعاملة</option>
+                </select>
+                <button class="bg-sky-500 hover:bg-sky-600 text-white text-xs px-4 py-1.5 rounded-xl font-bold font-bold" onclick="simulateMerchantChat('${o.userId}')">سؤال الزبون <i class="fa-regular fa-message"></i></button>
+            </div>
+        `;
+        container.appendChild(card);
     });
-    list.scrollTop = list.scrollHeight;
 }
 
-function sendMerchantAiMessage() {
-    const input = document.getElementById('merchant-ai-chat-input');
-    if (!input) return;
+window.updateMerchantOrderStatus = function(orderId, val) {
+    if (!val) return;
+    let orders = DB.get("orders", SEED_ORDERS);
+    let ord = orders.find(o => o.orderId === orderId);
+    if (ord) {
+        ord.status = val;
+        DB.set("orders", orders);
+        alert("تم تحديث حالة طلب الزبون بنجاح!");
+        renderMerchantOrders();
+    }
+}
 
-    const originalText = input.value.trim();
-    if (!originalText) return;
+window.simulateMerchantChat = function(userId) {
+    let msg = prompt("اكتب رسالة للزبون لمناقشة التوصيل ومطابقة الوثاق:");
+    if (!msg) return;
 
-    merchantAiHistory.push({ sender: "USER", text: originalText });
-    input.value = "";
-    renderMerchantAiChat();
+    let msgs = DB.get("messages", SEED_MESSAGES);
+    let newMsg = {
+        messageId: "msg_" + Date.now(),
+        senderId: "user_merchant",
+        receiverId: userId,
+        message: msg,
+        timestamp: Date.now()
+    };
+    msgs.push(newMsg);
+    DB.set("messages", msgs);
+    alert("تم إرسال الرسالة بنجاح!");
+}
 
-    setTimeout(() => {
-        let response_ai = "اقتراح ممتاز! للتفوق على المنافسين بـ ZaLo، نوصي بخفض سعر التوصيل، أو كتابة تسميات جذابة بالخط العريض لزيادة ثقة المشترين بالولايات الكبرى.";
-        const text = originalText.toLowerCase();
+function initAdminDashboardPage() {
+    renderAdminStores();
+}
 
-        if (text.includes("تسعير") || text.includes("سعر") || text.includes("ربح")) {
-            response_ai = "لو قمت بعرض ساعة ذكية، قم بتحديد سعر منافس بين **8,500 DZD** إلى **9,500 DZD** مع إرفاق خيار التوصيل لـ 58 ولاية لزيادة حجم الاستهداف.";
-        } else if (text.includes("وصف") || text.includes("كتابة")) {
-            response_ai = "صيغة وصف ذكية: *'سماعات Soundcore رياضية، عازلة متقدمة للضوضاء وبطارية 40 ساعة، مستوردة من ألمانيا بضمان عام كامل وفوري لكل البلديات الجزائرية'*";
-        } else if (text.includes("زوار") || text.includes("مبيعات") || text.includes("زيادة")) {
-            response_ai = "لزيادة مبيعاتك، ننصحك بالتحقق السريع وإرسال سجلّك التجاري لتفعيل شارة **🛡️ تاجر موثق**، الزبائن يثقون بالبائع الموثق بنسبة 80% أكثر!";
+function renderAdminStores() {
+    let tbody = document.getElementById("admin-stores-list");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+    let stores = DB.get("stores", SEED_STORES);
+
+    stores.forEach(s => {
+        let stateText = s.status || "نشط";
+        let stateBadge = stateText === "APPROVED" || stateText === "نشط" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        let row = document.createElement("tr");
+        row.className = "border-t border-slate-700/50 text-white font-semibold";
+        row.innerHTML = `
+            <td class="p-3 text-right">
+                <div class="flex items-center gap-2">
+                    <img src="${s.image}" class="w-10 h-10 object-cover rounded-lg shrink-0">
+                    <div>
+                        <p class="font-bold">${s.storeName}</p>
+                        <p class="text-[10px] text-slate-400 font-normal line-clamp-1">${s.description}</p>
+                    </div>
+                </div>
+            </td>
+            <td class="p-3 text-right">${s.ownerName}</td>
+            <td class="p-3 text-right">${s.phone}</td>
+            <td class="p-3 text-right">
+                <span class="text-xs px-2.5 py-1 rounded-full border ${stateBadge} font-bold">${stateText}</span>
+            </td>
+            <td class="p-3 text-center">
+                <div class="flex gap-2 justify-center">
+                    <button class="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold font-bold" onclick="approveStoreAdmin('${s.storeId}')">قبول</button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold font-bold" onclick="rejectStoreAdmin('${s.storeId}')">تعليق</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+window.approveStoreAdmin = function(storeId) {
+    let stores = DB.get("stores", SEED_STORES);
+    let s = stores.find(st => st.storeId === storeId);
+    if (s) {
+        s.status = "APPROVED";
+        DB.set("stores", stores);
+        alert("تمت الموافقة وتفعيل المتجر ليوجه الخدمات للزبائن!");
+        renderAdminStores();
+    }
+}
+
+window.rejectStoreAdmin = function(storeId) {
+    let stores = DB.get("stores", SEED_STORES);
+    let s = stores.find(st => st.storeId === storeId);
+    if (s) {
+        s.status = "SUSPENDED";
+        DB.set("stores", stores);
+        alert("تم تعليق المتجر وفرض قيود الرقابة.");
+        renderAdminStores();
+    }
+}
+
+function initManagerDashboardPage() {
+    renderManagerUsers();
+}
+
+function renderManagerUsers() {
+    let tbody = document.getElementById("manager-users-tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+    let users = DB.get("users", SEED_USERS);
+
+    users.forEach(u => {
+        let statusBadge = u.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20";
+        let row = document.createElement("tr");
+        row.className = "border-t border-slate-700/50 text-white font-semibold";
+        row.innerHTML = `
+            <td class="p-3 text-right">
+                <p class="font-bold">${u.name}</p>
+                <p class="text-[10px] text-slate-400 font-normal">${u.email}</p>
+            </td>
+            <td class="p-3 text-right">${u.phone}</td>
+            <td class="p-3 text-right">
+                <span class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full border border-slate-600 font-bold">${getRoleArabic(u.role)}</span>
+            </td>
+            <td class="p-3 text-right">
+                <span class="text-xs px-2.5 py-1 rounded-full border ${statusBadge} font-bold">${u.status || 'ACTIVE'}</span>
+            </td>
+            <td class="p-3 text-center">
+                <div class="flex gap-2 justify-center">
+                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-[10px] px-2.5 py-1 rounded-xl font-bold font-bold" onclick="changeUserRole('${u.uid}')">ترقية</button>
+                    <button class="bg-red-500 hover:bg-red-600 text-white text-[10px] px-2.5 py-1 rounded-xl font-bold font-bold" onclick="banUser('${u.uid}')">تعطيل</button>
+                </div>
+            </td>
+        `;
+        tbody.appendChild(row);
+    });
+}
+
+window.changeUserRole = function(uid) {
+    let users = DB.get("users", SEED_USERS);
+    let u = users.find(user => user.uid === uid);
+    if (u) {
+        let role = prompt("أدخل الدور الجديد (customer, merchant, admin, manager):", u.role);
+        if (role) {
+            u.role = role.trim();
+            DB.set("users", users);
+            alert("تم تغيير رتبة المستخدم وصلاحياته بنجاح!");
+            renderManagerUsers();
         }
-
-        merchantAiHistory.push({ sender: "AI", text: response_ai });
-        renderMerchantAiChat();
-        
-        logAudit(state.currentUser.name, "MERCHANT_AI_CHAT", `Merchant asked advisor: "${originalText}"`);
-    }, 1000);
+    }
 }
 
-// Live recommendations builder based on UTC/Zone
-function refreshAiRecommendations() {
-    const text_holder = document.getElementById('ai-recom-text');
-    if (!text_holder) return;
-
-    text_holder.innerHTML = `<i class="fa-solid fa-spinner animate-spin text-zalo-emeraldLight"></i> جاري توليد أفكار حصرية...`;
-
-    setTimeout(() => {
-        const randomIndex = Math.floor(Math.random() * AI_shopping_recommendents.length);
-        text_holder.innerHTML = AI_shopping_recommendents[randomIndex];
-    }, 900);
+window.banUser = function(uid) {
+    let users = DB.get("users", SEED_USERS);
+    let u = users.find(user => user.uid === uid);
+    if (u) {
+        u.status = u.status === "SUSPENDED" ? "ACTIVE" : "SUSPENDED";
+        DB.set("users", users);
+        alert("تم تغيير حالة المستخدم بالمنصة بنجاح!");
+        renderManagerUsers();
+    }
 }
-
-// Download Help Modal Triggers
-function openDownloadModal() {
-    const modal = document.getElementById('download-helper-modal');
-    if (modal) modal.classList.remove('hidden');
-}
-
-function toggleDownloadModal() {
-    const modal = document.getElementById('download-helper-modal');
-    if (modal) modal.classList.add('hidden');
-}
-
-// --- Window load entry point ---
-window.addEventListener("DOMContentLoaded", () => {
-    loadStateFromStorage();
-    
-    // Default screens initialization loading
-    renderProductsGrid();
-    renderCustomerOrders();
-    renderCustomerComplaints();
-    
-    // Notifications badges initial load
-    updateCartCountBadge();
-    updateNotificationBadge();
-    refreshAiRecommendations();
-    
-    renderMerchantAiChat();
-});

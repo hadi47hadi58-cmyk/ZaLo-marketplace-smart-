@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#c9a84c" />
+      <stop offset="50%" stop-color="#fcedb4" />
+      <stop offset="100%" stop-color="#a88523" />
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#0b2b14" />
+      <stop offset="100%" stop-color="#144d23" />
+    </linearGradient>
+  </defs>
+  <!-- Main Rounded Circle Background -->
+  <rect width="200" height="200" rx="44" fill="url(#bgGrad)" stroke="url(#goldGrad)" stroke-width="4"/>
+  
+  <!-- Outer Gold Accent Ring -->
+  <circle cx="100" cy="100" r="76" fill="none" stroke="url(#goldGrad)" stroke-width="1.5" stroke-dasharray="8 4"/>
+
+  <!-- Icon: stylized Cart/Bag and the letters Z & L -->
+  <g transform="translate(10, 10)">
+    <!-- Shopping bag handle -->
+    <path d="M 70 80 Q 90 40 110 80" fill="none" stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- Stylized Bag Body -->
+    <path d="M 60 85 L 120 85 Q 125 85 125 90 L 115 145 Q 114 150 109 150 L 71 150 Q 66 150 65 145 L 55 90 Q 55 85 60 85 Z" fill="none" stroke="url(#goldGrad)" stroke-width="5" stroke-linejoin="round"/>
+    
+    <!-- Stylized Monogram Z inside the bag -->
+    <path d="M 73 103 L 107 103 L 73 135 L 107 135" fill="none" stroke="url(#goldGrad)" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
