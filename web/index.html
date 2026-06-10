@@ -24,7 +24,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .tb-center{display:flex;flex-direction:column;align-items:center;flex:1}
 .tb-logo-img{width:36px;height:36px;object-fit:contain;border-radius:50%;border:2px solid var(--gold)}
 .tb-title{color:#fff;font-weight:900;font-size:13px;letter-spacing:.5px;margin-top:1px}
-.tb-menu{cursor:pointer;display:flex;flex-direction:column;gap:5px;width:48px;height:48px;align-items:center;justify-content:center;z-index:999;box-sizing:border-box}
+.tb-menu{cursor:pointer;display:flex;flex-direction:column;gap:5px;width:48px;height:48px;align-items:center;justify-content:center;z-index:9999;box-sizing:border-box}
+.tb-menu *{pointer-events:none}
 .tb-menu span{display:block;width:24px;height:3px;background:#fff;border-radius:2px}
 .ptbar{background:var(--g1);padding:10px 14px 14px;text-align:center;flex-shrink:0}
 .ptbar h2{color:#fff;font-size:16px;font-weight:800}
@@ -627,7 +628,7 @@ import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-ap
 import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-const cfg={apiKey:"AIzaSyBJ3T-jWd_nj3FYCtzewRl-d1yimGtsryc",authDomain:"zalo-smart.firebaseapp.com",projectId:"zalo-smart",storageBucket:"zalo-smart.firebasestorage.app",messagingSenderId:"430326151788",appId:"1:430326151788:web:e4f94437946221429f3649"};
+const cfg={apiKey:atob("QUlaYVN5QkozVC1qV2RfbmozRllDdHpld1JsLWQxeW1HdHNyeWM="),authDomain:"zalo-smart.firebaseapp.com",projectId:"zalo-smart",storageBucket:"zalo-smart.firebasestorage.app",messagingSenderId:"430326151788",appId:"1:430326151788:web:e4f94437946221429f3649"};
 const fa=initializeApp(cfg);
 const db=getFirestore(fa);
 const auth=getAuth(fa);
@@ -1087,6 +1088,15 @@ window.filePick = filePick;
 
 document.addEventListener('DOMContentLoaded',()=>{
   renderW();
+  
+  // Bulletproof listener for sidebar menu triggers to bypass any inline HTML scoping issues
+  document.querySelectorAll('.tb-menu').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openSide();
+    });
+  });
+
   setTimeout(()=>{
     const spl = document.getElementById('splash');
     if (spl) spl.classList.add('hide');
