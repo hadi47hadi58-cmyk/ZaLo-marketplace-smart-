@@ -32,10 +32,26 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    padding: 20px 16px;
+    justify-content: flex-start;
+    padding: 24px 16px;
     position: relative;
-    overflow: hidden;
+    overflow-y: auto;
+  }
+
+  @media (max-height: 740px) {
+    .logo-area { margin-bottom: 12px; }
+    .logo-img-wrap { width: 64px; height: 64px; margin-bottom: 6px; border-radius: 16px; }
+    .logo-img-wrap img { border-radius: 14px; }
+    .logo-title { font-size: 22px; }
+    .logo-sub { font-size: 11px; }
+    .card { padding: 18px 16px; border-radius: 16px; }
+    .tabs { margin-bottom: 14px; }
+    .roles-grid { margin-bottom: 12px; }
+    .form-group { margin-bottom: 10px; }
+    .form-input { padding: 10px 36px 10px 12px; font-size: 13px; }
+    .input-icon { right: 11px; font-size: 14px; }
+    .eye-btn { left: 11px; font-size: 14px; }
+    .submit-btn { padding: 10px; font-size: 14px; }
   }
 
   body::before {
@@ -547,9 +563,18 @@ const db = getFirestore(app);
 
 let currentLoginRole = 'customer';
 let currentRegRole = 'customer';
+let isSubmitting = false;
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) return;
+  if (isSubmitting) return; // Prevent race redirection during active log in / register
+
+  // Always force manager email to admin dashboard
+  if (user.email === "hadi47hadi58@gmail.com") {
+    window.location.href = 'admin.html';
+    return;
+  }
+
   try {
     const userDoc = await getDoc(doc(db, 'users', user.uid));
     if (userDoc.exists()) {
@@ -608,8 +633,45 @@ window.doLogin = async function() {
 
   setLoading('loginBtn', true);
   try {
-    await signInWithEmailAndPassword(auth, email, pass);
+    isSubmitting = true;
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+    const user = cred.user;
+
+    // Explicitly handle redirects directly on login success
+    if (user.email === "hadi47hadi58@gmail.com") {
+      window.location.href = 'admin.html';
+      return;
+    }
+
+    try {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists()) {
+        redirectByRole(userDoc.data().role);
+        return;
+      }
+      
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (adminDoc.exists()) {
+        const dataDoc = adminDoc.data();
+        if (dataDoc.role === 'super_admin' || dataDoc.role === 'admin' || dataDoc.role === 'support') {
+          window.location.href = 'admin.html';
+          return;
+        }
+      }
+      
+      const shopDoc = await getDoc(doc(db, 'shops', user.uid));
+      if (shopDoc.exists()) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+    } catch(err) {
+      console.error("Firestore error on logging in: ", err);
+    }
+
+    redirectByRole(currentLoginRole);
+
   } catch(e) {
+    isSubmitting = false;
     setLoading('loginBtn', false);
     
     // Developer offline local fallback check for the exact admin
@@ -654,6 +716,7 @@ window.doRegister = async function() {
 
   setLoading('regBtn', true);
   try {
+    isSubmitting = true;
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
 
@@ -697,6 +760,7 @@ window.doRegister = async function() {
     }, 1500);
 
   } catch(e) {
+    isSubmitting = false;
     setLoading('regBtn', false);
     console.error("Registration error: ", e);
     
