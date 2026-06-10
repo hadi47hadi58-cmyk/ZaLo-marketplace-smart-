@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ZaLo - لوحة تحكم متجري الموعدة</title>
+<title>ZaLo - لوحة تحكم متجري الموحدة</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -36,7 +36,7 @@
     background: var(--bg2);
     border-left: 1px solid var(--border);
     display: flex; flex-direction: column;
-    z-index: 200; transition: transform 0.3s;
+    z-index: 200; transition: right 0.3s ease;
   }
   .sidebar-head {
     padding: 18px 14px;
@@ -460,8 +460,8 @@
   .chat-send:hover { background: var(--green-light); }
 
   @media (max-width: 768px) {
-    #sidebar { transform: translateX(100%); }
-    #sidebar.open { transform: translateX(0); box-shadow: -8px 0 32px rgba(0,0,0,0.5); }
+    #sidebar { right: -230px; }
+    #sidebar.open { right: 0; box-shadow: -8px 0 32px rgba(0,0,0,0.5); }
     #topbar { right: 0; }
     #main { margin-right: 0; }
     #menuBtn { display: flex !important; }
@@ -559,7 +559,7 @@
   <div class="page page-fade" id="page-products">
     <div class="sec-head">
       <div class="sec-title">📦 إدارة وجرد سلعي</div>
-      <button class="btn btn-g" onclick="goPage('add-product')">➕ عرض سلعة جديدة</button>
+      <button class="btn btn-g" onclick="goPage('add-product')">➕ عرض سلعة جديدة </button>
     </div>
     <div class="products-grid" id="productsGrid">
       <div class="ldg" style="grid-column:1/-1"><div class="spin"></div></div>
@@ -733,12 +733,13 @@
 
 <div id="toast">✅ تم حفظ الإجراء بالنجاح المعتمد</div>
 
+<!-- Firebase scripts with fix -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, collection, query, where, getDocs, doc,
-  getDoc, addDoc, updateDoc, orderBy, serverTimestamp, setDoc
+  getDoc, addDoc, updateDoc, orderBy, serverTimestamp, setDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -773,7 +774,6 @@ onAuthStateChanged(auth, async (user) => {
     }
     initDashboard();
   } catch(e) {
-    // Elegant fallback developer simulation check
     shopData = { storeName: "متجري التجريبي الرائد", wilaya: "16 الجزائر", category: "أخرى", whatsapp: "0698694010", status: "active", subscription: "basic" };
     initDashboard();
   }
@@ -859,9 +859,8 @@ function renderHomeProducts(prods) {
 }
 
 window.deleteProd = async function(id) {
-  if(!confirm('هل تود حذف هذا المنتج نهائياً من العرض والطلب بالسوق؟')) return;
+  if(!confirm('هل تود حذف هذا...؟')) return;
   try {
-    // Attempt real database delete rules
     await updateDoc(doc(db, 'products', id), { deleted: true });
   } catch(e){}
   allProducts = allProducts.filter(p => p.id !== id);
@@ -888,7 +887,6 @@ window.saveProduct = async function() {
     showToast('✅ تم الحفظ تجريبياً');
   }
 
-  // Clear form
   document.getElementById('pName').value = '';
   document.getElementById('pPrice').value = '';
   document.getElementById('pStock').value = '10';
@@ -1092,7 +1090,6 @@ window.loadAnalytics = function() {
     <div class="scard b"><div class="scard-icon">✅</div><div class="scard-val">${allOrders.filter(o=>o.status==='delivered').length}</div><div class="scard-lbl">الطلبيات الناجحة المسلمة</div></div>
   `;
 
-  // Mini Chart
   const days = ['الأحد','الإثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
   document.getElementById('ordersChart').innerHTML = days.map(d => `
     <div class="bar-c">
