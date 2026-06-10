@@ -803,9 +803,14 @@ window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, ad
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('currentUserEmail').textContent = user.email;
-    loadDashboard();
+    if (user.email === "hadi47hadi58@gmail.com") {
+      document.getElementById('loginScreen').style.display = 'none';
+      document.getElementById('currentUserEmail').textContent = user.email;
+      loadDashboard();
+    } else {
+      alert("⚠️ غير مسموح بالدخول للمشرفين فقط!");
+      window.location.href = 'index.html';
+    }
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
   }

@@ -602,19 +602,37 @@ window.doLogin = async function() {
   if (!email) { showLoginError('⚠️ يرجى تعيين البريد الإلكتروني للتأمين'); return; }
   if (!pass) { showLoginError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
 
+  // Restrict admin role to the manager email address only
+  if (currentLoginRole === 'admin' && email !== 'hadi47hadi58@gmail.com') {
+    showLoginError('⚠️ هذا البريد الإلكتروني غير مصرح له بالدخول كمدير!');
+    return;
+  }
+
   setLoading('loginBtn', true);
   try {
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
-    // If real sign-in fails or permission rules aren't deployed, provide responsive prototype pass-through
     setLoading('loginBtn', false);
-    if(email.includes("admin") || currentLoginRole === 'admin'){
+    
+    // Developer offline local fallback check for the exact admin
+    if (email === "hadi47hadi58@gmail.com" && pass === "123456") {
       window.location.href = 'admin.html';
-    } else if(currentLoginRole === 'merchant') {
-      window.location.href = 'dashboard.html';
-    } else {
-      window.location.href = 'index.html';
+      return;
     }
+
+    console.error("Login verification error: ", e);
+    
+    let errMsg = '⚠️ البريد الإلكتروني أو كود المرور غير صحيح!';
+    if (e.code === 'auth/invalid-email') {
+      errMsg = '⚠️ صيغة البريد الإلكتروني المدخلة غير صالحة!';
+    } else if (e.code === 'auth/user-not-found') {
+      errMsg = '⚠️ البريد الإلكتروني المدخل غير مسجل لدينا!';
+    } else if (e.code === 'auth/wrong-password') {
+      errMsg = '⚠️ كود المرور المدخل غير صحيح!';
+    } else if (e.code === 'auth/too-many-requests') {
+      errMsg = '⚠️ تم حظر المحاولات مؤقتاً لكثرة الطلبات الفاشلة، يرجى المحاولة لاحقاً!';
+    }
+    showLoginError(errMsg);
   }
 };
 
@@ -681,16 +699,18 @@ window.doRegister = async function() {
     }, 1500);
 
   } catch(e) {
-    // Elegant fallback simulation
-    document.getElementById('regSuccessText').textContent = '✅ تم تسجيل حسابك دلالياً، جاري توجيهك...';
-    document.getElementById('regSuccess').classList.add('show');
-    setTimeout(() => {
-      if (currentRegRole === 'merchant') {
-        window.location.href = 'dashboard.html';
-      } else {
-        window.location.href = 'index.html';
-      }
-    }, 1500);
+    setLoading('regBtn', false);
+    console.error("Registration error: ", e);
+    
+    let errMsg = '⚠️ تعذر تسجيل الحساب! يرجى التحقق من المدخلات والمحاولة مجدداً.';
+    if (e.code === 'auth/email-already-in-use') {
+      errMsg = '⚠️ البريد الإلكتروني مستخدم بالفعل مسجلاً بحساب آخر!';
+    } else if (e.code === 'auth/invalid-email') {
+      errMsg = '⚠️ صيغة البريد الإلكتروني المدخلة غير صحيحة!';
+    } else if (e.code === 'auth/weak-password') {
+      errMsg = '⚠️ كلمة المرور ضعيفة جداً! يجب أن لا تقل عن 6 أحرف.';
+    }
+    showRegError(errMsg);
   }
 };
 
