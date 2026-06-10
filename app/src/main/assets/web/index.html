@@ -218,21 +218,29 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="sm-close" onclick="closeSide()">✕</button>
     <img class="sm-logo" src="logo.svg" alt="" onerror="this.src='https://placehold.co/100x100/1a5c2a/white?text=ZaLo'">
     <div class="sm-title">ZaLo</div>
-    <div class="sm-sub">السوق الذكي الجزائري</div>
+    <div class="sm-sub" id="smSub">السوق الذكي الجزائري</div>
   </div>
-  <div class="sm-sec">القائمة</div>
-  <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn">الرئيسية</div></div></div>
-  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn">الولايات</div></div></div>
-  <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn">جميع الأقسام</div></div></div>
-  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn">جميع المنتجات</div></div></div>
-  <div class="sm-sec">للتجار</div>
-  <div class="smi" onclick="closeSide();G('register')"><span class="si">🏪</span><div><div class="sn">سجّل متجرك</div><div class="sd">مجاناً</div></div></div>
-  <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">لوحة التحكم للتاجر والأدمن</div></div></div>
-  <div class="sm-sec">تواصل معنا وإدارة</div>
-  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
-  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
-  <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn">من نحن</div><div class="sd">حول منصة ZaLo الذكية</div></div></div>
-  <div class="sm-footer"><p>© 2026 ZaLo - السوق الذكي</p></div>
+  <div class="sm-sec" id="smSecMenu">القائمة</div>
+  <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn" id="smHome">الرئيسية</div></div></div>
+  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn" id="smWilayas">الولايات</div></div></div>
+  <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn" id="smCats">جميع الأقسام</div></div></div>
+  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn" id="smProds">جميع المنتجات</div></div></div>
+  <div class="sm-sec" id="smSecMerchants">للتجار</div>
+  <div class="smi" onclick="closeSide();G('register')"><span class="si">🏪</span><div><div class="sn" id="smRegStore">سجّل متجرك</div><div class="sd" id="smFree">مجاناً</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn" id="smDashboard">لوحة التحكم للتاجر والأدمن</div></div></div>
+  <div class="sm-sec" id="smSecContact">تواصل معنا وإدارة</div>
+  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn" id="smContactUs">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn" id="smAdminSite">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
+  <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn" id="smAboutUs">من نحن</div><div class="sd" id="smAboutDesc">حول منصة ZaLo الذكية</div></div></div>
+  
+  <div class="sm-sec" id="smSecLang">اللغة / Langue / Language</div>
+  <div style="display: flex; gap: 8px; justify-content: space-around; padding: 12px 14px; background: #fafafa; border-bottom: 1px solid #f0f0f0;">
+    <button class="lang-btn" data-lang="ar" onclick="setAppLanguage('ar')" style="flex: 1; padding: 10px 4px; border: 1px solid var(--bd); border-radius: 8px; background: var(--g1); color: #fff; font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">العربية</button>
+    <button class="lang-btn" data-lang="fr" onclick="setAppLanguage('fr')" style="flex: 1; padding: 10px 4px; border: 1px solid var(--bd); border-radius: 8px; background: #fff; color: var(--text); font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">Français</button>
+    <button class="lang-btn" data-lang="en" onclick="setAppLanguage('en')" style="flex: 1; padding: 10px 4px; border: 1px solid var(--bd); border-radius: 8px; background: #fff; color: var(--text); font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">English</button>
+  </div>
+
+  <div class="sm-footer"><p id="smCopyright">© 2026 ZaLo - السوق الذكي</p></div>
 </div>
 <div id="app" style="display:none">
 <div class="popup-ov" id="comm-popup" onclick="if(event.target===this)closeCommP()">
@@ -251,34 +259,34 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="tb-bell" onclick="G('notif')">🔔<div class="tb-badge" id="nb">2</div></div>
     <div class="tb-center">
       <img class="tb-logo-img" src="logo.svg" alt="" onerror="this.src='https://placehold.co/40x40/1a5c2a/white?text=ZaLo'">
-      <div class="tb-title">ZaLo smart marketplace</div>
+      <div class="tb-title" id="tbTitleHome">ZaLo smart marketplace</div>
     </div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
   <div class="content">
     <div class="home-body">
       <div class="home-logo-box"><img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/120x120/1a5c2a/white?text=ZaLo'"></div>
-      <div class="home-title">ZaLo<br>السوق الذكي الجزائري</div>
-      <button class="btn-gm" onclick="G('wilayas')">🛍️ تسوق في كل الولايات الـ69 الآن</button>
-      <button class="btn-gm" style="background:#cc9a00" onclick="G('register')">🏪 افتح متجرك وضاعف مبيعاتك</button>
+      <div class="home-title" id="homeTitleText">ZaLo<br>السوق الذكي الجزائري</div>
+      <button class="btn-gm" id="btnShopAll" onclick="G('wilayas')">🛍️ تسوق في كل الولايات الـ69 الآن</button>
+      <button class="btn-gm" id="btnOpenStore" style="background:#cc9a00" onclick="G('register')">🏪 افتح متجرك وضاعف مبيعاتك</button>
       <div class="home-circles">
         <div class="hcircle" onclick="G('cats')">
-          <div class="hcircle-icon" style="font-size:22px">⊞<br><span style="font-size:9px;font-weight:700">الأقسام</span></div>
-          <div class="hcircle-label">جميع الأقسام</div>
+          <div class="hcircle-icon" style="font-size:22px">⊞<br><span style="font-size:9px;font-weight:700" id="circleCatsLabel">الأقسام</span></div>
+          <div class="hcircle-label" id="circleAllCatsText">جميع الأقسام</div>
         </div>
         <div class="hcircle" onclick="G('all-prods')">
           <div class="hcircle-icon">📦</div>
-          <div class="hcircle-label">جميع المنتجات</div>
+          <div class="hcircle-label" id="circleAllProdsText">جميع المنتجات</div>
         </div>
       </div>
     </div>
   </div>
   <div class="bnav">
-    <div class="bn on" onclick="G('home')"><div class="bni">🏠</div><div class="bnl">الرئيسية</div></div>
-    <div class="bn" onclick="G('myorders')"><div class="bni">🛍️</div><div class="bnl">طلباتي</div></div>
-    <div class="bn" onclick="G('wilayas')"><div class="bni">📍</div><div class="bnl">الولايات</div></div>
-    <div class="bn" onclick="G('search')"><div class="bni">🔍</div><div class="bnl">بحث سريع</div></div>
-    <div class="bn" onclick="openLink('login.html')"><div class="bni">👤</div><div class="bnl">بوابتي الكبرى</div></div>
+    <div class="bn on" onclick="G('home')"><div class="bni">🏠</div><div class="bnl" id="bnlHome">الرئيسية</div></div>
+    <div class="bn" onclick="G('myorders')"><div class="bni">🛍️</div><div class="bnl" id="bnlOrders">طلباتي</div></div>
+    <div class="bn" onclick="G('wilayas')"><div class="bni">📍</div><div class="bnl" id="bnlWilayas">الولايات</div></div>
+    <div class="bn" onclick="G('search')"><div class="bni">🔍</div><div class="bnl" id="bnlSearch">بحث سريع</div></div>
+    <div class="bn" onclick="openLink('login.html')"><div class="bni">👤</div><div class="bnl" id="bnlPortal">بوابتي الكبرى</div></div>
   </div>
 </div>
 
@@ -286,10 +294,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-wilayas" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title">الولايات الـ69 الجزائرية</div></div>
+    <div class="tb-center"><div class="tb-title" id="tbTitleWilayas">الولايات الـ69 الجزائرية</div></div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
-  <div class="ptbar"><h2>تسوق حسب موقع المحلات</h2></div>
+  <div class="ptbar"><h2 id="ptbarWilayasText">تسوق حسب موقع المحلات</h2></div>
   <div class="content"><div class="wchips-wrap"><div class="wchips" id="wchips"></div></div></div>
 </div>
 
@@ -297,19 +305,19 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-cats" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title">جميع أقسام السوق</div></div>
+    <div class="tb-center"><div class="tb-title" id="tbTitleCats">جميع أقسام السوق</div></div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
-  <div class="ptbar"><h2>اختر صنف المنتجات</h2></div>
+  <div class="ptbar"><h2 id="ptbarCatsText">اختر صنف المنتجات</h2></div>
   <div class="content">
     <div class="cats-grid">
-      <div class="cat-card" onclick="openCat('هواتف وإلكترونيات')"><div class="cat-img">📱</div><div class="cat-lbl">هواتف وإلكترونيات</div></div>
-      <div class="cat-card" onclick="openCat('أثاث ومنزل')"><div class="cat-img">🛋️</div><div class="cat-lbl">أثاث ومنزل</div></div>
-      <div class="cat-card" onclick="openCat('ملابس وأزياء')"><div class="cat-img">👗</div><div class="cat-lbl">ملابس وأزياء</div></div>
-      <div class="cat-card" onclick="openCat('مواد غذائية')"><div class="cat-img">🥗</div><div class="cat-lbl">مواد غذائية</div></div>
-      <div class="cat-card" onclick="openCat('أدوات ومعدات')"><div class="cat-img">🔧</div><div class="cat-lbl">أدوات ومعدات</div></div>
-      <div class="cat-card" onclick="openCat('تجميل وعناية')"><div class="cat-img">💄</div><div class="cat-lbl">تجميل وعناية</div></div>
-      <div class="cat-card" onclick="openCat('كتب وقرطاسية')"><div class="cat-img">📚</div><div class="cat-lbl">كتب وقرطاسية</div></div>
+      <div class="cat-card" onclick="openCat('هواتف وإلكترونيات')"><div class="cat-img">📱</div><div class="cat-lbl" id="catLabelPhones">هواتف وإلكترونيات</div></div>
+      <div class="cat-card" onclick="openCat('أثاث ومنزل')"><div class="cat-img">🛋️</div><div class="cat-lbl" id="catLabelFurniture">أثاث ومنزل</div></div>
+      <div class="cat-card" onclick="openCat('ملابس وأزياء')"><div class="cat-img">👗</div><div class="cat-lbl" id="catLabelClothing">ملابس وأزياء</div></div>
+      <div class="cat-card" onclick="openCat('مواد غذائية')"><div class="cat-img">🥗</div><div class="cat-lbl" id="catLabelFood">مواد غذائية</div></div>
+      <div class="cat-card" onclick="openCat('أدوات ومعدات')"><div class="cat-img">🔧</div><div class="cat-lbl" id="catLabelTools">أدوات ومعدات</div></div>
+      <div class="cat-card" onclick="openCat('تجميل وعناية')"><div class="cat-img">💄</div><div class="cat-lbl" id="catLabelBeauty">تجميل وعناية</div></div>
+      <div class="cat-card" onclick="openCat('كتب وقرطاسية')"><div class="cat-img">📚</div><div class="cat-lbl" id="catLabelBooks">كتب وقرطاسية</div></div>
     </div>
   </div>
 </div>
@@ -323,7 +331,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="ptbar"><h2 id="stores-h2">محلات القسم</h2></div>
   <div class="content">
-    <div class="slist" id="slist"><div class="empty"><div class="ei">⏳</div><p>جاري تحميل المتاجر العتيدة...</p></div></div>
+    <div class="slist" id="slist"><div class="empty"><div class="ei">⏳</div><p id="loadingStoresTxt">جاري تحميل المتاجر العتيدة...</p></div></div>
   </div>
 </div>
 
@@ -331,10 +339,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-all-prods" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title">المنتجات الجزائرية</div></div>
+    <div class="tb-center"><div class="tb-title" id="tbTitleAllProds">المنتجات الجزائرية</div></div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
-  <div class="ptbar"><h2>جميع منتجات التجار</h2></div>
+  <div class="ptbar"><h2 id="ptbarAllProdsText">جميع منتجات التجار</h2></div>
   <div class="content">
     <div class="pgrid" id="all-pgrid"><div style="grid-column:span 2" class="empty"><div class="ei">⏳</div><p>جاري التحميل...</p></div></div>
   </div>
@@ -1086,7 +1094,249 @@ window.rBack = rBack;
 window.fillComm2 = fillComm2;
 window.filePick = filePick;
 
+// === TRANSLATION ENGINE ===
+const appTranslations = {
+  ar: {
+    smSub: "السوق الذكي الجزائري",
+    smSecMenu: "القائمة",
+    smHome: "الرئيسية",
+    smWilayas: "الولايات",
+    smCats: "جميع الأقسام",
+    smProds: "جميع المنتجات",
+    smSecMerchants: "للتجار",
+    smRegStore: "سجّل متجرك",
+    smFree: "مجاناً",
+    smDashboard: "لوحة التحكم للتاجر والأدمن",
+    smSecContact: "تواصل معنا وإدارة",
+    smContactUs: "اتصل بنا (واتساب)",
+    smAdminSite: "موقع الإدارة",
+    smAboutUs: "من نحن",
+    smAboutDesc: "حول منصة ZaLo الذكية",
+    smSecLang: "اللغة / Langue / Language",
+    smCopyright: "© 2026 ZaLo - السوق الذكي",
+    
+    // Bottom nav
+    bnlHome: "الرئيسية",
+    bnlOrders: "طلباتي",
+    bnlWilayas: "الولايات",
+    bnlSearch: "بحث سريع",
+    bnlPortal: "بوابتي الكبرى",
+    
+    // Top bar titles
+    tbTitleHome: "ZaLo smart marketplace",
+    tbTitleWilayas: "الولايات الـ69 الجزائرية",
+    tbTitleCats: "جميع أقسام السوق",
+    tbTitleAllProds: "المنتجات الجزائرية",
+    tbTitleDetail: "تفاصيل المنتج",
+    tbTitleOrder: "طلب الشراء والموقع",
+    tbTitleSearch: "البحث السريع الذكي",
+    tbTitleMyOrders: "مشترياتي وطلباتي",
+    tbTitleNotif: "مركز الإشعارات",
+    tbTitleRegister: "بوابة تسجيل التجار الجدد",
+    tbTitleAbout: "حول منصة ZaLo",
+    
+    // PT bar headlines
+    ptbarWilayasText: "تسوق حسب موقع المحلات",
+    ptbarCatsText: "اختر صنف المنتجات",
+    ptbarAllProdsText: "جميع منتجات التجار",
+    ptbarStoresText: "محلات القسم",
+    
+    // Cats list labels
+    catLabelPhones: "هواتف وإلكترونيات",
+    catLabelFurniture: "أثاث ومنزل",
+    catLabelClothing: "ملابس وأزياء",
+    catLabelFood: "مواد غذائية",
+    catLabelTools: "أدوات ومعدات",
+    catLabelBeauty: "تجميل وعناية",
+    catLabelBooks: "كتب وقرطاسية",
+    
+    // Home body
+    homeTitleText: "ZaLo<br>السوق الذكي الجزائري",
+    btnShopAll: "🛍️ تسوق في كل الولايات الـ69 الآن",
+    btnOpenStore: "🏪 افتح متجرك وضاعف مبيعاتك",
+    circleCatsLabel: "الأقسام",
+    circleAllCatsText: "جميع الأقسام",
+    circleAllProdsText: "جميع المنتجات",
+    
+    // Splash screen
+    splashSub: "marketplace smart • السوق الذكي الموحد",
+    loadingStoresTxt: "جاري تحميل المتاجر العتيدة..."
+  },
+  fr: {
+    smSub: "Le Marché Intelligent Algérien",
+    smSecMenu: "MENU",
+    smHome: "Accueil",
+    smWilayas: "Wilayas",
+    smCats: "Toutes les catégories",
+    smProds: "Tous les produits",
+    smSecMerchants: "POUR LES COMMERÇANTS",
+    smRegStore: "S'enregistrer",
+    smFree: "Gratuit",
+    smDashboard: "Tableau de Bord / Admin",
+    smSecContact: "CONTACT & SUPPORT",
+    smContactUs: "Contactez-nous (WhatsApp)",
+    smAdminSite: "Site d'administration",
+    smAboutUs: "À propos de nous",
+    smAboutDesc: "À propos de la plateforme ZaLo",
+    smSecLang: "Sélectionnez la langue",
+    smCopyright: "© 2026 ZaLo - Smart Market",
+    
+    // Bottom nav
+    bnlHome: "Accueil",
+    bnlOrders: "Mes commandes",
+    bnlWilayas: "Wilayas",
+    bnlSearch: "Recherche",
+    bnlPortal: "Mon Portail",
+    
+    // Top bar titles
+    tbTitleHome: "ZaLo Smart Marketplace",
+    tbTitleWilayas: "Toutes les Wilayas d'Algérie",
+    tbTitleCats: "Catégories",
+    tbTitleAllProds: "Produits Algériens",
+    tbTitleDetail: "Détails du Produit",
+    tbTitleOrder: "Passer une Commande",
+    tbTitleSearch: "Recherche Intelligente Rapide",
+    tbTitleMyOrders: "Mes Commandes",
+    tbTitleNotif: "Centre de Notifications",
+    tbTitleRegister: "Nouveau Commerçant",
+    tbTitleAbout: "À propos de ZaLo",
+    
+    // PT bar headlines
+    ptbarWilayasText: "Achetez par emplacement de magasin",
+    ptbarCatsText: "Choisissez la catégorie du produit",
+    ptbarAllProdsText: "Tous les produits des commerçants",
+    ptbarStoresText: "Magasins de cette section",
+    
+    // Cats list labels
+    catLabelPhones: "Téléphones & Électronique",
+    catLabelFurniture: "Maison & Ameublement",
+    catLabelClothing: "Prêt-à-porter & Mode",
+    catLabelFood: "Alimentation",
+    catLabelTools: "Outils & Équipements",
+    catLabelBeauty: "Beauté & Soins",
+    catLabelBooks: "Livres & Papeterie",
+    
+    // Home body
+    homeTitleText: "ZaLo<br>Le Marché Intelligent Algérien",
+    btnShopAll: "🛍️ Achetez dans les 69 Wilayas maintenant",
+    btnOpenStore: "🏪 Ouvrez votre boutique gratuitement",
+    circleCatsLabel: "Catégories",
+    circleAllCatsText: "Toutes les catégories",
+    circleAllProdsText: "Tous les produits",
+    
+    // Splash screen
+    splashSub: "marketplace smart • Le Marché Intelligent Unifié",
+    loadingStoresTxt: "Chargement des magasins..."
+  },
+  en: {
+    smSub: "The Algerian Smart Marketplace",
+    smSecMenu: "MENU",
+    smHome: "Home",
+    smWilayas: "Wilayas",
+    smCats: "All Categories",
+    smProds: "All Products",
+    smSecMerchants: "FOR MERCHANTS",
+    smRegStore: "Register Store",
+    smFree: "Free of charge",
+    smDashboard: "Dashboard / Admin Portal",
+    smSecContact: "CONTACT & MANAGEMENT",
+    smContactUs: "Contact Us (WhatsApp)",
+    smAdminSite: "Admin Website",
+    smAboutUs: "About Us",
+    smAboutDesc: "About the ZaLo platform",
+    smSecLang: "Choose Language",
+    smCopyright: "© 2026 ZaLo - Smart Market",
+    
+    // Bottom nav
+    bnlHome: "Home",
+    bnlOrders: "My Orders",
+    bnlWilayas: "Wilayas",
+    bnlSearch: "Search",
+    bnlPortal: "Grand Portal",
+    
+    // Top bar titles
+    tbTitleHome: "ZaLo Smart Marketplace",
+    tbTitleWilayas: "All 69 Algerian Wilayas",
+    tbTitleCats: "Market Categories",
+    tbTitleAllProds: "Algerian Products",
+    tbTitleDetail: "Product Details",
+    tbTitleOrder: "Place Your Order",
+    tbTitleSearch: "Smart Quick Search",
+    tbTitleMyOrders: "My Orders & History",
+    tbTitleNotif: "Notification Center",
+    tbTitleRegister: "New Merchant Portal",
+    tbTitleAbout: "About ZaLo Platform",
+    
+    // PT bar headlines
+    ptbarWilayasText: "Shop by store locations",
+    ptbarCatsText: "Choose a category of products",
+    ptbarAllProdsText: "All products from all merchants",
+    ptbarStoresText: "Stores in this section",
+    
+    // Cats list labels
+    catLabelPhones: "Phones & Electronics",
+    catLabelFurniture: "Home & Furniture",
+    catLabelClothing: "Clothing & Fashion",
+    catLabelFood: "Food & Groceries",
+    catLabelTools: "Tools & Equipment",
+    catLabelBeauty: "Beauty & Personal Care",
+    catLabelBooks: "Books & Stationery",
+    
+    // Home body
+    homeTitleText: "ZaLo<br>The Algerian Smart Marketplace",
+    btnShopAll: "🛍️ Shop in all 69 Wilayas now",
+    btnOpenStore: "🏪 Open your store & double sales",
+    circleCatsLabel: "Categories",
+    circleAllCatsText: "All Categories",
+    circleAllProdsText: "All Products",
+    
+    // Splash screen
+    splashSub: "marketplace smart • The Unified Smart Marketplace",
+    loadingStoresTxt: "Loading stores..."
+  }
+};
+
+window.setAppLanguage = function(lang) {
+  localStorage.setItem('lang', lang);
+  window.applyLanguage(lang);
+};
+
+window.applyLanguage = function(lang) {
+  const dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  document.documentElement.setAttribute('dir', dir);
+  document.documentElement.setAttribute('lang', lang);
+  document.body.style.direction = dir;
+  
+  // Update lang button active state
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    if (btn.getAttribute('data-lang') === lang) {
+      btn.style.background = 'var(--g1)';
+      btn.style.color = '#fff';
+    } else {
+      btn.style.background = '#fff';
+      btn.style.color = 'var(--text)';
+    }
+  });
+
+  const t = appTranslations[lang] || appTranslations.ar;
+  
+  // Replace texts dynamically using translated keys
+  const keys = Object.keys(t);
+  keys.forEach(key => {
+    const el = document.getElementById(key);
+    if (el) {
+      if (key === 'homeTitleText') {
+        el.innerHTML = t[key];
+      } else {
+        el.textContent = t[key];
+      }
+    }
+  });
+};
+
 document.addEventListener('DOMContentLoaded',()=>{
+  // Apply selected saved language initially on DOM content loaded
+  window.applyLanguage(localStorage.getItem('lang') || 'ar');
   renderW();
   
   // Bulletproof listener for sidebar menu triggers to bypass any inline HTML scoping issues

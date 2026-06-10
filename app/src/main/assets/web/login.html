@@ -346,13 +346,20 @@
 
 <div class="wrapper">
 
+  <!-- LANGUAGE SWITCHER -->
+  <div style="display: flex; justify-content: center; gap: 8px; margin-bottom: 20px; z-index: 10;">
+    <button class="lang-btn" data-lang="ar" onclick="setAppLanguage('ar')" style="padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; background: var(--green); color: #fff; font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">العربية</button>
+    <button class="lang-btn" data-lang="fr" onclick="setAppLanguage('fr')" style="padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.06); color: var(--text); font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">Français</button>
+    <button class="lang-btn" data-lang="en" onclick="setAppLanguage('en')" style="padding: 6px 14px; border: 1px solid var(--border); border-radius: 20px; background: rgba(255,255,255,0.06); color: var(--text); font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">English</button>
+  </div>
+
   <!-- LOGO -->
   <div class="logo-area">
     <div class="logo-img-wrap">
       <img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/80x80/1a5c2a/white?text=ZaLo'" />
     </div>
-    <div class="logo-title">Za<span>Lo</span></div>
-    <div class="logo-sub">السوق الذكي الجزائري الموحد</div>
+    <div class="logo-title" id="logoTitle">Za<span>Lo</span></div>
+    <div class="logo-sub" id="logoSub">السوق الذكي الجزائري الموحد</div>
   </div>
 
   <!-- CARD -->
@@ -360,28 +367,28 @@
 
     <!-- TABS -->
     <div class="tabs" id="mainTabs">
-      <button class="tab active" onclick="switchTab('login')">تسجيل الدخول</button>
-      <button class="tab" onclick="switchTab('register')">حساب جديد</button>
+      <button class="tab active" id="tabLoginBtn" onclick="switchTab('login')">تسجيل الدخول</button>
+      <button class="tab" id="tabRegBtn" onclick="switchTab('register')">حساب جديد</button>
     </div>
 
     <!-- ===== LOGIN FORM ===== -->
     <div id="loginForm">
 
-      <div class="role-label">اختر نوع حسابك للدخول</div>
+      <div class="role-label" id="roleLabel">اختر نوع حسابك للدخول</div>
       <div class="roles-grid">
         <button class="role-btn selected" onclick="selectRole('customer',this)">
-          <span class="role-icon">🛍️</span>عميل
+          <span class="role-icon">🛍️</span><span id="roleCustomerText">عميل</span>
         </button>
         <button class="role-btn" onclick="selectRole('merchant',this)">
-          <span class="role-icon">🏪</span>تاجر
+          <span class="role-icon">🏪</span><span id="roleMerchantText">تاجر</span>
         </button>
         <button class="role-btn" onclick="selectRole('admin',this)">
-          <span class="role-icon">🛡️</span>إدارة
+          <span class="role-icon">🛡️</span><span id="roleAdminText">إدارة</span>
         </button>
       </div>
 
       <div class="admin-note" id="adminNote">
-        🛡️ هذا القسم مخصص لإدارة المنصة والمراقبين والمالكين المعتمدين والمشرفين.
+        <span id="adminNoteText">🛡️ هذا القسم مخصص لإدارة المنصة والمراقبين والمالكين المعتمدين والمشرفين.</span>
       </div>
 
       <div class="error-msg" id="loginError">
@@ -389,7 +396,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">البريد الإلكتروني للعمل</label>
+        <label class="form-label" id="emailLabel">البريد الإلكتروني للعمل</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
           <input class="form-input" type="email" id="loginEmail" placeholder="example@gmail.com" />
@@ -397,7 +404,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">كلمة المرور الكودية</label>
+        <label class="form-label" id="passLabel">كلمة المرور الكودية</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input class="form-input" type="password" id="loginPass" placeholder="••••••••" />
@@ -406,26 +413,26 @@
       </div>
 
       <div class="forgot-link">
-        <a href="#" onclick="showForgot();return false">نسيت كلمة المرور؟</a>
+        <a href="#" id="forgotPassLink" onclick="showForgot();return false">نسيت كلمة المرور؟</a>
       </div>
 
       <button class="submit-btn" id="loginBtn" onclick="doLogin()">تأكيد الدخول الآمن</button>
 
-      <div class="card-footer" style="margin-top:14px">
-        ليس لديك حساب مسجل؟ <a onclick="switchTab('register')">سجل كعضو مميز</a>
+      <div class="card-footer" style="margin-top:14px" id="noAccountBlock">
+        <span id="noAccountPrefix">ليس لديك حساب مسجل؟ </span><a id="noAccountBtn" onclick="switchTab('register')">سجل كعضو مميز</a>
       </div>
     </div>
 
     <!-- ===== REGISTER FORM ===== -->
     <div id="registerForm" style="display:none">
 
-      <div class="role-label">نوع حسابك الجديد</div>
+      <div class="role-label" id="regRoleLabel">نوع حسابك الجديد</div>
       <div class="roles-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:20px">
         <button class="role-btn selected" onclick="selectRegRole('customer',this)">
-          <span class="role-icon">🛍️</span>عميل ذكي
+          <span class="role-icon">🛍️</span><span id="regCategoryCustomer">عميل ذكي</span>
         </button>
         <button class="role-btn" onclick="selectRegRole('merchant',this)">
-          <span class="role-icon">🏪</span>تاجر شريك
+          <span class="role-icon">🏪</span><span id="regCategoryMerchant">تاجر شريك</span>
         </button>
       </div>
 
@@ -437,7 +444,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">الاسم الكامل المميز</label>
+        <label class="form-label" id="regNameLabel">الاسم الكامل المميز</label>
         <div class="input-wrap">
           <span class="input-icon">👤</span>
           <input class="form-input" type="text" id="regName" placeholder="مثال: حميد بومدين" />
@@ -470,7 +477,7 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">تأكيد كلمة المرور المدخلة</label>
+        <label class="form-label" id="regPass2Label">تأكيد كلمة المرور المدخلة</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input class="form-input" type="password" id="regPass2" placeholder="أعد كتابتها بعناية" />
@@ -478,14 +485,14 @@
       </div>
 
       <div class="reg-only" id="merchantNote" style="display:none">
-        <div style="background:rgba(37,168,96,0.08);border:1px solid rgba(37,168,96,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
+        <div style="background:rgba(37,168,96,0.08);border:1px solid rgba(37,168,96,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6" id="merchantNoteText">
           🏪 بعد إتمام حسابك كتاجر، سيتم توجيهك فوراً لتصميم وتصنيف محلك (الولاية، الألوان، إضافة السلع والتوصيل).
         </div>
       </div>
 
       <div class="terms-row">
         <input type="checkbox" class="terms-check" id="termsCheck" checked />
-        <div class="terms-text">
+        <div class="terms-text" id="regTermsText">
           الموافقة الصريحة والكاملة على <a href="#" style="color:var(--gold);">شروط الاستخدام</a> وسياسات منصة ZaLo الذكية والمراقبة في الجزائر.
         </div>
       </div>
@@ -495,24 +502,24 @@
 
     <!-- ===== FORGOT PASSWORD ===== -->
     <div id="forgotForm" style="display:none">
-      <button class="back-btn" onclick="hideForgot()">← العودة للوراء</button>
+      <button class="back-btn" id="backLoginBtn" onclick="hideForgot()">← العودة للوراء</button>
       <div style="text-align:center;margin-bottom:20px">
         <div style="font-size:36px">🔑</div>
-        <div style="font-size:17px;font-weight:700;margin-top:8px">بوابة الاسترداد الآلية للرقم السري</div>
-        <div style="font-size:13px;color:var(--text2);margin-top:6px">
+        <div style="font-size:17px;font-weight:700;margin-top:8px" id="forgotTitle">بوابة الاسترداد الآلية للرقم السري</div>
+        <div style="font-size:13px;color:var(--text2);margin-top:6px" id="forgotDesc">
           سنرسل لك رابط تصفير واختيار كلمة مرور جديدة إلى بريدك فوراً
         </div>
       </div>
 
       <div class="success-msg" id="forgotSuccess">
-        <span>✅</span><span>رابط الاستعادة في طريقه إليك! تفقد صندوق بريدك الآن</span>
+        <span>✅</span><span id="forgotSuccessText">رابط الاستعادة في طريقه إليك! تفقد صندوق بريدك الآن</span>
       </div>
       <div class="error-msg" id="forgotError">
         <span>⚠️</span><span id="forgotErrorText">البريد المدخل غير مسجل مسبقاً</span>
       </div>
 
       <div class="form-group">
-        <label class="form-label">البريد الإلكتروني المراد تصفيره</label>
+        <label class="form-label" id="forgotEmailLabel">البريد الإلكتروني المراد تصفيره</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
           <input class="form-input" type="email" id="forgotEmail" placeholder="example@gmail.com" />
@@ -526,10 +533,10 @@
 
   <!-- Bottom link -->
   <div class="bottom-link">
-    <a href="index.html">← التوجه للصفحة الرئيسية الكبرى</a>
+    <a href="index.html" id="backMainBtn">← التوجه للصفحة الرئيسية الكبرى</a>
   </div>
 
-  <div class="whatsapp-help">
+  <div class="whatsapp-help" id="helpText">
     <span>هل تواجه تعطلاً كودياً؟</span>
     <a href="https://wa.me/213698694010" target="_blank">📞 راسلنا فوراً على واتساب</a>
   </div>
@@ -559,6 +566,235 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
+
+// === TRANSLATION ENGINE ===
+const translations = {
+  ar: {
+    logoTitle: "Za<span>Lo</span>",
+    logoSub: "السوق الذكي الجزائري الموحد",
+    tabLogin: "تسجيل الدخول",
+    tabReg: "حساب جديد",
+    roleLabel: "اختر نوع حسابك للدخول",
+    roleCustomer: "عميل",
+    roleMerchant: "تاجر",
+    roleAdmin: "إدارة",
+    adminNote: "🛡️ هذا القسم مخصص لإدارة المنصة والمراقبين والمالكين والمشرفين المحترفين.",
+    emailLabel: "البريد الإلكتروني للعمل",
+    emailPlaceholder: "example@gmail.com",
+    passLabel: "كلمة المرور الكودية",
+    passPlaceholder: "••••••••",
+    forgotPass: "نسيت كلمة المرور؟",
+    btnSubmitLogin: "تأكيد الدخول الآمن",
+    noAccountPrefix: "ليس لديك حساب مسجل؟ ",
+    noAccount: "سجل كعضو مميز",
+    backMain: "← التوجه للصفحة الرئيسية الكبرى",
+    helpMsgLabel: "هل تواجه تعطلاً كودياً؟",
+    helpMsgLink: "📞 راسلنا فوراً على واتساب",
+    // Register texts
+    regRoleLabel: "نوع حسابك الجديد",
+    regCategoryCustomer: "عميل ذكي",
+    regCategoryMerchant: "تاجر شريك",
+    regNameLabel: "الاسم الكامل المميز",
+    regNamePlaceholder: "مثال: حميد بومدين",
+    regPhoneLabel: "رقم الهاتف الفعلي للتسجيل",
+    regPhonePlaceholder: "0xxxxxxxxx",
+    regPassLabel: "كلمة مرور قوية",
+    regPassPlaceholder: "8 أحرف كحد أدنى",
+    regPass2Label: "تأكيد كلمة المرور المدخلة",
+    regPass2Placeholder: "أعد كتابتها بعناية",
+    merchantNoteText: "🏪 بعد إتمام حسابك كتاجر، سيتم توجيهك فوراً لتصميم وتصنيف محلك (الولاية، الألوان، إضافة السلع والتوصيل).",
+    regTerms: "الموافقة الصريحة والكاملة على شروط الاستخدام وسياسات منصة ZaLo الذكية والمراقبة في الجزائر.",
+    btnSubmitReg: "إنشاء حسابي الجديد",
+    // Forgot password screen UI labels
+    forgotTitle: "بوابة الاسترداد الآلية للرقم السري",
+    forgotDesc: "سنرسل لك رابط تصفير واختيار كلمة مرور جديدة إلى بريدك فوراً",
+    forgotEmailLabel: "البريد الإلكتروني المراد تصفيره",
+    forgotEmailPlaceholder: "example@gmail.com",
+    forgotBtn: "إرسال الرابط الآمن",
+    forgotSuccessText: "رابط الاستعادة في طريقه إليك! تفقد صندوق بريدك الآن",
+    forgotErrorText: "البريد المدخل غير مسجل مسبقاً",
+    backLogin: "← العودة للوراء"
+  },
+  fr: {
+    logoTitle: "Za<span>Lo</span>",
+    logoSub: "Le Marché Intelligent Algérien Unifié",
+    tabLogin: "Connexion",
+    tabReg: "S'inscrire",
+    roleLabel: "Choisissez le type de compte",
+    roleCustomer: "Client",
+    roleMerchant: "Commerçant",
+    roleAdmin: "Admin",
+    adminNote: "🛡️ Cette section est réservée aux administrateurs de la plateforme.",
+    emailLabel: "Adresse E-mail professionnelle",
+    emailPlaceholder: "exemple@gmail.com",
+    passLabel: "Code de passe",
+    passPlaceholder: "••••••••",
+    forgotPass: "Mot de passe oublié ?",
+    btnSubmitLogin: "Se connecter en toute sécurité",
+    noAccountPrefix: "Pas de compte ? ",
+    noAccount: "S'inscrire en tant que membre premium",
+    backMain: "← Aller à la page d'accueil principale",
+    helpMsgLabel: "Un problème technique ?",
+    helpMsgLink: "📞 Écrivez-nous sur WhatsApp",
+    // Register
+    regRoleLabel: "Type de votre nouveau compte",
+    regCategoryCustomer: "Client Intelligent",
+    regCategoryMerchant: "Commerçant Partenaire",
+    regNameLabel: "Nom complet distingué",
+    regNamePlaceholder: "Ex: Hamid Boumediene",
+    regPhoneLabel: "Numéro de téléphone d'inscription",
+    regPhonePlaceholder: "0xxxxxxxxx",
+    regPassLabel: "Mot de passe fort",
+    regPassPlaceholder: "Minimum 8 caractères",
+    regPass2Label: "Confirmer le mot de passe",
+    regPass2Placeholder: "Retapez-le soigneusement",
+    merchantNoteText: "🏪 Une fois votre compte créé, vous serez redirigé vers la configuration de votre magasin (Wilaya, produits, livraison).",
+    regTerms: "En créant un compte, j'accepte toutes les conditions d'utilisation.",
+    btnSubmitReg: "Créer mon nouveau compte",
+    // Forgot Pass
+    forgotTitle: "Récupération du mot de passe",
+    forgotDesc: "Nous enverrons un lien de réinitialisation de mot de passe à votre email immédiatement.",
+    forgotEmailLabel: "Email à réinitialiser",
+    forgotEmailPlaceholder: "exemple@gmail.com",
+    forgotBtn: "Envoyer le lien sécurisé",
+    forgotSuccessText: "Le lien de récupération a été envoyé ! Vérifiez votre boîte mail.",
+    forgotErrorText: "Cet e-mail n'est pas enregistré.",
+    backLogin: "← Retour"
+  },
+  en: {
+    logoTitle: "Za<span>Lo</span>",
+    logoSub: "The Unified Smart Algerian Marketplace",
+    tabLogin: "Sign In",
+    tabReg: "Register",
+    roleLabel: "Choose your account type to sign in",
+    roleCustomer: "Customer",
+    roleMerchant: "Merchant",
+    roleAdmin: "Admin",
+    adminNote: "🛡️ This section is reserved for platform administrators and managers.",
+    emailLabel: "Business Email Address",
+    emailPlaceholder: "example@gmail.com",
+    passLabel: "Secure Passcode",
+    passPlaceholder: "••••••••",
+    forgotPass: "Forgot Password?",
+    btnSubmitLogin: "Secure Sign In",
+    noAccountPrefix: "Don't have an account? ",
+    noAccount: "Register as a premium member",
+    backMain: "← Go to the grand main homepage",
+    helpMsgLabel: "Facing a technical issue?",
+    helpMsgLink: "📞 Write to us immediately on WhatsApp",
+    // Register
+    regRoleLabel: "Your new account type",
+    regCategoryCustomer: "Smart Customer",
+    regCategoryMerchant: "Merchant Partner",
+    regNameLabel: "Distinguished Full Name",
+    regNamePlaceholder: "Ex: Hamid Boumediene",
+    regPhoneLabel: "Registration Phone Number",
+    regPhonePlaceholder: "0xxxxxxxxx",
+    regPassLabel: "Strong Password",
+    regPassPlaceholder: "Minimum 8 characters",
+    regPass2Label: "Confirm Entered Password",
+    regPass2Placeholder: "Retype carefully",
+    merchantNoteText: "🏪 After creating your merchant account, you will be redirected to customize your shop (Wilaya, colors, store details).",
+    regTerms: "By creating an account, I fully agree to all terms and conditions of ZaLo.",
+    btnSubmitReg: "Create My New Account",
+    // Forgot Pass
+    forgotTitle: "Password Recovery Portal",
+    forgotDesc: "We will send a reset link to your email address immediately.",
+    forgotEmailLabel: "Email to recover",
+    forgotEmailPlaceholder: "example@gmail.com",
+    forgotBtn: "Send Secure Link",
+    forgotSuccessText: "Recovery link is on its way! Check your inbox.",
+    forgotErrorText: "The email address is not registered.",
+    backLogin: "← Back"
+  }
+};
+
+window.setAppLanguage = function(lang) {
+  localStorage.setItem('lang', lang);
+  window.applyLanguage(lang);
+};
+
+window.applyLanguage = function(lang) {
+  const dir = (lang === 'ar') ? 'rtl' : 'ltr';
+  document.documentElement.setAttribute('dir', dir);
+  document.documentElement.setAttribute('lang', lang);
+  document.body.style.direction = dir;
+  
+  // Highlight active lang buttons
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    if (btn.getAttribute('data-lang') === lang) {
+      btn.style.background = 'var(--green)';
+      btn.style.color = '#fff';
+    } else {
+      btn.style.background = 'rgba(255,255,255,0.06)';
+      btn.style.color = 'var(--text)';
+    }
+  });
+
+  const t = translations[lang] || translations.ar;
+  
+  // Replace texts
+  if (document.getElementById('logoTitle')) document.getElementById('logoTitle').innerHTML = t.logoTitle;
+  if (document.getElementById('logoSub')) document.getElementById('logoSub').textContent = t.logoSub;
+  if (document.getElementById('tabLoginBtn')) document.getElementById('tabLoginBtn').textContent = t.tabLogin;
+  if (document.getElementById('tabRegBtn')) document.getElementById('tabRegBtn').textContent = t.tabReg;
+  if (document.getElementById('roleLabel')) document.getElementById('roleLabel').textContent = t.roleLabel;
+  if (document.getElementById('roleCustomerText')) document.getElementById('roleCustomerText').textContent = t.roleCustomer;
+  if (document.getElementById('roleMerchantText')) document.getElementById('roleMerchantText').textContent = t.roleMerchant;
+  if (document.getElementById('roleAdminText')) document.getElementById('roleAdminText').textContent = t.roleAdmin;
+  if (document.getElementById('adminNoteText')) document.getElementById('adminNoteText').textContent = t.adminNote;
+  if (document.getElementById('emailLabel')) document.getElementById('emailLabel').textContent = t.emailLabel;
+  if (document.getElementById('loginEmail')) document.getElementById('loginEmail').placeholder = t.emailPlaceholder;
+  if (document.getElementById('passLabel')) document.getElementById('passLabel').textContent = t.passLabel;
+  if (document.getElementById('loginPass')) document.getElementById('loginPass').placeholder = t.passPlaceholder;
+  if (document.getElementById('forgotPassLink')) document.getElementById('forgotPassLink').textContent = t.forgotPass;
+  if (document.getElementById('loginBtn') && !document.getElementById('loginBtn').classList.contains('loading')) {
+    document.getElementById('loginBtn').textContent = t.btnSubmitLogin;
+  }
+  if (document.getElementById('noAccountPrefix')) document.getElementById('noAccountPrefix').textContent = t.noAccountPrefix;
+  if (document.getElementById('noAccountBtn')) document.getElementById('noAccountBtn').textContent = t.noAccount;
+  if (document.getElementById('backMainBtn')) document.getElementById('backMainBtn').textContent = t.backMain;
+
+  // Help footer
+  if (document.getElementById('helpText')) {
+    document.getElementById('helpText').innerHTML = `<span>${t.helpMsgLabel}</span> <a href="https://wa.me/213698694010" target="_blank">${t.helpMsgLink}</a>`;
+  }
+
+  // Register Form
+  if (document.getElementById('regRoleLabel')) document.getElementById('regRoleLabel').textContent = t.regRoleLabel;
+  if (document.getElementById('regCategoryCustomer')) document.getElementById('regCategoryCustomer').textContent = t.regCategoryCustomer;
+  if (document.getElementById('regCategoryMerchant')) document.getElementById('regCategoryMerchant').textContent = t.regCategoryMerchant;
+  if (document.getElementById('regNameLabel')) document.getElementById('regNameLabel').textContent = t.regNameLabel;
+  if (document.getElementById('regName')) document.getElementById('regName').placeholder = t.regNamePlaceholder;
+  if (document.getElementById('regPhoneLabel')) document.getElementById('regPhoneLabel').textContent = t.regPhoneLabel;
+  if (document.getElementById('regPhone')) document.getElementById('regPhone').placeholder = t.regPhonePlaceholder;
+  if (document.getElementById('regPassLabel')) document.getElementById('regPassLabel').textContent = t.regPassLabel;
+  if (document.getElementById('regPass')) document.getElementById('regPass').placeholder = t.regPassPlaceholder;
+  if (document.getElementById('regPass2Label')) document.getElementById('regPass2Label').textContent = t.regPass2Label;
+  if (document.getElementById('regPass2')) document.getElementById('regPass2').placeholder = t.regPass2Placeholder;
+  if (document.getElementById('merchantNoteText')) document.getElementById('merchantNoteText').textContent = t.merchantNoteText;
+  if (document.getElementById('regTermsText')) {
+    document.getElementById('regTermsText').innerHTML = `${t.regTerms.replace("شروط الاستخدام", `<a href="#" style="color:var(--gold);">${lang === 'ar' ? 'شروط الاستخدام' : (lang === 'fr' ? "les conditions d'utilisation" : 'terms and conditions')}</a>`)}`;
+  }
+  if (document.getElementById('regBtn') && !document.getElementById('regBtn').classList.contains('loading')) {
+    document.getElementById('regBtn').textContent = t.btnSubmitReg;
+  }
+
+  // Forgot password
+  if (document.getElementById('forgotTitle')) document.getElementById('forgotTitle').textContent = t.forgotTitle;
+  if (document.getElementById('forgotDesc')) document.getElementById('forgotDesc').textContent = t.forgotDesc;
+  if (document.getElementById('forgotEmailLabel')) document.getElementById('forgotEmailLabel').textContent = t.forgotEmailLabel;
+  if (document.getElementById('forgotEmail')) document.getElementById('forgotEmail').placeholder = t.forgotEmailPlaceholder;
+  if (document.getElementById('forgotBtn') && !document.getElementById('forgotBtn').classList.contains('loading')) {
+    document.getElementById('forgotBtn').textContent = t.forgotBtn;
+  }
+  if (document.getElementById('backLoginBtn')) document.getElementById('backLoginBtn').textContent = t.backLogin;
+  if (document.getElementById('forgotSuccessText')) document.getElementById('forgotSuccessText').textContent = t.forgotSuccessText;
+  if (document.getElementById('forgotErrorText')) document.getElementById('forgotErrorText').textContent = t.forgotErrorText;
+};
+
+// Initialize current language
+applyLanguage(localStorage.getItem('lang') || 'ar');
 
 let currentLoginRole = 'customer';
 let currentRegRole = 'customer';
