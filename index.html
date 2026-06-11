@@ -212,44 +212,6 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
 
-<!-- PASSCODE LOCK SCREEN -->
-<div id="passcode-screen" style="display:none; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
-  <div style="text-align:center; margin-bottom:30px;">
-    <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--g2); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
-    <div style="font-size:18px; font-weight:800; color:#fff;">تطبيق ZaLo مؤمن بالكامل</div>
-    <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:4px;" id="pin-prompt-text">الرجاء إدخال رمز المرور السري للدخول (الافتراضي: 1234)</div>
-  </div>
-  
-  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-  </div>
-  
-  <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
-    <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer; outline:none;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
-    <button onclick="pressPin('2')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer; outline:none;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">2</button>
-    <button onclick="pressPin('3')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">3</button>
-    
-    <button onclick="pressPin('4')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">4</button>
-    <button onclick="pressPin('5')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">5</button>
-    <button onclick="pressPin('6')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">6</button>
-    
-    <button onclick="pressPin('7')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">7</button>
-    <button onclick="pressPin('8')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">8</button>
-    <button onclick="pressPin('9')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">9</button>
-    
-    <button onclick="resetPin()" style="width:70px; height:70px; background:none; border:none; color:var(--red); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">تصفير</button>
-    <button onclick="pressPin('0')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">0</button>
-    <button onclick="backspacePin()" style="width:70px; height:70px; background:none; border:none; color:var(--gold2); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">مسح</button>
-  </div>
-  
-  <div style="margin-top:28px; font-size:11px; color:rgba(255,255,255,0.4); text-align:center;">
-    يمكنك تفعيل أو تصفير كلمة السر من إعدادات القفل بالصفحة الجانبية للتطبيق
-  </div>
-</div>
-
 <div id="toast" class="toast"></div>
 <div class="overlay" id="overlay" onclick="closeSide()"></div>
 <div class="sidemenu" id="sidemenu">
@@ -268,35 +230,12 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="smi" onclick="closeSide();G('register')"><span class="si">🏪</span><div><div class="sn">سجّل متجرك</div><div class="sd">مجاناً</div></div></div>
   <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">لوحة التحكم للتاجر والأدمن</div></div></div>
   <div class="sm-sec">تواصل معنا وإدارة</div>
-  <div class="smi" onclick="closeSide();openSecP()"><span class="si">🛡️</span><div><div class="sn">أمان وقفل التطبيق</div><div class="sd">تعديل رمز المرور والخصوصية</div></div></div>
   <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
   <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
   <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn">من نحن</div><div class="sd">حول منصة ZaLo الذكية</div></div></div>
   <div class="sm-footer"><p>© 2026 ZaLo - السوق الذكي</p></div>
 </div>
 <div id="app" style="display:none">
-<div class="popup-ov" id="security-popup" onclick="if(event.target===this)closeSecP()">
-  <div class="comm-popup" style="max-width:360px;">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; box-sizing:border-box; width:100%;">
-      <div class="comm-title">🛡️ إعدادات وصلاحيات الأمان وقفل السر</div>
-      <button style="border:none; background:rgba(0,0,0,0.06); color:#333; border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold; font-size:14px; font-family:sans-serif;" onclick="closeSecP()">✕</button>
-    </div>
-    <div style="margin-bottom:16px; text-align:right;">
-      <label style="display:flex; align-items:center; justify-content:space-between; cursor:pointer; padding:6px 0; direction:rtl;">
-        <span style="font-size:13px; font-weight:700; color:var(--g1);">تفعيل القفل السري لتأمين التطبيق</span>
-        <input type="checkbox" id="lock-enabled-toggle" onchange="toggleLockState(this.checked)" style="width:20px; height:20px; accent-color:var(--g1); margin-right:10px;">
-      </label>
-      <p style="font-size:11px; color:var(--gray); margin-top:2px;">وعند تفعيله، لن يتمكن أي شخص آخر من دخول وتصفح المنصة دون رمز السر.</p>
-    </div>
-    <div style="border-top:1.5px solid var(--bd); padding-top:12px; text-align:right;">
-      <div style="font-size:12px; font-weight:700; color:var(--g1); margin-bottom:8px;">تحديث رمز السر الفردي:</div>
-      <div style="margin-bottom:12px;">
-        <label style="font-size:11px; color:var(--gray); display:block; margin-bottom:4px;">الرمز السري الجديد (4 أرقام):</label>
-        <input class="finput" id="new-pin-input" type="password" maxlength="4" placeholder="••••" style="width:100%; text-align:center; font-size:20px; letter-spacing:6px; padding:10px; border:1px solid var(--bd); border-radius:8px; background:#fff; font-family:Arial, sans-serif;" />
-      </div>
-      <button class="btn-p" onclick="saveNewPIN()" style="width:100%; margin-top:10px; font-family:'Cairo';">💾 حفظ الكود السري الجديد</button>
-    </div>
-  </div>
 </div>
 <div class="popup-ov" id="comm-popup" onclick="if(event.target===this)closeCommP()">
   <div class="comm-popup">
@@ -1158,87 +1097,10 @@ function filePick(input,boxId,labelId){
 }
 
 // App Privacy Lock System
-let enteredPin = "";
+// App Privacy Lock System
 function initSecurityLock() {
-  // Always hidden on index.html (first entry screen) as requested by user
-  document.getElementById('passcode-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-}
-
-function updatePinDots() {
-  const dots = document.querySelectorAll('#pin-dots > div');
-  dots.forEach((dot, idx) => {
-    if (idx < enteredPin.length) {
-      dot.style.background = 'var(--g2)';
-      dot.style.borderColor = 'var(--g2)';
-      dot.style.transform = 'scale(1.25)';
-    } else {
-      dot.style.background = 'transparent';
-      dot.style.borderColor = '#ccc';
-      dot.style.transform = 'scale(1)';
-    }
-  });
-}
-
-function pressPin(num) {
-  if (enteredPin.length >= 4) return;
-  enteredPin += num;
-  updatePinDots();
-  if (enteredPin.length === 4) {
-    setTimeout(verifyPin, 150);
-  }
-}
-
-function verifyPin() {
-  const correctPin = localStorage.getItem('zalo_pin') || "1234";
-  if (enteredPin === correctPin) {
-    toast('🔓 تم إتاحة تصريح الدخول والفتح بنجاح', 'success');
-    document.getElementById('passcode-screen').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('passcode-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'block';
-    }, 300);
-  } else {
-    toast('❌ رمز المرور المدخل غير صحيح! حاول مجدداً', 'err');
-    enteredPin = "";
-    updatePinDots();
-  }
-}
-
-function resetPin() {
-  enteredPin = "";
-  updatePinDots();
-}
-
-function backspacePin() {
-  if (enteredPin.length > 0) {
-    enteredPin = enteredPin.slice(0, -1);
-    updatePinDots();
-  }
-}
-
-function openSecP() {
-  document.getElementById('security-popup').style.display = 'flex';
-  document.getElementById('lock-enabled-toggle').checked = localStorage.getItem('zalo_lock_enabled') !== 'false';
-}
-function closeSecP() {
-  document.getElementById('security-popup').style.display = 'none';
-}
-function toggleLockState(checked) {
-  localStorage.setItem('zalo_lock_enabled', checked ? 'true' : 'false');
-  toast(checked ? '🔒 تم تفعيل القفل السري لصفحة تسجيل الدخول' : '🔓 تم إلغاء القفل السري لصفحة تسجيل الدخول بنجاح', 'success');
-}
-function saveNewPIN() {
-  const input = document.getElementById('new-pin-input');
-  const code = input.value.trim();
-  if (code.length !== 4 || isNaN(code)) {
-    toast('⚠️ يرجى تعيين كود يتكون من 4 أرقام تماماً', 'err');
-    return;
-  }
-  localStorage.setItem('zalo_pin', code);
-  toast('✅ تم تحديث رمز التأمين بنجاح إلى: ' + code, 'success');
-  input.value = "";
-  closeSecP();
+  const app = document.getElementById('app');
+  if (app) app.style.display = 'block';
 }
 
 // Expose module functions to global window context for HTML inline events (such as onclick, oninput, etc.)
@@ -1266,13 +1128,6 @@ window.rNext = rNext;
 window.rBack = rBack;
 window.fillComm2 = fillComm2;
 window.filePick = filePick;
-window.pressPin = pressPin;
-window.resetPin = resetPin;
-window.backspacePin = backspacePin;
-window.openSecP = openSecP;
-window.closeSecP = closeSecP;
-window.toggleLockState = toggleLockState;
-window.saveNewPIN = saveNewPIN;
 
 document.addEventListener('DOMContentLoaded',()=>{
   renderW();
