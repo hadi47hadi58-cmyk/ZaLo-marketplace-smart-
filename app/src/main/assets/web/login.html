@@ -1141,8 +1141,15 @@ function setLoading(btnId, loading) {
 // Pin code control for login page
 let enteredPin = "";
 function initSecurityLock() {
-  // Always hidden as requested by user
-  document.getElementById('passcode-screen').style.display = 'none';
+  const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true';
+  const savedPin = localStorage.getItem('zalo_pin') || "1234";
+  localStorage.setItem('zalo_pin', savedPin);
+  
+  if (isEnabled) {
+    document.getElementById('passcode-screen').style.display = 'flex';
+  } else {
+    document.getElementById('passcode-screen').style.display = 'none';
+  }
 }
 
 function updatePinDots() {
