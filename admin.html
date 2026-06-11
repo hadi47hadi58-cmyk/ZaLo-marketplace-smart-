@@ -774,6 +774,22 @@
   </div>
 </div>
 
+<!-- MODAL: Document Viewer -->
+<div class="modal-overlay" id="docViewerModal" style="z-index:9999999;">
+  <div class="modal" style="max-width:550px; width:90%; border-radius:16px;">
+    <div class="modal-title" style="border-bottom:1px solid var(--border); padding-bottom:12px;">
+      <span id="docViewerTitle" style="font-weight:700;">معاينة المستند الرسمي</span>
+      <button class="modal-close" onclick="closeModal('docViewerModal')">✕</button>
+    </div>
+    <div id="docViewerContent" style="text-align:center; max-height:60vh; overflow-y:auto; padding:16px 8px;">
+      <!-- Dynamic Content -->
+    </div>
+    <div style="display:flex; justify-content:flex-end; padding-top:12px; border-top:1px solid var(--border); margin-top:12px;">
+      <button class="btn btn-outline" onclick="closeModal('docViewerModal')">إغلاق وتخطي المعاينة</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast">✅ تم حفظ الإجراء بالنجاح التام والموثوق</div>
 
@@ -1037,8 +1053,12 @@ window.viewRequest = function(id) {
     </div>
     <div class="detail-section">
       <div class="detail-title">الملخص والمستندات السانحة</div>
-      <span class="doc-link">📄 مستند السجل الموثق: ${r.rcNumber || 'غير متوفر'}</span>
-      <span class="doc-link">🪪 ملف الهوية الوطنية للتحفظ</span>
+      <div style="font-size:11px; color:#c2410c; margin-bottom:8px; font-weight:bold;">👉 انقر على أي مستند أدناه للمعاينة المباشرة:</div>
+      <span class="doc-link" onclick="window.viewDoc(\`${r.rcFile || ''}\`, '📄 نسخة السجل التجاري')">📄 نسخة السجل التجاري: ${r.rcNumber || 'رقم القيّد غير متوفر'}</span>
+      <span class="doc-link" onclick="window.viewDoc(\`${r.idFront || ''}\`, '🪪 بطاقة الهوية (الوجه الأمامي)')">🪪 بطاقة الهوية (الوجه الأمامي)</span>
+      ${r.idBack ? `<span class="doc-link" onclick="window.viewDoc(\`${r.idBack}\`, '🪪 بطاقة الهوية (الوجه الخلفي)')">🪪 بطاقة الهوية (الوجه الخلفي)</span>` : ''}
+      ${r.logoURL ? `<span class="doc-link" onclick="window.viewDoc(\`${r.logoURL}\`, '🖼️ الشعار التجاري لمتجرك المعتمد')">🖼️ الشعار التجاري للمحل</span>` : ''}
+      ${r.frontFile ? `<span class="doc-link" onclick="window.viewDoc(\`${r.frontFile}\`, '📸 صورة واجهة المحل أو متجر التاجر')">📸 صورة واجهة المحل</span>` : ''}
     </div>
   `;
   document.getElementById('merchantModalActions').innerHTML = `
@@ -1246,6 +1266,33 @@ window.showPage = function(page) {
 
 window.closeModal = function(id) {
   document.getElementById(id).classList.remove('open');
+};
+
+window.viewDoc = function(base64Data, title) {
+  const titleEl = document.getElementById('docViewerTitle');
+  const contentEl = document.getElementById('docViewerContent');
+  if (!base64Data || base64Data === 'غير متوفر') {
+    window.showToast('⚠️ لم يقم هذا التاجر برفع هذا الملف حالياً أو الملف غير مدمج');
+    return;
+  }
+  
+  titleEl.textContent = title || 'معاينة المستند';
+  
+  if (base64Data.startsWith('data:application/pdf') || base64Data.startsWith('application/pdf')) {
+    contentEl.innerHTML = `
+      <div style="padding: 30px 20px; background: rgba(0,0,0,0.02); border-radius: 12px; border: 2px dashed rgba(0,0,0,0.1); margin: 10px 0;">
+        <span style="font-size: 48px; display: block; margin-bottom: 12px;">📄</span>
+        <div style="font-size: 14px; font-weight: bold; margin-bottom: 20px;">ملف بصيغة PDF الرسمية للتاجر</div>
+        <a class="btn btn-green" href="${base64Data}" download="Sajel_Zalo.pdf" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; padding: 10px 20px; font-size:13px; font-weight:bold;">⬇️ تحميل وفتح ملف السجل بصيغة PDF</a>
+      </div>
+    `;
+  } else {
+    contentEl.innerHTML = `
+      <img src="${base64Data}" alt="مستند التاجر الرسمي" style="max-width: 100%; border-radius: 10px; border: 1px solid var(--border); box-shadow: 0 4px 15px rgba(0,0,0,0.12); margin-top:5px; max-height:50vh; object-fit:contain;">
+    `;
+  }
+  
+  document.getElementById('docViewerModal').classList.add('open');
 };
 
 window.showToast = function(msg) {

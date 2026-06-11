@@ -599,13 +599,13 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
         <div id="docs-r">
           <div class="ibox">📋 <strong>الملف الرسمي للتاجر المرخص:</strong> يرجى رفع سجل الهيئة مع بطاقة التعريف الوطنية وشعار متجرك المعتمد.</div>
           <div class="fg"><label>📄 نسخة السجل التجاري * (PDF أو صورة واضحة)</label>
-            <div class="file-box" id="fb-rc" onclick="document.getElementById('f-rc').click()">
+            <div class="file-box" id="fb-rc">
               <input type="file" id="f-rc" accept=".pdf,image/*" onchange="filePick(this,'fb-rc','fl-rc')">
               <div class="fbi">📄</div><div class="fbl" id="fl-rc">اضغط هنا لرفع مستند السجل</div><div class="fbh">PDF أو وصورة واضحة</div>
             </div>
           </div>
           <div class="fg"><label>🪪 بطاقة الهوية الوطنية * (الوجه الأمامي)</label>
-            <div class="file-box" id="fb-id1" onclick="document.getElementById('f-id1').click()">
+            <div class="file-box" id="fb-id1">
               <input type="file" id="f-id1" accept="image/*" onchange="filePick(this,'fb-id1','fl-id1')">
               <div class="fbi">🪪</div><div class="fbl" id="fl-id1">الوجه الأمامي للبطاقة</div>
             </div>
@@ -614,26 +614,26 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
         <div id="docs-f" style="display:none">
           <div class="ibox">🪪 <strong>تاجر المهن الحرة والعائلية:</strong> مستند بطاقة الهوية الوطنية (الحجم متكامل) مع شعار علامتك الحرة.</div>
           <div class="fg"><label>🪪 بطاقة الهوية الوطنية * (الوجه الأمامي)</label>
-            <div class="file-box" id="fb-idf" onclick="document.getElementById('f-idf').click()">
+            <div class="file-box" id="fb-idf">
               <input type="file" id="f-idf" accept="image/*" onchange="filePick(this,'fb-idf','fl-idf')">
               <div class="fbi">🪪</div><div class="fbl" id="fl-idf">رفع الوجه الأمامي</div>
             </div>
           </div>
           <div class="fg"><label>🪪 بطاقة الهوية الوطنية * (الوجه الخلفي)</label>
-            <div class="file-box" id="fb-idb" onclick="document.getElementById('f-idb').click()">
+            <div class="file-box" id="fb-idb">
               <input type="file" id="f-idb" accept="image/*" onchange="filePick(this,'fb-idb','fl-idb')">
               <div class="fbi">🔄</div><div class="fbl" id="fl-idb">رفع الوجه الخلفي للبطاقة</div>
             </div>
           </div>
         </div>
         <div class="fg"><label>🖼️ الشعار التجاري لمتجرك الخاص * (مهم جداً)</label>
-          <div class="file-box" id="fb-logo" onclick="document.getElementById('f-logo').click()">
+          <div class="file-box" id="fb-logo">
             <input type="file" id="f-logo" accept="image/*" onchange="filePick(this,'fb-logo','fl-logo')">
             <div class="fbi">🖼️</div><div class="fbl" id="fl-logo">اضغط لاختيار صورة الشعار</div>
           </div>
         </div>
         <div class="fg"><label>📸 صورة واجهة المحل أو الورشة (اختياري)</label>
-          <div class="file-box" onclick="document.getElementById('f-front').click()">
+          <div class="file-box">
             <input type="file" id="f-front" accept="image/*" onchange="filePick(this,'','fl-front')">
             <div class="fbi">📸</div><div class="fbl" id="fl-front">صورة تميز واجهة محلك</div>
           </div>
@@ -814,6 +814,9 @@ window.submitMerchant=async()=>{
   if(!sname||!oname||!email||!pass||!phone||!wa||!wil||!comm||!addr||!cat||!hours||!desc){toast('⚠️ الرجاء إكمال جميع الخانات الإجبارية أولاً','err');return;}
   if(pass.length < 6){toast('⚠️ يرجى اختيار كلمة مرور تفوق 5 أحرف لتأمين الأرباح','err');return;}
   
+  const getB64=id=>document.getElementById(id)?.dataset?.base64||'';
+  const rcFile=getB64('f-rc'), idFront=getB64('f-id1')||getB64('f-idf'), idBack=getB64('f-idb'), logoB64=getB64('f-logo'), frontFile=getB64('f-front');
+
   const btn=document.getElementById('sub-btn');
   document.getElementById('sub-ld').style.display='block';btn.disabled=true;
   try{
@@ -821,7 +824,7 @@ window.submitMerchant=async()=>{
     const rnum='REG-'+Date.now().toString().slice(-6);
     
     await ad(col(db,'merchant_requests'),{
-      storeName:sname,ownerName:oname,email,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:"",status:'pending',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,createdAt:sts()
+      storeName:sname,ownerName:oname,email,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'pending',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,createdAt:sts()
     });
     
     document.getElementById('reg-num').textContent=rnum;
@@ -1122,14 +1125,28 @@ function rNext(s){
 }
 function rBack(s){if(s===2){document.getElementById('rs2').style.display='none';document.getElementById('rs1').style.display='block';updateSteps(1);}else if(s===3){document.getElementById('rs3').style.display='none';document.getElementById('rs2').style.display='block';updateSteps(2);}}
 function fillComm2(wname){const w=WILAYAS.find(x=>x.n===wname);if(!w)return;const sel=document.getElementById('r-comm');sel.innerHTML='<option value="">اختر البلدية...</option>';w.c.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;sel.appendChild(o);});}
-function filePick(input,boxId,labelId){const f=input.files[0];if(!f)return;if(labelId)document.getElementById(labelId).textContent='✅ '+f.name;if(boxId)document.getElementById(boxId)?.classList.add('has');}
+function filePick(input,boxId,labelId){
+  const f=input.files[0];
+  if(!f)return;
+  if(labelId)document.getElementById(labelId).textContent='⏳ جاري التحميل...';
+  const reader=new FileReader();
+  reader.onload=function(e){
+    input.dataset.base64=e.target.result;
+    if(labelId)document.getElementById(labelId).textContent='✅ '+f.name;
+    if(boxId)document.getElementById(boxId)?.classList.add('has');
+  };
+  reader.onerror=function(){
+    if(labelId)document.getElementById(labelId).textContent='❌ خطأ في المعالجة';
+  };
+  reader.readAsDataURL(f);
+}
 
 // App Privacy Lock System
 let enteredPin = "";
 function initSecurityLock() {
-  const isEnabled = localStorage.getItem('zalo_lock_enabled') !== 'false'; // Enabled by default
-  const savedPin = localStorage.getItem('zalo_pin') || "1234";
+  const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true'; // Disabled by default for customer convenience
   localStorage.setItem('zalo_lock_enabled', isEnabled ? 'true' : 'false');
+  const savedPin = localStorage.getItem('zalo_pin') || "1234";
   localStorage.setItem('zalo_pin', savedPin);
   
   if (isEnabled) {
@@ -1267,7 +1284,7 @@ document.addEventListener('DOMContentLoaded',()=>{
     if (spl) spl.classList.add('hide');
     setTimeout(()=>{
       if (spl) spl.style.display='none';
-      const isEnabled = localStorage.getItem('zalo_lock_enabled') !== 'false';
+      const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true';
       if (!isEnabled) {
         const app = document.getElementById('app');
         if (app) app.style.display='block';
