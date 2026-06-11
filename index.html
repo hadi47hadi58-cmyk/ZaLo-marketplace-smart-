@@ -751,11 +751,27 @@ window.loadStores=async(cat)=>{
   try{
     const q=query(collection(db,'shops'),where('status','==','active'),where('category','==',cat));
     const snap=await getDocs(q);
-    if(snap.empty){el.innerHTML='<div class="empty"><div class="ei">🏪</div><p>لا توجد محلات في هذا القسم حالياً لولايتك<br><small>كن أول المنضمين وافتح متجرك مجاناً!</small></p></div>';return;}
+    
+    const filteredShops = [];
+    snap.forEach(d => {
+      const s = d.data();
+      const sWil = s.wilaya || '';
+      const sComm = s.commune || '';
+      
+      if (_selW && sWil !== _selW) return;
+      if (_selC && sComm !== _selC) return;
+      
+      filteredShops.push({ id: d.id, ...s });
+    });
+
+    if(filteredShops.length === 0){
+      el.innerHTML=`<div class="empty"><div class="ei">🏪</div><p>لا توجد محلات في هذا القسم حالياً لبلدية ${_selC || ''} (${_selW || ''})<br><small>كن أول المنضمين وافتح متجرك مجاناً!</small></p></div>`;
+      return;
+    }
+    
     el.innerHTML='';
-    snap.forEach(d=>{
-      const s=d.data();
-      el.innerHTML+=`<div class="scard" onclick="openStore('${d.id}','${(s.storeName||'').replace(/'/g,"\'")}','${s.whatsapp||'0698694010'}','${s.logoURL||''}')">
+    filteredShops.forEach(s=>{
+      el.innerHTML+=`<div class="scard" onclick="openStore('${s.id}','${(s.storeName||'').replace(/'/g,"\'")}','${s.whatsapp||'0698694010'}','${s.logoURL||''}')">
         <div class="slogo">${s.logoURL?`<img src="${s.logoURL}" alt="">`:'🏪'}</div>
         <div style="flex:1"><div class="sname">${s.storeName||'متجر شريك'}</div><div class="smeta">📍 ${s.wilaya||''} ${s.commune?'- '+s.commune:''}</div><div class="sbadge ${s.storeType==='registered'?'v':'f'}">${s.storeType==='registered'?'✅ معتمد وقانوني':'⏳ تاجر حر وعائلي'}</div></div>
         <div style="color:var(--g1);font-size:16px">←</div>
@@ -1144,18 +1160,9 @@ function filePick(input,boxId,labelId){
 // App Privacy Lock System
 let enteredPin = "";
 function initSecurityLock() {
-  const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true'; // Disabled by default for customer convenience
-  localStorage.setItem('zalo_lock_enabled', isEnabled ? 'true' : 'false');
-  const savedPin = localStorage.getItem('zalo_pin') || "1234";
-  localStorage.setItem('zalo_pin', savedPin);
-  
-  if (isEnabled) {
-    document.getElementById('passcode-screen').style.display = 'flex';
-    document.getElementById('app').style.display = 'none';
-  } else {
-    document.getElementById('passcode-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'block';
-  }
+  // Always hidden on index.html (first entry screen) as requested by user
+  document.getElementById('passcode-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'block';
 }
 
 function updatePinDots() {
@@ -1219,7 +1226,7 @@ function closeSecP() {
 }
 function toggleLockState(checked) {
   localStorage.setItem('zalo_lock_enabled', checked ? 'true' : 'false');
-  toast(checked ? '🔒 تم تفعيل القفل السري المانع' : '🔓 تم إقصاء القفل السري بنجاح', 'success');
+  toast(checked ? '🔒 تم تفعيل القفل السري لصفحة تسجيل الدخول' : '🔓 تم إلغاء القفل السري لصفحة تسجيل الدخول بنجاح', 'success');
 }
 function saveNewPIN() {
   const input = document.getElementById('new-pin-input');
@@ -1284,11 +1291,8 @@ document.addEventListener('DOMContentLoaded',()=>{
     if (spl) spl.classList.add('hide');
     setTimeout(()=>{
       if (spl) spl.style.display='none';
-      const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true';
-      if (!isEnabled) {
-        const app = document.getElementById('app');
-        if (app) app.style.display='block';
-      }
+      const app = document.getElementById('app');
+      if (app) app.style.display='block';
     },800);
   },1200);
 });

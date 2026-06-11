@@ -696,11 +696,27 @@ window.loadStores=async(cat)=>{
   try{
     const q=query(collection(db,'shops'),where('status','==','active'),where('category','==',cat));
     const snap=await getDocs(q);
-    if(snap.empty){el.innerHTML='<div class="empty"><div class="ei">🏪</div><p>لا توجد محلات في هذا القسم حالياً لولايتك<br><small>كن أول المنضمين وافتح متجرك مجاناً!</small></p></div>';return;}
+    
+    const filteredShops = [];
+    snap.forEach(d => {
+      const s = d.data();
+      const sWil = s.wilaya || '';
+      const sComm = s.commune || '';
+      
+      if (_selW && sWil !== _selW) return;
+      if (_selC && sComm !== _selC) return;
+      
+      filteredShops.push({ id: d.id, ...s });
+    });
+
+    if(filteredShops.length === 0){
+      el.innerHTML=`<div class="empty"><div class="ei">🏪</div><p>لا توجد محلات في هذا القسم حالياً لبلدية ${_selC || ''} (${_selW || ''})<br><small>كن أول المنضمين وافتح متجرك مجاناً!</small></p></div>`;
+      return;
+    }
+    
     el.innerHTML='';
-    snap.forEach(d=>{
-      const s=d.data();
-      el.innerHTML+=`<div class="scard" onclick="openStore('${d.id}','${(s.storeName||'').replace(/'/g,"\'")}','${s.whatsapp||'0698694010'}','${s.logoURL||''}')">
+    filteredShops.forEach(s=>{
+      el.innerHTML+=`<div class="scard" onclick="openStore('${s.id}','${(s.storeName||'').replace(/'/g,"\'")}','${s.whatsapp||'0698694010'}','${s.logoURL||''}')">
         <div class="slogo">${s.logoURL?`<img src="${s.logoURL}" alt="">`:'🏪'}</div>
         <div style="flex:1"><div class="sname">${s.storeName||'متجر شريك'}</div><div class="smeta">📍 ${s.wilaya||''} ${s.commune?'- '+s.commune:''}</div><div class="sbadge ${s.storeType==='registered'?'v':'f'}">${s.storeType==='registered'?'✅ معتمد وقانوني':'⏳ تاجر حر وعائلي'}</div></div>
         <div style="color:var(--g1);font-size:16px">←</div>

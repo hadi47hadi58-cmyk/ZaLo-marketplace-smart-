@@ -345,6 +345,44 @@
 
 <div class="bg-dots"></div>
 
+<!-- PASSCODE LOCK SCREEN -->
+<div id="passcode-screen" style="display:none; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
+  <div style="text-align:center; margin-bottom:30px;">
+    <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
+    <div style="font-size:18px; font-weight:800; color:#fff;">هذه الصفحة محمية برمز مرور</div>
+    <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:4px;" id="pin-prompt-text">الرجاء إدخال رمز المرور للدخول (الافتراضي: 1234)</div>
+  </div>
+  
+  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
+  </div>
+  
+  <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
+    <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer; outline:none;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
+    <button onclick="pressPin('2')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer; outline:none;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">2</button>
+    <button onclick="pressPin('3')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">3</button>
+    
+    <button onclick="pressPin('4')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">4</button>
+    <button onclick="pressPin('5')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">5</button>
+    <button onclick="pressPin('6')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">6</button>
+    
+    <button onclick="pressPin('7')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">7</button>
+    <button onclick="pressPin('8')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">8</button>
+    <button onclick="pressPin('9')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">9</button>
+    
+    <button onclick="resetPin()" style="width:70px; height:70px; background:none; border:none; color:var(--red); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">تصفير</button>
+    <button onclick="pressPin('0')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">0</button>
+    <button onclick="backspacePin()" style="width:70px; height:70px; background:none; border:none; color:var(--gold2); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">مسح</button>
+  </div>
+  
+  <div style="margin-top:28px; font-size:11px; color:rgba(255,255,255,0.4); text-align:center;">
+    يمكنك تفعيل أو تصفير كلمة السر من إعدادات القفل بالصفحة الجانبية للتطبيق الرئيسي
+  </div>
+</div>
+
 <div class="wrapper">
 
   <!-- LOGO -->
@@ -861,6 +899,73 @@ function setLoading(btnId, loading) {
   if (loading) btn.classList.add('loading');
   else btn.classList.remove('loading');
 }
+
+// Pin code control for login page
+let enteredPin = "";
+function initSecurityLock() {
+  const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true';
+  const savedPin = localStorage.getItem('zalo_pin') || "1234";
+  localStorage.setItem('zalo_pin', savedPin);
+  
+  if (isEnabled) {
+    document.getElementById('passcode-screen').style.display = 'flex';
+  } else {
+    document.getElementById('passcode-screen').style.display = 'none';
+  }
+}
+
+function updatePinDots() {
+  const dots = document.querySelectorAll('#pin-dots > div');
+  dots.forEach((dot, idx) => {
+    if (idx < enteredPin.length) {
+      dot.style.background = 'var(--gold2)';
+      dot.style.borderColor = 'var(--gold2)';
+      dot.style.transform = 'scale(1.25)';
+    } else {
+      dot.style.background = 'transparent';
+      dot.style.borderColor = '#ccc';
+      dot.style.transform = 'scale(1)';
+    }
+  });
+}
+
+window.pressPin = function(num) {
+  if (enteredPin.length >= 4) return;
+  enteredPin += num;
+  updatePinDots();
+  if (enteredPin.length === 4) {
+    setTimeout(verifyPin, 150);
+  }
+};
+
+function verifyPin() {
+  const correctPin = localStorage.getItem('zalo_pin') || "1234";
+  if (enteredPin === correctPin) {
+    document.getElementById('passcode-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('passcode-screen').style.display = 'none';
+    }, 300);
+  } else {
+    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
+    enteredPin = "";
+    updatePinDots();
+  }
+}
+
+window.resetPin = function() {
+  enteredPin = "";
+  updatePinDots();
+}
+
+window.backspacePin = function() {
+  if (enteredPin.length > 0) {
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinDots();
+  }
+}
+
+// Invoke on startup
+initSecurityLock();
 </script>
 </body>
 </html>
