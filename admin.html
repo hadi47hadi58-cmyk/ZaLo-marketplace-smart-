@@ -925,7 +925,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc }
+import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -943,7 +943,7 @@ const db = getFirestore(app);
 
 window._db = db;
 window._auth = auth;
-window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc };
+window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc };
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -1117,7 +1117,8 @@ window.approveRequest = async function(id) {
     
     const r = window._allRequests.find(x => x.id === id);
     if (r) {
-      await fu.addDoc(fu.collection(window._db, 'shops'), {
+      // 1. Create or overwrite the shop record with the request ID as its document ID
+      await fu.setDoc(fu.doc(window._db, 'shops', id), {
         storeName: r.storeName || '',
         ownerName: r.ownerName || '',
         email: r.email || '',
@@ -1136,6 +1137,17 @@ window.approveRequest = async function(id) {
         instagramURL: r.instagramURL || r.instagram || '',
         tiktokURL: r.tiktokURL || '',
         telegramURL: r.telegramURL || '',
+        status: 'active',
+        createdAt: new Date().toISOString()
+      });
+
+      // 2. Map this user role inside the users collection with identical ID
+      await fu.setDoc(fu.doc(window._db, 'users', id), {
+        uid: id,
+        displayName: r.ownerName || r.storeName || r.email.split('@')[0],
+        email: r.email || '',
+        phone: r.phone || '',
+        role: 'merchant',
         status: 'active',
         createdAt: new Date().toISOString()
       });

@@ -583,7 +583,7 @@ import {
   sendPasswordResetEmail, onAuthStateChanged, updateProfile
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, doc, setDoc, getDoc, serverTimestamp
+  getFirestore, doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -711,6 +711,74 @@ window.doLogin = async function() {
   } catch(e) {
     isSubmitting = false;
     setLoading('loginBtn', false);
+
+    // Self-healing check for approved/pending merchant registrants
+    if (currentLoginRole === 'merchant') {
+      try {
+        const q = query(collection(db, 'merchant_requests'), where('email', '==', email));
+        const qSnap = await getDocs(q);
+        if (!qSnap.empty) {
+          const reqDoc = qSnap.docs[0];
+          const reqData = reqDoc.data();
+          const reqStatus = reqData.status;
+
+          if (reqStatus === 'approved') {
+            try {
+              isSubmitting = true;
+              setLoading('loginBtn', true);
+              const cred = await createUserWithEmailAndPassword(auth, email, pass);
+              const user = cred.user;
+
+              // 1. users doc:
+              await setDoc(doc(db, 'users', user.uid), {
+                uid: user.uid,
+                displayName: reqData.ownerName || reqData.storeName || email.split('@')[0],
+                email: email,
+                phone: reqData.phone || '',
+                role: 'merchant',
+                status: 'active',
+                createdAt: serverTimestamp()
+              });
+
+              // 2. shops doc under their real user.uid:
+              await setDoc(doc(db, 'shops', user.uid), {
+                storeName: reqData.storeName || '',
+                ownerName: reqData.ownerName || '',
+                email: email,
+                phone: reqData.phone || '',
+                whatsapp: reqData.whatsapp || reqData.phone || '',
+                wilaya: reqData.wilaya || '',
+                commune: reqData.commune || '',
+                address: reqData.address || '',
+                category: reqData.category || '',
+                workHours: reqData.workHours || '',
+                description: reqData.description || '',
+                rcNumber: reqData.rcNumber || '',
+                storeType: reqData.storeType || 'registered',
+                logoURL: reqData.logoURL || '',
+                facebookURL: reqData.facebook || reqData.facebookURL || '',
+                instagramURL: reqData.instagram || reqData.instagramURL || '',
+                tiktokURL: reqData.tiktokURL || '',
+                telegramURL: reqData.telegramURL || '',
+                status: 'active',
+                subscription: 'basic',
+                createdAt: serverTimestamp()
+              });
+
+              window.location.href = 'dashboard.html';
+              return;
+            } catch(signUpError) {
+              console.error("Auto merchant sign-up failed: ", signUpError);
+            }
+          } else {
+            showLoginError(`⏳ طلب متجرك قيد المراجعة والتدقيق الأمني حالياً. رقم المعاملة: ${reqData.regNumber || 'مستمر'}. يرجى الانتظار لحين قبول الملف وتفعيله من قِبل الإدارة لمقاطعة.`);
+            return;
+          }
+        }
+      } catch(dbErr) {
+        console.error("Firestore self-healing request check failed: ", dbErr);
+      }
+    }
     
     // Developer offline local fallback check for the exact admin
     if (email === "hadi47hadi58@gmail.com" && pass === "123456") {
