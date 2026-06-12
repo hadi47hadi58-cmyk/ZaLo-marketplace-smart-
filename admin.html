@@ -469,7 +469,7 @@
   }
   .toggle.on::after { right: calc(100% - 21px); }
 
-  @media (max-width: 768px) {
+  @media (max-width: 1024px) {
     #sidebar { right: -240px; }
     #sidebar.open { right: 0; }
     #topbar { right: 0; }
@@ -557,6 +557,7 @@
 <div id="topbar">
   <div id="menuToggle" onclick="toggleSidebar()">☰</div>
   <div class="topbar-title" id="pageTitle">بوابة الرقابة والتحكم للجزائر</div>
+  <button onclick="window.location.href='index.html'" class="btn btn-outline" style="padding: 6px 14px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--border); display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; margin-left: 10px; font-family: 'Cairo', sans-serif;">🏡 عودة للرئيسية</button>
   <div class="topbar-avatar" id="avatarBtn">👑</div>
 </div>
 
@@ -678,10 +679,10 @@
     <div class="table-wrap">
       <table>
         <thead><tr>
-          <th>رقم تتبع الشحنة</th><th>المشتري المحترم</th><th>المتجر المسؤول</th><th>المبلغ المستحق</th><th>طريقة السداد المضمونة</th><th>تاريخ الطلب المودع</th>
+          <th>رقم تتبع الشحنة</th><th>المشتري المحترم</th><th>المتجر المسؤول</th><th>المبلغ المستحق</th><th>طريقة السداد المضمونة</th><th>تاريخ الطلب المودع</th><th>الإجراء</th>
         </tr></thead>
         <tbody id="ordersTable">
-          <tr><td colspan="6"><div class="loading"><div class="spinner"></div>جاري تحميل شحنات المشتريات للتجار...</div></td></tr>
+          <tr><td colspan="7"><div class="loading"><div class="spinner"></div>جاري تحميل شحنات المشتريات للتجار...</div></td></tr>
         </tbody>
       </table>
     </div>
@@ -925,7 +926,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc }
+import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -943,7 +944,7 @@ const db = getFirestore(app);
 
 window._db = db;
 window._auth = auth;
-window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc };
+window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc };
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
@@ -1220,16 +1221,84 @@ window.toggleMerchantStatus = async function(id, cStatus) {
 
 window.toggleProductStatus = async function(id, cStatus) {
   const nStatus = cStatus === 'hidden' ? 'active' : 'hidden';
+  try {
+    const fu = window._firestoreUtils;
+    await fu.updateDoc(fu.doc(window._db, 'products', id), { status: nStatus });
+  } catch(e){}
   showToast(nStatus === 'active' ? '✅ المنتج معلن ونشط الآن في الجزائر' : '🙈 تم إخفاء المنتج وحجبه بنجاح');
   window._allProducts = window._allProducts.map(p => p.id === id ? { ...p, status: nStatus } : p);
   renderProductsTable(window._allProducts);
 };
 
-window.deleteProduct = function(id) {
-  if (!confirm('حذف هذا المنتج المنشور بصفة نهائية؟')) return;
+window.deleteProduct = async function(id) {
+  if (!confirm('🚨 هل أنت متأكد من حذف هذا المنتج بصفة نهائية من منصة السلع؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'products', id));
+    showToast('🗑️ تم حذف المنتج بنجاح تام وتطهير المعروضات');
+  } catch(e) {
+    console.error("Failed to delete product:", e);
+    showToast('❌ عذراً، لم تكتمل عملية الحذف من قاعدة البيانات');
+  }
   window._allProducts = window._allProducts.filter(p => p.id !== id);
   renderProductsTable(window._allProducts);
-  showToast('🗑️ تم التخلص من المنتج المخالف بنجاح');
+};
+
+window.deleteMerchant = async function(id) {
+  if (!confirm('⚠️ هل أنت متأكد من حذف هذا التاجر نهائياً وسحب ترخيصه؟ سيتم حذف بيانات المحل وحساب المستخدم المرتبط به.')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'shops', id));
+    await fu.deleteDoc(fu.doc(window._db, 'users', id));
+    showToast('🗑️ تم حذف ملف التاجر وسحب الاعتماد بنجاح');
+  } catch(e) {
+    console.error("Failed to delete shop:", e);
+    showToast('❌ عذراً، فشل تنفيذ أمر الحذف بقاعدة البيانات');
+  }
+  window._allMerchants = window._allMerchants.filter(m => m.id !== id);
+  renderMerchantsTable(window._allMerchants);
+};
+
+window.deleteRequest = async function(id) {
+  if (!confirm('⚠️ هل أنت متأكد من رفض وتجاهل وحذف هذا الطلب نهائياً من سجل طلبات الانضمام؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'merchant_requests', id));
+    showToast('🗑️ تم حذف طلب الانضمام وتصفية آثاره بنجاح');
+  } catch(e) {
+    console.error("Failed to delete merchant request:", e);
+    showToast('❌ فشل حذف الملف بقاعدة البيانات');
+  }
+  window._allRequests = window._allRequests.filter(r => r.id !== id);
+  renderRequestsTable(window._allRequests);
+};
+
+window.deleteOrder = async function(id) {
+  if (!confirm('⚠️ هل أنت متأكد من حذف هذه المعاملة والطلبية نهائياً من سجل الشحنات والأرشيف؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'orders', id));
+    showToast('🗑️ تم تصفية الشحنة والطلبية من الأرشيف بنجاح');
+  } catch(e) {
+    console.error("Failed to delete order:", e);
+    showToast('❌ فشل إتمام معاملة الحذف');
+  }
+  window._allOrders = window._allOrders.filter(o => o.id !== id);
+  renderOrdersTable(window._allOrders);
+};
+
+window.deleteUser = async function(id) {
+  if (!confirm('🚨 هل أنت متأكد من حذف حساب الزبون هذا بالكامل وإلغاء تسجيل وثائقه في ZaLo؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'users', id));
+    showToast('🗑️ تم محو حساب الزبون وتصفية وثائقه المرجعية بنجاح');
+  } catch(e) {
+    console.error("Failed to delete user:", e);
+    showToast('❌ تعذر إتمام الحظر والمسح');
+  }
+  window._allUsers = window._allUsers.filter(u => u.id !== id);
+  renderUsersTable(window._allUsers);
 };
 
 function renderMerchantsTable(merts) {
@@ -1244,6 +1313,7 @@ function renderMerchantsTable(merts) {
       <td><div class="action-btns">
         <button class="action-btn ab-view" onclick="viewMerchant('${m.id}')">البيانات</button>
         <button class="action-btn ab-suspend" onclick="toggleMerchantStatus('${m.id}','${m.status}')">${m.status==='active'?'تعطيل الرخصة':'تفعيل الترخيص'}</button>
+        <button class="action-btn ab-delete" onclick="deleteMerchant('${m.id}')">حذف</button>
       </div></td>
     </tr>
   `).join('');
@@ -1282,6 +1352,7 @@ function renderRequestsTable(reqs) {
       <td><span class="badge badge-${r.status==='pending'?'pending':r.status==='approved'?'approved':'rejected'}">${r.status==='pending'?'انتظار التدقيق':r.status==='approved'?'تم القبول':'مرفوض'}</span></td>
       <td><div class="action-btns">
         <button class="action-btn ab-view" onclick="viewRequest('${r.id}')">مراجعة والبت</button>
+        <button class="action-btn ab-delete" onclick="deleteRequest('${r.id}')">حذف</button>
       </div></td>
     </tr>
   `).join('');
@@ -1313,6 +1384,7 @@ function renderOrdersTable(ords) {
       <td>${(o.price || o.total || 0).toLocaleString()} دج</td>
       <td>${o.paymentMethod || 'الدفع عند الاستلام'}</td>
       <td>${o.createdAt ? formatDate(o.createdAt) : 'معلق'}</td>
+      <td><button class="action-btn ab-delete" onclick="deleteOrder('${o.id}')">حذف</button></td>
     </tr>
   `).join('');
 }
@@ -1325,7 +1397,10 @@ function renderUsersTable(usrs) {
       <td>${u.email || '-'}</td>
       <td>${u.phone || '-'}</td>
       <td>📍 ${u.wilaya || '16 الجزائر'} (زبون)</td>
-      <td><button class="action-btn ab-reject" onclick="showToast('⛔ تم تقييد وحظر الزبون لمخالفة سياسات التوصيل')">حظر</button></td>
+      <td><div class="action-btns">
+        <button class="action-btn ab-reject" onclick="showToast('⛔ تم تقييد وحظر الزبون لمخالفة سياسات التوصيل')">حظر</button>
+        <button class="action-btn ab-delete" onclick="deleteUser('${u.id}')">حذف</button>
+      </div></td>
     </tr>
   `).join('');
 }

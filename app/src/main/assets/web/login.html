@@ -1003,17 +1003,31 @@ window.doLogin = async function() {
                 createdAt: serverTimestamp()
               });
 
+              isSubmitting = false;
+              setLoading('loginBtn', false);
               window.location.href = 'dashboard.html';
               return;
             } catch(signUpError) {
+              isSubmitting = false;
+              setLoading('loginBtn', false);
               console.error("Auto merchant sign-up failed: ", signUpError);
+              if (signUpError.code === 'auth/email-already-in-use') {
+                showLoginError('⚠️ الحساب موجود بالفعل، كود المرور المدخل غير صحيح!');
+              } else {
+                showLoginError('⚠️ فشل تسجيل الدخول أو تهيئة الحساب التلقائي: ' + signUpError.message);
+              }
+              return;
             }
           } else {
+            isSubmitting = false;
+            setLoading('loginBtn', false);
             showLoginError(`⏳ طلب متجرك قيد المراجعة والتدقيق الأمني حالياً. رقم المعاملة: ${reqData.regNumber || 'مستمر'}. يرجى الانتظار لحين قبول الملف وتفعيله من قِبل الإدارة لمقاطعة.`);
             return;
           }
         }
       } catch(dbErr) {
+        isSubmitting = false;
+        setLoading('loginBtn', false);
         console.error("Firestore self-healing request check failed: ", dbErr);
       }
     }
