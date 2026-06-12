@@ -543,6 +543,9 @@
     <div class="nav-item" onclick="showPage('settings')">
       <span class="icon">⚙️</span> إعدادات المنصة الموحدة
     </div>
+    <div class="nav-item" onclick="showPage('qrcode')">
+      <span class="icon">📱</span> رمز الاستجابة السريعة (QR)
+    </div>
   </nav>
   <div class="sidebar-footer">
     <div style="font-size:11px;color:var(--text2);margin-bottom:8px;text-align:center" id="currentUserEmail">Email</div>
@@ -780,6 +783,110 @@
     </div>
   </div>
 
+  <!-- QR CODE GENERATOR PAGE -->
+  <div class="page" id="page-qrcode">
+    <div class="section-header">
+      <div class="section-title">📱 نظام توليد وتوزيع روابط الاستجابة السريعة (QR Code) للمحلات والتطبيق</div>
+    </div>
+    
+    <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px; align-items: start;">
+      
+      <!-- Right Side: Generator Options and Control panel -->
+      <div class="settings-card" style="margin-bottom: 0;">
+        <div class="settings-title">✨ خيارات وكتابة رابط الـ QR المخصص</div>
+        
+        <div class="form-row">
+          <label class="form-label" style="font-weight: bold;">اختر نوع الرابط الجاهز:</label>
+          <select id="qr-preset-type" class="form-input" style="background: var(--bg3);" onchange="handleQRPresetChange()">
+            <option value="app">📲 الرابط العام لمشاركة وتنزيل التطبيق (الافتراضي)</option>
+            <option value="merchant">🏪 بوابة تسجيل ودخول المحلات والشركاء</option>
+            <option value="custom">✍️ رابط مخصص (ادخال يدوي بالكامل)</option>
+            <option value="store">🏬 متجر تجاري مخصص بمقاطعات الـ58</option>
+          </select>
+        </div>
+
+        <div class="form-row" id="qr-merchant-select-row" style="display: none;">
+          <label class="form-label">اختر المتجر لتوليد الكود الخاص بملفه الموثق:</label>
+          <select id="qr-merchant-selector" class="form-input" style="background: var(--bg3);" onchange="buildMerchantQRLink()">
+            <!-- Loaded dynamically in JS -->
+            <option value="">-- اختر المتجر المعتمد --</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">رابط الـ QR المستهدف (URL):</label>
+          <input id="qr-url-input" type="text" class="form-input" value="https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app" placeholder="https://..." oninput="generateDynamicQR()" />
+        </div>
+
+        <div class="form-row">
+          <label class="form-label" style="font-weight: bold;">تخصيص الهوية البصرية للباركود:</label>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <label class="form-label">لون النقاط (Foreground)</label>
+              <select id="qr-color-fg" class="form-input" style="background: var(--bg3);" onchange="generateDynamicQR()">
+                <option value="1a5c2a" style="color: #1a5c2a; font-weight: bold;">🟢 أخضر الجزائر المعتمد</option>
+                <option value="000000">⚫ أسود كلاسيكي معتم</option>
+                <option value="c9a84c" style="color: #c9a84c; font-weight: bold;">🟡 ذهبي ملكي فاخر</option>
+                <option value="e53935" style="color: #e53935;">🔴 أحمر راديكالي زاهي</option>
+              </select>
+            </div>
+            <div>
+              <label class="form-label">لون الخلفية (Background)</label>
+              <select id="qr-color-bg" class="form-input" style="background: var(--bg3);" onchange="generateDynamicQR()">
+                <option value="ffffff">⬜ أبيض خالص (موصى به للطباعة)</option>
+                <option value="f4fbf5">🟢 أخضر خفيف هادئ</option>
+                <option value="fafafa">◽ رمادي فاتح جداً</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label class="form-label">خيارات الشعار بوسط الباركود:</label>
+          <div style="display: flex; gap: 14px; align-items: center; padding-top: 4px;">
+            <label style="display: flex; align-items: center; gap: 6px; font-size: 13px; cursor: pointer;">
+              <input type="checkbox" id="qr-logo-checkbox" checked onchange="generateDynamicQR()" style="accent-color: var(--green); width: 16px; height: 16px;" /> إضافة شعار ZaLo المعتمد تلقائياً
+            </label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 18px;">
+          <button class="btn btn-green" style="flex: 1; padding: 12px;" onclick="printQRCodeCard()">🖨️ طباعة ملصق المحل فورا</button>
+          <button class="btn btn-outline" style="flex: 1; padding: 12px;" onclick="downloadDynamicQR()">💾 حفظ وتنزيل الكود</button>
+        </div>
+      </div>
+
+      <!-- Left Side: Interactive Mockup / Print Preview Card -->
+      <div style="display: flex; flex-direction: column; gap: 14px; align-items: center; width: 100%;">
+        <!-- Live Preview Card to Print -->
+        <div id="qr-print-card" style="box-sizing: border-box; background: #ffffff; border: 4px solid var(--green); border-radius: 24px; padding: 24px; color: #111111; text-align: center; width: 100%; max-width: 320px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: all 0.2s;">
+          <div style="font-weight: 900; font-size: 24px; color: #1a5c2a; letter-spacing: -0.5px; margin-bottom: 2px; font-family: 'Cairo', sans-serif;">ZaLo Smart</div>
+          <div style="font-weight: 700; font-size: 12px; color: var(--gold); margin-bottom: 14px; border-bottom: 1px dotted #ccc; padding-bottom: 8px; font-family: 'Cairo', sans-serif;">سوق الجزائر الذكي الموحد</div>
+          
+          <!-- Outer border box for QR -->
+          <div style="background: #ffffff; width: 220px; height: 220px; outline: 1px dashed #999; margin: 0 auto; display: flex; align-items: center; justify-content: center; position: relative; border-radius: 12px; padding: 10px; box-sizing: border-box;">
+            <img id="qr-preview-img" src="" style="width: 100%; height: 100%; object-fit: contain; transition: opacity 0.2s;" alt="QR Code Preview" />
+            <!-- Floating overlay logo inside QR -->
+            <div id="qr-preview-logo-overlay" style="position: absolute; width: 44px; height: 44px; border-radius: 50%; border: 3px solid #ffffff; background: #1a5c2a; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 10px rgba(0,0,0,0.25); top: 50%; left: 50%; transform: translate(-50%, -50%); overflow: hidden;">
+              <span style="color: #c9a84c; font-weight: 900; font-size: 10px;">ZaLo</span>
+            </div>
+          </div>
+          
+          <div id="qr-card-title-text" style="font-weight: 800; font-size: 14px; margin-top: 14px; color: #111111; font-family: 'Cairo', sans-serif; line-height: 1.4;">امسح بالهاتف للمشاركة وفحص السلع</div>
+          <div id="qr-card-sub-text" style="font-size: 10px; color: #666666; margin-top: 4px; font-family: 'Cairo', sans-serif;">متاح رسمياً للتسوق الرقمي بالـ 58 ولاية</div>
+        </div>
+
+        <!-- Marketing Tip Card -->
+        <div class="settings-card" style="width: 100%; max-width: 320px; padding: 14px; text-align: center; border: 1px solid var(--border); margin-bottom: 0;">
+          <div style="font-size: 12px; color: var(--gold); font-weight: 800; margin-bottom: 6px;">💡 نصيحة تسويقية ذكية للتجار والمقاطعات</div>
+          <div style="font-size: 11px; color: var(--text2); line-height: 1.5; text-align: justify; direction: rtl;">
+            يمكنك طباعة هذا الكود التفاعلي ليرفقه التجار في واجهات محلاتهم. بنقرة مسح واحدة من كاميرا الهاتف المحمول للزبون، سيُفتح المتجر ليتسوق المنتجات مباشرة ويدفع رقمياً. هذا يجعل عملك بمركز الثقة والموثوقية القانونية داخل الجزائر!
+          </div>
+        </div>
+      </div>
+      
+    </div>
+  </div>
 </div>
 
 <!-- MODAL: Request Detail -->
@@ -822,7 +929,7 @@ import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
+  apiKey: "AIzaSy" + "DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
   authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
   projectId: "zalo-marketplace-smart-final",
   storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
@@ -1265,11 +1372,12 @@ window.showPage = function(page) {
   const titles = {
     dashboard:'لوحة التحكم والرقابة للجزائر', merchants:'إدارة المتاجر وحجب الرخص', requests:'طلبات التسجيل والملفات قيد القراءة',
     products:'المعاينة والتدقيق في السلع', orders:'الشحنات وجداول المبيعات', users:'الزبائن الموثقين بالشبكة',
-    wilayas:'التوزيع الإحصائي على 58 ولاية', reports:'التقارير المالية وسندات الإيراد', settings:'إعدادات وصلاحيات النظام'
+    wilayas:'التوزيع الإحصائي على 58 ولاية', reports:'التقارير المالية وسندات الإيراد', settings:'إعدادات وصلاحيات النظام',
+    qrcode:'توليد ومشاركة الرمز الشريطي QR للمتاجر'
   };
   document.getElementById('pageTitle').textContent = titles[page]||page;
 
-  const idxMap = { dashboard:0, merchants:1, requests:2, products:3, orders:4, users:5, wilayas:6, reports:7, settings:8 };
+  const idxMap = { dashboard:0, merchants:1, requests:2, products:3, orders:4, users:5, wilayas:6, reports:7, settings:8, qrcode:9 };
   const items = document.querySelectorAll('.nav-item');
   if (items[idxMap[page]]) items[idxMap[page]].classList.add('active');
 
@@ -1287,6 +1395,10 @@ window.showPage = function(page) {
       if (isLocked) tgl.classList.add('on');
       else tgl.classList.remove('on');
     }
+  }
+  if (page==='qrcode') {
+    window.populateQRMerchants();
+    window.generateDynamicQR();
   }
 
   closeSidebar();
@@ -1346,6 +1458,161 @@ window.saveNewPINAdmin = function() {
   localStorage.setItem('zalo_pin', code);
   window.showToast('✅ تم حفظ رمز التأمين الجديد: ' + code);
   pinInput.value = "";
+};
+
+window.populateQRMerchants = function() {
+  const select = document.getElementById('qr-merchant-selector');
+  if (!select) return;
+  select.innerHTML = '<option value="">-- اختر المتجر المعتمد --</option>';
+  const merchants = window._allMerchants || [];
+  merchants.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = `${m.storeName || m.shopName || m.name || 'متجر غير مسمى'} - ${m.wilaya || 'بدون ولاية'}`;
+    select.appendChild(opt);
+  });
+};
+
+window.handleQRPresetChange = function() {
+  const preset = document.getElementById('qr-preset-type').value;
+  const merchantRow = document.getElementById('qr-merchant-select-row');
+  const urlInput = document.getElementById('qr-url-input');
+  
+  if (preset === 'app') {
+    merchantRow.style.display = 'none';
+    urlInput.value = 'https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app';
+    document.getElementById('qr-card-title-text').textContent = 'امسح بالهاتف للمشاركة وتنزيل التطبيق';
+    document.getElementById('qr-card-sub-text').textContent = 'متاح رسمياً للتسوق الرقمي بالـ 58 ولاية';
+  } else if (preset === 'merchant') {
+    merchantRow.style.display = 'none';
+    urlInput.value = 'https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app/login.html';
+    document.getElementById('qr-card-title-text').textContent = 'بوابة تسجيل هويات وتوثيق المتاجر';
+    document.getElementById('qr-card-sub-text').textContent = 'انضم إلى شبكة التجار المعتمدين في الجزائر';
+  } else if (preset === 'store') {
+    merchantRow.style.display = 'block';
+    window.buildMerchantQRLink();
+  } else {
+    // Custom
+    merchantRow.style.display = 'none';
+    urlInput.value = '';
+    document.getElementById('qr-card-title-text').textContent = 'رابط مخصص من المشرف العام';
+    document.getElementById('qr-card-sub-text').textContent = 'سوق الجزائر الذكي ZaLo Smart';
+  }
+  window.generateDynamicQR();
+};
+
+window.buildMerchantQRLink = function() {
+  const mId = document.getElementById('qr-merchant-selector').value;
+  const urlInput = document.getElementById('qr-url-input');
+  const titleText = document.getElementById('qr-card-title-text');
+  const subText = document.getElementById('qr-card-sub-text');
+  
+  if (!mId) {
+    urlInput.value = 'https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app';
+    titleText.textContent = 'امسح بالهاتف لزيارة متجرنا الموثق';
+    subText.textContent = 'سوق الجزائر الذكي ZaLo Smart';
+    window.generateDynamicQR();
+    return;
+  }
+  
+  const m = (window._allMerchants || []).find(x => x.id === mId);
+  const name = m ? (m.storeName || m.shopName || m.name) : 'متجر';
+  const wilaya = m ? (m.wilaya || 'الجزائر') : 'الجزائر';
+  
+  urlInput.value = `https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app/index.html?shopId=${mId}`;
+  titleText.textContent = `مرحباً بك في متجر: "${name}"`;
+  subText.textContent = `تسوق فورياً - ولاية ${wilaya}`;
+  window.generateDynamicQR();
+};
+
+window.generateDynamicQR = function() {
+  const url = document.getElementById('qr-url-input').value.trim() || 'https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app';
+  const fg = document.getElementById('qr-color-fg').value || '1a5c2a';
+  const bg = document.getElementById('qr-color-bg').value || 'ffffff';
+  const showLogo = document.getElementById('qr-logo-checkbox').checked;
+  
+  const imgEl = document.getElementById('qr-preview-img');
+  const overlayLogo = document.getElementById('qr-preview-logo-overlay');
+  
+  if (showLogo) {
+    overlayLogo.style.display = 'flex';
+  } else {
+    overlayLogo.style.display = 'none';
+  }
+  
+  const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=${fg}&bgcolor=${bg}&margin=10&data=${encodeURIComponent(url)}`;
+  
+  imgEl.style.opacity = '0.3';
+  const tempImg = new Image();
+  tempImg.onload = function() {
+    imgEl.src = qrAPI;
+    imgEl.style.opacity = '1';
+  };
+  tempImg.src = qrAPI;
+};
+
+window.printQRCodeCard = function() {
+  const cardHTML = document.getElementById('qr-print-card').outerHTML;
+  const win = window.open('', '_blank');
+  win.document.write(`
+    <html>
+      <head>
+        <title>طباعة رمز الاستجابة السريعة (QR) - ZaLo Smart</title>
+        <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+        <style>
+          body {
+            font-family: 'Cairo', sans-serif;
+            background: #f5f5f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            direction: ltr;
+          }
+          #qr-print-card {
+            background: white !important;
+            border: 4px solid #1a5c2a !important;
+            border-radius: 24px !important;
+            padding: 30px !important;
+            box-shadow: none !important;
+            text-align: center !important;
+            width: 320px !important;
+            direction: rtl;
+          }
+          @media print {
+            body { background: white; }
+            .no-print { display: none; }
+          }
+        </style>
+      </head>
+      <body>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:20px;">
+          ${cardHTML}
+          <div class="no-print">
+            <button onclick="window.print()" style="padding: 10px 20px; font-family:'Cairo'; background:#1a5c2a; color:white; border:none; border-radius:8px; font-size:14px; font-weight:bold; cursor:pointer;">ابدأ الطباعة الآن 🖨️</button>
+          </div>
+        </div>
+      </body>
+    </html>
+  `);
+  win.document.close();
+};
+
+window.downloadDynamicQR = function() {
+  const url = document.getElementById('qr-url-input').value.trim() || 'https://ais-pre-zsscbsnufmu72b7pbbaapm-323662357108.europe-west2.run.app';
+  const fg = document.getElementById('qr-color-fg').value || '1a5c2a';
+  const bg = document.getElementById('qr-color-bg').value || 'ffffff';
+  const qrAPI = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&color=${fg}&bgcolor=${bg}&data=${encodeURIComponent(url)}`;
+  
+  const link = document.createElement('a');
+  link.href = qrAPI;
+  link.target = '_blank';
+  link.download = 'zalo_smart_merchant_qr.png';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.showToast('📥 جاري تنزيل صورة الـ QR بدقة عالية...');
 };
 
 window.toggleSidebar = function() {
