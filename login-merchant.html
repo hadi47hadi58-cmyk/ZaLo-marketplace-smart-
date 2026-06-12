@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>ZaLo - بوابـة التجار الشركاء</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #1a5c2a;
+    --green-light: #2d7a3a;
+    --green-dark: #071a0b;
+    --gold: #c9a84c;
+    --gold2: #e8c97a;
+    --bg: #080e0a;
+    --card: #111a14;
+    --border: #1e3028;
+    --text: #e8f0ea;
+    --text2: #7a9e83;
+    --red: #e53935;
+    --input-bg: #0d1810;
+  }
+
+  * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    font-family: 'Cairo', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 24px 16px;
+    position: relative;
+    overflow-y: auto;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26,92,74,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 100%, rgba(37,168,96,0.08) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  .bg-dots {
+    position: fixed; inset: 0; pointer-events: none;
+    background-image: radial-gradient(circle, rgba(37,168,96,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+  }
+
+  .wrapper {
+    width: 100%; max-width: 420px;
+    position: relative; z-index: 1;
+    animation: fadeUp 0.5s ease;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(24px); }
+    to { opacity:1; transform: translateY(0); }
+  }
+
+  .logo-area {
+    text-align: center; margin-bottom: 24px;
+  }
+  .logo-img-wrap {
+    width: 72px; height: 72px;
+    border-radius: 20px;
+    background: var(--green-dark);
+    border: 2px solid rgba(37,168,96,0.3);
+    display: flex; align-items: center; justify-content: center;
+    margin: 0 auto 12px;
+    overflow: hidden;
+    box-shadow: 0 8px 32px rgba(26,122,74,0.3);
+  }
+  .logo-img-wrap img {
+    width: 100%; height: 100%; object-fit: cover;
+  }
+  .logo-title {
+    font-size: 26px; font-weight: 900;
+    color: var(--text);
+  }
+  .logo-title span { color: var(--gold2); }
+  .logo-sub {
+    font-size: 13px; color: var(--text2);
+    margin-top: 4px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    padding: 24px;
+    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+  }
+
+  .tabs {
+    display: flex;
+    background: var(--bg);
+    border-radius: 12px;
+    padding: 4px;
+    margin-bottom: 20px;
+    border: 1px solid var(--border);
+  }
+  .tab {
+    flex: 1; padding: 10px 4px;
+    border-radius: 9px; border: none;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'Cairo', sans-serif;
+    font-size: 13px; font-weight: 700;
+    cursor: pointer; transition: all 0.25s;
+    text-align: center;
+  }
+  .tab.active {
+    background: var(--green);
+    color: white;
+  }
+
+  .form-group { margin-bottom: 14px; }
+  .form-label {
+    font-size: 12px; color: var(--text2);
+    margin-bottom: 7px; display: block;
+    font-weight: 600;
+  }
+  .input-wrap {
+    position: relative;
+    display: flex; align-items: center;
+  }
+  .input-icon {
+    position: absolute; right: 13px;
+    font-size: 15px; pointer-events: none;
+    color: var(--text2);
+  }
+  .form-input {
+    width: 100%;
+    padding: 12px 40px 12px 14px;
+    background: var(--input-bg);
+    border: 1px solid var(--border);
+    border-radius: 11px;
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus {
+    border-color: var(--green);
+  }
+
+  .eye-btn {
+    position: absolute; left: 13px;
+    background: none; border: none;
+    cursor: pointer; font-size: 16px;
+    color: var(--text2); padding: 0;
+  }
+
+  .forgot-link {
+    text-align: left; margin-top: -6px; margin-bottom: 14px;
+  }
+  .forgot-link a {
+    font-size: 12px; color: var(--gold2);
+    text-decoration: none;
+  }
+
+  .error-msg, .success-msg {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; margin-bottom: 14px; display: none;
+    align-items: center; gap: 8px;
+  }
+  .error-msg {
+    background: rgba(229,57,53,0.1);
+    border: 1px solid rgba(229,57,53,0.3);
+    color: #ef9a9a;
+  }
+  .success-msg {
+    background: rgba(37,168,96,0.1);
+    border: 1px solid rgba(37,168,96,0.3);
+    color: var(--gold2);
+  }
+  .error-msg.show, .success-msg.show { display: flex; }
+
+  .submit-btn {
+    width: 100%; padding: 13px;
+    background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
+    border: none; border-radius: 12px;
+    color: white; font-family: 'Cairo', sans-serif;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .submit-btn:hover { opacity: 0.92; }
+  .submit-btn.loading { color: transparent; pointer-events: none; }
+
+  .phone-wrap { display: flex; gap: 8px; width: 100%; }
+  .phone-prefix {
+    padding: 12px 10px; background: var(--input-bg);
+    border: 1px solid var(--border); border-radius: 11px;
+    color: var(--text2); font-size: 13px; display: flex; align-items: center;
+  }
+
+  .terms-row {
+    display: flex; align-items: flex-start; gap: 10px; margin-bottom: 14px;
+  }
+  .terms-check { width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; }
+  .terms-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
+
+  .card-footer { text-align: center; margin-top: 16px; font-size: 13px; color: var(--text2); }
+  .card-footer a { color: var(--gold2); font-weight: 700; text-decoration: none; cursor: pointer; }
+
+  .bottom-link { text-align: center; margin-top: 20px; font-size: 13px; }
+  .bottom-link a { color: var(--gold2); text-decoration: none; font-weight: 600; }
+
+  .whatsapp-help {
+    display: flex; align-items: center; justify-content: center;
+    gap: 6px; margin-top: 16px; font-size: 12px; color: var(--text2);
+  }
+  .whatsapp-help a { color: #4caf50; text-decoration: none; font-weight: 600; }
+</style>
+</head>
+<body>
+
+<div class="bg-dots"></div>
+
+<!-- PASSCODE SCREEN -->
+<div id="passcode-screen" style="display:none; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif;">
+  <div style="text-align:center; margin-bottom:30px;">
+    <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
+    <div style="font-size:18px; font-weight:800; color:#fff;">دخول التجار المعتمدين</div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px;" id="pin-prompt-text">يرجى إدخال رمز المرور للدخول لمتجرك</div>
+  </div>
+  
+  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
+  </div>
+  
+  <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
+    <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
+    <button onclick="pressPin('2')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">2</button>
+    <button onclick="pressPin('3')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">3</button>
+    
+    <button onclick="pressPin('4')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">4</button>
+    <button onclick="pressPin('5')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">5</button>
+    <button onclick="pressPin('6')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">6</button>
+    
+    <button onclick="pressPin('7')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">7</button>
+    <button onclick="pressPin('8')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">8</button>
+    <button onclick="pressPin('9')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">9</button>
+    
+    <button onclick="resetPin()" style="width:70px; height:70px; background:none; border:none; color:var(--red); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">تصفير</button>
+    <button onclick="pressPin('0')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">0</button>
+    <button onclick="backspacePin()" style="width:70px; height:70px; background:none; border:none; color:var(--gold2); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">مسح</button>
+  </div>
+</div>
+
+<div class="wrapper">
+
+  <!-- LOGO -->
+  <div class="logo-area">
+    <div class="logo-img-wrap">
+      <img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/80x80/1a5c2a/white?text=ZaLo'" />
+    </div>
+    <div class="logo-title">Za<span>Lo</span></div>
+    <div class="logo-sub">بوابة تجار الجزائر الحرفيين والشراكة</div>
+  </div>
+
+  <!-- CARD -->
+  <div class="card">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab active" id="tabLoginBtn" onclick="switchTab('login')">تسجيل دخول التاجر</button>
+      <button class="tab" id="tabRegBtn" onclick="gotoJoinUrl()">طلب شراكة (تسجيل محل)</button>
+    </div>
+
+    <!-- ===== LOGIN FORM ===== -->
+    <div id="loginForm">
+      <div class="error-msg" id="loginError">
+        <span>⚠️</span><span id="loginErrorText">بريدك أو كود المرور غير صحيح</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني للعمل / المتجر</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input class="form-input" type="email" id="loginEmail" placeholder="example@gmail.com" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">رقم المرور السري</label>
+        <div class="input-wrap">
+          <span class="input-icon">🔒</span>
+          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" />
+          <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
+        </div>
+      </div>
+
+      <div class="forgot-link">
+        <a href="#" onclick="showForgot();return false">نسيت كلمة المرور؟</a>
+      </div>
+
+      <button class="submit-btn" id="loginBtn" onclick="doLogin()">تأكيد دخول المتجر</button>
+
+      <div class="card-footer">
+        <span>ليس لديك متجر معتمد بالمنصة؟ </span><a onclick="gotoJoinUrl()">سجل وقدم ملفك مجاناً</a>
+      </div>
+    </div>
+
+    <!-- ===== FORGOT PASSWORD ===== -->
+    <div id="forgotForm" style="display:none">
+      <button class="back-btn" onclick="hideForgot()" style="background:none; border:none; color:var(--text2); font-family:'Cairo'; font-size:13px; cursor:pointer; margin-bottom:14px;">← عودة لتسجيل الدخول</button>
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:36px">🔑</div>
+        <div style="font-size:17px;font-weight:700;margin-top:8px">بوابة تصفير حساب المتاجر</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:6px">سنرسل لك رابط تصفير الرقم السري لمتجرك الكترونياً</div>
+      </div>
+
+      <div class="success-msg" id="forgotSuccess">
+        <span>✅</span><span>رابط التصفير في طريقه إليك! تفقد صندوق والرسائل المزعجة</span>
+      </div>
+      <div class="error-msg" id="forgotError">
+        <span>⚠️</span><span>هذا البريد غير مسجل كمتجر في نظامنا</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">بريد المتجر</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input class="form-input" type="email" id="forgotEmail" placeholder="example@gmail.com" />
+        </div>
+      </div>
+
+      <button class="submit-btn" id="forgotBtn" onclick="doForgot()">إرسال الرابط الآمن</button>
+    </div>
+
+  </div>
+
+  <div class="bottom-link">
+    <a href="index.html">← التوجه للصفحة الرئيسية الكبرى</a>
+  </div>
+
+  <div class="whatsapp-help">
+    <span>هل تواجه تعطلاً في تفعيل متجرك؟</span>
+    <a href="https://wa.me/213698694010" target="_blank">📞 التنسيق المباشر واتساب للتجار</a>
+  </div>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
+  sendPasswordResetEmail, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import {
+  getFirestore, doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSy" + "DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
+  authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
+  projectId: "zalo-marketplace-smart-final",
+  storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
+  messagingSenderId: "393402903971",
+  appId: "1:393402903971:web:7c521e8cb7b823d306be16"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+let isSubmitting = false;
+
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return;
+  if (isSubmitting) return;
+
+  try {
+    const shopDoc = await getDoc(doc(db, 'shops', user.uid));
+    if (shopDoc.exists()) {
+      window.location.href = 'dashboard.html';
+    } else {
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if (userDoc.exists() && userDoc.data().role === 'merchant') {
+        window.location.href = 'dashboard.html';
+      }
+    }
+  } catch(e) {
+    window.location.href = 'dashboard.html';
+  }
+});
+
+window.gotoJoinUrl = function() {
+  window.location.href = 'index.html#register';
+};
+
+window.switchTab = function(type) {
+  if (type === 'login') {
+    document.getElementById('loginForm').style.display = 'block';
+    document.getElementById('forgotForm').style.display = 'none';
+    document.getElementById('tabLoginBtn').classList.add('active');
+    document.getElementById('tabRegBtn').classList.remove('active');
+  } else {
+    window.gotoJoinUrl();
+  }
+};
+
+window.toggleEye = function(id, btn) {
+  const input = document.getElementById(id);
+  if (input.type === 'password') {
+    input.type = 'text';
+    btn.textContent = '🙈';
+  } else {
+    input.type = 'password';
+    btn.textContent = '👁';
+  }
+};
+
+window.showForgot = function() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('forgotForm').style.display = 'block';
+};
+
+window.hideForgot = function() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('forgotForm').style.display = 'none';
+};
+
+function showLoginError(msg) {
+  const el = document.getElementById('loginError');
+  document.getElementById('loginErrorText').textContent = msg;
+  el.classList.add('show');
+}
+function hideLoginError() {
+  document.getElementById('loginError').classList.remove('show');
+}
+
+window.doLogin = async function() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  const pass = document.getElementById('loginPass').value;
+  hideLoginError();
+
+  if (!email) { showLoginError('⚠️ يرجى إدخال البريد الإلكتروني'); return; }
+  if (!pass) { showLoginError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
+
+  setLoading('loginBtn', true);
+  try {
+    isSubmitting = true;
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.location.href = 'dashboard.html';
+  } catch(e) {
+    isSubmitting = false;
+    setLoading('loginBtn', false);
+
+    // Self-healing check for approved/pending merchant registrants
+    try {
+      const q = query(collection(db, 'merchant_requests'), where('email', '==', email));
+      const qSnap = await getDocs(q);
+      if (!qSnap.empty) {
+        const reqDoc = qSnap.docs[0];
+        const reqData = reqDoc.data();
+        const reqStatus = reqData.status;
+
+        if (reqStatus === 'approved') {
+          try {
+            isSubmitting = true;
+            setLoading('loginBtn', true);
+            const cred = await createUserWithEmailAndPassword(auth, email, pass);
+            const user = cred.user;
+
+            await setDoc(doc(db, 'users', user.uid), {
+              uid: user.uid,
+              displayName: reqData.ownerName || reqData.storeName || email.split('@')[0],
+              email: email,
+              phone: reqData.phone || '',
+              role: 'merchant',
+              status: 'active',
+              createdAt: serverTimestamp()
+            });
+
+            await setDoc(doc(db, 'shops', user.uid), {
+              storeName: reqData.storeName || '',
+              ownerName: reqData.ownerName || '',
+              email: email,
+              phone: reqData.phone || '',
+              whatsapp: reqData.whatsapp || reqData.phone || '',
+              wilaya: reqData.wilaya || '',
+              commune: reqData.commune || '',
+              address: reqData.address || '',
+              category: reqData.category || '',
+              workHours: reqData.workHours || '',
+              description: reqData.description || '',
+              rcNumber: reqData.rcNumber || '',
+              storeType: reqData.storeType || 'registered',
+              logoURL: reqData.logoURL || '',
+              facebookURL: reqData.facebook || reqData.facebookURL || '',
+              instagramURL: reqData.instagram || reqData.instagramURL || '',
+              tiktokURL: reqData.tiktokURL || '',
+              telegramURL: reqData.telegramURL || '',
+              status: 'active',
+              subscription: 'basic',
+              createdAt: serverTimestamp()
+            });
+
+            isSubmitting = false;
+            setLoading('loginBtn', false);
+            window.location.href = 'dashboard.html';
+            return;
+          } catch(signUpError) {
+            isSubmitting = false;
+            setLoading('loginBtn', false);
+            if (signUpError.code === 'auth/email-already-in-use') {
+              showLoginError('⚠️ الحساب موجود بالفعل، كود المرور المدخل غير صحيح!');
+            } else {
+              showLoginError('⚠️ فشل التفعيل التلقائي: ' + signUpError.message);
+            }
+            return;
+          }
+        } else {
+          showLoginError(`⏳ طلب متجرك قيد المراجعة والتدقيق الأمني حالياً. رقم المعاملة: ${reqData.regNumber || 'مستمر'}. يرجى الانتظار لحين قبول الملف وتفعيله من قِبل الإدارة.`);
+          return;
+        }
+      }
+    } catch(dbErr) {
+      console.error(dbErr);
+    }
+
+    showLoginError('⚠️ البريد الإلكتروني أو كلمة المرور غير صحيحة!');
+  }
+};
+
+window.doForgot = async function() {
+  const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+  const err = document.getElementById('forgotError');
+  const succ = document.getElementById('forgotSuccess');
+  err.classList.remove('show');
+  succ.classList.remove('show');
+
+  if (!email) { err.classList.add('show'); return; }
+
+  setLoading('forgotBtn', true);
+  try {
+    await sendPasswordResetEmail(auth, email);
+    setLoading('forgotBtn', false);
+    succ.classList.add('show');
+  } catch(e) {
+    setLoading('forgotBtn', false);
+    err.classList.add('show');
+  }
+};
+
+function setLoading(id, val) {
+  const btn = document.getElementById(id);
+  if (!btn) return;
+  if (val) btn.classList.add('loading');
+  else btn.classList.remove('loading');
+}
+
+// Security locks check
+let enteredPin = "";
+function initSecurityLock() {
+  const isEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
+  if (isEnabled) {
+    document.getElementById('passcode-screen').style.display = 'flex';
+  } else {
+    document.getElementById('passcode-screen').style.display = 'none';
+  }
+}
+
+function updatePinDots() {
+  const dots = document.querySelectorAll('#pin-dots > div');
+  dots.forEach((dot, idx) => {
+    if (idx < enteredPin.length) {
+      dot.style.background = 'var(--gold2)';
+      dot.style.borderColor = 'var(--gold2)';
+      dot.style.transform = 'scale(1.25)';
+    } else {
+      dot.style.background = 'transparent';
+      dot.style.borderColor = '#ccc';
+      dot.style.transform = 'scale(1)';
+    }
+  });
+}
+
+window.pressPin = function(num) {
+  if (enteredPin.length >= 4) return;
+  enteredPin += num;
+  updatePinDots();
+  if (enteredPin.length === 4) {
+    setTimeout(verifyPin, 150);
+  }
+};
+
+function verifyPin() {
+  const correctPin = localStorage.getItem('zalo_pin_merchant') || "1234";
+  if (enteredPin === correctPin) {
+    document.getElementById('passcode-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('passcode-screen').style.display = 'none';
+    }, 300);
+  } else {
+    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
+    enteredPin = "";
+    updatePinDots();
+  }
+}
+
+window.resetPin = function() {
+  enteredPin = "";
+  updatePinDots();
+};
+
+window.backspacePin = function() {
+  if (enteredPin.length > 0) {
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinDots();
+  }
+};
+
+initSecurityLock();
+</script>
+</body>
+</html>

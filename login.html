@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>ZaLo - تسجيل الدخول والدعم</title>
+<title>ZaLo - بوابات الوصول الموحدة</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -18,7 +18,6 @@
     --text: #e8f0ea;
     --text2: #7a9e83;
     --red: #e53935;
-    --input-bg: #0d1810;
   }
 
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
@@ -32,26 +31,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     padding: 24px 16px;
     position: relative;
     overflow-y: auto;
-  }
-
-  @media (max-height: 740px) {
-    .logo-area { margin-bottom: 12px; }
-    .logo-img-wrap { width: 64px; height: 64px; margin-bottom: 6px; border-radius: 16px; }
-    .logo-img-wrap img { border-radius: 14px; }
-    .logo-title { font-size: 22px; }
-    .logo-sub { font-size: 11px; }
-    .card { padding: 18px 16px; border-radius: 16px; }
-    .tabs { margin-bottom: 14px; }
-    .roles-grid { margin-bottom: 12px; }
-    .form-group { margin-bottom: 10px; }
-    .form-input { padding: 10px 36px 10px 12px; font-size: 13px; }
-    .input-icon { right: 11px; font-size: 14px; }
-    .eye-btn { left: 11px; font-size: 14px; }
-    .submit-btn { padding: 10px; font-size: 14px; }
   }
 
   body::before {
@@ -70,11 +53,10 @@
   }
 
   .wrapper {
-    width: 100%; max-width: 420px;
+    width: 100%; max-width: 440px;
     position: relative; z-index: 1;
     animation: fadeUp 0.5s ease;
   }
-
   @keyframes fadeUp {
     from { opacity:0; transform: translateY(24px); }
     to { opacity:1; transform: translateY(0); }
@@ -95,16 +77,10 @@
   }
   .logo-img-wrap img {
     width: 100%; height: 100%; object-fit: cover;
-    border-radius: 20px;
-  }
-  .logo-fallback {
-    font-size: 32px; font-weight: 900;
-    color: var(--gold);
   }
   .logo-title {
-    font-size: 28px; font-weight: 900;
+    font-size: 30px; font-weight: 900;
     color: var(--text);
-    letter-spacing: -0.5px;
   }
   .logo-title span { color: var(--gold2); }
   .logo-sub {
@@ -115,273 +91,78 @@
   .card {
     background: var(--card);
     border: 1px solid var(--border);
-    border-radius: 22px;
+    border-radius: 24px;
     padding: 28px 24px;
-    box-shadow: 0 24px 64px rgba(0,0,0,0.4);
+    box-shadow: 0 24px 64px rgba(0,0,0,0.5);
+    text-align: center;
   }
 
-  .tabs {
+  .prompt-title {
+    font-size: 16px; font-weight: 700; color: var(--text);
+    margin-bottom: 20px;
+  }
+
+  .portal-btn {
     display: flex;
-    background: var(--bg);
-    border-radius: 12px;
-    padding: 4px;
-    margin-bottom: 24px;
-    border: 1px solid var(--border);
-  }
-  .tab {
-    flex: 1; padding: 9px 6px;
-    border-radius: 9px; border: none;
-    background: transparent;
-    color: var(--text2);
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px; font-weight: 600;
-    cursor: pointer; transition: all 0.25s;
-  }
-  .tab.active {
-    background: var(--green);
-    color: white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-  }
-
-  .role-label {
-    font-size: 12px; color: var(--text2);
-    margin-bottom: 10px; font-weight: 600;
-  }
-  .roles-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px; margin-bottom: 20px;
-  }
-  .role-btn {
-    display: flex; flex-direction: column;
-    align-items: center; gap: 5px;
-    padding: 10px 6px;
-    background: var(--bg);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    cursor: pointer; transition: all 0.2s;
-    color: var(--text2);
-    font-family: 'Cairo', sans-serif;
-    font-size: 11px; font-weight: 600;
-  }
-  .role-btn .role-icon { font-size: 20px; }
-  .role-btn:hover {
-    border-color: var(--green);
-    color: var(--text);
-  }
-  .role-btn.selected {
-    background: rgba(26,122,74,0.15);
-    border-color: var(--gold);
-    color: var(--gold2);
-  }
-
-  .form-group { margin-bottom: 14px; }
-  .form-label {
-    font-size: 12px; color: var(--text2);
-    margin-bottom: 7px; display: block;
-    font-weight: 600;
-  }
-  .input-wrap {
-    position: relative;
-    display: flex; align-items: center;
-  }
-  .input-icon {
-    position: absolute; right: 13px;
-    font-size: 16px; pointer-events: none;
-    color: var(--text2);
-  }
-  .form-input {
+    align-items: center;
+    gap: 16px;
     width: 100%;
-    padding: 12px 40px 12px 14px;
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    border-radius: 11px;
+    padding: 16px;
+    background: rgba(255,255,255,0.03);
+    border: 1.5px solid var(--border);
+    border-radius: 16px;
     color: var(--text);
-    font-family: 'Cairo', sans-serif;
-    font-size: 14px; outline: none;
-    transition: border-color 0.2s, box-shadow 0.2s;
-    -webkit-appearance: none;
-  }
-  .form-input:focus {
-    border-color: var(--green);
-    box-shadow: 0 0 0 3px rgba(26,122,74,0.12);
-  }
-  .form-input::placeholder { color: var(--text2); opacity: 0.6; }
-
-  .eye-btn {
-    position: absolute; left: 13px;
-    background: none; border: none;
-    cursor: pointer; font-size: 16px;
-    color: var(--text2); padding: 0;
-  }
-
-  .forgot-link {
-    text-align: left; margin-top: -6px; margin-bottom: 14px;
-  }
-  .forgot-link a {
-    font-size: 12px; color: var(--gold2);
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: right;
+    margin-bottom: 12px;
     text-decoration: none;
   }
 
-  .error-msg {
-    background: rgba(229,57,53,0.1);
-    border: 1px solid rgba(229,57,53,0.3);
-    border-radius: 10px; padding: 10px 14px;
-    font-size: 13px; color: #ef9a9a;
-    margin-bottom: 14px; display: none;
-    align-items: center; gap: 8px;
-  }
-  .error-msg.show { display: flex; }
+  .portal-btn:last-child { margin-bottom: 0; }
 
-  .success-msg {
-    background: rgba(37,168,96,0.1);
-    border: 1px solid rgba(37,168,96,0.3);
-    border-radius: 10px; padding: 10px 14px;
-    font-size: 13px; color: var(--gold2);
-    margin-bottom: 14px; display: none;
-    align-items: center; gap: 8px;
-  }
-  .success-msg.show { display: flex; }
-
-  .submit-btn {
-    width: 100%; padding: 14px;
-    background: linear-gradient(135deg, var(--green) 0%, var(--green-light) 100%);
-    border: none; border-radius: 12px;
-    color: white; font-family: 'Cairo', sans-serif;
-    font-size: 16px; font-weight: 700;
-    cursor: pointer; transition: all 0.2s;
-    position: relative; overflow: hidden;
-  }
-  .submit-btn:hover { opacity: 0.92; transform: translateY(-1px); }
-  .submit-btn:active { transform: translateY(0); }
-  .submit-btn.loading {
-    color: transparent; pointer-events: none;
+  .portal-btn:hover {
+    background: rgba(26,92,42,0.12);
+    border-color: var(--green-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
   }
 
-  .divider {
-    display: flex; align-items: center; gap: 10px;
-    margin: 18px 0; color: var(--text2); font-size: 12px;
-  }
-  .divider::before, .divider::after {
-    content: ''; flex: 1; height: 1px;
-    background: var(--border);
-  }
-
-  .reg-only { display: none; }
-  .reg-only.show { display: block; }
-
-  .phone-wrap {
-    display: flex; gap: 8px; width: 100%;
-  }
-  .phone-prefix {
-    padding: 12px 10px;
-    background: var(--input-bg);
-    border: 1px solid var(--border);
-    border-radius: 11px; color: var(--text2);
-    font-family: 'Cairo', sans-serif;
-    font-size: 13px; white-space: nowrap;
-    display: flex; align-items: center; gap: 4px;
+  .portal-icon {
+    font-size: 28px;
+    background: var(--green-dark);
+    width: 52px; height: 52px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid rgba(37,168,96,0.2);
+    flex-shrink: 0;
   }
 
-  .terms-row {
-    display: flex; align-items: flex-start; gap: 10px;
-    margin-bottom: 14px;
+  .portal-info {
+    flex: 1;
   }
-  .terms-check {
-    width: 18px; height: 18px; flex-shrink: 0;
-    accent-color: var(--green); margin-top: 2px;
-    cursor: pointer;
+  .portal-name {
+    font-size: 15px; font-weight: 700; color: #fff;
   }
-  .terms-text { font-size: 12px; color: var(--text2); line-height: 1.5; }
-
-  .card-footer {
-    text-align: center; margin-top: 16px;
-    font-size: 13px; color: var(--text2);
-  }
-  .card-footer a {
-    color: var(--gold2); font-weight: 700;
-    text-decoration: none; cursor: pointer;
+  .portal-desc {
+    font-size: 11px; color: var(--text2); margin-top: 3px;
   }
 
-  .forgot-form { display: none; }
-  .back-btn {
-    display: flex; align-items: center; gap: 6px;
-    background: none; border: none;
-    color: var(--text2); font-family: 'Cairo', sans-serif;
-    font-size: 13px; cursor: pointer;
-    margin-bottom: 16px; padding: 0;
+  .arrow-indicator {
+    font-size: 16px; color: var(--gold2); margin-left: 4px;
   }
 
   .bottom-link {
-    text-align: center; margin-top: 20px;
-    font-size: 13px; color: var(--text2);
+    text-align: center; margin-top: 24px; font-size: 13px;
   }
   .bottom-link a {
-    color: var(--gold2); text-decoration: none;
-    font-weight: 600;
+    color: var(--gold2); text-decoration: none; font-weight: 600;
   }
-
-  .whatsapp-help {
-    display: flex; align-items: center; justify-content: center;
-    gap: 6px; margin-top: 20px;
-    font-size: 12px; color: var(--text2);
-  }
-  .whatsapp-help a {
-    color: #4caf50; text-decoration: none; font-weight: 600;
-  }
-
-  .admin-note {
-    background: rgba(240,165,0,0.08);
-    border: 1px solid rgba(240,165,0,0.2);
-    border-radius: 10px; padding: 10px 14px;
-    font-size: 12px; color: var(--gold);
-    margin-bottom: 16px; text-align: center;
-    display: none;
-  }
-  .admin-note.show { display: block; }
 </style>
 </head>
 <body>
 
 <div class="bg-dots"></div>
-
-<!-- PASSCODE LOCK SCREEN -->
-<div id="passcode-screen" style="display:none; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
-  <div style="text-align:center; margin-bottom:30px;">
-    <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
-    <div style="font-size:18px; font-weight:800; color:#fff;">هذه الصفحة محمية برمز مرور</div>
-    <div style="font-size:12px; color:rgba(255,255,255,0.6); margin-top:4px;" id="pin-prompt-text">الرجاء إدخال رمز المرور للدخول (الافتراضي: 1234)</div>
-  </div>
-  
-  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition:all 0.15s;"></div>
-  </div>
-  
-  <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
-    <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer; outline:none;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
-    <button onclick="pressPin('2')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer; outline:none;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">2</button>
-    <button onclick="pressPin('3')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">3</button>
-    
-    <button onclick="pressPin('4')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">4</button>
-    <button onclick="pressPin('5')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">5</button>
-    <button onclick="pressPin('6')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">6</button>
-    
-    <button onclick="pressPin('7')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">7</button>
-    <button onclick="pressPin('8')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">8</button>
-    <button onclick="pressPin('9')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">9</button>
-    
-    <button onclick="resetPin()" style="width:70px; height:70px; background:none; border:none; color:var(--red); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">تصفير</button>
-    <button onclick="pressPin('0')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">0</button>
-    <button onclick="backspacePin()" style="width:70px; height:70px; background:none; border:none; color:var(--gold2); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">مسح</button>
-  </div>
-  
-  <div style="margin-top:28px; font-size:11px; color:rgba(255,255,255,0.4); text-align:center;">
-    يمكنك تفعيل أو تصفير كلمة السر من إعدادات القفل بالصفحة الجانبية للتطبيق الرئيسي
-  </div>
-</div>
 
 <div class="wrapper">
 
@@ -394,660 +175,47 @@
     <div class="logo-sub">السوق الذكي الجزائري الموحد</div>
   </div>
 
-  <!-- CARD -->
+  <!-- MAIN CARD -->
   <div class="card">
+    <div class="prompt-title">مرحباً بك! اختر وجهتك للدخول الآمن للمنصة:</div>
 
-    <!-- TABS -->
-    <div class="tabs" id="mainTabs">
-      <button class="tab active" onclick="switchTab('login')">تسجيل الدخول</button>
-      <button class="tab" onclick="switchTab('register')">حساب جديد</button>
-    </div>
-
-    <!-- ===== LOGIN FORM ===== -->
-    <div id="loginForm">
-
-      <div class="role-label">اختر نوع حسابك للدخول</div>
-      <div class="roles-grid">
-        <button class="role-btn selected" onclick="selectRole('customer',this)">
-          <span class="role-icon">🛍️</span>عميل
-        </button>
-        <button class="role-btn" onclick="selectRole('merchant',this)">
-          <span class="role-icon">🏪</span>تاجر
-        </button>
-        <button class="role-btn" onclick="selectRole('admin',this)">
-          <span class="role-icon">🛡️</span>إدارة
-        </button>
+    <!-- Customer portal -->
+    <a href="login-customer.html" class="portal-btn">
+      <div class="portal-icon">🛍️</div>
+      <div class="portal-info">
+        <div class="portal-name">بوابة الزبائن والعملاء</div>
+        <div class="portal-desc">تسوق السلع، تواصل مع المحلات، وتتبع شحناتك</div>
       </div>
+      <div class="arrow-indicator">◀</div>
+    </a>
 
-      <div class="admin-note" id="adminNote">
-        🛡️ هذا القسم مخصص لإدارة المنصة والمراقبين والمالكين المعتمدين والمشرفين.
+    <!-- Merchant portal -->
+    <a href="login-merchant.html" class="portal-btn">
+      <div class="portal-icon">🏪</div>
+      <div class="portal-info">
+        <div class="portal-name">بوابة التجار الشركاء</div>
+        <div class="portal-desc">إدارة المعروضات، ضبط الأسعار ومتابعة المبيعات</div>
       </div>
+      <div class="arrow-indicator">◀</div>
+    </a>
 
-      <div class="error-msg" id="loginError">
-        <span>⚠️</span><span id="loginErrorText">خطأ في البريد أو كلمة المرور</span>
+    <!-- Admin portal -->
+    <a href="login-admin.html" class="portal-btn">
+      <div class="portal-icon">🛡️</div>
+      <div class="portal-info">
+        <div class="portal-name">بوابة الإدارة العليا والرقابة</div>
+        <div class="portal-desc">المدير العام، المشرفين على الولايات، ومساعدي التسيير</div>
       </div>
-
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني للعمل</label>
-        <div class="input-wrap">
-          <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="loginEmail" placeholder="example@gmail.com" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">كلمة المرور الكودية</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" />
-          <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
-        </div>
-      </div>
-
-      <div class="forgot-link">
-        <a href="#" onclick="showForgot();return false">نسيت كلمة المرور؟</a>
-      </div>
-
-      <button class="submit-btn" id="loginBtn" onclick="doLogin()">تأكيد الدخول الآمن</button>
-
-      <div class="card-footer" style="margin-top:14px">
-        ليس لديك حساب مسجل؟ <a onclick="switchTab('register')">سجل كعضو مميز</a>
-      </div>
-    </div>
-
-    <!-- ===== REGISTER FORM ===== -->
-    <div id="registerForm" style="display:none">
-
-      <div class="role-label">نوع حسابك الجديد</div>
-      <div class="roles-grid" style="grid-template-columns:repeat(2,1fr);margin-bottom:20px">
-        <button class="role-btn selected" onclick="selectRegRole('customer',this)">
-          <span class="role-icon">🛍️</span>عميل ذكي
-        </button>
-        <button class="role-btn" onclick="selectRegRole('merchant',this)">
-          <span class="role-icon">🏪</span>تاجر شريك
-        </button>
-      </div>
-
-      <div class="error-msg" id="regError">
-        <span>⚠️</span><span id="regErrorText">حدث خطأ</span>
-      </div>
-      <div class="success-msg" id="regSuccess">
-        <span>✅</span><span id="regSuccessText">تم إنشاء وثيقة الحساب بنجاح</span>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">الاسم الكامل المميز</label>
-        <div class="input-wrap">
-          <span class="input-icon">👤</span>
-          <input class="form-input" type="text" id="regName" placeholder="مثال: حميد بومدين" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="block text-xs text-slate-300 font-bold mb-1.5" style="font-size: 12px; margin-bottom: 6px;">البريد الإلكتروني المعتمد</label>
-        <div class="input-wrap">
-          <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="regEmail" placeholder="example@gmail.com" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">رقم الهاتف الفعلي للتسجيل</label>
-        <div class="phone-wrap">
-          <div class="phone-prefix">🇩🇿 +213</div>
-          <input class="form-input" type="tel" id="regPhone" placeholder="0xxxxxxxxx" maxlength="10" />
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">كلمة مرور قوية</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="regPass" placeholder="8 أحرف كحد أدنى" />
-          <button class="eye-btn" type="button" onclick="toggleEye('regPass',this)">👁</button>
-        </div>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">تأكيد كلمة المرور المدخلة</label>
-        <div class="input-wrap">
-          <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="regPass2" placeholder="أعد كتابتها بعناية" />
-        </div>
-      </div>
-
-      <div class="reg-only" id="merchantNote" style="display:none">
-        <div style="background:rgba(37,168,96,0.08);border:1px solid rgba(37,168,96,0.2);border-radius:10px;padding:10px 14px;font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">
-          🏪 بعد إتمام حسابك كتاجر، سيتم توجيهك فوراً لتصميم وتصنيف محلك (الولاية، الألوان، إضافة السلع والتوصيل).
-        </div>
-      </div>
-
-      <div class="terms-row">
-        <input type="checkbox" class="terms-check" id="termsCheck" checked />
-        <div class="terms-text">
-          الموافقة الصريحة والكاملة على <a href="#" style="color:var(--gold);">شروط الاستخدام</a> وسياسات منصة ZaLo الذكية والمراقبة في الجزائر.
-        </div>
-      </div>
-
-      <button class="submit-btn" id="regBtn" onclick="doRegister()">إنشاء حسابي الجديد</button>
-    </div>
-
-    <!-- ===== FORGOT PASSWORD ===== -->
-    <div id="forgotForm" style="display:none">
-      <button class="back-btn" onclick="hideForgot()">← العودة للوراء</button>
-      <div style="text-align:center;margin-bottom:20px">
-        <div style="font-size:36px">🔑</div>
-        <div style="font-size:17px;font-weight:700;margin-top:8px">بوابة الاسترداد الآلية للرقم السري</div>
-        <div style="font-size:13px;color:var(--text2);margin-top:6px">
-          سنرسل لك رابط تصفير واختيار كلمة مرور جديدة إلى بريدك فوراً
-        </div>
-      </div>
-
-      <div class="success-msg" id="forgotSuccess">
-        <span>✅</span><span>رابط الاستعادة في طريقه إليك! تفقد صندوق بريدك الآن</span>
-      </div>
-      <div class="error-msg" id="forgotError">
-        <span>⚠️</span><span id="forgotErrorText">البريد المدخل غير مسجل مسبقاً</span>
-      </div>
-
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني المراد تصفيره</label>
-        <div class="input-wrap">
-          <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="forgotEmail" placeholder="example@gmail.com" />
-        </div>
-      </div>
-
-      <button class="submit-btn" id="forgotBtn" onclick="doForgot()">إرسال الرابط الآمن</button>
-    </div>
+      <div class="arrow-indicator">◀</div>
+    </a>
 
   </div>
 
-  <!-- Bottom link -->
   <div class="bottom-link">
-    <a href="index.html">← التوجه للصفحة الرئيسية الكبرى</a>
-  </div>
-
-  <div class="whatsapp-help">
-    <span>هل تواجه تعطلاً كودياً؟</span>
-    <a href="https://wa.me/213698694010" target="_blank">📞 راسلنا فوراً على واتساب</a>
+    <a href="index.html">← الرجوع للصفحة الرئيسية العامة للجزائر</a>
   </div>
 
 </div>
 
-<!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword,
-  sendPasswordResetEmail, onAuthStateChanged, updateProfile
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import {
-  getFirestore, doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSy" + "DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-  authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-  projectId: "zalo-marketplace-smart-final",
-  storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-  messagingSenderId: "393402903971",
-  appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-let currentLoginRole = 'customer';
-let currentRegRole = 'customer';
-let isSubmitting = false;
-
-onAuthStateChanged(auth, async (user) => {
-  if (!user) return;
-  if (isSubmitting) return; // Prevent race redirection during active log in / register
-
-  // Always force manager email to admin dashboard
-  if (user.email === "hadi47hadi58@gmail.com") {
-    window.location.href = 'admin.html';
-    return;
-  }
-
-  try {
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    if (userDoc.exists()) {
-      const userData = userDoc.data();
-      if (userData.role === 'admin') {
-        window.location.href = 'admin.html';
-        return;
-      } else if (userData.role === 'merchant') {
-        window.location.href = 'dashboard.html';
-        return;
-      } else if (userData.role === 'customer') {
-        window.location.href = 'index.html';
-        return;
-      }
-    }
-
-    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-    if (adminDoc.exists()) {
-      const dataDoc = adminDoc.data();
-      if (dataDoc.role === 'super_admin' || dataDoc.role === 'admin' || dataDoc.role === 'support') {
-        window.location.href = 'admin.html';
-        return;
-      }
-    }
-    const shopDoc = await getDoc(doc(db, 'shops', user.uid));
-    if (shopDoc.exists()) {
-      window.location.href = 'dashboard.html';
-      return;
-    }
-    
-    redirectByRole(currentLoginRole);
-  } catch(e) {
-    redirectByRole(currentLoginRole);
-  }
-});
-
-function redirectByRole(role) {
-  if (role === 'admin') { window.location.href = 'admin.html'; return; }
-  if (role === 'merchant') { window.location.href = 'dashboard.html'; return; }
-  window.location.href = 'index.html';
-}
-
-window.doLogin = async function() {
-  const email = document.getElementById('loginEmail').value.trim();
-  const pass = document.getElementById('loginPass').value;
-  hideLoginError();
-
-  if (!email) { showLoginError('⚠️ يرجى تعيين البريد الإلكتروني للتأمين'); return; }
-  if (!pass) { showLoginError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
-
-  // Restrict admin role to the manager email address only
-  if (currentLoginRole === 'admin' && email !== 'hadi47hadi58@gmail.com') {
-    showLoginError('⚠️ هذا البريد الإلكتروني غير مصرح له بالدخول كمدير!');
-    return;
-  }
-
-  setLoading('loginBtn', true);
-  try {
-    isSubmitting = true;
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    const user = cred.user;
-
-    // Explicitly handle redirects directly on login success
-    if (user.email === "hadi47hadi58@gmail.com") {
-      window.location.href = 'admin.html';
-      return;
-    }
-
-    try {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists()) {
-        redirectByRole(userDoc.data().role);
-        return;
-      }
-      
-      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-      if (adminDoc.exists()) {
-        const dataDoc = adminDoc.data();
-        if (dataDoc.role === 'super_admin' || dataDoc.role === 'admin' || dataDoc.role === 'support') {
-          window.location.href = 'admin.html';
-          return;
-        }
-      }
-      
-      const shopDoc = await getDoc(doc(db, 'shops', user.uid));
-      if (shopDoc.exists()) {
-        window.location.href = 'dashboard.html';
-        return;
-      }
-    } catch(err) {
-      console.error("Firestore error on logging in: ", err);
-    }
-
-    redirectByRole(currentLoginRole);
-
-  } catch(e) {
-    isSubmitting = false;
-    setLoading('loginBtn', false);
-
-    // Self-healing check for approved/pending merchant registrants
-    if (currentLoginRole === 'merchant') {
-      try {
-        const q = query(collection(db, 'merchant_requests'), where('email', '==', email));
-        const qSnap = await getDocs(q);
-        if (!qSnap.empty) {
-          const reqDoc = qSnap.docs[0];
-          const reqData = reqDoc.data();
-          const reqStatus = reqData.status;
-
-          if (reqStatus === 'approved') {
-            try {
-              isSubmitting = true;
-              setLoading('loginBtn', true);
-              const cred = await createUserWithEmailAndPassword(auth, email, pass);
-              const user = cred.user;
-
-              // 1. users doc:
-              await setDoc(doc(db, 'users', user.uid), {
-                uid: user.uid,
-                displayName: reqData.ownerName || reqData.storeName || email.split('@')[0],
-                email: email,
-                phone: reqData.phone || '',
-                role: 'merchant',
-                status: 'active',
-                createdAt: serverTimestamp()
-              });
-
-              // 2. shops doc under their real user.uid:
-              await setDoc(doc(db, 'shops', user.uid), {
-                storeName: reqData.storeName || '',
-                ownerName: reqData.ownerName || '',
-                email: email,
-                phone: reqData.phone || '',
-                whatsapp: reqData.whatsapp || reqData.phone || '',
-                wilaya: reqData.wilaya || '',
-                commune: reqData.commune || '',
-                address: reqData.address || '',
-                category: reqData.category || '',
-                workHours: reqData.workHours || '',
-                description: reqData.description || '',
-                rcNumber: reqData.rcNumber || '',
-                storeType: reqData.storeType || 'registered',
-                logoURL: reqData.logoURL || '',
-                facebookURL: reqData.facebook || reqData.facebookURL || '',
-                instagramURL: reqData.instagram || reqData.instagramURL || '',
-                tiktokURL: reqData.tiktokURL || '',
-                telegramURL: reqData.telegramURL || '',
-                status: 'active',
-                subscription: 'basic',
-                createdAt: serverTimestamp()
-              });
-
-              isSubmitting = false;
-              setLoading('loginBtn', false);
-              window.location.href = 'dashboard.html';
-              return;
-            } catch(signUpError) {
-              isSubmitting = false;
-              setLoading('loginBtn', false);
-              console.error("Auto merchant sign-up failed: ", signUpError);
-              if (signUpError.code === 'auth/email-already-in-use') {
-                showLoginError('⚠️ الحساب موجود بالفعل، كود المرور المدخل غير صحيح!');
-              } else {
-                showLoginError('⚠️ فشل تسجيل الدخول أو تهيئة الحساب التلقائي: ' + signUpError.message);
-              }
-              return;
-            }
-          } else {
-            isSubmitting = false;
-            setLoading('loginBtn', false);
-            showLoginError(`⏳ طلب متجرك قيد المراجعة والتدقيق الأمني حالياً. رقم المعاملة: ${reqData.regNumber || 'مستمر'}. يرجى الانتظار لحين قبول الملف وتفعيله من قِبل الإدارة لمقاطعة.`);
-            return;
-          }
-        }
-      } catch(dbErr) {
-        isSubmitting = false;
-        setLoading('loginBtn', false);
-        console.error("Firestore self-healing request check failed: ", dbErr);
-      }
-    }
-    
-    // Developer offline local fallback check for the exact admin
-    if (email === "hadi47hadi58@gmail.com" && pass === "123456") {
-      window.location.href = 'admin.html';
-      return;
-    }
-
-    console.error("Login verification error: ", e);
-    
-    let errMsg = '⚠️ البريد الإلكتروني أو كود المرور غير صحيح!';
-    if (e.code === 'auth/invalid-email') {
-      errMsg = '⚠️ صيغة البريد الإلكتروني المدخلة غير صالحة!';
-    } else if (e.code === 'auth/user-not-found') {
-      errMsg = '⚠️ البريد الإلكتروني المدخل غير مسجل لدينا!';
-    } else if (e.code === 'auth/wrong-password') {
-      errMsg = '⚠️ كود المرور المدخل غير صحيح!';
-    } else if (e.code === 'auth/too-many-requests') {
-      errMsg = '⚠️ تم حظر المحاولات مؤقتاً لكثرة الطلبات الفاشلة، يرجى المحاولة لاحقاً!';
-    }
-    showLoginError(errMsg);
-  }
-};
-
-window.doRegister = async function() {
-  const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
-  const phone = document.getElementById('regPhone').value.trim();
-  const pass = document.getElementById('regPass').value;
-  const pass2 = document.getElementById('regPass2').value;
-  const terms = document.getElementById('termsCheck').checked;
-
-  hideRegError();
-  document.getElementById('regSuccess').classList.remove('show');
-
-  if (!name) { showRegError('⚠️ يرجى إدخال اسمك الكامل للاعتماد'); return; }
-  if (!email) { showRegError('⚠️ بريدك الإلكتروني مطلوب للتسليم والتقارير'); return; }
-  if (!phone || phone.length < 9) { showRegError('⚠️ رقم هاتف التوزيع أو المتجر غير صالح'); return; }
-  if (pass.length < 6) { showRegError('⚠️ كود المرور يجب أن لا يقل عن 6 أحرف'); return; }
-  if (pass !== pass2) { showRegError('⚠️ كلمتا المرور المدخلتان غير متطابقتين'); return; }
-  if (!terms) { showRegError('⚠️ يجب إعلان الموافقة على رخصة النشاط والاستخدام'); return; }
-
-  setLoading('regBtn', true);
-  try {
-    isSubmitting = true;
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    await updateProfile(cred.user, { displayName: name });
-
-    await setDoc(doc(db, 'users', cred.user.uid), {
-      uid: cred.user.uid,
-      displayName: name,
-      email,
-      phone,
-      role: currentRegRole,
-      createdAt: serverTimestamp(),
-      wilaya: '',
-      status: 'active'
-    });
-
-    if(currentRegRole==='merchant'){
-       await setDoc(doc(db, 'shops', cred.user.uid), {
-          storeName: name + " لتجارة التجزئة",
-          wilaya: "16 الجزائر",
-          category: "هواتف وإلكترونيات",
-          whatsapp: phone,
-          logoUrl: "",
-          facebookURL: "",
-          instagramURL: "",
-          tiktokURL: "",
-          telegramURL: "",
-          status: "active",
-          subscription: "basic",
-          createdAt: serverTimestamp()
-       });
-    }
-
-    document.getElementById('regSuccessText').textContent = '✅ تم إنشاء وتأمين وثائق حسابك بنجاح تام!';
-    document.getElementById('regSuccess').classList.add('show');
-
-    setTimeout(() => {
-      if (currentRegRole === 'merchant') {
-        window.location.href = 'dashboard.html';
-      } else {
-        window.location.href = 'index.html';
-      }
-    }, 1500);
-
-  } catch(e) {
-    isSubmitting = false;
-    setLoading('regBtn', false);
-    console.error("Registration error: ", e);
-    
-    let errMsg = '⚠️ تعذر تسجيل الحساب! يرجى التحقق من المدخلات والمحاولة مجدداً.';
-    if (e.code === 'auth/email-already-in-use') {
-      errMsg = '⚠️ البريد الإلكتروني مستخدم بالفعل مسجلاً بحساب آخر!';
-    } else if (e.code === 'auth/invalid-email') {
-      errMsg = '⚠️ صيغة البريد الإلكتروني المدخلة غير صحيحة!';
-    } else if (e.code === 'auth/weak-password') {
-      errMsg = '⚠️ كلمة المرور ضعيفة جداً! يجب أن لا تقل عن 6 أحرف.';
-    }
-    showRegError(errMsg);
-  }
-};
-
-window.doForgot = async function() {
-  const email = document.getElementById('forgotEmail').value.trim();
-  document.getElementById('forgotError').classList.remove('show');
-  document.getElementById('forgotSuccess').classList.remove('show');
-
-  if (!email) {
-    document.getElementById('forgotErrorText').textContent = '⚠️ البريد الإلكتروني الخاص بك مطلوب للاستعادة';
-    document.getElementById('forgotError').classList.add('show');
-    return;
-  }
-
-  setLoading('forgotBtn', true);
-  try {
-    await sendPasswordResetEmail(auth, email);
-    document.getElementById('forgotSuccess').classList.add('show');
-    setLoading('forgotBtn', false);
-  } catch(e) {
-    document.getElementById('forgotSuccess').classList.add('show');
-    setLoading('forgotBtn', false);
-  }
-};
-
-window.selectRole = function(role, btn) {
-  currentLoginRole = role;
-  document.querySelectorAll('#loginForm .role-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  const note = document.getElementById('adminNote');
-  note.classList.toggle('show', role === 'admin');
-  hideLoginError();
-};
-
-window.selectRegRole = function(role, btn) {
-  currentRegRole = role;
-  document.querySelectorAll('#registerForm .role-btn').forEach(b => b.classList.remove('selected'));
-  btn.classList.add('selected');
-  const merchantNote = document.getElementById('merchantNote');
-  if (merchantNote) merchantNote.style.display = role === 'merchant' ? 'block' : 'none';
-};
-
-window.switchTab = function(tab) {
-  const isLogin = tab === 'login';
-  document.getElementById('loginForm').style.display = isLogin ? 'block' : 'none';
-  document.getElementById('registerForm').style.display = isLogin ? 'none' : 'block';
-  document.getElementById('forgotForm').style.display = 'none';
-  document.querySelectorAll('#mainTabs .tab').forEach((t,i) => {
-    t.classList.toggle('active', isLogin ? i===0 : i===1);
-  });
-  hideLoginError(); hideRegError();
-};
-
-window.showForgot = function() {
-  document.getElementById('loginForm').style.display = 'none';
-  document.getElementById('forgotForm').style.display = 'block';
-  document.getElementById('mainTabs').style.display = 'none';
-};
-window.hideForgot = function() {
-  document.getElementById('loginForm').style.display = 'block';
-  document.getElementById('forgotForm').style.display = 'none';
-  document.getElementById('mainTabs').style.display = 'flex';
-};
-
-window.toggleEye = function(inputId, btn) {
-  const input = document.getElementById(inputId);
-  const isPass = input.type === 'password';
-  input.type = isPass ? 'text' : 'password';
-  btn.textContent = isPass ? '🙈' : '👁';
-};
-
-function showLoginError(msg) {
-  document.getElementById('loginErrorText').textContent = msg;
-  document.getElementById('loginError').classList.add('show');
-}
-function hideLoginError() { document.getElementById('loginError').classList.remove('show'); }
-
-function showRegError(msg) {
-  document.getElementById('regErrorText').textContent = msg;
-  document.getElementById('regError').classList.add('show');
-}
-function hideRegError() { document.getElementById('regError').classList.remove('show'); }
-
-function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if (loading) btn.classList.add('loading');
-  else btn.classList.remove('loading');
-}
-
-// Pin code control for login page
-let enteredPin = "";
-function initSecurityLock() {
-  const isEnabled = localStorage.getItem('zalo_lock_enabled') === 'true';
-  const savedPin = localStorage.getItem('zalo_pin') || "1234";
-  localStorage.setItem('zalo_pin', savedPin);
-  
-  if (isEnabled) {
-    document.getElementById('passcode-screen').style.display = 'flex';
-  } else {
-    document.getElementById('passcode-screen').style.display = 'none';
-  }
-}
-
-function updatePinDots() {
-  const dots = document.querySelectorAll('#pin-dots > div');
-  dots.forEach((dot, idx) => {
-    if (idx < enteredPin.length) {
-      dot.style.background = 'var(--gold2)';
-      dot.style.borderColor = 'var(--gold2)';
-      dot.style.transform = 'scale(1.25)';
-    } else {
-      dot.style.background = 'transparent';
-      dot.style.borderColor = '#ccc';
-      dot.style.transform = 'scale(1)';
-    }
-  });
-}
-
-window.pressPin = function(num) {
-  if (enteredPin.length >= 4) return;
-  enteredPin += num;
-  updatePinDots();
-  if (enteredPin.length === 4) {
-    setTimeout(verifyPin, 150);
-  }
-};
-
-function verifyPin() {
-  const correctPin = localStorage.getItem('zalo_pin') || "1234";
-  if (enteredPin === correctPin) {
-    document.getElementById('passcode-screen').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('passcode-screen').style.display = 'none';
-    }, 300);
-  } else {
-    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
-    enteredPin = "";
-    updatePinDots();
-  }
-}
-
-window.resetPin = function() {
-  enteredPin = "";
-  updatePinDots();
-}
-
-window.backspacePin = function() {
-  if (enteredPin.length > 0) {
-    enteredPin = enteredPin.slice(0, -1);
-    updatePinDots();
-  }
-}
-
-// Invoke on startup
-initSecurityLock();
-</script>
 </body>
 </html>

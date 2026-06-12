@@ -559,7 +559,7 @@
   <div class="page page-fade" id="page-products">
     <div class="sec-head">
       <div class="sec-title">📦 إدارة وجرد سلعي</div>
-      <button class="btn btn-g" onclick="goPage('add-product')">➕ عرض سلعة جديدة </button>
+      <button class="btn btn-g" onclick="goPage('add-product')">➕ عرض سلعة جديدة</button>
     </div>
     <div class="products-grid" id="productsGrid">
       <div class="ldg" style="grid-column:1/-1"><div class="spin"></div></div>
@@ -761,7 +761,7 @@ let allProducts = [];
 let allOrders = [];
 
 onAuthStateChanged(auth, async (user) => {
-  if (!user) { window.location.href = 'login.html'; return; }
+  if (!user) { window.location.href = 'login-merchant.html'; return; }
 
   shopId = user.uid;
   try {
@@ -859,7 +859,7 @@ function renderHomeProducts(prods) {
 }
 
 window.deleteProd = async function(id) {
-  if(!confirm('هل تود حذف هذا...؟')) return;
+  if(!confirm('هل تود حذف هذا المنتج نهائياً من العرض والطلب بالسوق؟')) return;
   try {
     await updateDoc(doc(db, 'products', id), { deleted: true });
   } catch(e){}
@@ -1079,7 +1079,7 @@ window.saveProfile = async function() {
 
 window.doLogout = async function() {
   await signOut(auth);
-  window.location.href = 'login.html';
+  window.location.href = 'login-merchant.html';
 };
 
 window.loadAnalytics = function() {

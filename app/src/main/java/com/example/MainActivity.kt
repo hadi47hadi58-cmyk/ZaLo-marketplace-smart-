@@ -45,8 +45,7 @@ fun PureWebContainerScreen() {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF0B1528)) // Base background color matching the ZaLo theme
-            .statusBarsPadding()
+            .background(Color(0xFF080E0A)) // Matches ZaLo rich deep dark background #080e0a
     ) {
         AndroidView(
             modifier = Modifier.fillMaxSize(),
