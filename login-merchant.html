@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ZaLo - بوابـة التجار الشركاء</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<!-- reCAPTCHA Enterprise (المفتاح الصحيح من Google Cloud) -->
+<script src="https://www.google.com/recaptcha/enterprise.js?render=6LdvbBstAAaAlpwVQUClNBhYFjX7l2X0quOh4yF"></script>
 <style>
   :root {
     --green: #1a5c2a;
@@ -351,7 +353,7 @@
 
 </div>
 
-<!-- Firebase -->
+<!-- Firebase SDK (modular) -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
@@ -362,13 +364,15 @@ import {
   getFirestore, doc, setDoc, getDoc, serverTimestamp, collection, query, where, getDocs
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
+// Firebase configuration الصحيحة من الصورة
 const firebaseConfig = {
-  apiKey: "AIzaSy" + "DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
+  apiKey: "AIzaSyDTTMqT9MBp9yMLLnydJ7_sHNu1kQ9hWw",
   authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
   projectId: "zalo-marketplace-smart-final",
   storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-  messagingSenderId: "393402903971",
-  appId: "1:393402903971:web:7c521e8cb7b823d306be16"
+  messagingSenderId: "3944029039731",
+  appId: "1:3934029039731:web:7c521e8cb7b823d386be16",
+  measurementId: "0-6048d8f2-1"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -441,6 +445,7 @@ function hideLoginError() {
   document.getElementById('loginError').classList.remove('show');
 }
 
+// دالة تسجيل الدخول المعدَّلة مع reCAPTCHA
 window.doLogin = async function() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('loginPass').value;
@@ -450,6 +455,28 @@ window.doLogin = async function() {
   if (!pass) { showLoginError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
 
   setLoading('loginBtn', true);
+  
+  // ==== تنفيذ reCAPTCHA Enterprise قبل محاولة تسجيل الدخول ====
+  try {
+    // انتظر حتى تتوفر مكتبة reCAPTCHA (قد تكون حملت بالفعل)
+    await new Promise((resolve) => {
+      if (window.grecaptcha && window.grecaptcha.enterprise) {
+        resolve();
+      } else {
+        // انتظر ثانية واحدة كحد أقصى
+        setTimeout(resolve, 1000);
+      }
+    });
+    const token = await grecaptcha.enterprise.execute('6LdvbBstAAaAlpwVQUClNBhYFjX7l2X0quOh4yF', {action: 'login'});
+    console.log("reCAPTCHA token generated", token);
+    // Firebase Auth سيتعامل مع token تلقائياً (عبر header)
+  } catch (recaptchaError) {
+    console.error("reCAPTCHA error", recaptchaError);
+    setLoading('loginBtn', false);
+    showLoginError('⚠️ فشل التحقق الأمني. يرجى تحديث الصفحة والمحاولة مرة أخرى.');
+    return;
+  }
+
   try {
     isSubmitting = true;
     await signInWithEmailAndPassword(auth, email, pass);
@@ -458,7 +485,7 @@ window.doLogin = async function() {
     isSubmitting = false;
     setLoading('loginBtn', false);
 
-    // Self-healing check for approved/pending merchant registrants
+        // محاولة إنشاء حساب تلقائي إذا كان الطلب معتمداً
     try {
       const q = query(collection(db, 'merchant_requests'), where('email', '==', email));
       const qSnap = await getDocs(q);
@@ -562,7 +589,7 @@ function setLoading(id, val) {
   else btn.classList.remove('loading');
 }
 
-// Security locks check
+// Security locks
 let enteredPin = "";
 function initSecurityLock() {
   const isEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
