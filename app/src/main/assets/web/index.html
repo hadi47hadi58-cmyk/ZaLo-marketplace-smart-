@@ -771,7 +771,7 @@ window.saveOrder=async(data)=>{
 
 window.submitMerchant=async()=>{
   const fv=id=>document.getElementById(id)?.value?.trim()||'';
-  const sname=fv('r-sname'),oname=fv('r-oname'),email=fv('r-email'),pass=document.getElementById('r-pass').value,phone=fv('r-phone'),wa=fv('r-wa'),wil=fv('r-wil'),comm=fv('r-comm'),addr=fv('r-addr'),cat=fv('r-cat'),hours=fv('r-hours'),desc=fv('r-desc'),rcnum=fv('r-rcnum'),fb=fv('r-fb'),ig=fv('r-ig'),tiktok=fv('r-tiktok'),tg=fv('r-tg');
+  const sname=fv('r-sname'),oname=fv('r-oname'),email=fv('r-email').toLowerCase(),pass=document.getElementById('r-pass').value,phone=fv('r-phone'),wa=fv('r-wa'),wil=fv('r-wil'),comm=fv('r-comm'),addr=fv('r-addr'),cat=fv('r-cat'),hours=fv('r-hours'),desc=fv('r-desc'),rcnum=fv('r-rcnum'),fb=fv('r-fb'),ig=fv('r-ig'),tiktok=fv('r-tiktok'),tg=fv('r-tg');
   if(!sname||!oname||!email||!pass||!phone||!wa||!wil||!comm||!addr||!cat||!hours||!desc){toast('⚠️ الرجاء إكمال جميع الخانات الإجبارية أولاً','err');return;}
   if(pass.length < 6){toast('⚠️ يرجى اختيار كلمة مرور تفوق 5 أحرف لتأمين الأرباح','err');return;}
   

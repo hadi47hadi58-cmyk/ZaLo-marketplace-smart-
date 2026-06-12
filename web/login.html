@@ -894,7 +894,7 @@ function redirectByRole(role) {
 }
 
 window.doLogin = async function() {
-  const email = document.getElementById('loginEmail').value.trim();
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('loginPass').value;
   hideLoginError();
 
@@ -1042,7 +1042,7 @@ window.doLogin = async function() {
 
 window.doRegister = async function() {
   const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim();
+  const email = document.getElementById('regEmail').value.trim().toLowerCase();
   const phone = document.getElementById('regPhone').value.trim();
   const pass = document.getElementById('regPass').value;
   const pass2 = document.getElementById('regPass2').value;

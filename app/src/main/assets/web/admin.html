@@ -235,7 +235,13 @@
 
   .table-wrap {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; overflow: hidden;
+    border-radius: 14px; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  @media (max-width: 480px) {
+    .stats-grid { grid-template-columns: 1fr; }
+    .topbar-title { font-size: 15px; }
+    .topbar-search { max-width: 140px; }
   }
   table { width: 100%; border-collapse: collapse; }
   thead tr { background: var(--bg3); }
@@ -972,37 +978,39 @@ window.loadDashboard = async function() {
   const db = window._db;
 
   try {
-    // Fetch real or seeded shops
+    // Fetch real shops
     const sSnap = await fu.getDocs(fu.collection(db, 'shops'));
     const shops = sSnap.docs.map(d => ({id:d.id, ...d.data()}));
-    document.getElementById('statMerchants').textContent = shops.length > 0 ? shops.length : "12";
+    document.getElementById('statMerchants').textContent = shops.length;
 
     // Requests
     const rSnap = await fu.getDocs(fu.collection(db, 'merchant_requests'));
     const requests = rSnap.docs.map(d => ({id:d.id, ...d.data()}));
     const pendingReqs = requests.filter(r => r.status === 'pending');
-    document.getElementById('statPending').textContent = pendingReqs.length > 0 ? pendingReqs.length : "3";
-    document.getElementById('pendingBadge').textContent = pendingReqs.length > 0 ? pendingReqs.length : "3";
+    document.getElementById('statPending').textContent = pendingReqs.length;
+    document.getElementById('pendingBadge').textContent = pendingReqs.length;
 
     // Products
     const pSnap = await fu.getDocs(fu.collection(db, 'products'));
-    document.getElementById('statProducts').textContent = pSnap.size > 0 ? pSnap.size : "85";
+    const products = pSnap.docs.map(d=>({id:d.id,...d.data()}));
+    document.getElementById('statProducts').textContent = products.length;
 
     // Users / Customers
     const uSnap = await fu.getDocs(fu.collection(db, 'users'));
-    document.getElementById('statUsers').textContent = uSnap.size > 0 ? uSnap.size : "156";
+    const users = uSnap.docs.map(d=>({id:d.id,...d.data()}));
+    document.getElementById('statUsers').textContent = users.length;
 
-    // Render components
-    window._allMerchants = shops.length > 0 ? shops : getSampleMerchants();
-    window._allRequests = requests.length > 0 ? requests : getSampleRequests();
-    window._allProducts = pSnap.size > 0 ? pSnap.docs.map(d=>({id:d.id,...d.data()})) : getSampleProducts();
-    window._allUsers = uSnap.size > 0 ? uSnap.docs.map(d=>({id:d.id,...d.data()})) : getSampleUsers();
+    // Render components (completely real!)
+    window._allMerchants = shops;
+    window._allRequests = requests;
+    window._allProducts = products;
+    window._allUsers = users;
 
     try{
       const ordSnap=await fu.getDocs(fu.collection(db,'orders'));
       window._allOrders = ordSnap.docs.map(d=>({id:d.id,...d.data()}));
     } catch(err){
-      window._allOrders = getSampleOrders();
+      window._allOrders = [];
     }
 
     renderWilayaChart(window._allMerchants);
@@ -1010,22 +1018,24 @@ window.loadDashboard = async function() {
     renderActivityLog(window._allRequests, window._allMerchants);
 
   } catch(e) {
+    console.error("Firestore loading error: ", e);
     loadMockDashboard();
   }
 };
 
 function loadMockDashboard() {
-  window._allRequests = getSampleRequests();
-  window._allMerchants = getSampleMerchants();
-  window._allProducts = getSampleProducts();
-  window._allUsers = getSampleUsers();
-  window._allOrders = getSampleOrders();
+  // Clear any mock placeholders to respect user wish "لا أريد ارقام او احصائيات وهمية"
+  window._allRequests = [];
+  window._allMerchants = [];
+  window._allProducts = [];
+  window._allUsers = [];
+  window._allOrders = [];
 
-  document.getElementById('statMerchants').textContent = window._allMerchants.length;
-  document.getElementById('statPending').textContent = window._allRequests.filter(r=>r.status==='pending').length;
-  document.getElementById('pendingBadge').textContent = window._allRequests.filter(r=>r.status==='pending').length;
-  document.getElementById('statProducts').textContent = window._allProducts.length;
-  document.getElementById('statUsers').textContent = window._allUsers.length;
+  document.getElementById('statMerchants').textContent = "0";
+  document.getElementById('statPending').textContent = "0";
+  document.getElementById('pendingBadge').textContent = "0";
+  document.getElementById('statProducts').textContent = "0";
+  document.getElementById('statUsers').textContent = "0";
 
   renderWilayaChart(window._allMerchants);
   renderRecentRequests(window._allRequests);
@@ -1324,7 +1334,7 @@ window.loadWilayas = function() {
   const defaults = ['16 الجزائر','31 وهران','25 قسنطينة','23 عنابة','19 سطيف','06 بجاية','07 بسكرة','13 تلمسان','05 باتنة'];
   document.getElementById('wilayasGrid').innerHTML = defaults.map(w => `
     <div class="wilaya-chip">
-      <div class="wc-count">${counts[w] || 1}</div>
+      <div class="wc-count">${counts[w] || 0}</div>
       <div class="wc-name">${w}</div>
     </div>
   `).join('');
