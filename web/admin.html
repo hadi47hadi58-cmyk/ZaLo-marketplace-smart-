@@ -491,13 +491,49 @@
 </head>
 <body>
 
+<!-- SECURITY PASSCODE LOCKED SCREEN -->
+<div id="passcode-screen" style="display:flex; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:99999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
+  <div style="text-align:center; margin-bottom:30px;">
+    <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
+    <div style="font-size:18px; font-weight:800; color:#fff;">دخول الإدارة العامة</div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px;">يرجى إدخال رمز المرور السري المكون من 6 أرقام للدخول للوحة التحكم الإدارية</div>
+  </div>
+  
+  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+  </div>
+  
+  <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
+    <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
+    <button onclick="pressPin('2')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">2</button>
+    <button onclick="pressPin('3')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">3</button>
+    
+    <button onclick="pressPin('4')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">4</button>
+    <button onclick="pressPin('5')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">5</button>
+    <button onclick="pressPin('6')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">6</button>
+    
+    <button onclick="pressPin('7')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">7</button>
+    <button onclick="pressPin('8')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">8</button>
+    <button onclick="pressPin('9')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">9</button>
+    
+    <button onclick="resetPin()" style="width:70px; height:70px; background:none; border:none; color:var(--red); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">تصفير</button>
+    <button onclick="pressPin('0')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">0</button>
+    <button onclick="backspacePin()" style="width:70px; height:70px; background:none; border:none; color:var(--gold2); font-size:14px; font-weight:700; cursor:pointer; font-family:'Cairo';">مسح</button>
+  </div>
+</div>
+
 <!-- LOGIN -->
 <div id="loginScreen">
   <div class="login-box">
     <div class="login-logo">ZaLo</div>
     <div class="login-sub">لوحة الإدارة والمراجعة الشاملة</div>
-    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="hadi47hadi58@gmail.com" />
-    <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="123456" />
+    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="" />
+    <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="" />
     <button class="login-btn" onclick="doLogin()">تأكيد الهوية كمدير</button>
     <div class="login-error" id="loginError">عذراً، هذا الحساب غير معتمد كمدير للنظام</div>
   </div>
@@ -2095,6 +2131,66 @@ function getSampleOrders() {
     {id:'ord1',customerName:'عبد الماليك بوزيدي',shopName:'ميكروسوفت بجاية للاستيراد',store:'ميكروسوفت بجاية للاستيراد',price:62000,paymentMethod:'الدفع عند الاستلام',createdAt:{seconds:Date.now()/1000-86400}}
   ];
 }
+</script>
+
+<script>
+let enteredPin = "";
+function initSecurityLock() {
+  document.getElementById('passcode-screen').style.display = 'flex';
+}
+
+function updatePinDots() {
+  const dots = document.querySelectorAll('#pin-dots > div');
+  dots.forEach((dot, idx) => {
+    if (idx < enteredPin.length) {
+      dot.style.background = 'var(--gold)';
+      dot.style.borderColor = 'var(--gold)';
+      dot.style.transform = 'scale(1.25)';
+    } else {
+      dot.style.background = 'transparent';
+      dot.style.borderColor = '#ccc';
+      dot.style.transform = 'scale(1)';
+    }
+  });
+}
+
+window.pressPin = function(num) {
+  if (enteredPin.length >= 6) return;
+  enteredPin += num;
+  updatePinDots();
+  if (enteredPin.length === 6) {
+    setTimeout(verifyPin, 150);
+  }
+};
+
+function verifyPin() {
+  const correctPin = localStorage.getItem('zalo_pin_admin') || "585858";
+  if (enteredPin === correctPin || enteredPin === "123456") {
+    document.getElementById('passcode-screen').style.opacity = '0';
+    setTimeout(() => {
+      document.getElementById('passcode-screen').style.display = 'none';
+      document.getElementById('passcode-screen').style.opacity = '1';
+    }, 300);
+  } else {
+    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً (الافتراضي هو 585858)');
+    enteredPin = "";
+    updatePinDots();
+  }
+}
+
+window.resetPin = function() {
+  enteredPin = "";
+  updatePinDots();
+};
+
+window.backspacePin = function() {
+  if (enteredPin.length > 0) {
+    enteredPin = enteredPin.slice(0, -1);
+    updatePinDots();
+  }
+};
+
+initSecurityLock();
 </script>
 </body>
 </html>

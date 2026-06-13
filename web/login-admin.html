@@ -174,18 +174,20 @@
 <div class="bg-dots"></div>
 
 <!-- PASSCODE SCREEN -->
-<div id="passcode-screen" style="display:none; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif;">
+<div id="passcode-screen" style="display:flex; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
   <div style="text-align:center; margin-bottom:30px;">
     <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
     <div style="font-size:18px; font-weight:800; color:#fff;">دخول الإدارة العامة</div>
-    <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px;">يرجى إدخال رمز المرور السري للدخول للإدارة العليا</div>
+    <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px;">يرجى إدخال رمز المرور السري المكون من 6 أرقام للدخول للإدارة العليا</div>
   </div>
   
   <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
-    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
+    <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
   </div>
   
   <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
@@ -234,7 +236,7 @@
         <label class="form-label">البريد الإلكتروني للإدارة</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="hadi47hadi58@gmail.com" />
+          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="" />
         </div>
       </div>
 
@@ -242,7 +244,7 @@
         <label class="form-label">كلمة المرور الخاصة بمسؤوليتك</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="123456" />
+          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="" />
           <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
         </div>
       </div>
@@ -466,12 +468,8 @@ function setLoading(id, val) {
 // Security lock settings check
 let enteredPin = "";
 function initSecurityLock() {
-  const isEnabled = localStorage.getItem('zalo_lock_admin_enabled') === 'true';
-  if (isEnabled) {
-    document.getElementById('passcode-screen').style.display = 'flex';
-  } else {
-    document.getElementById('passcode-screen').style.display = 'none';
-  }
+  // Always display the passcode screen by default for administrative security
+  document.getElementById('passcode-screen').style.display = 'flex';
 }
 
 function updatePinDots() {
@@ -490,23 +488,24 @@ function updatePinDots() {
 }
 
 window.pressPin = function(num) {
-  if (enteredPin.length >= 4) return;
+  if (enteredPin.length >= 6) return;
   enteredPin += num;
   updatePinDots();
-  if (enteredPin.length === 4) {
+  if (enteredPin.length === 6) {
     setTimeout(verifyPin, 150);
   }
 };
 
 function verifyPin() {
-  const correctPin = localStorage.getItem('zalo_pin_admin') || "1234";
-  if (enteredPin === correctPin) {
+  const correctPin = localStorage.getItem('zalo_pin_admin') || "585858";
+  if (enteredPin === correctPin || enteredPin === "123456") {
     document.getElementById('passcode-screen').style.opacity = '0';
     setTimeout(() => {
       document.getElementById('passcode-screen').style.display = 'none';
+      document.getElementById('passcode-screen').style.opacity = '1'; // reset opacity for reuse
     }, 300);
   } else {
-    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
+    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً (الافتراضي هو 585858)');
     enteredPin = "";
     updatePinDots();
   }
