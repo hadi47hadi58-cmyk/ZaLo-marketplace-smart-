@@ -726,13 +726,17 @@ window.loadProducts=async(sid)=>{
     const snap=await getDocs(query(collection(db,'products'),where('storeId','==',sid)));
     if(snap.empty){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">📦</div><p>لا توجد منتجات معروضة للبيع حالياً</p></div>';return;}
     grid.innerHTML='';
+    let count = 0;
     snap.forEach(d=>{
       const p=d.data();
-      grid.innerHTML+=`<div class="pcard" onclick="openProd('${d.id}','${(p.name||'').replace(/'/g,"\'")}',${p.price||0},'${p.image||''}','${p.emoji||'📦'}')">
-        <div class="pcard-img">${p.image?`<img src="${p.image}" alt="">`:`<span>${p.emoji||'📦'}</span>`}</div>
+      if(p.deleted === true || p.status === 'deleted') return;
+      count++;
+      grid.innerHTML+=`<div class="pcard" onclick="openProd('${d.id}','${(p.name||'').replace(/'/g,"\'")}',${p.price||0},'${p.image||p.imageURL||''}','${p.emoji||'📦'}')">
+        <div class="pcard-img">${(p.image||p.imageURL)?`<img src="${p.image||p.imageURL}" alt="">`:`<span>${p.emoji||'📦'}</span>`}</div>
         <div class="pcard-body"><div class="pcard-name">${p.name||''}</div><div class="pcard-price">${(p.price||0).toLocaleString()} <span>دج</span></div></div>
       </div>`;
     });
+    if(count === 0){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">📦</div><p>لا توجد منتجات معروضة للبيع حالياً</p></div>';}
   }catch(e){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">⚠️</div><p>خطأ في استيراد المنتجات</p></div>';}
 };
 
@@ -743,13 +747,17 @@ window.loadAllProds=async()=>{
     const snap=await getDocs(collection(db,'products'));
     if(snap.empty){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">📦</div><p>لا توجد منتجات عامة معروضة بعد</p></div>';return;}
     grid.innerHTML='';
+    let count = 0;
     snap.forEach(d=>{
       const p=d.data();
-      grid.innerHTML+=`<div class="pcard" onclick="openProd('${d.id}','${(p.name||'').replace(/'/g,"\'")}',${p.price||0},'${p.image||''}','${p.emoji||'📦'}')">
-        <div class="pcard-img">${p.image?`<img src="${p.image}" alt="">`:`<span>${p.emoji||'📦'}</span>`}</div>
+      if(p.deleted === true || p.status === 'deleted') return;
+      count++;
+      grid.innerHTML+=`<div class="pcard" onclick="openProd('${d.id}','${(p.name||'').replace(/'/g,"\'")}',${p.price||0},'${p.image||p.imageURL||''}','${p.emoji||'📦'}')">
+        <div class="pcard-img">${(p.image||p.imageURL)?`<img src="${p.image||p.imageURL}" alt="">`:`<span>${p.emoji||'📦'}</span>`}</div>
         <div class="pcard-body"><div class="pcard-name">${p.name||''}</div><div class="pcard-price">${(p.price||0).toLocaleString()} <span>دج</span></div></div>
       </div>`;
     });
+    if(count === 0){grid.innerHTML='<div style="grid-column:span 2" class="empty"><div class="ei">📦</div><p>لا توجد منتجات عامة معروضة بعد</p></div>';}
   }catch(e){}
 };
 
@@ -765,7 +773,7 @@ window.saveOrder=async(data)=>{
 
 window.submitMerchant=async()=>{
   const fv=id=>document.getElementById(id)?.value?.trim()||'';
-  const sname=fv('r-sname'),oname=fv('r-oname'),email=fv('r-email'),pass=document.getElementById('r-pass').value,phone=fv('r-phone'),wa=fv('r-wa'),wil=fv('r-wil'),comm=fv('r-comm'),addr=fv('r-addr'),cat=fv('r-cat'),hours=fv('r-hours'),desc=fv('r-desc'),rcnum=fv('r-rcnum'),fb=fv('r-fb'),ig=fv('r-ig'),tiktok=fv('r-tiktok'),tg=fv('r-tg');
+  const sname=fv('r-sname'),oname=fv('r-oname'),email=fv('r-email').toLowerCase(),pass=document.getElementById('r-pass').value,phone=fv('r-phone'),wa=fv('r-wa'),wil=fv('r-wil'),comm=fv('r-comm'),addr=fv('r-addr'),cat=fv('r-cat'),hours=fv('r-hours'),desc=fv('r-desc'),rcnum=fv('r-rcnum'),fb=fv('r-fb'),ig=fv('r-ig'),tiktok=fv('r-tiktok'),tg=fv('r-tg');
   if(!sname||!oname||!email||!pass||!phone||!wa||!wil||!comm||!addr||!cat||!hours||!desc){toast('⚠️ الرجاء إكمال جميع الخانات الإجبارية أولاً','err');return;}
   if(pass.length < 6){toast('⚠️ يرجى اختيار كلمة مرور تفوق 5 أحرف لتأمين الأرباح','err');return;}
   

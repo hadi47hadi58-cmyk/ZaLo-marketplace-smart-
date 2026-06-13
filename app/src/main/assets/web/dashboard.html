@@ -620,7 +620,7 @@
         </div>
       </div>
       <div style="display:flex;gap:10px;margin-top:12px">
-        <button class="btn btn-g" style="flex:1;justify-content:center;padding:12px" onclick="saveProduct()">💾 نشر وحفظ المعروض</button>
+        <button id="btnSaveProduct" class="btn btn-g" style="flex:1;justify-content:center;padding:12px" onclick="saveProduct()">💾 نشر وحفظ المعروض</button>
         <button class="btn btn-o" onclick="goPage('products')">تراجع</button>
       </div>
     </div>
@@ -1026,7 +1026,10 @@ window.deleteProd = async function(id) {
   showToast('🗑️ تم إخصاء السلعة بنجاح');
 };
 
+window.isSavingProduct = false;
 window.saveProduct = async function() {
+  if (window.isSavingProduct) return;
+
   const name = document.getElementById('pName').value.trim();
   const cat = document.getElementById('pCategory').value;
   const price = parseFloat(document.getElementById('pPrice').value) || 0;
@@ -1037,6 +1040,13 @@ window.saveProduct = async function() {
   const imageBase64 = imgInput ? imgInput.dataset.base64 : '';
 
   if(!name || !cat || !price) { showToast('❗ يرجى تعبئة حقول السلعة الإجبارية وعرض السعر'); return; }
+
+  window.isSavingProduct = true;
+  const saveBtn = document.getElementById('btnSaveProduct');
+  if (saveBtn) {
+    saveBtn.disabled = true;
+    saveBtn.innerHTML = '⏳ جاري الحفظ والنشر الآن...';
+  }
 
   // 1. Save to Firebase Firestore
   try {
@@ -1107,6 +1117,14 @@ window.saveProduct = async function() {
   }
 
   await loadProducts();
+  
+  // Re-enable
+  window.isSavingProduct = false;
+  if (saveBtn) {
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '💾 نشر وحفظ المعروض';
+  }
+
   goPage('products');
 };
 

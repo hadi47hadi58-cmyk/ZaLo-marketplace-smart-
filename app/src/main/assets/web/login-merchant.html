@@ -545,8 +545,16 @@ window.doLogin = async function() {
 
     // Self-healing check for approved/pending merchant registrants
     try {
-      const q = query(collection(db, 'merchant_requests'), where('email', '==', email));
-      const qSnap = await getDocs(q);
+      let qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', email)));
+      if (qSnap.empty) {
+        // Fallback for capitalized first letter: e.g., Hadi47hadi58@gmail.com
+        const capitalizedEmail = email.charAt(0).toUpperCase() + email.slice(1);
+        qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', capitalizedEmail)));
+      }
+      if (qSnap.empty) {
+        // Fallback for raw typed uppercase
+        qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', email.toUpperCase())));
+      }
       if (!qSnap.empty) {
         const reqDoc = qSnap.docs[0];
         const reqData = reqDoc.data();
