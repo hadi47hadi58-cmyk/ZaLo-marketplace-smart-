@@ -607,7 +607,19 @@
         <label class="flbl">نبذة ووصف شامل للمنتج وتحديد الجودة والمقاسات</label>
         <textarea class="finput" id="pDesc" rows="3" placeholder="أدخل تفاصيل ومواصفات مغرية للبيع..."></textarea>
       </div>
-      <div style="display:flex;gap:10px;margin-top:6px">
+      <div class="frow">
+        <label class="flbl">📷 صورة المنتج للبيع (جالبة للمشترين)</label>
+        <div id="pImgBox" style="position:relative; background:var(--bg3); border:2px dashed var(--border); border-radius:12px; padding:18px; text-align:center; cursor:pointer; min-height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.25s;">
+          <input type="file" id="pImgInput" accept="image/*" onchange="pickProductImage(this)" style="position:absolute; inset:0; opacity:0; cursor:pointer;" />
+          <div id="pImgPlaceholder">
+            <div style="font-size:26px; margin-bottom:6px">📸</div>
+            <div id="pImgLabel" style="font-size:12px; font-weight:700">اضغط لرفع صورة من جهازك للسلعة</div>
+            <div style="font-size:10px; color:var(--text2); margin-top:3px">JPEG or PNG - تظهر مباشرة في كتالوج متجرك</div>
+          </div>
+          <img id="pImgPreview" style="display:none; max-width:100%; max-height:160px; object-fit:contain; border-radius:8px; margin-top:5px;" />
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;margin-top:12px">
         <button class="btn btn-g" style="flex:1;justify-content:center;padding:12px" onclick="saveProduct()">💾 نشر وحفظ المعروض</button>
         <button class="btn btn-o" onclick="goPage('products')">تراجع</button>
       </div>

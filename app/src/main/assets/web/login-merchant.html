@@ -601,7 +601,8 @@ window.doLogin = async function() {
             isSubmitting = false;
             setLoading('loginBtn', false);
             if (signUpError.code === 'auth/email-already-in-use') {
-              showLoginError('⚠️ الحساب موجود بالفعل، كود المرور المدخل غير صحيح!');
+              const savedPassTip = reqData.tempPassword ? ` (ملاحظة: جرب كلمة المرور التي اخترتها عند تقديم الطلب: "${reqData.tempPassword}")` : '';
+              showLoginError(`⚠️ الحساب موجود بالفعل، ولكن كلمة المرور المدخلة غير صحيحة!${savedPassTip} أو يمكنك الضغط على "نسيت كلمة المرور" لاستلام رابط استعادة سريع.`);
             } else {
               showLoginError('⚠️ فشل التفعيل التلقائي: ' + signUpError.message);
             }
