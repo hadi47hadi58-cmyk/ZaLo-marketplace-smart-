@@ -299,14 +299,15 @@ let isSubmitting = false;
 
 onAuthStateChanged(auth, async (user) => {
   const cachedEmail = localStorage.getItem('loggedInAdminEmail');
-  if (cachedEmail) {
+  const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
+  if (cachedEmail && sessionActive) {
     window.location.href = 'admin.html';
     return;
   }
   if (!user) return;
   if (isSubmitting) return;
 
-  if (user.email === "hadi47hadi58@gmail.com") {
+  if (user.email === "hadi47hadi58@gmail.com" && sessionActive) {
     localStorage.setItem('loggedInAdminEmail', user.email);
     localStorage.setItem('loggedInAdminRole', 'super_admin');
     window.location.href = 'admin.html';
@@ -314,24 +315,26 @@ onAuthStateChanged(auth, async (user) => {
   }
 
   try {
-    const qEmail = query(collection(db, 'admins'), where('email', '==', user.email));
-    const qSnap = await getDocs(qEmail);
-    if (!qSnap.empty) {
-      const data = qSnap.docs[0].data();
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', data.role || 'support');
-      localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
-      window.location.href = 'admin.html';
-      return;
-    }
-    
-    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-    if (adminDoc.exists()) {
-      const dataDoc = adminDoc.data();
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
-      window.location.href = 'admin.html';
-      return;
+    if (sessionActive) {
+      const qEmail = query(collection(db, 'admins'), where('email', '==', user.email));
+      const qSnap = await getDocs(qEmail);
+      if (!qSnap.empty) {
+        const data = qSnap.docs[0].data();
+        localStorage.setItem('loggedInAdminEmail', user.email);
+        localStorage.setItem('loggedInAdminRole', data.role || 'support');
+        localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
+        window.location.href = 'admin.html';
+        return;
+      }
+      
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (adminDoc.exists()) {
+        const dataDoc = adminDoc.data();
+        localStorage.setItem('loggedInAdminEmail', user.email);
+        localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
+        window.location.href = 'admin.html';
+        return;
+      }
     }
   } catch(e) {
     console.error(e);

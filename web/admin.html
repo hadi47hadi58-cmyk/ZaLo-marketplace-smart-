@@ -532,8 +532,8 @@
   <div class="login-box">
     <div class="login-logo">ZaLo</div>
     <div class="login-sub">لوحة الإدارة والمراجعة الشاملة</div>
-    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="" />
-    <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="" />
+    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="hadi47hadi58@gmail.com" />
+    <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="123456" />
     <button class="login-btn" onclick="doLogin()">تأكيد الهوية كمدير</button>
     <div class="login-error" id="loginError">عذراً، هذا الحساب غير معتمد كمدير للنظام</div>
   </div>
@@ -1102,7 +1102,9 @@ window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, ad
 
 onAuthStateChanged(auth, async (user) => {
   const cachedEmail = localStorage.getItem('loggedInAdminEmail');
-  if (cachedEmail) {
+  const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
+
+  if (cachedEmail && sessionActive) {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('currentUserEmail').textContent = cachedEmail;
     const cachedRole = localStorage.getItem('loggedInAdminRole') || 'supervisor';
@@ -1111,7 +1113,7 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  if (user) {
+  if (user && sessionActive) {
     if (user.email === "hadi47hadi58@gmail.com") {
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
@@ -1185,6 +1187,7 @@ window.doLogin = async function() {
           localStorage.setItem('loggedInAdminEmail', email);
           localStorage.setItem('loggedInAdminRole', adminData.role || 'supervisor');
           localStorage.setItem('loggedInAdminName', adminData.name || 'مساعد');
+          sessionStorage.setItem('admin_logged_in_session', 'true');
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('currentUserEmail').textContent = email;
           document.getElementById('roleTag').textContent = adminData.role === 'supervisor' ? 'مشرف المنصة' : 'مساعد إداري';
@@ -1200,6 +1203,7 @@ window.doLogin = async function() {
       localStorage.setItem('loggedInAdminEmail', email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
       localStorage.setItem('loggedInAdminName', 'المالك العام');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       document.getElementById('loginScreen').style.display = 'none';
       document.getElementById('currentUserEmail').textContent = email;
       document.getElementById('roleTag').textContent = 'المالك العام';
@@ -1207,8 +1211,10 @@ window.doLogin = async function() {
       return;
     }
 
+    sessionStorage.setItem('admin_logged_in_session', 'true');
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
+    sessionStorage.removeItem('admin_logged_in_session');
     const el = document.getElementById('loginError');
     if (el) el.style.display = 'block';
   }

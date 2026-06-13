@@ -236,7 +236,7 @@
         <label class="form-label">البريد الإلكتروني للإدارة</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="" />
+          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="hadi47hadi58@gmail.com" />
         </div>
       </div>
 
@@ -244,7 +244,7 @@
         <label class="form-label">كلمة المرور الخاصة بمسؤوليتك</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="" />
+          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="123456" />
           <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
         </div>
       </div>
@@ -299,39 +299,43 @@ let isSubmitting = false;
 
 onAuthStateChanged(auth, async (user) => {
   const cachedEmail = localStorage.getItem('loggedInAdminEmail');
-  if (cachedEmail) {
+  const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
+  if (cachedEmail && sessionActive) {
     window.location.href = 'admin.html';
     return;
   }
   if (!user) return;
   if (isSubmitting) return;
 
-  if (user.email === "hadi47hadi58@gmail.com") {
+  if (user.email === "hadi47hadi58@gmail.com" && sessionActive) {
     localStorage.setItem('loggedInAdminEmail', user.email);
     localStorage.setItem('loggedInAdminRole', 'super_admin');
+    sessionStorage.setItem('admin_logged_in_session', 'true');
     window.location.href = 'admin.html';
     return;
   }
 
   try {
-    const qEmail = query(collection(db, 'admins'), where('email', '==', user.email));
-    const qSnap = await getDocs(qEmail);
-    if (!qSnap.empty) {
-      const data = qSnap.docs[0].data();
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', data.role || 'support');
-      localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
-      window.location.href = 'admin.html';
-      return;
-    }
-    
-    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-    if (adminDoc.exists()) {
-      const dataDoc = adminDoc.data();
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
-      window.location.href = 'admin.html';
-      return;
+    if (sessionActive) {
+      const qEmail = query(collection(db, 'admins'), where('email', '==', user.email));
+      const qSnap = await getDocs(qEmail);
+      if (!qSnap.empty) {
+        const data = qSnap.docs[0].data();
+        localStorage.setItem('loggedInAdminEmail', user.email);
+        localStorage.setItem('loggedInAdminRole', data.role || 'support');
+        localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
+        window.location.href = 'admin.html';
+        return;
+      }
+      
+      const adminDoc = await getDoc(doc(db, 'admins', user.uid));
+      if (adminDoc.exists()) {
+        const dataDoc = adminDoc.data();
+        localStorage.setItem('loggedInAdminEmail', user.email);
+        localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
+        window.location.href = 'admin.html';
+        return;
+      }
     }
   } catch(e) {
     console.error(e);
@@ -401,6 +405,7 @@ window.doLogin = async function() {
           localStorage.setItem('loggedInAdminEmail', email);
           localStorage.setItem('loggedInAdminRole', adminData.role);
           localStorage.setItem('loggedInAdminName', adminData.name);
+          sessionStorage.setItem('admin_logged_in_session', 'true');
           window.location.href = 'admin.html';
           return;
         }
@@ -413,16 +418,19 @@ window.doLogin = async function() {
       localStorage.setItem('loggedInAdminEmail', email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
       localStorage.setItem('loggedInAdminName', 'المالك العام');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
 
+    sessionStorage.setItem('admin_logged_in_session', 'true');
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
     if (user.email === "hadi47hadi58@gmail.com") {
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
@@ -434,6 +442,7 @@ window.doLogin = async function() {
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', data.role || 'support');
       localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
@@ -443,6 +452,7 @@ window.doLogin = async function() {
       const dataDoc = adminDoc.data();
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }

@@ -484,6 +484,57 @@ window.doLogin = async function() {
     console.warn('reCAPTCHA block skipped:', e);
   }
 
+  // Default master merchant account bypass
+  if (email === 'merchant@zalo.com' && pass === '12345678') {
+    try {
+      isSubmitting = true;
+      setLoading('loginBtn', true);
+      let cred;
+      try {
+        cred = await signInWithEmailAndPassword(auth, email, pass);
+      } catch(signInErr) {
+        try {
+          cred = await createUserWithEmailAndPassword(auth, email, pass);
+        } catch(signUpErr) {
+          if (signUpErr.code === 'auth/email-already-in-use') {
+            // Already signed up
+          }
+        }
+      }
+      
+      const currentUser = auth.currentUser || (cred ? cred.user : null);
+      if (currentUser) {
+        await setDoc(doc(db, 'users', currentUser.uid), {
+          uid: currentUser.uid,
+          displayName: "التاجر الشريك التجريبي",
+          email: email,
+          phone: "0698694010",
+          role: 'merchant',
+          status: 'active',
+          createdAt: serverTimestamp()
+        });
+        await setDoc(doc(db, 'shops', currentUser.uid), {
+          storeName: "محل زالو التجريبي الموحد",
+          ownerName: "التاجر عبد القادر",
+          email: email,
+          phone: "0698694010",
+          whatsapp: "0698694010",
+          wilaya: "16 الجزائر",
+          commune: "الجزائر الوسطى",
+          address: "نهج ديدوش مراد، الجزائر العاصمة",
+          category: "هواتف وإلكترونيات",
+          status: 'active',
+          subscription: 'premium',
+          createdAt: serverTimestamp()
+        });
+        window.location.href = 'dashboard.html';
+        return;
+      }
+    } catch(err) {
+      console.error(err);
+    }
+  }
+
   try {
     isSubmitting = true;
     await signInWithEmailAndPassword(auth, email, pass);
