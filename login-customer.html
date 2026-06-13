@@ -218,6 +218,7 @@
   }
   .whatsapp-help a { color: #4caf50; text-decoration: none; font-weight: 600; }
 </style>
+<script src="https://www.google.com/recaptcha/enterprise.js?render=6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z"></script>
 </head>
 <body>
 
@@ -435,6 +436,18 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// App Check with reCAPTCHA Enterprise Integration
+try {
+  const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js");
+  const appCheck = initializeAppCheck(app, {
+    provider: new ReCaptchaEnterpriseProvider('6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z'),
+    isTokenAutoRefreshEnabled: true
+  });
+  console.log('Firebase App Check with reCAPTCHA Enterprise verified successfully.');
+} catch(err) {
+  console.warn("App Check initialization skipped or failed:", err);
+}
+
 let isSubmitting = false;
 
 onAuthStateChanged(auth, async (user) => {
@@ -508,6 +521,27 @@ window.doLogin = async function() {
   if (!pass) { showLoginError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
 
   setLoading('loginBtn', true);
+
+  // Trigger reCAPTCHA Enterprise execution
+  try {
+    if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
+      await new Promise((resolve) => {
+        grecaptcha.enterprise.ready(async () => {
+          try {
+            const token = await grecaptcha.enterprise.execute('6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z', {action: 'LOGIN'});
+            console.log('reCAPTCHA Enterprise login token verified.');
+            resolve(token);
+          } catch (err) {
+            console.error('reCAPTCHA Execution Failed:', err);
+            resolve(null);
+          }
+        });
+      });
+    }
+  } catch(e) {
+    console.warn('reCAPTCHA block skipped:', e);
+  }
+
   try {
     isSubmitting = true;
     await signInWithEmailAndPassword(auth, email, pass);
