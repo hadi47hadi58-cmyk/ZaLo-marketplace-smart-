@@ -725,6 +725,22 @@
         <label class="flbl">رابط قناة أو حساب تيليجرام (اختياري)</label>
         <input class="finput" id="editTelegram" placeholder="https://t.me/..." />
       </div>
+      <div class="frow">
+        <label class="flbl">📍 ولاية النشاط والفرز الجغرافي *</label>
+        <select class="finput" id="editWilaya" onchange="fillDashboardCommunes(this.value)" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
+          <option value="">اختر الولاية...</option>
+        </select>
+      </div>
+      <div class="frow">
+        <label class="flbl">🏙️ البلدية والمنطقة *</label>
+        <select class="finput" id="editCommune" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
+          <option value="">اختر البلدية...</option>
+        </select>
+      </div>
+      <div class="frow">
+        <label class="flbl">🏠 عنوان المحل بالتفصيل *</label>
+        <input class="finput" id="editAddress" placeholder="اسم الشارع، رقم المحل..." />
+      </div>
       <button class="btn btn-g btn-full" onclick="saveProfile()">💾 تثبيت وحفظ معلومات ملف المتجر</button>
     </div>
   </div>
@@ -845,21 +861,49 @@ window.pickProductImage = function(input) {
   const placeholder = document.getElementById('pImgPlaceholder');
   const box = document.getElementById('pImgBox');
   
-  if (label) label.textContent = '⏳ جاري ضبط الأبعاد وتحميل المعاينة...';
+  if (label) label.textContent = '⏳ جاري تهيئة وضغط الصورة بحجم مثالي...';
   
   const reader = new FileReader();
   reader.onload = function(e){
-    input.dataset.base64 = e.target.result;
-    if(preview) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-    }
-    if(placeholder) placeholder.style.display = 'none';
-    if(box) {
-      box.style.borderColor = 'var(--green)';
-      box.style.background = 'rgba(37,168,96,0.06)';
-    }
-    if (label) label.textContent = '✅ تم تحميل الصورة بنجاح!';
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 400;
+      const MAX_HEIGHT = 400;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      input.dataset.base64 = compressedBase64;
+      
+      if(preview) {
+        preview.src = compressedBase64;
+        preview.style.display = 'block';
+      }
+      if(placeholder) placeholder.style.display = 'none';
+      if(box) {
+        box.style.borderColor = 'var(--green)';
+        box.style.background = 'rgba(37,168,96,0.06)';
+      }
+      if (label) label.textContent = '✅ تم ضغط وتهيئة الصورة بنجاح!';
+    };
+    img.src = e.target.result;
   };
   reader.onerror = function(){
     if (label) label.textContent = '❌ خطأ في معالجة الصورة';
@@ -877,6 +921,23 @@ function initDashboard() {
   document.getElementById('editInstagram').value = shopData.instagramURL || '';
   document.getElementById('editTiktok').value = shopData.tiktokURL || '';
   document.getElementById('editTelegram').value = shopData.telegramURL || '';
+
+  const wSel = document.getElementById('editWilaya');
+  if (wSel) {
+    wSel.innerHTML = '<option value="">اختر الولاية...</option>';
+    WILAYAS.forEach(w => {
+      const o = document.createElement('option');
+      o.value = w.n;
+      o.textContent = w.n;
+      wSel.appendChild(o);
+    });
+    wSel.value = shopData.wilaya || '';
+    fillDashboardCommunes(shopData.wilaya || '');
+    const cSel = document.getElementById('editCommune');
+    if (cSel) cSel.value = shopData.commune || '';
+  }
+  const addrInput = document.getElementById('editAddress');
+  if (addrInput) addrInput.value = shopData.address || '';
 
   // Synchronize store representation into local storage db representation for client-side
   syncStoreToLocalStorage();
@@ -1283,6 +1344,9 @@ window.saveProfile = async function() {
   const sIg = document.getElementById('editInstagram').value.trim();
   const sTiktok = document.getElementById('editTiktok').value.trim();
   const sTg = document.getElementById('editTelegram').value.trim();
+  const sWil = document.getElementById('editWilaya').value;
+  const sComm = document.getElementById('editCommune').value;
+  const sAddr = document.getElementById('editAddress').value.trim();
 
   if(!sName) { showToast('❗ اسم المتجر مطلوب'); return; }
 
@@ -1293,7 +1357,10 @@ window.saveProfile = async function() {
       facebookURL: sFb,
       instagramURL: sIg,
       tiktokURL: sTiktok,
-      telegramURL: sTg
+      telegramURL: sTg,
+      wilaya: sWil,
+      commune: sComm,
+      address: sAddr
     });
   } catch(e){}
 
@@ -1303,10 +1370,112 @@ window.saveProfile = async function() {
   shopData.instagramURL = sIg;
   shopData.tiktokURL = sTiktok;
   shopData.telegramURL = sTg;
+  shopData.wilaya = sWil;
+  shopData.commune = sComm;
+  shopData.address = sAddr;
 
   document.getElementById('sideName').textContent = sName;
   document.getElementById('profileName').textContent = sName;
+  document.getElementById('profileWilaya').textContent = `📍 التمركز الاقتصادي: ${sWil || 'غير محدد بعد'}`;
   showToast('✅ تم تدوين وحفظ معلومات متجرك بنجاح!');
+};
+
+// WILAYAS global dictionary
+const WILAYAS = [
+  {n:"01 أدرار",c:["أدرار","رقان","أولف","بودة","فنوغيل"]},
+  {n:"02 الشلف",c:["الشلف","تنس","بني حواء","وادي الفضة"]},
+  {n:"03 الأغواط",c:["الأغواط","عين ماضي","آفلو","حاسي الرمل"]},
+  {n:"04 أم البواقي",c:["أم البواقي","عين البيضاء","عين مليلة","مسكيانة"]},
+  {n:"05 باتنة",c:["باتنة","عين التوتة","تازولت","مروانة","بريكة","أريس"]},
+  {n:"06 بجاية",c:["بجاية","أقبو","سيدي عيش","تيشي","أميزور"]},
+  {n:"07 بسكرة",c:["بسكرة","طولقة","أورلال","سيدي عقبة","زريبة الوادي"]},
+  {n:"08 بشار",c:["بشار","القنادسة","عين الصفراء","العبادلة"]},
+  {n:"09 البليدة",c:["البليدة","الأربعاء","بوفاريك","موزاية","بني مراد"]},
+  {n:"10 البويرة",c:["البويرة","عين بسام","سور الغزلان","بودربالة"]},
+  {n:"11 تمنراست",c:["تمنراست","أبلسة","عين قزام","إن صالح"]},
+  {n:"12 تبسة",c:["تبسة","الشريعة","الونزة","أم علي","الكويف"]},
+  {n:"13 تلمسان",c:["تلمسان","بني صاف","ندرومة","غزوات","مغنية"]},
+  {n:"14 تيارت",c:["تيارت","فرندة","رحوية","عين الدهب","مهدية"]},
+  {n:"15 تيزي وزو",c:["تيزي وزو","ذراع بن خداء","عزازقة","بني يني"]},
+  {n:"16 الجزائر",c:["باب الوادي","حيدرة","القبة","بوزريعة","بن عكنون","الدار البيضاء","المحمدية","الحراش","بئر مراد رايس","الكاليتوس","برج الكيفان"]},
+  {n:"17 الجلفة",c:["الجلفة","عين وسارة","مسعد","حاسي بحبح","دار الشيوخ"]},
+  {n:"18 جيجل",c:["جيجل","الميلية","الطاهير","زيامة منصورية"]},
+  {n:"19 سطيف",c:["سطيف","العلمة","بوعنداس","رأس الواد","عين أرنات"]},
+  {n:"20 سعيدة",c:["سعيدة","عين الحجر","سيدي أحمد","يوب"]},
+  {n:"21 سكيكدة",c:["سكيكدة","عزابة","القل","حمادي كرومة","الحروش"]},
+  {n:"22 سيدي بلعباس",c:["سيدي بلعباس","تلاغ","سفيزف","بن باديس"]},
+  {n:"23 عنابة",c:["عنابة","سيدي عمار","برحال","الحجار","بوهدارة"]},
+  {n:"24 قالمة",c:["قالمة","بوشقوف","حمام دباغ","لخزارة"]},
+  {n:"25 قسنطينة",c:["قسنطينة","الخروب","عين عبيد","ديدوش مراد","حامة بوزيان"]},
+  {n:"26 المدية",c:["المدية","الأخضرية","بني سليمان","العزيزية","تابلاط"]},
+  {n:"27 مستغانم",c:["مستغانم","عين تادلس","سيق","سيدي لخضر"]},
+  {n:"28 المسيلة",c:["المسيلة","بوسعادة","سيدي عيسى","أولاد دراج"]},
+  {n:"29 معسكر",c:["معسكر","تيغنيف","سيق","بوهني"]},
+  {n:"30 ورقلة",c:["ورقلة","تقرت","حاسي مسعود","النقوسة"]},
+  {n:"31 وهران",c:["وهران","عين الترك","بئر الجير","سيدي الشحمي","أرزيو","بطيوة","مرسى الحجاج"]},
+  {n:"32 البيض",c:["البيض","بوقطب","الشلالة"]},
+  {n:"33 إليزي",c:["إليزي","برج عمر إدريس","إن أميناس"]},
+  {n:"34 برج بوعريريج",c:["برج بوعريريج","رأس الوادي","المنصورة","بن داود"]},
+  {n:"35 بومرداس",c:["بومرداس","رويبة","بودواو","دلس","برج منايل","خميس الخشنة"]},
+  {n:"36 الطارف",c:["الطارف","القالة","بن مهيدي"]},
+  {n:"37 تندوف",c:["تندوف","أم العسل"]},
+  {n:"38 تيسمسيلت",c:["تيسمسيلت","ثنية الأحد","برج بونعامة"]},
+  {n:"39 الوادي",c:["الوادي","الرباح","قمار","الرقيبة"]},
+  {n:"40 خنشلة",c:["خنشلة","بابار","شلية"]},
+  {n:"41 سوق أهراس",c:["سوق أهراس","sدراتة","مداوروش"]},
+  {n:"42 تيبازة",c:["تيبازة","شرشال","حجوط","القليعة"]},
+  {n:"43 ميلة",c:["ميلة","شلغوم العيد","التلاغمة"]},
+  {n:"44 عين الدفلى",c:["عين الدفلى","خميس مليانة","مليانة"]},
+  {n:"45 النعامة",c:["النعامة","مشرية","عين الصفراء"]},
+  {n:"46 عين تموشنت",c:["عين تموشنت","حمام بوحجر","بني صاف"]},
+  {n:"47 غرداية",c:["غرداية","بريان","القرارة","زلفانة"]},
+  {n:"48 غليزان",c:["غليزان","مازونة","عمي موسى"]},
+  {n:"49 تيميمون",c:["تيميمون","أوقروت","شروين","تالة"]},
+  {n:"50 برج باجي مختار",c:["برج باجي مختار","تيمياوين"]},
+  {n:"51 أولاد جلال",c:["أولاد جلال","سيدي خالد","البسباس","الشعيبة"]},
+  {n:"52 بني عباس",c:["بني عباس","كرازاز","الواتة","القصابي"]},
+  {n:"53 عين صالح",c:["عين صالح","إن غار","فقارة الزوى"]},
+  {n:"54 عين قزام",c:["عين قزام","تين زواتين"]},
+  {n:"55 تقرت",c:["تقرت","تماسين","المنقر","سيدي سليمان"]},
+  {n:"56 جانت",c:["جانت","برج الحواس"]},
+  {n:"57 المغير",c:["المغير","جامعة","أم الطيور","مرارة"]},
+  {n:"58 المنيعة",c:["المنيعة","حاسي القارة","حاسي الفحل"]},
+  {n:"59 أفلو",c:["أفلو","عين سيدي علي","الحاج مشري","الغيشة"]},
+  {n:"60 عين البيضاء",c:["عين البيضاء","بريش","الزرق"]},
+  {n:"61 عين مليلة",c:["عين مليلة","أولاد قاسم","أولاد حملة"]},
+  {n:"62 سدراتة",c:["سدراتة","الخزارة","مداوروش"]},
+  {n:"63 العلمة",c:["العلمة","بئر العرش","بازر سكرة"]},
+  {n:"64 بوسعادة",c:["بوسعادة","الهامل","أولاد سيدي ابراهيم"]},
+  {n:"65 بريكة",c:["بريكة","أمدوكال","الجزار"]},
+  {n:"66 قصر الشلالة",c:["قصر الشلالة","سرغين","زمالة الأمير عبد القادر"]},
+  {n:"67 مسعد",c:["مسعد","دلدول","سد الرحال"]},
+  {n:"68 فرندة",c:["فرندة","عين الحديد","تخمرت"]},
+  {n:"69 الأبيض سيدي الشيخ",c:["الأبيض سيدي الشيخ","البنود","الشلالة"]}
+];
+
+window.fillDashboardCommunes = function(wname) {
+  const w = WILAYAS.find(x => x.n === wname);
+  const sel = document.getElementById('editCommune');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">اختر البلدية...</option>';
+  if(!w) return;
+  w.c.forEach(c => {
+    const o = document.createElement('option');
+    o.value = c;
+    o.textContent = c;
+    sel.appendChild(o);
+  });
+};
+
+window.showToast = function(msg) {
+  const t = document.getElementById('toast');
+  if(!t) {
+    console.log("Toast element not found:", msg);
+    return;
+  }
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3500);
 };
 
 window.doLogout = async function() {
