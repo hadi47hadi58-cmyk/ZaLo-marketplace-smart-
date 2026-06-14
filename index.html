@@ -787,7 +787,7 @@ window.submitMerchant=async()=>{
     const rnum='REG-'+Date.now().toString().slice(-6);
     
     await ad(col(db,'merchant_requests'),{
-      storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'pending',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,createdAt:sts()
+      storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'approved',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,createdAt:sts()
     });
     
     document.getElementById('reg-num').textContent=rnum;
