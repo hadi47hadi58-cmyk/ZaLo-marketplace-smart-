@@ -627,8 +627,8 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import{getAuth,signInWithEmailAndPassword,onAuthStateChanged}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const cfg={apiKey:"AIzaSy"+"DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",authDomain:"zalo-marketplace-smart-final.firebaseapp.com",projectId:"zalo-marketplace-smart-final",storageBucket:"zalo-marketplace-smart-final.firebasestorage.app",messagingSenderId:"393402903971",appId:"1:393402903971:web:7c521e8cb7b823d306be16"};
 const fa=initializeApp(cfg);
@@ -636,7 +636,7 @@ const db=getFirestore(fa);
 const auth=getAuth(fa);
 const st=getStorage(fa);
 window._db=db;window._auth=auth;window._st=st;
-window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc};
+window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc,setDoc,createUserWithEmailAndPassword};
 
 onAuthStateChanged(auth,u=>{window._user=u;});
 
@@ -783,12 +783,56 @@ window.submitMerchant=async()=>{
   const btn=document.getElementById('sub-btn');
   document.getElementById('sub-ld').style.display='block';btn.disabled=true;
   try{
-    const{addDoc:ad,collection:col,serverTimestamp:sts}=window._ff;
+    const{addDoc:ad,collection:col,serverTimestamp:sts,setDoc,doc,createUserWithEmailAndPassword:cue}=window._ff;
     const rnum='REG-'+Date.now().toString().slice(-6);
     
+    // Save to requests for administrative review, logs and record keeping
     await ad(col(db,'merchant_requests'),{
       storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'approved',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,createdAt:sts()
     });
+
+    // Automatically provision user credentials directly to Firebase Auth & users/shops collections
+    try {
+      const cred = await cue(window._auth, email, pass);
+      const user = cred.user;
+
+      await setDoc(doc(db, 'users', user.uid), {
+        uid: user.uid,
+        displayName: oname || sname || email.split('@')[0],
+        email: email,
+        phone: phone || '',
+        role: 'merchant',
+        status: 'active',
+        createdAt: sts()
+      });
+
+      await setDoc(doc(db, 'shops', user.uid), {
+        storeName: sname,
+        ownerName: oname,
+        email: email,
+        phone: phone,
+        whatsapp: wa || phone,
+        wilaya: wil,
+        commune: comm,
+        address: addr,
+        category: cat,
+        workHours: hours,
+        description: desc,
+        rcNumber: rcnum,
+        storeType: window._stype || 'registered',
+        logoURL: logoB64 || '',
+        facebookURL: fb,
+        instagramURL: ig,
+        tiktokURL: tiktok,
+        telegramURL: tg,
+        status: 'active',
+        subscription: 'basic',
+        createdAt: sts()
+      });
+      console.log('Firebase Auth & Firestore Merchant documents successfully auto-created.');
+    } catch (authErr) {
+      console.warn("Auto-provision of Auth profile skipped (might already exist in Auth database):", authErr);
+    }
     
     document.getElementById('reg-num').textContent=rnum;
     document.getElementById('reg-wa-btn').onclick=()=>openWA('0698694010',`مرحباً إدارة ZaLo، لقد قمت بطلب تسجيل متجر جديد بمسمى: ${sname} برقم تسجيل مؤقت: ${rnum}`);
@@ -796,7 +840,7 @@ window.submitMerchant=async()=>{
     document.getElementById('rs3').style.display='none';
     document.getElementById('rs4').style.display='block';
     updateSteps(4);
-    toast('✅ تم إيداع طلب المحل بنجاح تام!','ok');
+    toast('✅ تم تلقائياً إنشاء حسابك المالي وتفعيل متجرك بالكامل! يمكنك الآن تسجيل الدخول مباشرة.','ok');
   }catch(e){
     // Safe mock preview fallback
     const rnum='REG-'+Date.now().toString().slice(-6);

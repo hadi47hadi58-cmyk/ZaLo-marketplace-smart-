@@ -791,6 +791,82 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
+function syncStoreToLocalStorage() {
+  try {
+    const localStores = JSON.parse(localStorage.getItem('zalo_stores')) || [];
+    const existingIndex = localStores.findIndex(s => s.storeId === shopId);
+    
+    const storeObj = {
+      storeId: shopId,
+      municipalityId: "el-menia", // default municipality so it shows up on client-side right away
+      storeName: shopData.storeName || "محل زالو المعتمد",
+      ownerName: shopData.ownerName || "تاجر شريك",
+      phone: shopData.whatsapp || shopData.phone || "0698694010",
+      address: shopData.address || "وسط المدينة",
+      image: shopData.logoURL || "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80",
+      category: shopData.category || "هواتف وإلكترونيات"
+    };
+
+    if (existingIndex > -1) {
+      localStores[existingIndex] = { ...localStores[existingIndex], ...storeObj };
+    } else {
+      localStores.push(storeObj);
+    }
+    
+    localStorage.setItem('zalo_stores', JSON.stringify(localStores));
+    
+    // Also inject default categories for this store in client-side db replica
+    const localCats = JSON.parse(localStorage.getItem('zalo_categories')) || [];
+    const catsForStore = [
+      { categoryId: "cat_phones", storeId: shopId, categoryName: "هواتف" },
+      { categoryId: "cat_electronic", storeId: shopId, categoryName: "إلكترونيات" },
+      { categoryId: "cat_parts", storeId: shopId, categoryName: "قطع غيار" },
+      { categoryId: "cat_food", storeId: shopId, categoryName: "مواد غذائية" },
+      { categoryId: "cat_clothes", storeId: shopId, categoryName: "ملابس" },
+      { categoryId: "cat_services", storeId: shopId, categoryName: "خدمات" }
+    ];
+    
+    catsForStore.forEach(c => {
+      if (!localCats.some(lc => lc.categoryId === c.categoryId && lc.storeId === c.storeId)) {
+        localCats.push(c);
+      }
+    });
+    localStorage.setItem('zalo_categories', JSON.stringify(localCats));
+  } catch(e) {
+    console.error("Local storage store synchronization error:", e);
+  }
+}
+
+window.pickProductImage = function(input) {
+  const f = input.files[0];
+  if(!f) return;
+  const label = document.getElementById('pImgLabel');
+  const preview = document.getElementById('pImgPreview');
+  const placeholder = document.getElementById('pImgPlaceholder');
+  const box = document.getElementById('pImgBox');
+  
+  if (label) label.textContent = '⏳ جاري ضبط الأبعاد وتحميل المعاينة...';
+  
+  const reader = new FileReader();
+  reader.onload = function(e){
+    input.dataset.base64 = e.target.result;
+    if(preview) {
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+    }
+    if(placeholder) placeholder.style.display = 'none';
+    if(box) {
+      box.style.borderColor = 'var(--green)';
+      box.style.background = 'rgba(37,168,96,0.06)';
+    }
+    if (label) label.textContent = '✅ تم تحميل الصورة بنجاح!';
+  };
+  reader.onerror = function(){
+    if (label) label.textContent = '❌ خطأ في معالجة الصورة';
+  };
+  reader.readAsDataURL(f);
+};
+
 function initDashboard() {
   document.getElementById('sideName').textContent = shopData.storeName || 'متجري المعتمد';
   document.getElementById('profileName').textContent = shopData.storeName || 'متجري المعتمد';
@@ -801,6 +877,9 @@ function initDashboard() {
   document.getElementById('editInstagram').value = shopData.instagramURL || '';
   document.getElementById('editTiktok').value = shopData.tiktokURL || '';
   document.getElementById('editTelegram').value = shopData.telegramURL || '';
+
+  // Synchronize store representation into local storage db representation for client-side
+  syncStoreToLocalStorage();
 
   loadHome();
   loadChat();
@@ -822,10 +901,57 @@ async function loadHome() {
 
 async function loadProducts() {
   try {
+    // 1. Fetch products belonging to this shop from Firebase Firestore
     const snap = await getDocs(query(collection(db, 'products'), where('storeId', '==', shopId)));
-    allProducts = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    const dbProds = snap.docs.filter(d => !d.data().deleted).map(d => ({
+      id: d.id, 
+      name: d.data().name,
+      price: d.data().price,
+      stock: d.data().stock,
+      description: d.data().description,
+      imageURL: d.data().imageURL || "",
+      category: d.data().category,
+      storeId: d.data().storeId
+    }));
+    
+    // 2. Load and merge products from local storage replica
+    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
+    const filteredLocal = localProds.filter(p => p.storeId === shopId).map(p => ({
+      id: p.productId,
+      name: p.productName,
+      price: p.price,
+      stock: p.stock,
+      description: p.description,
+      imageURL: (p.images && p.images.length) ? p.images[0] : "",
+      category: p.categoryId,
+      storeId: p.storeId
+    }));
+
+    // Combine them, preferring db products if names conflict
+    const combined = [...dbProds];
+    filteredLocal.forEach(lp => {
+      if (!combined.some(cp => cp.name.toLowerCase() === lp.name.toLowerCase())) {
+        combined.push(lp);
+      }
+    });
+
+    allProducts = combined;
   } catch(e) {
-    allProducts = getSampleProducts();
+    console.error("Firestore loading error, falling back to local storage:", e);
+    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
+    allProducts = localProds.filter(p => p.storeId === shopId).map(p => ({
+      id: p.productId,
+      name: p.productName,
+      price: p.price,
+      stock: p.stock,
+      description: p.description,
+      imageURL: (p.images && p.images.length) ? p.images[0] : "",
+      category: p.categoryId,
+      storeId: p.storeId
+    }));
+    if (allProducts.length === 0) {
+      allProducts = getSampleProducts();
+    }
   }
   renderProducts();
 }
@@ -840,34 +966,46 @@ function renderProducts() {
     </div>`;
     return;
   }
-  grid.innerHTML = allProducts.map(p => `
-    <div class="prod-card">
-      <div class="prod-img">📦</div>
-      <div class="prod-info">
-        <div class="prod-name">${p.name}</div>
-        <div class="prod-price">${(p.price || 0).toLocaleString()} دج</div>
-        <div class="prod-stock">المخزون المتوفر: ${p.stock || 10}</div>
-        <div class="prod-actions">
-          <button class="ab ab-e" onclick="deleteProd('${p.id}')">حذف</button>
+  grid.innerHTML = allProducts.map(p => {
+    const imgHTML = p.imageURL ? `<img src="${p.imageURL}" class="prod-img" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px" alt="${p.name}" />` : `<div class="prod-img" style="width:100%;height:140px;background:var(--bg3);display:flex;align-items:center;justify-content:center;border-radius:10px;margin-bottom:8px;font-size:28px">📦</div>`;
+    return `
+      <div class="prod-card">
+        ${imgHTML}
+        <div class="prod-info">
+          <div class="prod-name" style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">${p.name}</div>
+          <div class="prod-price" style="font-size:13px;color:var(--gold2);font-weight:800;margin-bottom:4px">${(p.price || 0).toLocaleString()} دج</div>
+          <div class="prod-stock" style="font-size:11px;color:var(--text2)">المخزون المتوفر: ${p.stock || 10}</div>
+          <div class="prod-actions" style="margin-top:8px">
+            <button class="ab ab-e" style="background:#ef5350;color:#fff;padding:4px 10px;border-radius:6px;width:100%;font-size:11px" onclick="deleteProd('${p.id}')">❌ حذف نهائي</button>
+          </div>
         </div>
       </div>
-    </div>
-  `).join('');
+    `;
+  }).join('');
 }
 
 function renderHomeProducts(prods) {
-  document.getElementById('homeProducts').innerHTML = prods.length ? `
+  const container = document.getElementById('homeProducts');
+  if (!prods.length) {
+    container.innerHTML = `<div class="empty">لا توجد معروضات نشطة مضافة</div>`;
+    return;
+  }
+  container.innerHTML = `
     <div class="products-grid">
-      ${prods.map(p => `
-        <div class="prod-card">
-          <div class="prod-info">
-            <div class="prod-name">📦 ${p.name}</div>
-            <div class="prod-price">${(p.price || 0).toLocaleString()} دج</div>
+      ${prods.map(p => {
+        const imgHTML = p.imageURL ? `<img src="${p.imageURL}" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-left:10px" alt="${p.name}" />` : `<div style="font-size:24px;width:64px;height:64px;background:var(--bg3);display:flex;align-items:center;justify-content:center;border-radius:8px;margin-left:10px">📦</div>`;
+        return `
+          <div class="prod-card" style="display:flex;align-items:center;padding:10px;background:var(--card);border:1px solid var(--border);border-radius:12px">
+            ${imgHTML}
+            <div class="prod-info" style="flex:1">
+              <div class="prod-name" style="font-weight:700;font-size:13px">${p.name}</div>
+              <div class="prod-price" style="color:var(--gold2);font-weight:800;font-size:12px;margin-top:2px">${(p.price || 0).toLocaleString()} دج</div>
+            </div>
           </div>
-        </div>
-      `).join('')}
+        `;
+      }).join('')}
     </div>
-  ` : `<div class="empty">لا توجد معروضات نشطة مضافة</div>`;
+  `;
 }
 
 window.deleteProd = async function(id) {
@@ -875,9 +1013,17 @@ window.deleteProd = async function(id) {
   try {
     await updateDoc(doc(db, 'products', id), { deleted: true });
   } catch(e){}
+  
+  // Also delete from local storage replica
+  try {
+    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
+    const updated = localProds.filter(p => p.productId !== id);
+    localStorage.setItem('zalo_products', JSON.stringify(updated));
+  } catch(e){}
+
   allProducts = allProducts.filter(p => p.id !== id);
   renderProducts();
-  showToast('🗑️ تم إقصاء السلعة بنجاح');
+  showToast('🗑️ تم إخصاء السلعة بنجاح');
 };
 
 window.isSavingProduct = false;
@@ -889,6 +1035,9 @@ window.saveProduct = async function() {
   const price = parseFloat(document.getElementById('pPrice').value) || 0;
   const stock = parseInt(document.getElementById('pStock').value) || 10;
   const desc = document.getElementById('pDesc').value.trim();
+  
+  const imgInput = document.getElementById('pImgInput');
+  const imageBase64 = imgInput ? imgInput.dataset.base64 : '';
 
   if(!name || !cat || !price) { showToast('❗ يرجى تعبئة حقول السلعة الإجبارية وعرض السعر'); return; }
 
@@ -899,23 +1048,76 @@ window.saveProduct = async function() {
     saveBtn.innerHTML = '⏳ جاري الحفظ والنشر الآن...';
   }
 
+  // 1. Save to Firebase Firestore
   try {
     await addDoc(collection(db, 'products'), {
-      name, category: cat, price, stock, description: desc, storeId: shopId, shopName: shopData.storeName || "متجر مجهول", status: "active", createdAt: serverTimestamp()
+      name, 
+      category: cat, 
+      price, 
+      stock, 
+      description: desc, 
+      storeId: shopId, 
+      shopName: shopData.storeName || "متجر مجهول", 
+      status: "active", 
+      imageURL: imageBase64 || "",
+      createdAt: serverTimestamp()
     });
     showToast('✅ تم النشر وإضافتها لكتالوج البيع بنجاح!');
   } catch(e) {
-    allProducts.unshift({ id: 'mock_'+Date.now(), name, category: cat, price, stock, description: desc });
+    console.error("Firestore add error:", e);
     showToast('✅ تم الحفظ تجريبياً');
   }
 
+  // 2. Save to client-side localStorage db replica
+  try {
+    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
+    
+    let localCatId = 'cat_phones';
+    if(cat.includes('ملابس')) localCatId = 'cat_clothes';
+    else if(cat.includes('منزل')) localCatId = 'cat_parts';
+    else if(cat.includes('غذائية')) localCatId = 'cat_food';
+    else if(cat.includes('أخرى')) localCatId = 'cat_services';
+
+    const newProd = {
+      productId: 'prod_' + Date.now(),
+      storeId: shopId,
+      categoryId: localCatId,
+      productName: name,
+      price: price,
+      description: desc,
+      images: imageBase64 ? [imageBase64] : ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"],
+      stock: stock
+    };
+    localProds.unshift(newProd);
+    localStorage.setItem('zalo_products', JSON.stringify(localProds));
+  } catch(e){
+    console.error("Local storage add error:", e);
+  }
+
+  // Reset inputs
   document.getElementById('pName').value = '';
   document.getElementById('pPrice').value = '';
   document.getElementById('pStock').value = '10';
   document.getElementById('pDesc').value = '';
+  
+  if (imgInput) {
+    imgInput.value = '';
+    delete imgInput.dataset.base64;
+    const preview = document.getElementById('pImgPreview');
+    const placeholder = document.getElementById('pImgPlaceholder');
+    const box = document.getElementById('pImgBox');
+    const label = document.getElementById('pImgLabel');
+    if (preview) preview.style.display = 'none';
+    if (placeholder) placeholder.style.display = 'block';
+    if (box) {
+      box.style.borderColor = 'var(--border)';
+      box.style.background = 'var(--bg3)';
+    }
+    if (label) label.textContent = 'اضغط لرفع صورة من جهازك للسلعة';
+  }
 
   await loadProducts();
-
+  
   // Re-enable
   window.isSavingProduct = false;
   if (saveBtn) {
