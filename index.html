@@ -786,15 +786,13 @@ window.submitMerchant=async()=>{
     const{addDoc:ad,collection:col,serverTimestamp:sts,setDoc,doc,createUserWithEmailAndPassword:cue}=window._ff;
     const rnum='REG-'+Date.now().toString().slice(-6);
     
-    // Save to requests for administrative review, logs and record keeping
-    await ad(col(db,'merchant_requests'),{
-      storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'approved',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,createdAt:sts()
-    });
+    let finalUid = 'REG-' + Date.now().toString().slice(-6);
 
     // Automatically provision user credentials directly to Firebase Auth & users/shops collections
     try {
       const cred = await cue(window._auth, email, pass);
       const user = cred.user;
+      finalUid = user.uid;
 
       await setDoc(doc(db, 'users', user.uid), {
         uid: user.uid,
@@ -833,6 +831,11 @@ window.submitMerchant=async()=>{
     } catch (authErr) {
       console.warn("Auto-provision of Auth profile skipped (might already exist in Auth database):", authErr);
     }
+
+    // Save to requests for administrative review, logs and record keeping
+    await setDoc(doc(db,'merchant_requests', finalUid),{
+      storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'approved',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,uid:finalUid,createdAt:sts()
+    });
     
     document.getElementById('reg-num').textContent=rnum;
     document.getElementById('reg-wa-btn').onclick=()=>openWA('0698694010',`مرحباً إدارة ZaLo، لقد قمت بطلب تسجيل متجر جديد بمسمى: ${sname} برقم تسجيل مؤقت: ${rnum}`);

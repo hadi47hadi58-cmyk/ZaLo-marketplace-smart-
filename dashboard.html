@@ -726,6 +726,19 @@
         <input class="finput" id="editTelegram" placeholder="https://t.me/..." />
       </div>
       <div class="frow">
+        <label class="flbl">📁 قسم وصنف المنتجات الرئيسي *</label>
+        <select class="finput" id="editCategory" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
+          <option value="">اختر القسم...</option>
+          <option value="هواتف وإلكترونيات">هواتف وإلكترونيات</option>
+          <option value="أثاث ومنزل">أثاث ومنزل</option>
+          <option value="ملابس وأزياء">ملابس وأزياء</option>
+          <option value="مواد غذائية">مواد غذائية</option>
+          <option value="أدوات ومعدات">أدوات ومعدات</option>
+          <option value="تجميل وعناية">تجميل وعناية</option>
+          <option value="كتب وقرطاسية">كتب وقرطاسية</option>
+        </select>
+      </div>
+      <div class="frow">
         <label class="flbl">📍 ولاية النشاط والفرز الجغرافي *</label>
         <select class="finput" id="editWilaya" onchange="fillDashboardCommunes(this.value)" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
           <option value="">اختر الولاية...</option>
@@ -797,7 +810,58 @@ onAuthStateChanged(auth, async (user) => {
     if (shopSnap.exists()) {
       shopData = shopSnap.data();
     } else {
-      shopData = { storeName: "متجري المعتمد الجديد", wilaya: "16 الجزائر", category: "هواتف وإلكترونيات", whatsapp: "0698694010", status: "active", subscription: "basic" };
+      // Intelligent Self-Healing search through requests
+      let reqData = null;
+      try {
+        const uEmail = user.email ? user.email.trim().toLowerCase() : '';
+        if (uEmail) {
+          // Check for exact email in requests
+          let qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail)));
+          if (qSnap.empty) {
+            // Capitalized fallback
+            const capitalizedEmail = uEmail.charAt(0).toUpperCase() + uEmail.slice(1);
+            qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', capitalizedEmail)));
+          }
+          if (qSnap.empty) {
+            // Uppercase fallback
+            qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail.toUpperCase())));
+          }
+          
+          if (!qSnap.empty) {
+            reqData = qSnap.docs[0].data();
+          }
+        }
+      } catch (e) {
+        console.warn("Self-healing: Error fetching from merchant_requests", e);
+      }
+
+      if (reqData) {
+        // Heal the 'shops' document with real request statistics & inputs instead of dummy Algiers placeholders
+        shopData = {
+          storeName: reqData.storeName || "متجري الشريك المعتمد",
+          ownerName: reqData.ownerName || "تاجر شريك",
+          email: user.email,
+          phone: reqData.phone || "0698694010",
+          whatsapp: reqData.whatsapp || reqData.phone || "0698694010",
+          wilaya: reqData.wilaya || "58 المنيعة",
+          commune: reqData.commune || "المنيعة",
+          address: reqData.address || "وسط المدينة",
+          category: reqData.category || "ملابس وأزياء",
+          workHours: reqData.workHours || "08:00 - 20:00",
+          description: reqData.description || "",
+          logoURL: reqData.logoURL || "",
+          facebookURL: reqData.facebook || reqData.facebookURL || "",
+          instagramURL: reqData.instagram || reqData.instagramURL || "",
+          tiktokURL: reqData.tiktokURL || "",
+          telegramURL: reqData.telegramURL || "",
+          status: 'active',
+          subscription: 'basic',
+          createdAt: serverTimestamp()
+        };
+      } else {
+        // Fallback dummy
+        shopData = { storeName: "متجري المعتمد الجديد", wilaya: "16 الجزائر", category: "هواتف وإلكترونيات", whatsapp: "0698694010", status: "active", subscription: "basic" };
+      }
       await setDoc(doc(db, 'shops', user.uid), shopData);
     }
     initDashboard();
@@ -921,6 +985,11 @@ function initDashboard() {
   document.getElementById('editInstagram').value = shopData.instagramURL || '';
   document.getElementById('editTiktok').value = shopData.tiktokURL || '';
   document.getElementById('editTelegram').value = shopData.telegramURL || '';
+
+  const catSel = document.getElementById('editCategory');
+  if (catSel) {
+    catSel.value = shopData.category || '';
+  }
 
   const wSel = document.getElementById('editWilaya');
   if (wSel) {
@@ -1344,6 +1413,7 @@ window.saveProfile = async function() {
   const sIg = document.getElementById('editInstagram').value.trim();
   const sTiktok = document.getElementById('editTiktok').value.trim();
   const sTg = document.getElementById('editTelegram').value.trim();
+  const sCat = document.getElementById('editCategory').value;
   const sWil = document.getElementById('editWilaya').value;
   const sComm = document.getElementById('editCommune').value;
   const sAddr = document.getElementById('editAddress').value.trim();
@@ -1358,6 +1428,7 @@ window.saveProfile = async function() {
       instagramURL: sIg,
       tiktokURL: sTiktok,
       telegramURL: sTg,
+      category: sCat,
       wilaya: sWil,
       commune: sComm,
       address: sAddr
@@ -1370,6 +1441,7 @@ window.saveProfile = async function() {
   shopData.instagramURL = sIg;
   shopData.tiktokURL = sTiktok;
   shopData.telegramURL = sTg;
+  shopData.category = sCat;
   shopData.wilaya = sWil;
   shopData.commune = sComm;
   shopData.address = sAddr;
