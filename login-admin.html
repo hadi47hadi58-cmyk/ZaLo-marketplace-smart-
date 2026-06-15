@@ -481,9 +481,22 @@ function setLoading(id, val) {
 
 // Security lock settings check
 let enteredPin = "";
-function initSecurityLock() {
+async function initSecurityLock() {
   // Always display the passcode screen by default for administrative security
-  document.getElementById('passcode-screen').style.display = 'flex';
+  const passcodeEl = document.getElementById('passcode-screen');
+  if (passcodeEl) passcodeEl.style.display = 'flex';
+
+  // Fetch latest settings from Firestore to stay in perfect sync
+  try {
+    const secDoc = await getDoc(doc(db, 'settings', 'security'));
+    if (secDoc.exists()) {
+      const data = secDoc.data();
+      const remotePin = data.admin_pin || "123456";
+      localStorage.setItem('zalo_pin_admin', remotePin);
+    }
+  } catch(e) {
+    console.error("Firestore security lock sync failed:", e);
+  }
 }
 
 function updatePinDots() {

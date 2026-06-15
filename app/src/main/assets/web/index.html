@@ -308,10 +308,19 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
       <div class="cat-card" onclick="openCat('هواتف وإلكترونيات')"><div class="cat-img">📱</div><div class="cat-lbl">هواتف وإلكترونيات</div></div>
       <div class="cat-card" onclick="openCat('أثاث ومنزل')"><div class="cat-img">🛋️</div><div class="cat-lbl">أثاث ومنزل</div></div>
       <div class="cat-card" onclick="openCat('ملابس وأزياء')"><div class="cat-img">👗</div><div class="cat-lbl">ملابس وأزياء</div></div>
+      <div class="cat-card" onclick="openCat('أحذية وحقائب')"><div class="cat-img">👜</div><div class="cat-lbl">أحذية وحقائب</div></div>
       <div class="cat-card" onclick="openCat('مواد غذائية')"><div class="cat-img">🥗</div><div class="cat-lbl">مواد غذائية</div></div>
+      <div class="cat-card" onclick="openCat('ألعاب وهدايا')"><div class="cat-img">🎁</div><div class="cat-lbl">ألعاب وهدايا</div></div>
+      <div class="cat-card" onclick="openCat('سيارات وقطع غيار')"><div class="cat-img">🚗</div><div class="cat-lbl">سيارات وقطع غيار</div></div>
+      <div class="cat-card" onclick="openCat('رياضية ولياقة')"><div class="cat-img">⚽</div><div class="cat-lbl">رياضية ولياقة</div></div>
+      <div class="cat-card" onclick="openCat('عقارات كراء وبيع')"><div class="cat-img">🏢</div><div class="cat-lbl">عقارات كراء وبيع</div></div>
+      <div class="cat-card" onclick="openCat('صحة ومكملات غذائية')"><div class="cat-img">💊</div><div class="cat-lbl">صحة ومكملات</div></div>
+      <div class="cat-card" onclick="openCat('خردوات ومواد بناء')"><div class="cat-img">🧱</div><div class="cat-lbl">خردوات وبناء</div></div>
       <div class="cat-card" onclick="openCat('أدوات ومعدات')"><div class="cat-img">🔧</div><div class="cat-lbl">أدوات ومعدات</div></div>
       <div class="cat-card" onclick="openCat('تجميل وعناية')"><div class="cat-img">💄</div><div class="cat-lbl">تجميل وعناية</div></div>
       <div class="cat-card" onclick="openCat('كتب وقرطاسية')"><div class="cat-img">📚</div><div class="cat-lbl">كتب وقرطاسية</div></div>
+      <div class="cat-card" onclick="openCat('خدمات ومهن حرة')"><div class="cat-img">🛠️</div><div class="cat-lbl">خدمات ومهن</div></div>
+      <div class="cat-card" onclick="openCat('أخرى')"><div class="cat-img">🏷️</div><div class="cat-lbl">أخرى</div></div>
     </div>
   </div>
 </div>
@@ -352,8 +361,22 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
       <div id="scall-btn" style="background:rgba(255,255,255,.2);border:none;border-radius:50%;width:34px;height:34px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;color:#fff">📞</div>
     </div>
   </div>
-  <div class="ptbar"><h2 id="prod-h2">منتجات المتجر</h2></div>
-  <div class="content">
+  <div class="content" style="padding-top:0;">
+    <!-- STORE DYNAMIC PROFILE HEADER -->
+    <div id="store-profile-header" style="background:linear-gradient(135deg, #0d1a12 0%, #050a07 100%); padding:24px 16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:2px solid var(--gold); box-shadow:0 4px 15px rgba(0,0,0,0.15); margin-bottom:12px;">
+      <!-- Logo Wrap -->
+      <div style="width:84px; height:84px; border-radius:50%; background:#142218; border:2.5px solid var(--gold); padding:4px; box-shadow:0 6px 14px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:10px;">
+        <img id="store-profile-logo" src="" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:none;">
+        <span id="store-profile-logo-placeholder" style="font-size:38px; display:block;">🏪</span>
+      </div>
+      <!-- Store Name -->
+      <h2 id="store-profile-name" style="color:#fff; font-size:18px; font-weight:800; margin:0 0 6px; font-family:'Cairo', sans-serif; text-shadow:0 1px 4px rgba(0,0,0,0.5);">—</h2>
+      <!-- Location Badge -->
+      <div style="background:rgba(201,168,76,0.15); border:1.2px solid rgba(201,168,76,0.35); border-radius:20px; padding:3px 14px; color:var(--gold); font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; direction:rtl;">
+        📍 <span id="store-profile-wilcom">شريك شبكة ZaLo</span>
+      </div>
+    </div>
+
     <div id="store-closed-banner" style="display:none; background:#ffebee; border-bottom:1.5px solid #ffcdd2; color:#c62828; padding:12px 14px; text-align:center; font-weight:700; font-size:13px; direction:rtl;">
       ⚠️ نعتذر منكم، هذا المتجر مغلق مؤقتاً للراحة العائلية ولا يستقبل أي طلبيات شراء حالياً بنظام الدفع عند الاستلام.
     </div>
@@ -514,7 +537,11 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="fg"><label>📁 فئة النشاط التجاري *</label>
           <select class="fsel" id="r-cat"><option value="">اختر التخصص...</option>
             <option>هواتف وإلكترونيات</option><option>أثاث ومنزل</option><option>ملابس وأزياء</option>
-            <option>مواد غذائية</option><option>تجميل وعناية</option><option>أدوات ومعدات</option><option>أخرى</option>
+            <option>أحذية وحقائب</option><option>مواد غذائية</option><option>ألعاب وهدايا</option>
+            <option>سيارات وقطع غيار</option><option>رياضية ولياقة</option><option>عقارات كراء وبيع</option>
+            <option>صحة ومكملات غذائية</option><option>خردوات ومواد بناء</option><option>أدوات ومعدات</option>
+            <option>تجميل وعناية</option><option>كتب وقرطاسية</option><option>خدمات ومهن حرة</option>
+            <option>أخرى</option>
           </select>
         </div>
         <div class="fg"><label>🏷️ فئة التسجيل المطلوبة *</label>
@@ -1000,7 +1027,21 @@ function openStore(id,name,wa,logo){
   _store={id,name,wa,logo,storeOpen:true};
   
   document.getElementById('prod-sname').textContent=name;
-  document.getElementById('prod-h2').textContent=name;
+  
+  // Update Profile Header with initial available parameters
+  document.getElementById('store-profile-name').textContent = name;
+  const pImg = document.getElementById('store-profile-logo');
+  const pPlc = document.getElementById('store-profile-logo-placeholder');
+  if (logo && logo.trim().length > 0) {
+    pImg.src = logo;
+    pImg.style.display = 'block';
+    pPlc.style.display = 'none';
+  } else {
+    pImg.style.display = 'none';
+    pPlc.style.display = 'block';
+  }
+  document.getElementById('store-profile-wilcom').textContent = 'جاري تحديد منطقة النشاط...';
+
   document.getElementById('swa-btn').onclick=()=>openWA(wa,'مرحباً متجر ' + name + '، أود الاستفسار بخصوص السلع المعروضة في منصة ZaLo.');
   document.getElementById('scall-btn').onclick=()=>window.open('tel:' + wa);
   
@@ -1021,6 +1062,17 @@ function openStore(id,name,wa,logo){
       if (sDoc.exists) {
         const s = sDoc.data();
         
+        // Populate precise location details
+        const details_loc = s.commune ? `${s.wilaya} - ${s.commune}` : (s.wilaya || 'شريك شبكة ZaLo');
+        document.getElementById('store-profile-wilcom').textContent = details_loc;
+
+        // Populate precise shop-custom logo if exists
+        if (s.logoURL && s.logoURL.trim().length > 0) {
+          pImg.src = s.logoURL;
+          pImg.style.display = 'block';
+          pPlc.style.display = 'none';
+        }
+
         // Sync store open status
         const storeIsOpen = (s.storeOpen !== false);
         _store.storeOpen = storeIsOpen;

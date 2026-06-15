@@ -1746,22 +1746,48 @@ window.saveNewAdmin = async function() {
   }
 };
 
-window.toggleLockState = function(type) {
+window.saveSecuritySettingsToFirestore = async function() {
+  try {
+    const custEnabled = localStorage.getItem('zalo_lock_customer_enabled') === 'true';
+    const custPin = localStorage.getItem('zalo_pin_customer') || '1234';
+    const merchEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
+    const merchPin = localStorage.getItem('zalo_pin_merchant') || '1234';
+    const adminEnabled = localStorage.getItem('zalo_lock_admin_enabled') === 'true';
+    const adminPin = localStorage.getItem('zalo_pin_admin') || '123456';
+    
+    await setDoc(doc(db, 'settings', 'security'), {
+      customer_enabled: custEnabled,
+      customer_pin: custPin,
+      merchant_enabled: merchEnabled,
+      merchant_pin: merchPin,
+      admin_enabled: adminEnabled,
+      admin_pin: adminPin
+    });
+    console.log("🎯 Dynamic settings updated in Firestore successfully.");
+  } catch(e) {
+    console.error("Error saving security settings to Firestore:", e);
+  }
+};
+
+window.toggleLockState = async function(type) {
   const tgl = document.getElementById(`lock-${type}-toggle`);
   const isEnabled = tgl.classList.contains('on');
   localStorage.setItem(`zalo_lock_${type}_enabled`, isEnabled ? 'true' : 'false');
-  window.showToast(`🛡️ تم تحديث حالة قفل بوابة ${type === 'customer' ? 'الزبائن' : (type === 'merchant' ? 'التجار' : 'المدير')} بالنجاح`);
+  await window.saveSecuritySettingsToFirestore();
+  window.showToast(`🛡️ تم تحديث حالة قفل بوابة ${type === 'customer' ? 'الزبائن' : (type === 'merchant' ? 'التجار' : 'المدير')} بالنجاح وجاري مزامنتها عالمياً`);
 };
 
-window.savePIN = function(type) {
+window.savePIN = async function(type) {
   const pinInput = document.getElementById(`pin-input-${type}`);
   const code = pinInput.value.trim();
-  if (code.length !== 4 || isNaN(code)) {
-    window.showToast('⚠️ يرجى تعيين كود يتكون من 4 أرقام تماماً');
+  const requiredLen = (type === 'admin') ? 6 : 4;
+  if (code.length !== requiredLen || isNaN(code)) {
+    window.showToast(`⚠️ يرجى تعيين كود يتكون من ${requiredLen} أرقام تماماً`);
     return;
   }
   localStorage.setItem(`zalo_pin_${type}`, code);
-  window.showToast(`✅ تم حفظ رمز تأمين بوابة ${type === 'customer' ? 'الزبائن' : (type === 'merchant' ? 'التجار' : 'المدير')}: ${code}`);
+  await window.saveSecuritySettingsToFirestore();
+  window.showToast(`✅ تم حفظ رمز تأمين بوابة ${type === 'customer' ? 'الزبائن' : (type === 'merchant' ? 'التجار' : 'المدير')} بنجاح: ${code}`);
 };
 
 window.loadWilayas = function() {
@@ -1841,38 +1867,56 @@ window.showPage = function(page) {
   if (page==='wilayas') window.loadWilayas();
   if (page==='reports') window.loadReports();
   if (page==='settings') {
-    // 🛍️ Customer Portal Settings loading
-    const custLocked = localStorage.getItem('zalo_lock_customer_enabled') === 'true';
-    const custTgl = document.getElementById('lock-customer-toggle');
-    if (custTgl) {
-      if (custLocked) custTgl.classList.add('on');
-      else custTgl.classList.remove('on');
-    }
-    const custPin = localStorage.getItem('zalo_pin_customer') || '1234';
-    const custInput = document.getElementById('pin-input-customer');
-    if (custInput) custInput.value = custPin;
+    // Synchronize latest settings from Firestore preceding page load
+    (async () => {
+      try {
+        const secDoc = await getDoc(doc(db, 'settings', 'security'));
+        if (secDoc.exists()) {
+          const data = secDoc.data();
+          localStorage.setItem('zalo_lock_customer_enabled', data.customer_enabled ? 'true' : 'false');
+          localStorage.setItem('zalo_pin_customer', data.customer_pin || '1234');
+          localStorage.setItem('zalo_lock_merchant_enabled', data.merchant_enabled ? 'true' : 'false');
+          localStorage.setItem('zalo_pin_merchant', data.merchant_pin || '1234');
+          localStorage.setItem('zalo_lock_admin_enabled', data.admin_enabled ? 'true' : 'false');
+          localStorage.setItem('zalo_pin_admin', data.admin_pin || '123456');
+        }
+      } catch(e) {
+        console.error("Failed to pre-fetch security config:", e);
+      }
+      
+      // 🛍️ Customer Portal Settings loading
+      const custLocked = localStorage.getItem('zalo_lock_customer_enabled') === 'true';
+      const custTgl = document.getElementById('lock-customer-toggle');
+      if (custTgl) {
+        if (custLocked) custTgl.classList.add('on');
+        else custTgl.classList.remove('on');
+      }
+      const custPin = localStorage.getItem('zalo_pin_customer') || '1234';
+      const custInput = document.getElementById('pin-input-customer');
+      if (custInput) custInput.value = custPin;
 
-    // 🏪 Merchant Portal Settings loading
-    const merchLocked = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
-    const merchTgl = document.getElementById('lock-merchant-toggle');
-    if (merchTgl) {
-      if (merchLocked) merchTgl.classList.add('on');
-      else merchTgl.classList.remove('on');
-    }
-    const merchPin = localStorage.getItem('zalo_pin_merchant') || '1234';
-    const merchInput = document.getElementById('pin-input-merchant');
-    if (merchInput) merchInput.value = merchPin;
+      // 🏪 Merchant Portal Settings loading
+      const merchLocked = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
+      const merchTgl = document.getElementById('lock-merchant-toggle');
+      if (merchTgl) {
+        if (merchLocked) merchTgl.classList.add('on');
+        else merchTgl.classList.remove('on');
+      }
+      const merchPin = localStorage.getItem('zalo_pin_merchant') || '1234';
+      const merchInput = document.getElementById('pin-input-merchant');
+      if (merchInput) merchInput.value = merchPin;
 
-    // 🛡️ Admin Portal Settings loading
-    const admLocked = localStorage.getItem('zalo_lock_admin_enabled') === 'true';
-    const admTgl = document.getElementById('lock-admin-toggle');
-    if (admTgl) {
-      if (admLocked) admTgl.classList.add('on');
-      else admTgl.classList.remove('on');
-    }
-    const admPin = localStorage.getItem('zalo_pin_admin') || '1234';
-    const admInput = document.getElementById('pin-input-admin');
-    if (admInput) admInput.value = admPin;
+      // 🛡️ Admin Portal Settings loading
+      const admLocked = localStorage.getItem('zalo_lock_admin_enabled') === 'true';
+      const admTgl = document.getElementById('lock-admin-toggle');
+      if (admTgl) {
+        if (admLocked) admTgl.classList.add('on');
+        else admTgl.classList.remove('on');
+      }
+      const admPin = localStorage.getItem('zalo_pin_admin') || '123456';
+      const admInput = document.getElementById('pin-input-admin');
+      if (admInput) admInput.value = admPin;
+    })();
   }
   if (page==='qrcode') {
     window.populateQRMerchants();

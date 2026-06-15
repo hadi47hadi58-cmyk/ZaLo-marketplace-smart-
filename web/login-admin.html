@@ -236,7 +236,7 @@
         <label class="form-label">البريد الإلكتروني للإدارة</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="" />
+          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="hadi47hadi58@gmail.com" />
         </div>
       </div>
 
@@ -244,7 +244,7 @@
         <label class="form-label">كلمة المرور الخاصة بمسؤوليتك</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="" />
+          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="123456" />
           <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
         </div>
       </div>
@@ -314,6 +314,7 @@ onAuthStateChanged(auth, async (user) => {
   if (user.email === "hadi47hadi58@gmail.com" && sessionActive) {
     localStorage.setItem('loggedInAdminEmail', user.email);
     localStorage.setItem('loggedInAdminRole', 'super_admin');
+    sessionStorage.setItem('admin_logged_in_session', 'true');
     window.location.href = 'admin.html';
     return;
   }
@@ -408,6 +409,7 @@ window.doLogin = async function() {
           localStorage.setItem('loggedInAdminEmail', email);
           localStorage.setItem('loggedInAdminRole', adminData.role);
           localStorage.setItem('loggedInAdminName', adminData.name);
+          sessionStorage.setItem('admin_logged_in_session', 'true');
           window.location.href = 'admin.html';
           return;
         }
@@ -420,16 +422,19 @@ window.doLogin = async function() {
       localStorage.setItem('loggedInAdminEmail', email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
       localStorage.setItem('loggedInAdminName', 'المالك العام');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
 
+    sessionStorage.setItem('admin_logged_in_session', 'true');
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
     if (user.email === "hadi47hadi58@gmail.com") {
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
@@ -441,6 +446,7 @@ window.doLogin = async function() {
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', data.role || 'support');
       localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
@@ -450,6 +456,7 @@ window.doLogin = async function() {
       const dataDoc = adminDoc.data();
       localStorage.setItem('loggedInAdminEmail', user.email);
       localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
     }
@@ -474,9 +481,22 @@ function setLoading(id, val) {
 
 // Security lock settings check
 let enteredPin = "";
-function initSecurityLock() {
+async function initSecurityLock() {
   // Always display the passcode screen by default for administrative security
-  document.getElementById('passcode-screen').style.display = 'flex';
+  const passcodeEl = document.getElementById('passcode-screen');
+  if (passcodeEl) passcodeEl.style.display = 'flex';
+
+  // Fetch latest settings from Firestore to stay in perfect sync
+  try {
+    const secDoc = await getDoc(doc(db, 'settings', 'security'));
+    if (secDoc.exists()) {
+      const data = secDoc.data();
+      const remotePin = data.admin_pin || "123456";
+      localStorage.setItem('zalo_pin_admin', remotePin);
+    }
+  } catch(e) {
+    console.error("Firestore security lock sync failed:", e);
+  }
 }
 
 function updatePinDots() {

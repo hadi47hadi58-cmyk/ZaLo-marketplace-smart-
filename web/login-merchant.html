@@ -618,8 +618,7 @@ window.doLogin = async function() {
             isSubmitting = false;
             setLoading('loginBtn', false);
             if (signUpError.code === 'auth/email-already-in-use') {
-              const savedPassTip = reqData.tempPassword ? ` (ملاحظة: جرب كلمة المرور التي اخترتها عند تقديم الطلب: "${reqData.tempPassword}")` : '';
-              showLoginError(`⚠️ الحساب موجود بالفعل، ولكن كلمة المرور المدخلة غير صحيحة!${savedPassTip} أو يمكنك الضغط على "نسيت كلمة المرور" لاستلام رابط استعادة سريع.`);
+              showLoginError('⚠️ الحساب موجود بالفعل، كود المرور المدخل غير صحيح!');
             } else {
               showLoginError('⚠️ فشل التفعيل التلقائي: ' + signUpError.message);
             }
@@ -667,12 +666,33 @@ function setLoading(id, val) {
 
 // Security locks check
 let enteredPin = "";
-function initSecurityLock() {
-  const isEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
-  if (isEnabled) {
-    document.getElementById('passcode-screen').style.display = 'flex';
+async function initSecurityLock() {
+  // Try to use cached local storage value first for zero-delay display
+  const cachedEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
+  const passcodeEl = document.getElementById('passcode-screen');
+  if (cachedEnabled) {
+    if (passcodeEl) passcodeEl.style.display = 'flex';
   } else {
-    document.getElementById('passcode-screen').style.display = 'none';
+    if (passcodeEl) passcodeEl.style.display = 'none';
+  }
+
+  // Then immediately pull latest settings from Firestore to ensure global synchronization
+  try {
+    const secDoc = await getDoc(doc(db, 'settings', 'security'));
+    if (secDoc.exists()) {
+      const data = secDoc.data();
+      const isEnabled = data.merchant_enabled === true;
+      const remotePin = data.merchant_pin || "1234";
+      
+      localStorage.setItem('zalo_lock_merchant_enabled', isEnabled ? 'true' : 'false');
+      localStorage.setItem('zalo_pin_merchant', remotePin);
+      
+      if (passcodeEl) {
+        passcodeEl.style.display = isEnabled ? 'flex' : 'none';
+      }
+    }
+  } catch(e) {
+    console.error("Firestore lock lookup bypassed, utilizing local cache:", e);
   }
 }
 
