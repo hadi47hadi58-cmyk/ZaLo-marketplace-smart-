@@ -211,6 +211,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
+
 <div id="toast" class="toast"></div>
 <div class="overlay" id="overlay" onclick="closeSide()"></div>
 <div class="sidemenu" id="sidemenu">
@@ -218,31 +219,24 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
     <button class="sm-close" onclick="closeSide()">✕</button>
     <img class="sm-logo" src="logo.svg" alt="" onerror="this.src='https://placehold.co/100x100/1a5c2a/white?text=ZaLo'">
     <div class="sm-title">ZaLo</div>
-    <div class="sm-sub" id="smSub">السوق الذكي الجزائري</div>
+    <div class="sm-sub">السوق الذكي الجزائري</div>
   </div>
-  <div class="sm-sec" id="smSecMenu">القائمة</div>
-  <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn" id="smHome">الرئيسية</div></div></div>
-  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn" id="smWilayas">الولايات</div></div></div>
-  <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn" id="smCats">جميع الأقسام</div></div></div>
-  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn" id="smProds">جميع المنتجات</div></div></div>
-  <div class="sm-sec" id="smSecMerchants">للتجار</div>
-  <div class="smi" onclick="closeSide();G('register')"><span class="si">🏪</span><div><div class="sn" id="smRegStore">سجّل متجرك</div><div class="sd" id="smFree">مجاناً</div></div></div>
-  <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn" id="smDashboard">لوحة التحكم للتاجر والأدمن</div></div></div>
-  <div class="sm-sec" id="smSecContact">تواصل معنا وإدارة</div>
-  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn" id="smContactUs">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
-  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn" id="smAdminSite">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
-  <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn" id="smAboutUs">من نحن</div><div class="sd" id="smAboutDesc">حول منصة ZaLo الذكية</div></div></div>
-  
-  <div class="sm-sec" id="smSecLang">اللغة / Langue / Language</div>
-  <div style="display: flex; gap: 8px; justify-content: space-around; padding: 12px 14px; background: #fafafa; border-bottom: 1px solid #f0f0f0;">
-    <button class="lang-btn" data-lang="ar" onclick="setAppLanguage('ar')" style="flex: 1; padding: 10px 4px; border: 1px solid var(--bd); border-radius: 8px; background: var(--g1); color: #fff; font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">العربية</button>
-    <button class="lang-btn" data-lang="fr" onclick="setAppLanguage('fr')" style="flex: 1; padding: 10px 4px; border: 1px solid var(--bd); border-radius: 8px; background: #fff; color: var(--text); font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">Français</button>
-    <button class="lang-btn" data-lang="en" onclick="setAppLanguage('en')" style="flex: 1; padding: 10px 4px; border: 1px solid var(--bd); border-radius: 8px; background: #fff; color: var(--text); font-family: 'Cairo', sans-serif; font-weight: bold; font-size: 11px; cursor: pointer; transition: all 0.2s;">English</button>
-  </div>
-
-  <div class="sm-footer"><p id="smCopyright">© 2026 ZaLo - السوق الذكي</p></div>
+  <div class="sm-sec">القائمة</div>
+  <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn">الرئيسية</div></div></div>
+  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn">الولايات</div></div></div>
+  <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn">جميع الأقسام</div></div></div>
+  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn">جميع المنتجات</div></div></div>
+  <div class="sm-sec">للتجار</div>
+  <div class="smi" onclick="closeSide();G('register')"><span class="si">🏪</span><div><div class="sn">سجّل متجرك</div><div class="sd">مجاناً</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">لوحة التحكم للتاجر والأدمن</div></div></div>
+  <div class="sm-sec">تواصل معنا وإدارة</div>
+  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
+  <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn">من نحن</div><div class="sd">حول منصة ZaLo الذكية</div></div></div>
+  <div class="sm-footer"><p>© 2026 ZaLo - السوق الذكي</p></div>
 </div>
 <div id="app" style="display:none">
+</div>
 <div class="popup-ov" id="comm-popup" onclick="if(event.target===this)closeCommP()">
   <div class="comm-popup">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; border-bottom:1px solid #f0f0f0; padding-bottom:10px; box-sizing:border-box; width:100%;">
@@ -259,34 +253,34 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="tb-bell" onclick="G('notif')">🔔<div class="tb-badge" id="nb">2</div></div>
     <div class="tb-center">
       <img class="tb-logo-img" src="logo.svg" alt="" onerror="this.src='https://placehold.co/40x40/1a5c2a/white?text=ZaLo'">
-      <div class="tb-title" id="tbTitleHome">ZaLo smart marketplace</div>
+      <div class="tb-title">ZaLo smart marketplace</div>
     </div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
   <div class="content">
     <div class="home-body">
       <div class="home-logo-box"><img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/120x120/1a5c2a/white?text=ZaLo'"></div>
-      <div class="home-title" id="homeTitleText">ZaLo<br>السوق الذكي الجزائري</div>
-      <button class="btn-gm" id="btnShopAll" onclick="G('wilayas')">🛍️ تسوق في كل الولايات الـ69 الآن</button>
-      <button class="btn-gm" id="btnOpenStore" style="background:#cc9a00" onclick="G('register')">🏪 افتح متجرك وضاعف مبيعاتك</button>
+      <div class="home-title">ZaLo<br>السوق الذكي الجزائري</div>
+      <button class="btn-gm" onclick="G('wilayas')">🛍️ تسوق في كل الولايات الـ69 الآن</button>
+      <button class="btn-gm" style="background:#cc9a00" onclick="G('register')">🏪 افتح متجرك وضاعف مبيعاتك</button>
       <div class="home-circles">
         <div class="hcircle" onclick="G('cats')">
-          <div class="hcircle-icon" style="font-size:22px">⊞<br><span style="font-size:9px;font-weight:700" id="circleCatsLabel">الأقسام</span></div>
-          <div class="hcircle-label" id="circleAllCatsText">جميع الأقسام</div>
+          <div class="hcircle-icon" style="font-size:22px">⊞<br><span style="font-size:9px;font-weight:700">الأقسام</span></div>
+          <div class="hcircle-label">جميع الأقسام</div>
         </div>
         <div class="hcircle" onclick="G('all-prods')">
           <div class="hcircle-icon">📦</div>
-          <div class="hcircle-label" id="circleAllProdsText">جميع المنتجات</div>
+          <div class="hcircle-label">جميع المنتجات</div>
         </div>
       </div>
     </div>
   </div>
   <div class="bnav">
-    <div class="bn on" onclick="G('home')"><div class="bni">🏠</div><div class="bnl" id="bnlHome">الرئيسية</div></div>
-    <div class="bn" onclick="G('myorders')"><div class="bni">🛍️</div><div class="bnl" id="bnlOrders">طلباتي</div></div>
-    <div class="bn" onclick="G('wilayas')"><div class="bni">📍</div><div class="bnl" id="bnlWilayas">الولايات</div></div>
-    <div class="bn" onclick="G('search')"><div class="bni">🔍</div><div class="bnl" id="bnlSearch">بحث سريع</div></div>
-    <div class="bn" onclick="openLink('login.html')"><div class="bni">👤</div><div class="bnl" id="bnlPortal">بوابتي الكبرى</div></div>
+    <div class="bn on" onclick="G('home')"><div class="bni">🏠</div><div class="bnl">الرئيسية</div></div>
+    <div class="bn" onclick="G('myorders')"><div class="bni">🛍️</div><div class="bnl">طلباتي</div></div>
+    <div class="bn" onclick="G('wilayas')"><div class="bni">📍</div><div class="bnl">الولايات</div></div>
+    <div class="bn" onclick="G('search')"><div class="bni">🔍</div><div class="bnl">بحث سريع</div></div>
+    <div class="bn" onclick="openLink('login.html')"><div class="bni">👤</div><div class="bnl">بوابتي الكبرى</div></div>
   </div>
 </div>
 
@@ -294,10 +288,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-wilayas" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title" id="tbTitleWilayas">الولايات الـ69 الجزائرية</div></div>
+    <div class="tb-center"><div class="tb-title">الولايات الـ69 الجزائرية</div></div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
-  <div class="ptbar"><h2 id="ptbarWilayasText">تسوق حسب موقع المحلات</h2></div>
+  <div class="ptbar"><h2>تسوق حسب موقع المحلات</h2></div>
   <div class="content"><div class="wchips-wrap"><div class="wchips" id="wchips"></div></div></div>
 </div>
 
@@ -305,19 +299,19 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-cats" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title" id="tbTitleCats">جميع أقسام السوق</div></div>
+    <div class="tb-center"><div class="tb-title">جميع أقسام السوق</div></div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
-  <div class="ptbar"><h2 id="ptbarCatsText">اختر صنف المنتجات</h2></div>
+  <div class="ptbar"><h2>اختر صنف المنتجات</h2></div>
   <div class="content">
     <div class="cats-grid">
-      <div class="cat-card" onclick="openCat('هواتف وإلكترونيات')"><div class="cat-img">📱</div><div class="cat-lbl" id="catLabelPhones">هواتف وإلكترونيات</div></div>
-      <div class="cat-card" onclick="openCat('أثاث ومنزل')"><div class="cat-img">🛋️</div><div class="cat-lbl" id="catLabelFurniture">أثاث ومنزل</div></div>
-      <div class="cat-card" onclick="openCat('ملابس وأزياء')"><div class="cat-img">👗</div><div class="cat-lbl" id="catLabelClothing">ملابس وأزياء</div></div>
-      <div class="cat-card" onclick="openCat('مواد غذائية')"><div class="cat-img">🥗</div><div class="cat-lbl" id="catLabelFood">مواد غذائية</div></div>
-      <div class="cat-card" onclick="openCat('أدوات ومعدات')"><div class="cat-img">🔧</div><div class="cat-lbl" id="catLabelTools">أدوات ومعدات</div></div>
-      <div class="cat-card" onclick="openCat('تجميل وعناية')"><div class="cat-img">💄</div><div class="cat-lbl" id="catLabelBeauty">تجميل وعناية</div></div>
-      <div class="cat-card" onclick="openCat('كتب وقرطاسية')"><div class="cat-img">📚</div><div class="cat-lbl" id="catLabelBooks">كتب وقرطاسية</div></div>
+      <div class="cat-card" onclick="openCat('هواتف وإلكترونيات')"><div class="cat-img">📱</div><div class="cat-lbl">هواتف وإلكترونيات</div></div>
+      <div class="cat-card" onclick="openCat('أثاث ومنزل')"><div class="cat-img">🛋️</div><div class="cat-lbl">أثاث ومنزل</div></div>
+      <div class="cat-card" onclick="openCat('ملابس وأزياء')"><div class="cat-img">👗</div><div class="cat-lbl">ملابس وأزياء</div></div>
+      <div class="cat-card" onclick="openCat('مواد غذائية')"><div class="cat-img">🥗</div><div class="cat-lbl">مواد غذائية</div></div>
+      <div class="cat-card" onclick="openCat('أدوات ومعدات')"><div class="cat-img">🔧</div><div class="cat-lbl">أدوات ومعدات</div></div>
+      <div class="cat-card" onclick="openCat('تجميل وعناية')"><div class="cat-img">💄</div><div class="cat-lbl">تجميل وعناية</div></div>
+      <div class="cat-card" onclick="openCat('كتب وقرطاسية')"><div class="cat-img">📚</div><div class="cat-lbl">كتب وقرطاسية</div></div>
     </div>
   </div>
 </div>
@@ -331,7 +325,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="ptbar"><h2 id="stores-h2">محلات القسم</h2></div>
   <div class="content">
-    <div class="slist" id="slist"><div class="empty"><div class="ei">⏳</div><p id="loadingStoresTxt">جاري تحميل المتاجر العتيدة...</p></div></div>
+    <div class="slist" id="slist"><div class="empty"><div class="ei">⏳</div><p>جاري تحميل المتاجر العتيدة...</p></div></div>
   </div>
 </div>
 
@@ -339,10 +333,10 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-all-prods" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title" id="tbTitleAllProds">المنتجات الجزائرية</div></div>
+    <div class="tb-center"><div class="tb-title">المنتجات الجزائرية</div></div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
-  <div class="ptbar"><h2 id="ptbarAllProdsText">جميع منتجات التجار</h2></div>
+  <div class="ptbar"><h2>جميع منتجات التجار</h2></div>
   <div class="content">
     <div class="pgrid" id="all-pgrid"><div style="grid-column:span 2" class="empty"><div class="ei">⏳</div><p>جاري التحميل...</p></div></div>
   </div>
@@ -360,6 +354,9 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="ptbar"><h2 id="prod-h2">منتجات المتجر</h2></div>
   <div class="content">
+    <div id="store-closed-banner" style="display:none; background:#ffebee; border-bottom:1.5px solid #ffcdd2; color:#c62828; padding:12px 14px; text-align:center; font-weight:700; font-size:13px; direction:rtl;">
+      ⚠️ نعتذر منكم، هذا المتجر مغلق مؤقتاً للراحة العائلية ولا يستقبل أي طلبيات شراء حالياً بنظام الدفع عند الاستلام.
+    </div>
     <div id="store-socials-container" style="display:none; padding:12px 14px 6px; background:#fbfbfb; border-bottom:1.5px solid var(--bd); flex-direction:column; gap:8px;">
        <div style="font-size:11px; font-weight:700; color:var(--g1); margin-bottom:4px; text-align:center;">💼 قنوات تواصل المتجر الرسمية المباشرة:</div>
        <div id="store-socials-row" style="display:flex; justify-content:center; gap:8px; flex-wrap:wrap; margin-bottom: 6px;"></div>
@@ -376,7 +373,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
     <div style="width:34px"></div>
   </div>
   <div class="content">
-    <div class="prod-detail">
+    <div class="prod-detail" id="prod-detail-wrapper">
       <div class="pd-img" id="pd-img-wrap"><span style="font-size:80px" id="pd-emoji">📦</span></div>
       <div class="pd-name" id="pd-name">اسم المنتج التجاري</div>
       <div class="pd-price" id="pd-price">0 دج</div>
@@ -387,8 +384,13 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
         <div class="qty-val" id="qty-v">1</div>
         <button class="qty-btn" onclick="chQty(1)">+</button>
       </div>
-      <button style="width:100%;max-width:320px;background:var(--gold);color:var(--g1);border:none;border-radius:13px;padding:14px;font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 15px rgba(201,168,76,0.2)" onclick="goOrd()">🛒 الشراء المباشر الآن</button>
-      <button style="width:100%;max-width:320px;background:var(--g1);color:#fff;border:none;border-radius:13px;padding:13px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px" onclick="toast('✅ تمت الإضافة إلى سلة تسوقك','ok')">🛍️ أضف إلى السلة</button>
+    <div id="pd-order-actions-wrap" style="width:100%; display:flex; flex-direction:column; align-items:center;">
+      <button id="pd-buy-btn" style="width:100%;max-width:320px;background:var(--gold);color:var(--g1);border:none;border-radius:13px;padding:14px;font-family:'Cairo',sans-serif;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 15px rgba(201,168,76,0.2)" onclick="goOrd()">🛒 الشراء المباشر الآن</button>
+      <button id="pd-cart-btn" style="width:100%;max-width:320px;background:var(--g1);color:#fff;border:none;border-radius:13px;padding:13px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:10px" onclick="toast('✅ تمت الإضافة إلى سلة تسوقك','ok')">🛍️ أضف إلى السلة</button>
+    </div>
+    <div id="pd-store-closed-banner" style="display:none; background:#ffebee; border:1px solid #ffcdd2; color:#c62828; border-radius:12px; padding:15px; text-align:center; font-weight:700; font-size:13px; max-width:320px; width:100%; margin-bottom:10px; box-sizing:border-box; direction:rtl;">
+      ⚠️ نعتذر منكم، المتجر مغلق مؤقتاً للراحة حالياً ولا يستقبل أي طلبيات شراء في هذا الوقت وسيعود قريباً.
+    </div>
     </div>
   </div>
 </div>
@@ -783,6 +785,9 @@ window.submitMerchant=async()=>{
   if(!sname||!oname||!email||!pass||!phone||!wa||!wil||!comm||!addr||!cat||!hours||!desc){toast('⚠️ الرجاء إكمال جميع الخانات الإجبارية أولاً','err');return;}
   if(pass.length < 6){toast('⚠️ يرجى اختيار كلمة مرور تفوق 5 أحرف لتأمين الأرباح','err');return;}
   
+  const getB64=id=>document.getElementById(id)?.dataset?.base64||'';
+  const rcFile=getB64('f-rc'), idFront=getB64('f-id1')||getB64('f-idf'), idBack=getB64('f-idb'), logoB64=getB64('f-logo'), frontFile=getB64('f-front');
+
   const btn=document.getElementById('sub-btn');
   document.getElementById('sub-ld').style.display='block';btn.disabled=true;
   try{
@@ -821,7 +826,7 @@ window.submitMerchant=async()=>{
         description: desc,
         rcNumber: rcnum,
         storeType: window._stype || 'registered',
-        logoURL: '',
+        logoURL: logoB64 || '',
         facebookURL: fb,
         instagramURL: ig,
         tiktokURL: tiktok,
@@ -837,7 +842,7 @@ window.submitMerchant=async()=>{
 
     // Save to requests for administrative review, logs and record keeping
     await setDoc(doc(db,'merchant_requests', finalUid),{
-      storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:"",status:'approved',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,uid:finalUid,createdAt:sts()
+      storeName:sname,ownerName:oname,email,tempPassword:pass,phone,whatsapp:wa,wilaya:wil,commune:comm,address:addr,category:cat,workHours:hours,description:desc,rcNumber:rcnum,storeType:window._stype||'registered',logoURL:logoB64||"",status:'approved',regNumber:rnum,facebook:fb,instagram:ig,tiktokURL:tiktok,telegramURL:tg,rcFile,idFront,idBack,frontFile,uid:finalUid,createdAt:sts()
     });
     
     document.getElementById('reg-num').textContent=rnum;
@@ -908,7 +913,7 @@ const WILAYAS=[
   {n:"38 تيسمسيلت",c:["تيسمسيلت","ثنية الأحد","برج بونعامة"]},
   {n:"39 الوادي",c:["الوادي","الرباح","قمار","الرقيبة"]},
   {n:"40 خنشلة",c:["خنشلة","بابار","شلية"]},
-  {n:"41 سوق أهراس",c:["سوق أهراس","سدراتة","مداوروش"]},
+  {n:"41 سوق أهراس",c:["سوق أهراس","sدراتة","مداوروش"]},
   {n:"42 تيبازة",c:["تيبازة","شرشال","حجوط","القليعة"]},
   {n:"43 ميلة",c:["ميلة","شلغوم العيد","التلاغمة"]},
   {n:"44 عين الدفلى",c:["عين الدفلى","خميس مليانة","مليانة"]},
@@ -960,6 +965,7 @@ function back(){
 function toast(msg,type){const t=document.getElementById('toast');t.innerHTML=msg;t.className='toast show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
 function openWA(num,msg){const n=num.replace(/\D/g,'');const i=n.startsWith('0')?'213'+n.slice(1):n;window.open('https://wa.me/'+i+'?text='+encodeURIComponent(msg),'_blank');}
 function openLink(url){window.open(url,'_blank');}
+// Open side, trigger visually
 function openSide(){document.getElementById('sidemenu').classList.add('open');document.getElementById('overlay').classList.add('show');}
 function closeSide(){document.getElementById('sidemenu').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
 function renderW(){document.getElementById('wchips').innerHTML=WILAYAS.map(w=>`<div class="wchip" onclick="showCP('${w.n.replace(/'/g,"\\'")}')">${w.n}</div>`).join('');}
@@ -991,24 +997,38 @@ function openCat(cat){
   G('stores');
 }
 function openStore(id,name,wa,logo){
-  _store={id,name,wa,logo};
+  _store={id,name,wa,logo,storeOpen:true};
+  
   document.getElementById('prod-sname').textContent=name;
   document.getElementById('prod-h2').textContent=name;
   document.getElementById('swa-btn').onclick=()=>openWA(wa,'مرحباً متجر ' + name + '، أود الاستفسار بخصوص السلع المعروضة في منصة ZaLo.');
   document.getElementById('scall-btn').onclick=()=>window.open('tel:' + wa);
   
+  // Hide store closed banner by default
+  const closedBanner = document.getElementById('store-closed-banner');
+  if (closedBanner) closedBanner.style.display = 'none';
+
   // Render default WhatsApp link first
   const socialsRow = document.getElementById('store-socials-row');
   const socialsContainer = document.getElementById('store-socials-container');
   socialsRow.innerHTML = `<button style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="openWA('${wa}','مرحباً متجر ' + '${name}')">💬 واتساب</button>`;
   socialsContainer.style.display = 'flex';
 
-  // Attempt to fetch full store document to retrieve any social links (e.g. facebook, instagram, tiktok, telegram)
+  // Attempt to fetch full store document to retrieve any social links and storeOpen status
   try {
     const { doc, getDoc } = window._ff;
     getDoc(doc(window._db, 'shops', id)).then(sDoc => {
       if (sDoc.exists) {
         const s = sDoc.data();
+        
+        // Sync store open status
+        const storeIsOpen = (s.storeOpen !== false);
+        _store.storeOpen = storeIsOpen;
+        
+        if (closedBanner) {
+          closedBanner.style.display = storeIsOpen ? 'none' : 'block';
+        }
+
         let html = `<button style="background:#25d366;color:#fff;border:none;border-radius:10px;padding:6px 12px;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;" onclick="openWA('${s.whatsapp || wa}','مرحباً متجر ' + '${name}')">💬 واتساب</button>`;
         
         if (s.facebookURL) {
@@ -1035,16 +1055,227 @@ function openStore(id,name,wa,logo){
   if (window.loadProducts) window.loadProducts(id);
   G('products');
 }
+
 function openProd(id,name,price,img,emoji){
   _prod={id,name,price,img,emoji};_qty=1;
+  
+  // Backup template HTML
+  const wrObj = document.getElementById('prod-detail-wrapper');
+  if (wrObj && !window.originalProductDetailHTML) {
+    window.originalProductDetailHTML = wrObj.innerHTML;
+  }
+  
+  // Restore normal layout on each entry by default
+  if (wrObj && window.originalProductDetailHTML) {
+    wrObj.innerHTML = window.originalProductDetailHTML;
+  }
+
+  // Set normal details
   document.getElementById('pd-name').textContent=name;
   document.getElementById('pd-price').textContent=price.toLocaleString()+' دج';
   document.getElementById('pd-store').textContent='🏪 '+( _store ? _store.name : 'محل شريك معتمد');
   document.getElementById('qty-v').textContent=1;
   const wrap=document.getElementById('pd-img-wrap');
-  wrap.innerHTML=img?`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:contain">`:`<span style="font-size:80px">${emoji}</span>`;
+  if (wrap) {
+    wrap.innerHTML=img?`<img src="${img}" alt="" style="width:100%;height:100%;object-fit:contain">`:`<span style="font-size:80px">${emoji}</span>`;
+  }
+
+  // Manage closed status indicators
+  const closedBanner = document.getElementById('pd-store-closed-banner');
+  const actionsWrap = document.getElementById('pd-order-actions-wrap');
+  const isClosed = (_store && _store.storeOpen === false);
+  if (closedBanner) closedBanner.style.display = isClosed ? 'block' : 'none';
+  if (actionsWrap) actionsWrap.style.display = isClosed ? 'none' : 'flex';
+
+  // Async query to fetch if this product contains Landing Page metadata
+  try {
+    const { doc, getDoc } = window._ff;
+    getDoc(doc(window._db, 'products', id)).then(pDoc => {
+      if (pDoc.exists) {
+        const p = pDoc.data();
+        if (p.isLandingPage) {
+          renderLandingPageLayout({ id, ...p });
+        }
+      }
+    }).catch(() => {});
+  } catch(e) {}
+
   G('proddetail');
 }
+
+window.renderLandingPageLayout = function(p) {
+  const wrObj = document.getElementById('prod-detail-wrapper');
+  if (!wrObj) return;
+
+  wrObj.innerHTML = `
+<div style="background:#fff; color:#333; direction:rtl; text-align:right; font-family:'Cairo', sans-serif;">
+  <div style="background:#fff9db; border:1px solid #ffe3e3; border-radius:10px; padding:8px 12px; font-weight:700; color:#e03131; font-size:13px; text-align:center; margin-bottom:12px; display:flex; align-items:center; justify-content:center; gap:6px;">
+    🚀 عرض ترويجي حصري لفترة محدودة!
+  </div>
+
+  <h1 style="font-size:20px; font-weight:800; line-height:1.4; color:#212529; margin: 0 0 15px; text-align:center;">
+    ${p.lpHeadline || p.name}
+  </h1>
+
+  <div style="width:100%; border-radius:14px; overflow:hidden; box-shadow:0 4px 15px rgba(0,0,0,0.1); margin-bottom:15px; background:#f8f9fa;">
+    <img src="${p.imageURL || p.image || 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=600&q=80'}" style="width:100%; height:auto; display:block; object-fit:contain; max-height:300px;" alt="" />
+  </div>
+
+  <div style="background:#f8f9fa; border-radius:12px; padding:15px; display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border:1.5px solid #e9ecef;">
+    <div>
+      <div style="font-size:11px; color:#868e96; font-weight:600;">السعر الحالي الخرافي:</div>
+      <div style="font-size:22px; color:#2b8a3e; font-weight:800;">${(p.price || 0).toLocaleString()} دج</div>
+    </div>
+    ${p.lpHeadline || p.price ? `
+    <div>
+      <div style="font-size:11px; color:#868e96; font-weight:600; text-align:left;">السعر السابق قبل العرض:</div>
+      <div style="font-size:16px; color:#fa5252; text-decoration:line-through; font-weight:700; text-align:left;">${((p.price || 0) * 1.5).toLocaleString()} دج</div>
+    </div>
+    ` : ''}
+  </div>
+
+  <div style="background:#fff; border-radius:12px; padding:5px 0 15px; margin-bottom:10px; border-bottom:1px solid #e9ecef;">
+    <h3 style="font-size:14px; font-weight:700; color:#495057; margin-bottom:12px;">🔴 لماذا تختار هذا المنتوج دون غيره؟</h3>
+    <ul style="list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:10px;">
+      <li style="display:flex; align-items:flex-start; gap:8px; font-size:13px; font-weight:700; color:#343a40;">
+        <span style="color:#22c55e; font-size:16px;">✅</span>
+        <div>${p.lpFeature1 || 'توصيل سريع مضمون وآمن لولاية نشاطك'}</div>
+      </li>
+      <li style="display:flex; align-items:flex-start; gap:8px; font-size:13px; font-weight:700; color:#343a40;">
+        <span style="color:#22c55e; font-size:16px;">✅</span>
+        <div>${p.lpFeature2 || 'الدفع الكامل غير المشروط بعد المعاينة اليدوية'}</div>
+      </li>
+      <li style="display:flex; align-items:flex-start; gap:8px; font-size:13px; font-weight:700; color:#343a40;">
+        <span style="color:#22c55e; font-size:16px;">✅</span>
+        <div>${p.lpFeature3 || 'ضمان الرضا الذهبي واستحقاق الاسترجاع الآني'}</div>
+      </li>
+    </ul>
+  </div>
+
+  ${p.lpVideoURL ? `
+  <div style="margin-bottom:20px;">
+    <h3 style="font-size:14px; font-weight:700; color:#495057; margin-bottom:10px;">🎥 فيديو ترويجي تفصلي للخدمة:</h3>
+    <div style="width:100%; position:relative; padding-bottom:56.25%; height:0; border-radius:12px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,0.1);">
+      <iframe src="${p.lpVideoURL.replace('watch?v=', 'embed/')}" style="position:absolute; top:0; left:0; width:100%; height:100%; border:0;" allowfullscreen></iframe>
+    </div>
+  </div>
+  ` : ''}
+
+  ${p.description ? `
+  <div style="margin-bottom:20px; background:#f8f9fa; border-radius:12px; padding:15px;">
+    <h3 style="font-size:14px; font-weight:700; color:#495057; margin-top:0; margin-bottom:8px;">📝 تفاصيل الوصف والجودة:</h3>
+    <p style="font-size:12.5px; line-height:1.6; color:#495057; margin:0;">${p.description}</p>
+  </div>
+  ` : ''}
+
+  <div style="display:flex; justify-content:space-around; align-items:center; padding:12px; background:#e8f4fd; border-radius:10px; margin-bottom:15px; border:1px solid #b3d7f7;">
+    <div style="text-align:center;">
+      <div style="font-size:20px; margin-bottom:4px;">🚚</div>
+      <div style="font-size:10px; font-weight:700; color:#1a3d54;">توصيل سريع</div>
+    </div>
+    <div style="text-align:center; border-left:1px solid #b3d7f7; border-right:1px solid #b3d7f7; padding:0 20px;">
+      <div style="font-size:20px; margin-bottom:4px;">🛡️</div>
+      <div style="font-size:10px; font-weight:700; color:#1a3d54;">جودة مضمونة</div>
+    </div>
+    <div style="text-align:center;">
+      <div style="font-size:20px; margin-bottom:4px;">💵</div>
+      <div style="font-size:10px; font-weight:700; color:#1a3d54;">دفع عند الاستلام</div>
+    </div>
+  </div>
+
+  ${p.lpTrustBadge ? `
+  <div style="text-align:center; font-size:12px; font-weight:700; color:#495057; margin-bottom:20px; display:flex; align-items:center; justify-content:center; gap:6px;">
+    ⭐️ <span>${p.lpTrustBadge}</span>
+  </div>
+  ` : ''}
+
+  <div id="lp-checkout-container" style="background:#fff3f3; border:2px solid #ffa8a8; border-radius:14px; padding:20px; box-shadow:0 8px 24px rgba(240,62,62,0.1); margin-top:20px;">
+    <h3 style="font-size:16px; font-weight:800; color:#c92a2a; margin-top:0; margin-bottom:6px; text-align:center;">🛒 اطلب عريضتك الآن وسجل الشراء فورا!</h3>
+    <p style="font-size:11px; color:#868e96; margin:0 0 15px; text-align:center;">يرجى ملء الاستمارة أدناه وسيتصل بكم موزعنا لتسليم الشحنة وتثبيت طلبكم</p>
+    
+    <div style="margin-bottom:12px;">
+      <label style="display:block; font-size:12px; font-weight:700; color:#495057; margin-bottom:6px;">الاسم الكامل للمشتري *</label>
+      <input id="lpOrderName" class="fi" placeholder="مثال: يوسف الطيب" style="width:100%; border:1px solid #ccc; padding:10px; border-radius:6px; font-family:'Cairo'; box-sizing:border-box;" />
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block; font-size:12px; font-weight:700; color:#495057; margin-bottom:6px;">رقم هاتف الاتصال الهاتفي *</label>
+      <input id="lpOrderPhone" type="tel" class="fi" placeholder="مثال: 06XXXXXXXX" style="width:100%; border:1px solid #ccc; padding:10px; border-radius:6px; font-family:'Cairo'; box-sizing:border-box;" />
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <label style="display:block; font-size:12px; font-weight:700; color:#495057; margin-bottom:6px;">ولاية التوزيع والتسليم *</label>
+      <select id="lpOrderWil" class="fsel" style="width:100%; height:40px; border:1px solid #ccc; border-radius:6px; font-family:'Cairo'; padding:0 8px; box-sizing:border-box;"></select>
+    </div>
+
+    <div style="margin-bottom:15px;">
+      <label style="display:block; font-size:12px; font-weight:700; color:#495057; margin-bottom:6px;">عنوان ومكان التوصيل الدقيق *</label>
+      <input id="lpOrderAddr" class="fi" placeholder="مثال: حي السلام عمارة 10 رقم 4" style="width:100%; border:1px solid #ccc; padding:10px; border-radius:6px; font-family:'Cairo'; box-sizing:border-box;" />
+    </div>
+
+    <button id="lpOrderBtn" style="width:100%; background:#e03131; color:#fff; border:none; border-radius:10px; padding:14px; font-family:'Cairo',sans-serif; font-size:16px; font-weight:800; cursor:pointer;" onclick="placeLandingPageOrder('${p.id}')">🔥 تأكيد الطلبية والشراء السريع</button>
+  </div>
+  
+  <div id="lp-store-closed-banner" style="display:none; background:#ffebee; border:1px solid #ffcdd2; color:#c62828; border-radius:12px; padding:15px; text-align:center; font-weight:700; font-size:13px; margin-top:20px; direction:rtl;">
+    ⚠️ نعتذر منكم، المتجر مغلق مؤقتاً للراحة حالياً ولا يستقبل أي طلبيات شراء شراء في هذا الوقت وسيرجع فورا!
+  </div>
+</div>
+  `;
+  
+  // Disable checkout if store closed
+  if (_store && _store.storeOpen === false) {
+    document.getElementById('lp-checkout-container').style.display = 'none';
+    document.getElementById('lp-store-closed-banner').style.display = 'block';
+  } else {
+    document.getElementById('lp-checkout-container').style.display = 'block';
+    document.getElementById('lp-store-closed-banner').style.display = 'none';
+  }
+
+  // Populate Wilayas
+  setTimeout(() => {
+    const sel = document.getElementById('lpOrderWil');
+    if (sel) {
+      sel.innerHTML = '<option value="">اختر الولاية للاستلام...</option>';
+      WILAYAS.forEach(w => {
+        const o = document.createElement('option');
+        o.value = w.n;
+        o.textContent = w.n;
+        sel.appendChild(o);
+      });
+      if (_selW) sel.value = _selW;
+    }
+  }, 100);
+};
+
+window.placeLandingPageOrder = function(prodId) {
+  const name = document.getElementById('lpOrderName').value.trim();
+  const phone = document.getElementById('lpOrderPhone').value.trim();
+  const wil = document.getElementById('lpOrderWil').value;
+  const addr = document.getElementById('lpOrderAddr').value.trim();
+  
+  if(!name || !phone || !wil || !addr) {
+    toast('⚠️ الرجاء إدخال الحقول المعلمة بـ (*) للتوصيل السريع','err');
+    return;
+  }
+  
+  if(window.saveOrder) {
+    window.saveOrder({
+      customer: name,
+      phone: phone,
+      address: addr,
+      wilaya: wil,
+      product: _prod?.name,
+      storeId: _store?.id || 'direct',
+      store: _store?.name || 'مفتوح',
+      price: _prod?.price || 0,
+      qty: 1,
+      paymentMethod: 'COD',
+      note: 'طلب مباشر عبر صفحة الهبوط الذكية لقنوات المتجر'
+    });
+  } else {
+    G('success');
+  }
+};
 function chQty(d){_qty=Math.max(1,_qty+d);document.getElementById('qty-v').textContent=_qty;}
 function goOrd(){
   document.getElementById('o-prod').textContent=_prod?.name||'—';
@@ -1153,6 +1384,13 @@ function filePick(input,boxId,labelId){
   reader.readAsDataURL(f);
 }
 
+// App Privacy Lock System
+// App Privacy Lock System
+function initSecurityLock() {
+  const app = document.getElementById('app');
+  if (app) app.style.display = 'block';
+}
+
 // Expose module functions to global window context for HTML inline events (such as onclick, oninput, etc.)
 window.G = G;
 window.back = back;
@@ -1179,250 +1417,9 @@ window.rBack = rBack;
 window.fillComm2 = fillComm2;
 window.filePick = filePick;
 
-// === TRANSLATION ENGINE ===
-const appTranslations = {
-  ar: {
-    smSub: "السوق الذكي الجزائري",
-    smSecMenu: "القائمة",
-    smHome: "الرئيسية",
-    smWilayas: "الولايات",
-    smCats: "جميع الأقسام",
-    smProds: "جميع المنتجات",
-    smSecMerchants: "للتجار",
-    smRegStore: "سجّل متجرك",
-    smFree: "مجاناً",
-    smDashboard: "لوحة التحكم للتاجر والأدمن",
-    smSecContact: "تواصل معنا وإدارة",
-    smContactUs: "اتصل بنا (واتساب)",
-    smAdminSite: "موقع الإدارة",
-    smAboutUs: "من نحن",
-    smAboutDesc: "حول منصة ZaLo الذكية",
-    smSecLang: "اللغة / Langue / Language",
-    smCopyright: "© 2026 ZaLo - السوق الذكي",
-    
-    // Bottom nav
-    bnlHome: "الرئيسية",
-    bnlOrders: "طلباتي",
-    bnlWilayas: "الولايات",
-    bnlSearch: "بحث سريع",
-    bnlPortal: "بوابتي الكبرى",
-    
-    // Top bar titles
-    tbTitleHome: "ZaLo smart marketplace",
-    tbTitleWilayas: "الولايات الـ69 الجزائرية",
-    tbTitleCats: "جميع أقسام السوق",
-    tbTitleAllProds: "المنتجات الجزائرية",
-    tbTitleDetail: "تفاصيل المنتج",
-    tbTitleOrder: "طلب الشراء والموقع",
-    tbTitleSearch: "البحث السريع الذكي",
-    tbTitleMyOrders: "مشترياتي وطلباتي",
-    tbTitleNotif: "مركز الإشعارات",
-    tbTitleRegister: "بوابة تسجيل التجار الجدد",
-    tbTitleAbout: "حول منصة ZaLo",
-    
-    // PT bar headlines
-    ptbarWilayasText: "تسوق حسب موقع المحلات",
-    ptbarCatsText: "اختر صنف المنتجات",
-    ptbarAllProdsText: "جميع منتجات التجار",
-    ptbarStoresText: "محلات القسم",
-    
-    // Cats list labels
-    catLabelPhones: "هواتف وإلكترونيات",
-    catLabelFurniture: "أثاث ومنزل",
-    catLabelClothing: "ملابس وأزياء",
-    catLabelFood: "مواد غذائية",
-    catLabelTools: "أدوات ومعدات",
-    catLabelBeauty: "تجميل وعناية",
-    catLabelBooks: "كتب وقرطاسية",
-    
-    // Home body
-    homeTitleText: "ZaLo<br>السوق الذكي الجزائري",
-    btnShopAll: "🛍️ تسوق في كل الولايات الـ69 الآن",
-    btnOpenStore: "🏪 افتح متجرك وضاعف مبيعاتك",
-    circleCatsLabel: "الأقسام",
-    circleAllCatsText: "جميع الأقسام",
-    circleAllProdsText: "جميع المنتجات",
-    
-    // Splash screen
-    splashSub: "marketplace smart • السوق الذكي الموحد",
-    loadingStoresTxt: "جاري تحميل المتاجر العتيدة..."
-  },
-  fr: {
-    smSub: "Le Marché Intelligent Algérien",
-    smSecMenu: "MENU",
-    smHome: "Accueil",
-    smWilayas: "Wilayas",
-    smCats: "Toutes les catégories",
-    smProds: "Tous les produits",
-    smSecMerchants: "POUR LES COMMERÇANTS",
-    smRegStore: "S'enregistrer",
-    smFree: "Gratuit",
-    smDashboard: "Tableau de Bord / Admin",
-    smSecContact: "CONTACT & SUPPORT",
-    smContactUs: "Contactez-nous (WhatsApp)",
-    smAdminSite: "Site d'administration",
-    smAboutUs: "À propos de nous",
-    smAboutDesc: "À propos de la plateforme ZaLo",
-    smSecLang: "Sélectionnez la langue",
-    smCopyright: "© 2026 ZaLo - Smart Market",
-    
-    // Bottom nav
-    bnlHome: "Accueil",
-    bnlOrders: "Mes commandes",
-    bnlWilayas: "Wilayas",
-    bnlSearch: "Recherche",
-    bnlPortal: "Mon Portail",
-    
-    // Top bar titles
-    tbTitleHome: "ZaLo Smart Marketplace",
-    tbTitleWilayas: "Toutes les Wilayas d'Algérie",
-    tbTitleCats: "Catégories",
-    tbTitleAllProds: "Produits Algériens",
-    tbTitleDetail: "Détails du Produit",
-    tbTitleOrder: "Passer une Commande",
-    tbTitleSearch: "Recherche Intelligente Rapide",
-    tbTitleMyOrders: "Mes Commandes",
-    tbTitleNotif: "Centre de Notifications",
-    tbTitleRegister: "Nouveau Commerçant",
-    tbTitleAbout: "À propos de ZaLo",
-    
-    // PT bar headlines
-    ptbarWilayasText: "Achetez par emplacement de magasin",
-    ptbarCatsText: "Choisissez la catégorie du produit",
-    ptbarAllProdsText: "Tous les produits des commerçants",
-    ptbarStoresText: "Magasins de cette section",
-    
-    // Cats list labels
-    catLabelPhones: "Téléphones & Électronique",
-    catLabelFurniture: "Maison & Ameublement",
-    catLabelClothing: "Prêt-à-porter & Mode",
-    catLabelFood: "Alimentation",
-    catLabelTools: "Outils & Équipements",
-    catLabelBeauty: "Beauté & Soins",
-    catLabelBooks: "Livres & Papeterie",
-    
-    // Home body
-    homeTitleText: "ZaLo<br>Le Marché Intelligent Algérien",
-    btnShopAll: "🛍️ Achetez dans les 69 Wilayas maintenant",
-    btnOpenStore: "🏪 Ouvrez votre boutique gratuitement",
-    circleCatsLabel: "Catégories",
-    circleAllCatsText: "Toutes les catégories",
-    circleAllProdsText: "Tous les produits",
-    
-    // Splash screen
-    splashSub: "marketplace smart • Le Marché Intelligent Unifié",
-    loadingStoresTxt: "Chargement des magasins..."
-  },
-  en: {
-    smSub: "The Algerian Smart Marketplace",
-    smSecMenu: "MENU",
-    smHome: "Home",
-    smWilayas: "Wilayas",
-    smCats: "All Categories",
-    smProds: "All Products",
-    smSecMerchants: "FOR MERCHANTS",
-    smRegStore: "Register Store",
-    smFree: "Free of charge",
-    smDashboard: "Dashboard / Admin Portal",
-    smSecContact: "CONTACT & MANAGEMENT",
-    smContactUs: "Contact Us (WhatsApp)",
-    smAdminSite: "Admin Website",
-    smAboutUs: "About Us",
-    smAboutDesc: "About the ZaLo platform",
-    smSecLang: "Choose Language",
-    smCopyright: "© 2026 ZaLo - Smart Market",
-    
-    // Bottom nav
-    bnlHome: "Home",
-    bnlOrders: "My Orders",
-    bnlWilayas: "Wilayas",
-    bnlSearch: "Search",
-    bnlPortal: "Grand Portal",
-    
-    // Top bar titles
-    tbTitleHome: "ZaLo Smart Marketplace",
-    tbTitleWilayas: "All 69 Algerian Wilayas",
-    tbTitleCats: "Market Categories",
-    tbTitleAllProds: "Algerian Products",
-    tbTitleDetail: "Product Details",
-    tbTitleOrder: "Place Your Order",
-    tbTitleSearch: "Smart Quick Search",
-    tbTitleMyOrders: "My Orders & History",
-    tbTitleNotif: "Notification Center",
-    tbTitleRegister: "New Merchant Portal",
-    tbTitleAbout: "About ZaLo Platform",
-    
-    // PT bar headlines
-    ptbarWilayasText: "Shop by store locations",
-    ptbarCatsText: "Choose a category of products",
-    ptbarAllProdsText: "All products from all merchants",
-    ptbarStoresText: "Stores in this section",
-    
-    // Cats list labels
-    catLabelPhones: "Phones & Electronics",
-    catLabelFurniture: "Home & Furniture",
-    catLabelClothing: "Clothing & Fashion",
-    catLabelFood: "Food & Groceries",
-    catLabelTools: "Tools & Equipment",
-    catLabelBeauty: "Beauty & Personal Care",
-    catLabelBooks: "Books & Stationery",
-    
-    // Home body
-    homeTitleText: "ZaLo<br>The Algerian Smart Marketplace",
-    btnShopAll: "🛍️ Shop in all 69 Wilayas now",
-    btnOpenStore: "🏪 Open your store & double sales",
-    circleCatsLabel: "Categories",
-    circleAllCatsText: "All Categories",
-    circleAllProdsText: "All Products",
-    
-    // Splash screen
-    splashSub: "marketplace smart • The Unified Smart Marketplace",
-    loadingStoresTxt: "Loading stores..."
-  }
-};
-
-window.setAppLanguage = function(lang) {
-  localStorage.setItem('lang', lang);
-  window.applyLanguage(lang);
-};
-
-window.applyLanguage = function(lang) {
-  const dir = (lang === 'ar') ? 'rtl' : 'ltr';
-  document.documentElement.setAttribute('dir', dir);
-  document.documentElement.setAttribute('lang', lang);
-  document.body.style.direction = dir;
-  
-  // Update lang button active state
-  document.querySelectorAll('.lang-btn').forEach(btn => {
-    if (btn.getAttribute('data-lang') === lang) {
-      btn.style.background = 'var(--g1)';
-      btn.style.color = '#fff';
-    } else {
-      btn.style.background = '#fff';
-      btn.style.color = 'var(--text)';
-    }
-  });
-
-  const t = appTranslations[lang] || appTranslations.ar;
-  
-  // Replace texts dynamically using translated keys
-  const keys = Object.keys(t);
-  keys.forEach(key => {
-    const el = document.getElementById(key);
-    if (el) {
-      if (key === 'homeTitleText') {
-        el.innerHTML = t[key];
-      } else {
-        el.textContent = t[key];
-      }
-    }
-  });
-};
-
 document.addEventListener('DOMContentLoaded',()=>{
-  // Apply selected saved language initially on DOM content loaded
-  window.applyLanguage(localStorage.getItem('lang') || 'ar');
   renderW();
+  initSecurityLock();
   
   // Bulletproof listener for sidebar menu triggers to bypass any inline HTML scoping issues
   document.querySelectorAll('.tb-menu').forEach(btn => {
