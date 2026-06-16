@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ZaLo - بوابـة المدير والمشرفين</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a5c2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#1a5c2a">
+<link class="apple-touch-icon" href="icon-192.svg">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('ZaLo Service Worker Registered!', reg.scope))
+        .catch(err => console.error('ZaLo Service Worker registration failed:', err));
+    });
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -478,9 +492,12 @@ function setLoading(id, val) {
 // Security lock settings check
 let enteredPin = "";
 async function initSecurityLock() {
-  // Always display the passcode screen by default for administrative security
   const passcodeEl = document.getElementById('passcode-screen');
-  if (passcodeEl) passcodeEl.style.display = 'flex';
+  if (sessionStorage.getItem('admin_security_unlocked') === 'true') {
+    if (passcodeEl) passcodeEl.style.display = 'none';
+  } else {
+    if (passcodeEl) passcodeEl.style.display = 'flex';
+  }
 
   // Fetch latest settings from Firestore to stay in perfect sync
   try {

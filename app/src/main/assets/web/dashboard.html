@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ZaLo - لوحة تحكم متجري الموحدة</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a5c2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#1a5c2a">
+<link class="apple-touch-icon" href="icon-192.svg">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('ZaLo Service Worker Registered!', reg.scope))
+        .catch(err => console.error('ZaLo Service Worker registration failed:', err));
+    });
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -857,6 +871,79 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
+// WILAYAS global dictionary
+const WILAYAS = [
+  {n:"01 أدرار",c:["أدرار","رقان","أولف","بودة","فنوغيل"]},
+  {n:"02 الشلف",c:["الشلف","تنس","بني حواء","وادي الفضة"]},
+  {n:"03 الأغواط",c:["الأغواط","عين ماضي","آفلو","حاسي الرمل"]},
+  {n:"04 أم البواقي",c:["أم البواقي","عين البيضاء","عين مليلة","مسكيانة"]},
+  {n:"05 باتنة",c:["باتنة","عين التوتة","تازولت","مروانة","بريكة","أريس"]},
+  {n:"06 بجاية",c:["بجاية","أقبو","سيدي عيش","تيشي","أميزور"]},
+  {n:"07 بسكرة",c:["بسكرة","طولقة","أورلال","سيدي عقبة","زريبة الوادي"]},
+  {n:"08 بشار",c:["بشار","القنادسة","عين الصفراء","العبادلة"]},
+  {n:"09 البليدة",c:["البليدة","الأربعاء","بوفاريك","موزاية","بني مراد"]},
+  {n:"10 البويرة",c:["البويرة","عين بسام","سور الغزلان","بودربالة"]},
+  {n:"11 تمنراست",c:["تمنراست","أبلسة","عين قزام","إن صالح"]},
+  {n:"12 تبسة",c:["تبسة","الشريعة","الونزة","أم علي","الكويف"]},
+  {n:"13 تلمسان",c:["تلمسان","بني صاف","ندرومة","غزوات","مغنية"]},
+  {n:"14 تيارت",c:["تيارت","فرندة","رحوية","عين الدهب","مهدية"]},
+  {n:"15 تيزي وزو",c:["تيزي وزو","ذراع بن خداء","عزازقة","بني يني"]},
+  {n:"16 الجزائر",c:["باب الوادي","حيدرة","القبة","بوزريعة","بن عكنون","الدار البيضاء","المحمدية","الحراش","بئر مراد رايس","الكاليتوس","برج الكيفان"]},
+  {n:"17 الجلفة",c:["الجلفة","عين وسارة","مسعد","حاسي بحبح","دار الشيوخ"]},
+  {n:"18 جيجل",c:["جيجل","الميلية","الطاهير","زيامة منصورية"]},
+  {n:"19 سطيف",c:["سطيف","العلمة","بوعنداس","رأس الواد","عين أرنات"]},
+  {n:"20 سعيدة",c:["سعيدة","عين الحجر","سيدي أحمد","يوب"]},
+  {n:"21 سكيكدة",c:["سكيكدة","عزابة","القل","حمادي كرومة","الحروش"]},
+  {n:"22 سيدي بلعباس",c:["سيدي بلعباس","تلاغ","سفيزف","بن باديس"]},
+  {n:"23 عنابة",c:["عنابة","سيدي عمار","برحال","الحجار","بوهدارة"]},
+  {n:"24 قالمة",c:["قالمة","بوشقوف","حمام دباغ","لخزارة"]},
+  {n:"25 قسنطينة",c:["قسنطينة","الخروب","عين عبيد","ديدوش مراد","حامة بوزيان"]},
+  {n:"26 المدية",c:["المدية","الأخضرية","بني سليمان","العزيزية","تابلاط"]},
+  {n:"27 مستغانم",c:["مستغانم","عين تادلس","سيق","سيدي لخضر"]},
+  {n:"28 المسيلة",c:["المسيلة","بوسعادة","سيدي عيسى","أولاد دراج"]},
+  {n:"29 معسكر",c:["معسكر","تيغنيف","سيق","بوهني"]},
+  {n:"30 ورقلة",c:["ورقلة","تقرت","حاسي مسعود","النقوسة"]},
+  {n:"31 وهران",c:["وهران","عين الترك","بئر الجير","سيدي الشحمي","أرزيو","بطيوة","مرسى الحجاج"]},
+  {n:"32 البيض",c:["البيض","بوقطب","الشلالة"]},
+  {n:"33 إليزي",c:["إليزي","برج عمر إدريس","إن أميناس"]},
+  {n:"34 برج بوعريريج",c:["برج بوعريريج","رأس الوادي","المنصورة","بن داود"]},
+  {n:"35 بومرداس",c:["بومرداس","رويبة","بودواو","دلس","برج منايل","خميس الخشنة"]},
+  {n:"36 الطارف",c:["الطارف","القالة","بن مهيدي"]},
+  {n:"37 تندوف",c:["تندوف","أم العسل"]},
+  {n:"38 تيسمسيلت",c:["تيسمسيلت","ثنية الأحد","برج بونعامة"]},
+  {n:"39 الوادي",c:["الوادي","الرباح","قمار","الرقيبة"]},
+  {n:"40 خنشلة",c:["خنشلة","بابار","شلية"]},
+  {n:"41 سوق أهراس",c:["سوق أهراس","sدراتة","مداوروش"]},
+  {n:"42 تيبازة",c:["تيبازة","شرشال","حجوط","القليعة"]},
+  {n:"43 ميلة",c:["ميلة","شلغوم العيد","التلاغمة"]},
+  {n:"44 عين الدفلى",c:["عين الدفلى","خميس مليانة","مليانة"]},
+  {n:"45 النعامة",c:["النعامة","مشرية","عين الصفراء"]},
+  {n:"46 عين تموشنت",c:["عين تموشنت","حمام بوحجر","بني صاف"]},
+  {n:"47 غرداية",c:["غرداية","بريان","القرارة","زلفانة"]},
+  {n:"48 غليزان",c:["غليزان","مازونة","عمي موسى"]},
+  {n:"49 تيميمون",c:["تيميمون","أوقروت","شروين","تالة"]},
+  {n:"50 برج باجي مختار",c:["برج باجي مختار","تيمياوين"]},
+  {n:"51 أولاد جلال",c:["أولاد جلال","سيدي خالد","البسباس","الشعيبة"]},
+  {n:"52 بني عباس",c:["بني عباس","كرازاز","الواتة","القصابي"]},
+  {n:"53 عين صالح",c:["عين صالح","إن غار","فقارة الزوى"]},
+  {n:"54 عين قزام",c:["عين قزام","تين زواتين"]},
+  {n:"55 تقرت",c:["تقرت","تماسين","المنقر","سيدي سليمان"]},
+  {n:"56 جانت",c:["جانت","برج الحواس"]},
+  {n:"57 المغير",c:["المغير","جامعة","أم الطيور","مرارة"]},
+  {n:"58 المنيعة",c:["المنيعة","حاسي القارة","حاسي الفحل"]},
+  {n:"59 أفلو",c:["أفلو","عين سيدي علي","الحاج مشري","الغيشة"]},
+  {n:"60 عين البيضاء",c:["عين البيضاء","بريش","الزرق"]},
+  {n:"61 عين مليلة",c:["عين مليلة","أولاد قاسم","أولاد حملة"]},
+  {n:"62 سدراتة",c:["سدراتة","الخزارة","مداوروش"]},
+  {n:"63 العلمة",c:["العلمة","بئر العرش","بازر سكرة"]},
+  {n:"64 بوسعادة",c:["بوسعادة","الهامل","أولاد سيدي ابراهيم"]},
+  {n:"65 بريكة",c:["بريكة","أمدوكال","الجزار"]},
+  {n:"66 قصر الشلالة",c:["قصر الشلالة","سرغين","زمالة الأمير عبد القادر"]},
+  {n:"67 مسعد",c:["مسعد","دلدول","سد الرحال"]},
+  {n:"68 فرندة",c:["فرندة","عين الحديد","تخمرت"]},
+  {n:"69 الأبيض سيدي الشيخ",c:["الأبيض سيدي الشيخ","البنود","الشلالة"]}
+];
+
 let shopData = null;
 let shopId = null;
 let allProducts = [];
@@ -1258,9 +1345,8 @@ async function loadHome() {
 
 async function loadProducts() {
   try {
-    // 1. Fetch products belonging to this shop from Firebase Firestore
     const snap = await getDocs(query(collection(db, 'products'), where('storeId', '==', shopId)));
-    const dbProds = snap.docs.filter(d => !d.data().deleted).map(d => ({
+    allProducts = snap.docs.filter(d => !d.data().deleted).map(d => ({
       id: d.id, 
       name: d.data().name,
       price: d.data().price,
@@ -1277,60 +1363,9 @@ async function loadProducts() {
       lpVideoURL: d.data().lpVideoURL || "",
       lpTrustBadge: d.data().lpTrustBadge || ""
     }));
-    
-    // 2. Load and merge products from local storage replica
-    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
-    const filteredLocal = localProds.filter(p => p.storeId === shopId).map(p => ({
-      id: p.productId,
-      name: p.productName,
-      price: p.price,
-      stock: p.stock,
-      description: p.description,
-      imageURL: (p.images && p.images.length) ? p.images[0] : "",
-      category: p.categoryId,
-      storeId: p.storeId,
-      isLandingPage: p.isLandingPage,
-      lpHeadline: p.lpHeadline || "",
-      lpFeature1: p.lpFeature1 || "",
-      lpFeature2: p.lpFeature2 || "",
-      lpFeature3: p.lpFeature3 || "",
-      lpVideoURL: p.lpVideoURL || "",
-      lpTrustBadge: p.lpTrustBadge || ""
-    }));
-
-    // Combine them, preferring db products if names conflict
-    const combined = [...dbProds];
-    filteredLocal.forEach(lp => {
-      const lpName = (lp.name || "").toString().trim().toLowerCase();
-      if (lpName && !combined.some(cp => (cp.name || "").toString().trim().toLowerCase() === lpName)) {
-        combined.push(lp);
-      }
-    });
-
-    allProducts = combined;
   } catch(e) {
-    console.error("Firestore loading error, falling back to local storage:", e);
-    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
-    allProducts = localProds.filter(p => p.storeId === shopId).map(p => ({
-      id: p.productId,
-      name: p.productName,
-      price: p.price,
-      stock: p.stock,
-      description: p.description,
-      imageURL: (p.images && p.images.length) ? p.images[0] : "",
-      category: p.categoryId,
-      storeId: p.storeId,
-      isLandingPage: p.isLandingPage,
-      lpHeadline: p.lpHeadline || "",
-      lpFeature1: p.lpFeature1 || "",
-      lpFeature2: p.lpFeature2 || "",
-      lpFeature3: p.lpFeature3 || "",
-      lpVideoURL: p.lpVideoURL || "",
-      lpTrustBadge: p.lpTrustBadge || ""
-    }));
-    if (allProducts.length === 0) {
-      allProducts = getSampleProducts();
-    }
+    console.error("Firestore loading error:", e);
+    allProducts = [];
   }
   renderProducts();
 }
@@ -1394,16 +1429,9 @@ window.deleteProd = async function(id) {
     await updateDoc(doc(db, 'products', id), { deleted: true });
   } catch(e){}
   
-  // Also delete from local storage replica
-  try {
-    const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
-    const updated = localProds.filter(p => p.productId !== id);
-    localStorage.setItem('zalo_products', JSON.stringify(updated));
-  } catch(e){}
-
   allProducts = allProducts.filter(p => p.id !== id);
   renderProducts();
-  showToast('🗑️ تم إخصاء السلعة بنجاح');
+  showToast('🗑️ تم حذف السلعة بنجاح');
 };
 
 window.editingProductId = null;
@@ -1482,34 +1510,8 @@ window.saveProduct = async function() {
       showToast('✅ تم تحديث بيانات المعروض بنجاح!');
     } catch(e) {
       console.error("Firestore update error:", e);
-      showToast('✅ تم التعديل والتحديث محلياً بنجاح');
+      showToast('⚠️ حدث خطأ في النظام أثناء محاولة الحفظ');
     }
-
-    // 2. Replicate inside local storage
-    try {
-      const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
-      const idx = localProds.findIndex(p => p.productId === window.editingProductId);
-      let localCatId = 'cat_phones';
-      if(cat.includes('ملابس')) localCatId = 'cat_clothes';
-      else if(cat.includes('منزل')) localCatId = 'cat_parts';
-      else if(cat.includes('غذائية')) localCatId = 'cat_food';
-      else if(cat.includes('أخرى')) localCatId = 'cat_services';
-
-      if (idx !== -1) {
-        localProds[idx] = {
-          ...localProds[idx],
-          productName: name,
-          price: price,
-          description: desc,
-          stock: stock,
-          categoryId: localCatId,
-          isLandingPage: isLanding,
-          lpHeadline, lpFeature1, lpFeature2, lpFeature3, lpVideoURL, lpTrustBadge,
-          ...(imageBase64 ? { images: [imageBase64] } : {})
-        };
-        localStorage.setItem('zalo_products', JSON.stringify(localProds));
-      }
-    } catch(e){}
 
     window.editingProductId = null;
   } else {
@@ -1537,35 +1539,7 @@ window.saveProduct = async function() {
       showToast('✅ تم النشر وإضافتها لكتالوج البيع بنجاح!');
     } catch(e) {
       console.error("Firestore add error:", e);
-      showToast('✅ تم الحفظ تجريبياً');
-    }
-
-    // 2. Save to client-side localStorage db replica
-    try {
-      const localProds = JSON.parse(localStorage.getItem('zalo_products')) || [];
-      
-      let localCatId = 'cat_phones';
-      if(cat.includes('ملابس')) localCatId = 'cat_clothes';
-      else if(cat.includes('منزل')) localCatId = 'cat_parts';
-      else if(cat.includes('غذائية')) localCatId = 'cat_food';
-      else if(cat.includes('أخرى')) localCatId = 'cat_services';
-
-      const newProd = {
-        productId: 'prod_' + Date.now(),
-        storeId: shopId,
-        categoryId: localCatId,
-        productName: name,
-        price: price,
-        description: desc,
-        images: imageBase64 ? [imageBase64] : ["https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=400&q=80"],
-        stock: stock,
-        isLandingPage: isLanding,
-        lpHeadline, lpFeature1, lpFeature2, lpFeature3, lpVideoURL, lpTrustBadge
-      };
-      localProds.unshift(newProd);
-      localStorage.setItem('zalo_products', JSON.stringify(localProds));
-    } catch(e){
-      console.error("Local storage add error:", e);
+      showToast('⚠️ حدث خطأ أثناء تشكيل ونشر المنتج');
     }
   }
 
@@ -1611,14 +1585,38 @@ window.saveProduct = async function() {
   goPage('products');
 };
 
+let ordersListenerSet = false;
 async function loadOrders() {
+  if (ordersListenerSet) return;
+  ordersListenerSet = true;
   try {
-    const snap = await getDocs(query(collection(db, 'orders'), where('storeId', '==', shopId)));
-    allOrders = snap.docs.map(d=>({id:d.id, ...d.data()}));
+    const qOrders = query(collection(db, 'orders'), where('storeId', '==', shopId));
+    onSnapshot(qOrders, (snap) => {
+      allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      renderOrders(allOrders);
+
+      // Dynamically calculate and display stats from Firestore
+      const sProdEl = document.getElementById('sProd');
+      if (sProdEl) sProdEl.textContent = allProducts.length;
+
+      const sOrdersEl = document.getElementById('sOrders');
+      if (sOrdersEl) sOrdersEl.textContent = allOrders.filter(o => o && o.status === 'pending').length;
+
+      const rev = allOrders.filter(o => o && (o.status === 'delivered' || o.status === 'confirmed')).reduce((sum, item) => sum + (item.price || item.total || 0), 0);
+      const sRevenueEl = document.getElementById('sRevenue');
+      if (sRevenueEl) sRevenueEl.textContent = rev.toLocaleString();
+
+      const sRatingEl = document.getElementById('sRating');
+      if (sRatingEl) sRatingEl.textContent = "4.9 ★";
+
+      renderHomeOrders(allOrders.slice(0, 3));
+      renderHomeProducts(allProducts.slice(0, 3));
+    }, err => {
+      console.error("Realtime orders load error:", err);
+    });
   } catch(e) {
-    allOrders = getSampleOrders();
+    console.error("Initial loadOrders error:", e);
   }
-  renderOrders(allOrders);
 }
 
 function renderOrders(ords) {
@@ -1804,79 +1802,6 @@ window.saveProfile = async function() {
   document.getElementById('profileWilaya').textContent = `📍 التمركز الاقتصادي: ${sWil || 'غير محدد بعد'}`;
   showToast('✅ تم تدوين وحفظ معلومات متجرك بنجاح!');
 };
-
-// WILAYAS global dictionary
-const WILAYAS = [
-  {n:"01 أدرار",c:["أدرار","رقان","أولف","بودة","فنوغيل"]},
-  {n:"02 الشلف",c:["الشلف","تنس","بني حواء","وادي الفضة"]},
-  {n:"03 الأغواط",c:["الأغواط","عين ماضي","آفلو","حاسي الرمل"]},
-  {n:"04 أم البواقي",c:["أم البواقي","عين البيضاء","عين مليلة","مسكيانة"]},
-  {n:"05 باتنة",c:["باتنة","عين التوتة","تازولت","مروانة","بريكة","أريس"]},
-  {n:"06 بجاية",c:["بجاية","أقبو","سيدي عيش","تيشي","أميزور"]},
-  {n:"07 بسكرة",c:["بسكرة","طولقة","أورلال","سيدي عقبة","زريبة الوادي"]},
-  {n:"08 بشار",c:["بشار","القنادسة","عين الصفراء","العبادلة"]},
-  {n:"09 البليدة",c:["البليدة","الأربعاء","بوفاريك","موزاية","بني مراد"]},
-  {n:"10 البويرة",c:["البويرة","عين بسام","سور الغزلان","بودربالة"]},
-  {n:"11 تمنراست",c:["تمنراست","أبلسة","عين قزام","إن صالح"]},
-  {n:"12 تبسة",c:["تبسة","الشريعة","الونزة","أم علي","الكويف"]},
-  {n:"13 تلمسان",c:["تلمسان","بني صاف","ندرومة","غزوات","مغنية"]},
-  {n:"14 تيارت",c:["تيارت","فرندة","رحوية","عين الدهب","مهدية"]},
-  {n:"15 تيزي وزو",c:["تيزي وزو","ذراع بن خداء","عزازقة","بني يني"]},
-  {n:"16 الجزائر",c:["باب الوادي","حيدرة","القبة","بوزريعة","بن عكنون","الدار البيضاء","المحمدية","الحراش","بئر مراد رايس","الكاليتوس","برج الكيفان"]},
-  {n:"17 الجلفة",c:["الجلفة","عين وسارة","مسعد","حاسي بحبح","دار الشيوخ"]},
-  {n:"18 جيجل",c:["جيجل","الميلية","الطاهير","زيامة منصورية"]},
-  {n:"19 سطيف",c:["سطيف","العلمة","بوعنداس","رأس الواد","عين أرنات"]},
-  {n:"20 سعيدة",c:["سعيدة","عين الحجر","سيدي أحمد","يوب"]},
-  {n:"21 سكيكدة",c:["سكيكدة","عزابة","القل","حمادي كرومة","الحروش"]},
-  {n:"22 سيدي بلعباس",c:["سيدي بلعباس","تلاغ","سفيزف","بن باديس"]},
-  {n:"23 عنابة",c:["عنابة","سيدي عمار","برحال","الحجار","بوهدارة"]},
-  {n:"24 قالمة",c:["قالمة","بوشقوف","حمام دباغ","لخزارة"]},
-  {n:"25 قسنطينة",c:["قسنطينة","الخروب","عين عبيد","ديدوش مراد","حامة بوزيان"]},
-  {n:"26 المدية",c:["المدية","الأخضرية","بني سليمان","العزيزية","تابلاط"]},
-  {n:"27 مستغانم",c:["مستغانم","عين تادلس","سيق","سيدي لخضر"]},
-  {n:"28 المسيلة",c:["المسيلة","بوسعادة","سيدي عيسى","أولاد دراج"]},
-  {n:"29 معسكر",c:["معسكر","تيغنيف","سيق","بوهني"]},
-  {n:"30 ورقلة",c:["ورقلة","تقرت","حاسي مسعود","النقوسة"]},
-  {n:"31 وهران",c:["وهران","عين الترك","بئر الجير","سيدي الشحمي","أرزيو","بطيوة","مرسى الحجاج"]},
-  {n:"32 البيض",c:["البيض","بوقطب","الشلالة"]},
-  {n:"33 إليزي",c:["إليزي","برج عمر إدريس","إن أميناس"]},
-  {n:"34 برج بوعريريج",c:["برج بوعريريج","رأس الوادي","المنصورة","بن داود"]},
-  {n:"35 بومرداس",c:["بومرداس","رويبة","بودواو","دلس","برج منايل","خميس الخشنة"]},
-  {n:"36 الطارف",c:["الطارف","القالة","بن مهيدي"]},
-  {n:"37 تندوف",c:["تندوف","أم العسل"]},
-  {n:"38 تيسمسيلت",c:["تيسمسيلت","ثنية الأحد","برج بونعامة"]},
-  {n:"39 الوادي",c:["الوادي","الرباح","قمار","الرقيبة"]},
-  {n:"40 خنشلة",c:["خنشلة","بابار","شلية"]},
-  {n:"41 سوق أهراس",c:["سوق أهراس","sدراتة","مداوروش"]},
-  {n:"42 تيبازة",c:["تيبازة","شرشال","حجوط","القليعة"]},
-  {n:"43 ميلة",c:["ميلة","شلغوم العيد","التلاغمة"]},
-  {n:"44 عين الدفلى",c:["عين الدفلى","خميس مليانة","مليانة"]},
-  {n:"45 النعامة",c:["النعامة","مشرية","عين الصفراء"]},
-  {n:"46 عين تموشنت",c:["عين تموشنت","حمام بوحجر","بني صاف"]},
-  {n:"47 غرداية",c:["غرداية","بريان","القرارة","زلفانة"]},
-  {n:"48 غليزان",c:["غليزان","مازونة","عمي موسى"]},
-  {n:"49 تيميمون",c:["تيميمون","أوقروت","شروين","تالة"]},
-  {n:"50 برج باجي مختار",c:["برج باجي مختار","تيمياوين"]},
-  {n:"51 أولاد جلال",c:["أولاد جلال","سيدي خالد","البسباس","الشعيبة"]},
-  {n:"52 بني عباس",c:["بني عباس","كرازاز","الواتة","القصابي"]},
-  {n:"53 عين صالح",c:["عين صالح","إن غار","فقارة الزوى"]},
-  {n:"54 عين قزام",c:["عين قزام","تين زواتين"]},
-  {n:"55 تقرت",c:["تقرت","تماسين","المنقر","سيدي سليمان"]},
-  {n:"56 جانت",c:["جانت","برج الحواس"]},
-  {n:"57 المغير",c:["المغير","جامعة","أم الطيور","مرارة"]},
-  {n:"58 المنيعة",c:["المنيعة","حاسي القارة","حاسي الفحل"]},
-  {n:"59 أفلو",c:["أفلو","عين سيدي علي","الحاج مشري","الغيشة"]},
-  {n:"60 عين البيضاء",c:["عين البيضاء","بريش","الزرق"]},
-  {n:"61 عين مليلة",c:["عين مليلة","أولاد قاسم","أولاد حملة"]},
-  {n:"62 سدراتة",c:["سدراتة","الخزارة","مداوروش"]},
-  {n:"63 العلمة",c:["العلمة","بئر العرش","بازر سكرة"]},
-  {n:"64 بوسعادة",c:["بوسعادة","الهامل","أولاد سيدي ابراهيم"]},
-  {n:"65 بريكة",c:["بريكة","أمدوكال","الجزار"]},
-  {n:"66 قصر الشلالة",c:["قصر الشلالة","سرغين","زمالة الأمير عبد القادر"]},
-  {n:"67 مسعد",c:["مسعد","دلدول","سد الرحال"]},
-  {n:"68 فرندة",c:["فرندة","عين الحديد","تخمرت"]},
-  {n:"69 الأبيض سيدي الشيخ",c:["الأبيض سيدي الشيخ","البنود","الشلالة"]}
-];
 
 window.fillDashboardCommunes = function(wname) {
   const w = WILAYAS.find(x => x.n === wname);

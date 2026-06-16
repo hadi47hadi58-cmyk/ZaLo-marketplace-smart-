@@ -4,6 +4,20 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ZaLo - بوابـة التجار الشركاء</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1a5c2a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="#1a5c2a">
+<link rel="apple-touch-icon" href="icon-192.svg">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('service-worker.js')
+        .then(reg => console.log('ZaLo Service Worker Registered!', reg.scope))
+        .catch(err => console.error('ZaLo Service Worker registration failed:', err));
+    });
+  }
+</script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -654,9 +668,16 @@ function setLoading(id, val) {
 // Security locks check
 let enteredPin = "";
 async function initSecurityLock() {
+  const passcodeEl = document.getElementById('passcode-screen');
+
+  // Session storage check first
+  if (sessionStorage.getItem('merchant_security_unlocked') === 'true') {
+    if (passcodeEl) passcodeEl.style.display = 'none';
+    return;
+  }
+
   // Try to use cached local storage value first for zero-delay display
   const cachedEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
-  const passcodeEl = document.getElementById('passcode-screen');
   if (cachedEnabled) {
     if (passcodeEl) passcodeEl.style.display = 'flex';
   } else {
@@ -674,8 +695,10 @@ async function initSecurityLock() {
       localStorage.setItem('zalo_lock_merchant_enabled', isEnabled ? 'true' : 'false');
       localStorage.setItem('zalo_pin_merchant', remotePin);
       
-      if (passcodeEl) {
-        passcodeEl.style.display = isEnabled ? 'flex' : 'none';
+      if (sessionStorage.getItem('merchant_security_unlocked') === 'true') {
+        if (passcodeEl) passcodeEl.style.display = 'none';
+      } else {
+        if (passcodeEl) passcodeEl.style.display = isEnabled ? 'flex' : 'none';
       }
     }
   } catch(e) {
@@ -710,6 +733,7 @@ window.pressPin = function(num) {
 function verifyPin() {
   const correctPin = localStorage.getItem('zalo_pin_merchant') || "1234";
   if (enteredPin === correctPin) {
+    sessionStorage.setItem('merchant_security_unlocked', 'true');
     document.getElementById('passcode-screen').style.opacity = '0';
     setTimeout(() => {
       document.getElementById('passcode-screen').style.display = 'none';
