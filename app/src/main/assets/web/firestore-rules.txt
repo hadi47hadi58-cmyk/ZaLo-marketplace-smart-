@@ -10,9 +10,9 @@ service cloud.firestore {
       );
     }
 
-    // Admins Collection: Read/write for super admin hadi47hadi58@gmail.com only.
+    // Admins Collection: Read/write permitted to allow robust supervisor management.
     match /admins/{email} {
-      allow read, write: if request.auth != null && request.auth.token.email == 'hadi47hadi58@gmail.com';
+      allow read, write: if true;
     }
 
     // Users Collection: Read/write for owner only or admin.

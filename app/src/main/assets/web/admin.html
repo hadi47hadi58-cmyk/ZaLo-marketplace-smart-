@@ -1038,6 +1038,9 @@
         <label class="form-label" style="font-weight:700;">الصفة والرتبة التسييرية:</label>
         <select class="form-input" id="adm-role" style="background:#0d1810; color:#fff;">
           <option value="supervisor">👮 مشرف ولائي ومراقب</option>
+          <option value="supervisor_cust">👥 مشرف على طلبيات مع الزبائن</option>
+          <option value="supervisor_merch">🏬 مشرف على طلبيات مع التاجر</option>
+          <option value="coordinator_municipality">🤝 منسق بلدي مالي/لوجستي</option>
           <option value="assistant">💼 مساعد إداري ومنسق تسليم</option>
         </select>
       </div>
@@ -1045,11 +1048,64 @@
         <label class="form-label" style="font-weight:700;">النطاق والولاية المختصة:</label>
         <select class="form-input" id="adm-wilaya" style="background:#0d1810; color:#fff;">
           <option value="كامل الجزائر">كامل الجزائر (مسؤول عام)</option>
-          <option value="16 الجزائر">16 الجزائر</option>
-          <option value="31 وهران">31 وهران</option>
-          <option value="25 قسنطينة">25 قسنطينة</option>
+          <option value="01 أدرار">01 أدرار</option>
+          <option value="02 الشلف">02 الشلف</option>
+          <option value="03 الأغواط">03 الأغواط</option>
+          <option value="04 أم البواقي">04 أم البواقي</option>
+          <option value="05 باتنة">05 باتنة</option>
           <option value="06 بجاية">06 بجاية</option>
+          <option value="07 بسكرة">07 بسكرة</option>
+          <option value="08 بشار">08 بشار</option>
+          <option value="09 البليدة">09 البليدة</option>
+          <option value="10 البويرة">10 البويرة</option>
+          <option value="11 تمنراست">11 تمنراست</option>
+          <option value="12 تبسة">12 تبسة</option>
+          <option value="13 تلمسان">13 تلمسان</option>
+          <option value="14 تيارت">14 تيارت</option>
+          <option value="15 تيزي وزو">15 تيزي وزو</option>
+          <option value="16 الجزائر">16 الجزائر</option>
+          <option value="17 الجلفة">17 الجلفة</option>
+          <option value="18 جيجل">18 جيجل</option>
           <option value="19 سطيف">19 سطيف</option>
+          <option value="20 سعيدة">20 سعيدة</option>
+          <option value="21 سكيكدة">21 سكيكدة</option>
+          <option value="22 سيدي بلعباس">22 سيدي بلعباس</option>
+          <option value="23 عنابة">23 عنابة</option>
+          <option value="24 قالمة">24 قالمة</option>
+          <option value="25 قسنطينة">25 قسنطينة</option>
+          <option value="26 المدية">26 المدية</option>
+          <option value="27 مستغانم">27 مستغانم</option>
+          <option value="28 المسيلة">28 المسيلة</option>
+          <option value="29 معسكر">29 معسكر</option>
+          <option value="30 ورقلة">30 ورقلة</option>
+          <option value="31 وهران">31 وهران</option>
+          <option value="32 البيض">32 البيض</option>
+          <option value="33 إليزي">33 إليزي</option>
+          <option value="34 برج بوعريريج">34 برج بوعريريج</option>
+          <option value="35 بومرداس">35 بومرداس</option>
+          <option value="36 الطارف">36 الطارف</option>
+          <option value="37 تندوف">37 تندوف</option>
+          <option value="38 تيسمسيلت">38 تيسمسيلت</option>
+          <option value="39 الوادي">39 الوادي</option>
+          <option value="40 خنشلة">40 خنشلة</option>
+          <option value="41 سوق أهراس">41 سوق أهراس</option>
+          <option value="42 تيبازة">42 تيبازة</option>
+          <option value="43 ميلة">43 ميلة</option>
+          <option value="44 عين الدفلى">44 عين الدفلى</option>
+          <option value="45 النعامة">45 النعامة</option>
+          <option value="46 عين تموشنت">46 عين تموشنت</option>
+          <option value="47 غرداية">47 غرداية</option>
+          <option value="48 غليزان">48 غليزان</option>
+          <option value="49 تميمون">49 تميمون</option>
+          <option value="50 برج باجي مختار">50 برج باجي مختار</option>
+          <option value="51 أولاد جلال">51 أولاد جلال</option>
+          <option value="52 بني عباس">52 بني عباس</option>
+          <option value="53 عين صالح">53 عين صالح</option>
+          <option value="54 عين قزام">54 عين قزام</option>
+          <option value="55 تقرت">55 تقرت</option>
+          <option value="56 جانت">56 جانت</option>
+          <option value="57 المغير">57 المغير</option>
+          <option value="58 المنيعة">58 المنيعة</option>
         </select>
       </div>
     </div>
@@ -1091,6 +1147,18 @@ window._db = db;
 window._auth = auth;
 window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc };
 
+window.getAdminRoleLabel = function(role) {
+  switch (role) {
+    case 'super_admin': return '👑 المالك العام';
+    case 'supervisor': return '👮 مشرف ولائي ومراقب';
+    case 'supervisor_cust': return '👥 مشرف على طلبيات مع الزبائن';
+    case 'supervisor_merch': return '🏬 مشرف على طلبيات مع التاجر';
+    case 'coordinator_municipality': return '🤝 منسق بلدي مالي/لوجستي';
+    case 'assistant': return '💼 مساعد إداري ومنسق تسليم';
+    default: return '💼 مساعد إداري';
+  }
+};
+
 onAuthStateChanged(auth, async (user) => {
   const cachedEmail = localStorage.getItem('loggedInAdminEmail');
   const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
@@ -1099,7 +1167,7 @@ onAuthStateChanged(auth, async (user) => {
     document.getElementById('loginScreen').style.display = 'none';
     document.getElementById('currentUserEmail').textContent = cachedEmail;
     const cachedRole = localStorage.getItem('loggedInAdminRole') || 'supervisor';
-    document.getElementById('roleTag').textContent = cachedRole === 'super_admin' ? 'المالك العام' : (cachedRole === 'supervisor' ? 'مشرف المنصة' : 'مساعد إداري');
+    document.getElementById('roleTag').textContent = window.getAdminRoleLabel(cachedRole);
     loadDashboard();
     return;
   }
@@ -1124,7 +1192,7 @@ onAuthStateChanged(auth, async (user) => {
           localStorage.setItem('loggedInAdminName', admData.name || 'مساعد');
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('currentUserEmail').textContent = user.email;
-          document.getElementById('roleTag').textContent = admData.role === 'supervisor' ? 'مشرف المنصة' : 'مساعد إداري';
+          document.getElementById('roleTag').textContent = window.getAdminRoleLabel(admData.role || 'supervisor');
           loadDashboard();
         } else {
           alert("⚠️ الحساب غير مصرح له كمسؤول أو مساعد إداري!");
@@ -1181,7 +1249,7 @@ window.doLogin = async function() {
           sessionStorage.setItem('admin_logged_in_session', 'true');
           document.getElementById('loginScreen').style.display = 'none';
           document.getElementById('currentUserEmail').textContent = email;
-          document.getElementById('roleTag').textContent = adminData.role === 'supervisor' ? 'مشرف المنصة' : 'مساعد إداري';
+          document.getElementById('roleTag').textContent = window.getAdminRoleLabel(adminData.role || 'supervisor');
           loadDashboard();
           return;
         }
@@ -1658,6 +1726,18 @@ function renderUsersTable(usrs) {
   `).join('');
 }
 
+function getAdminRoleLabel(role) {
+  switch (role) {
+    case 'super_admin': return '👑 المالك العام';
+    case 'supervisor': return '👮 مشرف ولائي ومراقب';
+    case 'supervisor_cust': return '👥 مشرف طلبيات (زبائن)';
+    case 'supervisor_merch': return '🏬 مشرف طلبيات (تجار)';
+    case 'coordinator_municipality': return '🤝 منسق بلدي مالي/لوجستي';
+    case 'assistant': return '💼 مساعد إداري ومنسق تسليم';
+    default: return '💼 مساعد إداري';
+  }
+}
+
 function renderAdminsTable(admins) {
   const tbody = document.getElementById('adminsTable');
   if (!tbody) return;
@@ -1666,7 +1746,7 @@ function renderAdminsTable(admins) {
       <td><strong>${a.name || '-'}</strong></td>
       <td><code>${a.email || '-'}</code></td>
       <td>${a.phone || '-'}</td>
-      <td><span class="badge" style="background:#071a0b; color:var(--gold); border:1px solid rgba(212,175,55,0.3); font-weight:700;">${a.role === 'supervisor' ? '👮 مشرف الصلاحيات' : '💼 مساعد إداري'}</span></td>
+      <td><span class="badge" style="background:#071a0b; color:var(--gold); border:1px solid rgba(212,175,55,0.3); font-weight:700;">${getAdminRoleLabel(a.role)}</span></td>
       <td>📍 ${a.wilaya || 'كامل الجزائر'}</td>
       <td><div class="action-btns">
         <button class="action-btn ab-delete" onclick="deleteAdmin('${a.id}')">إقصاء</button>
@@ -1780,12 +1860,29 @@ window.savePIN = async function(type) {
 window.loadWilayas = function() {
   const counts = {};
   window._allMerchants.forEach(m => {
-    if (m.wilaya) counts[m.wilaya] = (counts[m.wilaya] || 0) + 1;
+    if (m.wilaya) {
+      // Normalize or extract wilaya name to match format "01 أدرار"
+      const matched = m.wilaya.trim();
+      counts[matched] = (counts[matched] || 0) + 1;
+    }
   });
-  const defaults = ['16 الجزائر','31 وهران','25 قسنطينة','23 عنابة','19 سطيف','06 بجاية','07 بسكرة','13 تلمسان','05 باتنة'];
+  const defaults = [
+    "01 أدرار", "02 الشلف", "03 الأغواط", "04 أم البواقي", "05 باتنة",
+    "06 بجاية", "07 بسكرة", "08 بشار", "09 البليدة", "10 البويرة",
+    "11 تمنراست", "12 تبسة", "13 تلمسان", "14 تيارت", "15 تيزي وزو",
+    "16 الجزائر", "17 الجلفة", "18 جيجل", "19 سطيف", "20 سعيدة",
+    "21 سكيكدة", "22 سيدي بلعباس", "23 عنابة", "24 قالمة", "25 قسنطينة",
+    "26 المدية", "27 مستغانم", "28 المسيلة", "29 معسكر", "30 ورقلة",
+    "31 وهران", "32 البيض", "33 إليزي", "34 برج بوعريريج", "35 بومرداس",
+    "36 الطارف", "37 تندوف", "38 تيسمسيلت", "39 الوادي", "40 خنشلة",
+    "41 سوق أهراس", "42 تيبازة", "43 ميلة", "44 عين الدفلى", "45 النعامة",
+    "46 عين تموشنت", "47 غرداية", "48 غليزان", "49 تميمون", "50 برج باجي مختار",
+    "51 أولاد جلال", "52 بني عباس", "53 عين صالح", "54 عين قزام", "55 تقرت",
+    "56 جانت", "57 المغير", "58 المنيعة"
+  ];
   document.getElementById('wilayasGrid').innerHTML = defaults.map(w => `
     <div class="wilaya-chip">
-      <div class="wc-count">${counts[w] || 1}</div>
+      <div class="wc-count">${counts[w] || 0}</div>
       <div class="wc-name">${w}</div>
     </div>
   `).join('');
