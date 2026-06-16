@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>ZaLo - لوحة تحكم متجري الموحدة</title>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
   :root {
     --green: #1a5c2a;
@@ -494,34 +495,34 @@
   <nav class="sidebar-nav">
     <div class="nav-sec">الرئيسية</div>
     <div class="nav-item active" onclick="goPage('home')">
-      <span class="ni">📊</span> لوحتي الشاملة
+      <span class="ni"><i class="fa-solid fa-chart-pie"></i></span> لوحتي الشاملة
     </div>
     <div class="nav-sec">المنتجات</div>
     <div class="nav-item" onclick="goPage('products')">
-      <span class="ni">📦</span> معروضاتي
+      <span class="ni"><i class="fa-solid fa-box-open"></i></span> معروضاتي
     </div>
     <div class="nav-item" onclick="goPage('add-product')">
-      <span class="ni">➕</span> إضافة سلعة
+      <span class="ni"><i class="fa-solid fa-plus"></i></span> إضافة سلعة
     </div>
     <div class="nav-sec">الطلبات والشحن</div>
     <div class="nav-item" onclick="goPage('orders')">
-      <span class="ni">🛒</span> طلبيات الزبائن
+      <span class="ni"><i class="fa-solid fa-cart-shopping"></i></span> طلبيات الزبائن
       <span class="nav-badge" id="newOrdersBadge" style="display:none">0</span>
     </div>
     <div class="nav-sec">تواصل فوري</div>
     <div class="nav-item" onclick="goPage('chat')">
-      <span class="ni">💬</span> الدعم والمراسلة
+      <span class="ni"><i class="fa-solid fa-comments"></i></span> الدعم والمراسلة
     </div>
     <div class="nav-sec">الحساب والاشتراك</div>
     <div class="nav-item" onclick="goPage('analytics')">
-      <span class="ni">📈</span> إحصاءات المعاملات
+      <span class="ni"><i class="fa-solid fa-chart-line"></i></span> إحصاءات المعاملات
     </div>
     <div class="nav-item" onclick="goPage('profile')">
-      <span class="ni">🏪</span> معلومات المتجر
+      <span class="ni"><i class="fa-solid fa-store"></i></span> معلومات المتجر
     </div>
   </nav>
   <div class="sidebar-foot">
-    <button class="logout-btn" onclick="doLogout()">🚪 تسجيل الخروج</button>
+    <button class="logout-btn" onclick="doLogout()"><i class="fa-solid fa-sign-out-alt"></i> تسجيل الخروج</button>
   </div>
 </div>
 
@@ -753,6 +754,31 @@
       <div style="font-size:14px;font-weight:700;margin-bottom:16px;padding-bottom:10px;border-bottom:1px solid var(--border)">
         تعديل معلومات وتأصيل النشاط
       </div>
+      <!-- Store Images Upload (شعار وواجهة المتجر) -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+        <div>
+          <label class="flbl">🖼️ شعار المتجر (اللوغو الرئيسي)</label>
+          <div id="uShopLogoBox" style="position:relative; background:var(--bg3); border:2px dashed var(--border); border-radius:12px; padding:12px; text-align:center; cursor:pointer; min-height:80px; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.25s;">
+            <input type="file" id="uShopLogoInput" accept="image/*" onchange="pickShopProfileImage(this, 'logo')" style="position:absolute; inset:0; opacity:0; cursor:pointer;" />
+            <div id="uShopLogoPlaceholder">
+              <div style="font-size:20px; margin-bottom:3px">🖼️</div>
+              <div id="uShopLogoLabel" style="font-size:10px; font-weight:700">اضغط لرفع الشعار</div>
+            </div>
+            <img id="uShopLogoPreview" style="display:none; width:50px; height:50px; object-fit:cover; border-radius:10px;" />
+          </div>
+        </div>
+        <div>
+          <label class="flbl">📸 واجهة المحل (صورة الخلفية)</label>
+          <div id="uShopBannerBox" style="position:relative; background:var(--bg3); border:2px dashed var(--border); border-radius:12px; padding:12px; text-align:center; cursor:pointer; min-height:80px; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.25s;">
+            <input type="file" id="uShopBannerInput" accept="image/*" onchange="pickShopProfileImage(this, 'banner')" style="position:absolute; inset:0; opacity:0; cursor:pointer;" />
+            <div id="uShopBannerPlaceholder">
+              <div style="font-size:20px; margin-bottom:3px">📸</div>
+              <div id="uShopBannerLabel" style="font-size:10px; font-weight:700">اضغط لرفع الواجهة</div>
+            </div>
+            <img id="uShopBannerPreview" style="display:none; width:50px; height:50px; object-fit:cover; border-radius:10px;" />
+          </div>
+        </div>
+      </div>
       <div class="frow">
         <label class="flbl">مسمى متجري الفعلي للجمهور</label>
         <input class="finput" id="editShopName" placeholder="الاسم الموثق" />
@@ -978,6 +1004,69 @@ function syncStoreToLocalStorage() {
   }
 }
 
+window.pickShopProfileImage = function(input, type) {
+  const f = input.files[0];
+  if(!f) return;
+  const labelId = type === 'logo' ? 'uShopLogoLabel' : 'uShopBannerLabel';
+  const previewId = type === 'logo' ? 'uShopLogoPreview' : 'uShopBannerPreview';
+  const placeholderId = type === 'logo' ? 'uShopLogoPlaceholder' : 'uShopBannerPlaceholder';
+  const boxId = type === 'logo' ? 'uShopLogoBox' : 'uShopBannerBox';
+
+  const label = document.getElementById(labelId);
+  const preview = document.getElementById(previewId);
+  const placeholder = document.getElementById(placeholderId);
+  const box = document.getElementById(boxId);
+  
+  if (label) label.textContent = '⏳ جاري الضغط...';
+  
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = new Image();
+    img.onload = function() {
+      const canvas = document.createElement('canvas');
+      const MAX_WIDTH = 400;
+      const MAX_HEIGHT = 400;
+      let width = img.width;
+      let height = img.height;
+
+      if (width > height) {
+        if (width > MAX_WIDTH) {
+          height *= MAX_WIDTH / width;
+          width = MAX_WIDTH;
+        }
+      } else {
+        if (height > MAX_HEIGHT) {
+          width *= MAX_HEIGHT / height;
+          height = MAX_HEIGHT;
+        }
+      }
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, width, height);
+      
+      const compressedBase64 = canvas.toDataURL('image/jpeg', 0.7);
+      input.dataset.base64 = compressedBase64;
+      
+      if(preview) {
+        preview.src = compressedBase64;
+        preview.style.display = 'block';
+      }
+      if(placeholder) placeholder.style.display = 'none';
+      if(box) {
+        box.style.borderColor = 'var(--green)';
+        box.style.background = 'rgba(37,168,96,0.06)';
+      }
+      if (label) label.textContent = '✅ جاهز!';
+    };
+    img.src = e.target.result;
+  };
+  reader.onerror = function(){
+    if (label) label.textContent = '❌ خطأ';
+  };
+  reader.readAsDataURL(f);
+};
+
 window.pickProductImage = function(input) {
   const f = input.files[0];
   if(!f) return;
@@ -1068,6 +1157,48 @@ function initDashboard() {
   }
   const addrInput = document.getElementById('editAddress');
   if (addrInput) addrInput.value = shopData.address || '';
+
+  // Set logo and banner previews dynamically
+  const logoPreview = document.getElementById('uShopLogoPreview');
+  const logoPlaceholder = document.getElementById('uShopLogoPlaceholder');
+  const logoBox = document.getElementById('uShopLogoBox');
+  if (shopData.logoURL && logoPreview) {
+    logoPreview.src = shopData.logoURL;
+    logoPreview.style.display = 'block';
+    if (logoPlaceholder) logoPlaceholder.style.display = 'none';
+    if (logoBox) {
+      logoBox.style.borderColor = 'var(--green)';
+      logoBox.style.background = 'rgba(37,168,96,0.06)';
+    }
+  } else if (logoPreview) {
+    logoPreview.style.display = 'none';
+    if (logoPlaceholder) logoPlaceholder.style.display = 'block';
+    if (logoBox) {
+      logoBox.style.borderColor = 'var(--border)';
+      logoBox.style.background = 'var(--bg3)';
+    }
+  }
+
+  const bannerPreview = document.getElementById('uShopBannerPreview');
+  const bannerPlaceholder = document.getElementById('uShopBannerPlaceholder');
+  const bannerBox = document.getElementById('uShopBannerBox');
+  const shopBannerSrc = shopData.frontURL || shopData.frontFile;
+  if (shopBannerSrc && bannerPreview) {
+    bannerPreview.src = shopBannerSrc;
+    bannerPreview.style.display = 'block';
+    if (bannerPlaceholder) bannerPlaceholder.style.display = 'none';
+    if (bannerBox) {
+      bannerBox.style.borderColor = 'var(--green)';
+      bannerBox.style.background = 'rgba(37,168,96,0.06)';
+    }
+  } else if (bannerPreview) {
+    bannerPreview.style.display = 'none';
+    if (bannerPlaceholder) bannerPlaceholder.style.display = 'block';
+    if (bannerBox) {
+      bannerBox.style.borderColor = 'var(--border)';
+      bannerBox.style.background = 'var(--bg3)';
+    }
+  }
 
   // Display custom store logo on sidebar and profile
   const sideAvatar = document.getElementById('sideAvatar');
@@ -1759,21 +1890,37 @@ window.saveProfile = async function() {
   const sComm = document.getElementById('editCommune').value;
   const sAddr = document.getElementById('editAddress').value.trim();
 
+  const logoInputObj = document.getElementById('uShopLogoInput');
+  const bannerInputObj = document.getElementById('uShopBannerInput');
+  const newLogoB64 = logoInputObj ? logoInputObj.dataset.base64 : '';
+  const newBannerB64 = bannerInputObj ? bannerInputObj.dataset.base64 : '';
+
   if(!sName) { showToast('❗ اسم المتجر مطلوب'); return; }
 
+  const updatePayload = { 
+    storeName: sName, 
+    whatsapp: sWa,
+    facebookURL: sFb,
+    instagramURL: sIg,
+    tiktokURL: sTiktok,
+    telegramURL: sTg,
+    category: sCat,
+    wilaya: sWil,
+    commune: sComm,
+    address: sAddr
+  };
+
+  if (newLogoB64) {
+    updatePayload.logoURL = newLogoB64;
+    shopData.logoURL = newLogoB64;
+  }
+  if (newBannerB64) {
+    updatePayload.frontURL = newBannerB64;
+    shopData.frontURL = newBannerB64;
+  }
+
   try {
-    await updateDoc(doc(db, 'shops', shopId), { 
-      storeName: sName, 
-      whatsapp: sWa,
-      facebookURL: sFb,
-      instagramURL: sIg,
-      tiktokURL: sTiktok,
-      telegramURL: sTg,
-      category: sCat,
-      wilaya: sWil,
-      commune: sComm,
-      address: sAddr
-    });
+    await updateDoc(doc(db, 'shops', shopId), updatePayload);
   } catch(e){}
 
   shopData.storeName = sName;
@@ -1790,6 +1937,14 @@ window.saveProfile = async function() {
   document.getElementById('sideName').textContent = sName;
   document.getElementById('profileName').textContent = sName;
   document.getElementById('profileWilaya').textContent = `📍 التمركز الاقتصادي: ${sWil || 'غير محدد بعد'}`;
+
+  // Reset file input data elements to avoid redundant processing
+  if (logoInputObj) delete logoInputObj.dataset.base64;
+  if (bannerInputObj) delete bannerInputObj.dataset.base64;
+
+  // Refresh previews in UI dynamically
+  initDashboard();
+
   showToast('✅ تم تدوين وحفظ معلومات متجرك بنجاح!');
 };
 

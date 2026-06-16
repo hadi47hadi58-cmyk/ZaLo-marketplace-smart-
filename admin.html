@@ -32,7 +32,7 @@
   }
 
   #loginScreen {
-    position: fixed; inset: 0;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: linear-gradient(135deg, #0a0f0d 0%, #0f2018 50%, #0a0f0d 100%);
     display: flex; align-items: center; justify-content: center;
     z-index: 9999;
@@ -301,7 +301,7 @@
   }
 
   .modal-overlay {
-    position: fixed; inset: 0;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0,0,0,0.7);
     display: flex; align-items: center; justify-content: center;
     z-index: 1000; padding: 16px;
@@ -477,7 +477,7 @@
     .chart-grid { grid-template-columns: 1fr; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     #menuToggle { display: flex !important; }
-    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99; }
+    .overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 99; }
     .overlay.show { display: block; }
   }
   #menuToggle {
@@ -492,7 +492,7 @@
 <body>
 
 <!-- SECURITY PASSCODE LOCKED SCREEN -->
-<div id="passcode-screen" style="display:flex; position:fixed; inset:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:99999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
+<div id="passcode-screen" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:99999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
   <div style="text-align:center; margin-bottom:30px;">
     <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
     <div style="font-size:18px; font-weight:800; color:#fff;">دخول الإدارة العامة</div>

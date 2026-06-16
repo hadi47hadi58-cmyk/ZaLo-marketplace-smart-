@@ -9,7 +9,7 @@
 :root{--g1:#1a5c2a;--g2:#2d7a3a;--g3:#3d9e4e;--gold:#c9a84c;--gold2:#e8c97a;--bg:#fafafa;--white:#fff;--text:#1a1a1a;--gray:#666;--bd:#e0e0e0;--red:#e53935}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
-#splash{position:fixed;inset:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
+#splash{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
 #splash.hide{opacity:0;pointer-events:none}
 .sp-img{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(201,168,76,.6));animation:spPop .9s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes spPop{from{transform:scale(.1);opacity:0}to{transform:scale(1);opacity:1}}
@@ -51,7 +51,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .wchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:9px;justify-content:center}
 .wchip{background:#fff;color:var(--text);border:1.5px solid var(--bd);padding:10px 4px;border-radius:12px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 1.5px 4px rgba(0,0,0,0.02)}
 .wchip:active,.wchip.sel{border-color:var(--gold);background:var(--g1);color:#fff;box-shadow:0 3px 10px rgba(45,122,58,0.2)}
-.popup-ov{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:150000;display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
+.popup-ov{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);z-index:150000;display:none;align-items:center;justify-content:center;padding:16px;box-sizing:border-box}
 .popup-ov.show{display:flex}
 .comm-popup{background:#ffffff;border-radius:24px;padding:24px;width:100%;max-width:380px;max-height:85vh;box-shadow:0 20px 50px rgba(0,0,0,0.3);display:flex;flex-direction:column;animation:scaleUpP 0.25s cubic-bezier(0.175,0.885,0.32,1.275);direction:rtl;box-sizing:border-box;border:1px solid rgba(255,255,255,0.1)}
 @keyframes scaleUpP{from{transform:scale(0.85);opacity:0}to{transform:scale(1);opacity:1}}
@@ -130,7 +130,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .toast.ok{background:var(--g1)}
 .toast.err{background:var(--red)}
 @keyframes slideUp{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
-.overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:100000;display:none}
+.overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);z-index:100000;display:none}
 .overlay.show{display:block}
 .sidemenu{position:fixed;top:0;right:-282px;width:280px;height:100vh;background:#fff;z-index:100001;transition:right .3s;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid rgba(0,0,0,0.08)}
 .sidemenu.open{right:0}
@@ -164,7 +164,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .tbtn{flex:1;padding:10px 6px;border-radius:11px;border:2px solid var(--bd);background:#fff;font-family:'Cairo',sans-serif;font-size:11px;font-weight:700;cursor:pointer;text-align:center;line-height:1.5;transition:all .2s}
 .tbtn.on{border-color:var(--g1);background:#f0f8f0;color:var(--g1)}
 .file-box{border:2px dashed var(--bd);border-radius:12px;padding:16px;text-align:center;background:#fafafa;cursor:pointer;transition:all .2s;position:relative}
-.file-box input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;font-size:0}
+.file-box input{position:absolute;top:0;left:0;right:0;bottom:0;opacity:0;cursor:pointer;width:100%;height:100%;font-size:0}
 .file-box.has{border-color:var(--g2);background:#f0fff4}
 .fbi{font-size:26px;margin-bottom:4px;pointer-events:none}
 .fbl{font-size:12px;color:var(--gray);pointer-events:none}
@@ -363,11 +363,13 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   </div>
   <div class="content" style="padding-top:0;">
     <!-- STORE DYNAMIC PROFILE HEADER -->
-    <div id="store-profile-header" style="background:linear-gradient(135deg, #0d1a12 0%, #050a07 100%); padding:24px 16px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:2px solid var(--gold); box-shadow:0 4px 15px rgba(0,0,0,0.15); margin-bottom:12px;">
+    <div id="store-profile-header" style="position:relative; background:linear-gradient(135deg, #0d1a12 0%, #050a07 100%); padding:38px 16px 24px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:2.5px solid var(--gold); box-shadow:0 4px 15px rgba(0,0,0,0.25); margin-bottom:12px; overflow:hidden;">
+      <!-- Storefront Tent Awning (M مظلة المحل) -->
+      <div style="position:absolute; top:0; left:0; right:0; height:18px; background:repeating-linear-gradient(90deg, var(--gold) 0px, var(--gold) 20px, #15271b 20px, #15271b 40px); border-bottom:2.5px solid var(--gold2); box-shadow:0 2px 5px rgba(0,0,0,0.25);"></div>
       <!-- Logo Wrap -->
-      <div style="width:84px; height:84px; border-radius:50%; background:#142218; border:2.5px solid var(--gold); padding:4px; box-shadow:0 6px 14px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:10px;">
+      <div style="position:relative; z-index:2; width:84px; height:84px; border-radius:50%; background:#142218; border:2.5px solid var(--gold); padding:4px; box-shadow:0 6px 14px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:10px;">
         <img id="store-profile-logo" src="" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:none;">
-        <span id="store-profile-logo-placeholder" style="font-size:38px; display:block;">🏪</span>
+        <div id="store-profile-logo-placeholder" style="width:100%; height:100%; display:block;"></div>
       </div>
       <!-- Store Name -->
       <h2 id="store-profile-name" style="color:#fff; font-size:18px; font-weight:800; margin:0 0 6px; font-family:'Cairo', sans-serif; text-shadow:0 1px 4px rgba(0,0,0,0.5);">—</h2>
@@ -675,6 +677,8 @@ window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadByte
 
 onAuthStateChanged(auth,u=>{window._user=u;});
 
+window.defaultStoreSVG = `<svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="32" fill="#142218"/><path d="M14 26h36l-3 22H17L14 26z" fill="#0d1710" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><path d="M12 26l3-6h34l3 6H12z" fill="var(--gold)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 20l-1 6M25 20v6M32 20v6M39 20v6M46 20l1 6" stroke="#0d1710" stroke-width="1.5"/><path d="M24 35h16v13H24V35z" fill="#0d1710" stroke="var(--gold)" stroke-width="1.5"/><circle cx="27" cy="41" r="1.5" fill="var(--gold)"/></svg>`;
+
 // Sample seeding implementation for dynamic data if empty
 const SAMPLE_SHOPS=[
   {storeName:"متجر النور للإلكترونيات",category:"هواتف وإلكترونيات",wilaya:"16 الجزائر",commune:"حيدرة",storeType:"registered",whatsapp:"0698694010",logoURL:"",status:"active"},
@@ -746,7 +750,7 @@ window.loadStores=async(cat)=>{
     el.innerHTML='';
     filteredShops.forEach(s=>{
       el.innerHTML+=`<div class="scard" onclick="openStore('${s.id}','${(s.storeName||'').replace(/'/g,"\'")}','${s.whatsapp||'0698694010'}','${s.logoURL||''}')">
-        <div class="slogo">${s.logoURL?`<img src="${s.logoURL}" alt="">`:'🏪'}</div>
+        <div class="slogo">${s.logoURL?`<img src="${s.logoURL}" alt="">`:window.defaultStoreSVG}</div>
         <div style="flex:1"><div class="sname">${s.storeName||'متجر شريك'}</div><div class="smeta">📍 ${s.wilaya||''} ${s.commune?'- '+s.commune:''}</div><div class="sbadge ${s.storeType==='registered'?'v':'f'}">${s.storeType==='registered'?'✅ معتمد وقانوني':'⏳ تاجر حر وعائلي'}</div></div>
         <div style="color:var(--g1);font-size:16px">←</div>
       </div>`;
@@ -1038,6 +1042,7 @@ function openStore(id,name,wa,logo){
     pPlc.style.display = 'none';
   } else {
     pImg.style.display = 'none';
+    pPlc.innerHTML = window.defaultStoreSVG;
     pPlc.style.display = 'block';
   }
   document.getElementById('store-profile-wilcom').textContent = 'جاري تحديد منطقة النشاط...';
@@ -1071,6 +1076,10 @@ function openStore(id,name,wa,logo){
           pImg.src = s.logoURL;
           pImg.style.display = 'block';
           pPlc.style.display = 'none';
+        } else {
+          pImg.style.display = 'none';
+          pPlc.innerHTML = window.defaultStoreSVG;
+          pPlc.style.display = 'block';
         }
 
         // Sync store open status
