@@ -53,6 +53,13 @@
     background-size: 32px 32px;
   }
 
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .shake { animation: shake 0.4s ease-in-out; }
+
   .wrapper {
     width: 100%; max-width: 420px;
     position: relative; z-index: 1;
@@ -181,7 +188,7 @@
     <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px;">يرجى إدخال رمز المرور السري المكون من 6 أرقام للدخول للإدارة العليا</div>
   </div>
   
-  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
+  <div style="display:flex; gap:16px; margin-bottom:24px;" id="pin-dots">
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
@@ -189,6 +196,8 @@
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
   </div>
+
+  <div id="pin-error-msg" style="color:#ff6b6b; font-size:13px; font-weight:700; background:rgba(255,107,107,0.1); padding:6px 14px; border-radius:15px; border:1px solid rgba(255,107,107,0.2); margin-top:-8px; margin-bottom:20px; transition:all 0.3s ease; opacity:0; transform:translateY(-15px); pointer-events:none; text-align:center; min-height: 32px; display: flex; align-items: center; justify-content: center;">❌ رمز المرور المدخل غير صحيح! حاول مجدداً</div>
   
   <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
     <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
@@ -236,7 +245,7 @@
         <label class="form-label">البريد الإلكتروني للإدارة</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="hadi47hadi58@gmail.com" />
+          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="" autocomplete="off" />
         </div>
       </div>
 
@@ -244,7 +253,7 @@
         <label class="form-label">كلمة المرور الخاصة بمسؤوليتك</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="123456" />
+          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="" autocomplete="off" />
           <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
         </div>
       </div>
@@ -532,7 +541,24 @@ function verifyPin() {
       document.getElementById('passcode-screen').style.opacity = '1'; // reset opacity for reuse
     }, 300);
   } else {
-    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً (الافتراضي هو 585858)');
+    const dotsEl = document.getElementById('pin-dots');
+    const errMsgEl = document.getElementById('pin-error-msg');
+    
+    if (dotsEl) {
+      dotsEl.classList.remove('shake');
+      void dotsEl.offsetWidth; // trigger reflow
+      dotsEl.classList.add('shake');
+    }
+    
+    if (errMsgEl) {
+      errMsgEl.style.opacity = '1';
+      errMsgEl.style.transform = 'translateY(0)';
+      setTimeout(() => {
+        errMsgEl.style.opacity = '0';
+        errMsgEl.style.transform = 'translateY(-15px)';
+      }, 3000);
+    }
+
     enteredPin = "";
     updatePinDots();
   }
