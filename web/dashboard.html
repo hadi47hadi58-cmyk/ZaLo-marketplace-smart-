@@ -1232,17 +1232,28 @@ window.editProd = function(id) {
 };
 
 async function loadHome() {
-  await loadProducts();
-  await loadOrders();
+  try {
+    await loadProducts();
+    await loadOrders();
 
-  document.getElementById('sProd').textContent = allProducts.length;
-  document.getElementById('sOrders').textContent = allOrders.filter(o=>o.status==='pending').length;
-  const rev = allOrders.filter(o=>o.status==='delivered'||o.status==='confirmed').reduce((sum, item)=>sum+(item.price || item.total || 0), 0);
-  document.getElementById('sRevenue').textContent = rev.toLocaleString();
-  document.getElementById('sRating').textContent = "4.9 ★";
+    const sProdEl = document.getElementById('sProd');
+    if (sProdEl) sProdEl.textContent = allProducts.length;
 
-  renderHomeOrders(allOrders.slice(0, 3));
-  renderHomeProducts(allProducts.slice(0, 3));
+    const sOrdersEl = document.getElementById('sOrders');
+    if (sOrdersEl) sOrdersEl.textContent = allOrders.filter(o=>o && o.status==='pending').length;
+
+    const rev = allOrders.filter(o=>o && (o.status==='delivered'||o.status==='confirmed')).reduce((sum, item)=>sum+(item.price || item.total || 0), 0);
+    const sRevenueEl = document.getElementById('sRevenue');
+    if (sRevenueEl) sRevenueEl.textContent = rev.toLocaleString();
+
+    const sRatingEl = document.getElementById('sRating');
+    if (sRatingEl) sRatingEl.textContent = "4.9 ★";
+
+    renderHomeOrders(allOrders.slice(0, 3));
+    renderHomeProducts(allProducts.slice(0, 3));
+  } catch(err) {
+    console.error("Error inside loadHome:", err);
+  }
 }
 
 async function loadProducts() {
@@ -1290,7 +1301,8 @@ async function loadProducts() {
     // Combine them, preferring db products if names conflict
     const combined = [...dbProds];
     filteredLocal.forEach(lp => {
-      if (!combined.some(cp => cp.name.toLowerCase() === lp.name.toLowerCase())) {
+      const lpName = (lp.name || "").toString().trim().toLowerCase();
+      if (lpName && !combined.some(cp => (cp.name || "").toString().trim().toLowerCase() === lpName)) {
         combined.push(lp);
       }
     });

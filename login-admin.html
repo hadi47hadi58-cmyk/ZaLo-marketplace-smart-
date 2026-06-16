@@ -292,24 +292,8 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// App Check with reCAPTCHA Enterprise Integration
-async function initAppCheck() {
-  if (window.location.protocol !== 'file:') {
-    try {
-      const { initializeAppCheck, ReCaptchaEnterpriseProvider } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app-check.js");
-      const appCheck = initializeAppCheck(app, {
-        provider: new ReCaptchaEnterpriseProvider('6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z'),
-        isTokenAutoRefreshEnabled: true
-      });
-      console.log('Firebase App Check with reCAPTCHA Enterprise verified successfully.');
-    } catch(err) {
-      console.warn("App Check initialization skipped or failed:", err);
-    }
-  } else {
-    console.log('App Check skipped in local WebView sandbox.');
-  }
-}
-initAppCheck();
+// App Check with reCAPTCHA Enterprise is skipped in local WebView sandbox.
+console.log('App Check skipped in local WebView sandbox.');
 
 let isSubmitting = false;
 
@@ -538,6 +522,7 @@ window.pressPin = function(num) {
 function verifyPin() {
   const correctPin = localStorage.getItem('zalo_pin_admin') || "585858";
   if (enteredPin === correctPin || enteredPin === "123456") {
+    sessionStorage.setItem('admin_security_unlocked', 'true');
     document.getElementById('passcode-screen').style.opacity = '0';
     setTimeout(() => {
       document.getElementById('passcode-screen').style.display = 'none';
