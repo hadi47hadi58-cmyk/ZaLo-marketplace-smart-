@@ -180,10 +180,40 @@
 
   .bottom-link { text-align: center; margin-top: 24px; font-size: 13px; }
   .bottom-link a { color: var(--gold2); text-decoration: none; font-weight: 600; }
+
+  .forgot-link {
+    text-align: left; margin-top: -6px; margin-bottom: 20px;
+  }
+  .forgot-link a {
+    font-size: 12px; color: var(--gold2);
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .error-block, .success-block {
+    border-radius: 10px; padding: 10px 14px;
+    font-size: 13px; margin-bottom: 14px; display: none;
+    align-items: center; gap: 8px;
+    border: 1px solid rgba(229,57,53,0.3);
+    color: #ef9a9a;
+    background: rgba(229,57,53,0.05);
+  }
+  .success-block {
+    border: 1px solid rgba(76,175,80,0.3);
+    color: #a5d6a7;
+    background: rgba(76,175,80,0.05);
+  }
+  .error-block.show, .success-block.show { display: flex; }
 </style>
 <script src="https://www.google.com/recaptcha/enterprise.js?render=6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z"></script>
 </head>
 <body>
+<script>
+  (function() {
+    if (sessionStorage.getItem('admin_security_unlocked') === 'true') {
+      document.write('<style>#passcode-screen { display: none !important; }</style>');
+    }
+  })();
+</script>
 
 <div class="bg-dots"></div>
 
@@ -263,7 +293,38 @@
         </div>
       </div>
 
+      <div class="forgot-link">
+        <a href="#" onclick="showForgot();return false">نسيت كلمة المرور؟</a>
+      </div>
+
       <button class="submit-btn" id="loginBtn" onclick="doLogin()">تأكيد دخول النظام الإداري</button>
+    </div>
+
+    <!-- ===== FORGOT PASSWORD ===== -->
+    <div id="forgotForm" style="display:none">
+      <button class="back-btn" onclick="hideForgot()" style="background:none; border:none; color:var(--text2); font-family:'Cairo'; font-size:13px; cursor:pointer; margin-bottom:14px; display: flex; align-items: center; gap: 4px;"><span>←</span> عودة لتسجيل الدخول</button>
+      <div style="text-align:center;margin-bottom:20px">
+        <div style="font-size:36px">🔑</div>
+        <div style="font-size:17px;font-weight:700;margin-top:8px">تصفير كلمة المرور الإدارية</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.6);margin-top:6px">سنرسل لك رابط تصفير الرقم السري لحسابك الإداري الكترونياً</div>
+      </div>
+
+      <div class="success-block" id="forgotSuccess">
+        <span>✅</span><span>رابط التصفير في طريقه إليك! تفقد البريد الوارد أو المزعج (Spam)</span>
+      </div>
+      <div class="error-block" id="forgotError">
+        <span>⚠️</span><span>البريد الإلكتروني المدخل غير صالح أو غير مرتبط بحساب إداري</span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني المراد تصفيره</label>
+        <div class="input-wrap">
+          <span class="input-icon">✉️</span>
+          <input class="form-input" type="email" id="forgotEmail" placeholder="example@gmail.com" />
+        </div>
+      </div>
+
+      <button class="submit-btn" id="forgotBtn" onclick="doForgot()">إرسال الرابط الآمن لحسابي</button>
     </div>
 
   </div>
@@ -278,7 +339,7 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword, sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
   getFirestore, doc, getDoc, collection, getDocs, query, where, setDoc
@@ -644,6 +705,53 @@ window.backspacePin = function() {
   if (enteredPin.length > 0) {
     enteredPin = enteredPin.slice(0, -1);
     updatePinDots();
+  }
+};
+
+window.showForgot = function() {
+  document.getElementById('loginForm').style.display = 'none';
+  document.getElementById('forgotForm').style.display = 'block';
+};
+
+window.hideForgot = function() {
+  document.getElementById('loginForm').style.display = 'block';
+  document.getElementById('forgotForm').style.display = 'none';
+};
+
+window.doForgot = async function() {
+  const email = document.getElementById('forgotEmail').value.trim().toLowerCase();
+  const err = document.getElementById('forgotError');
+  const succ = document.getElementById('forgotSuccess');
+  
+  err.classList.remove('show');
+  succ.classList.remove('show');
+
+  if (!email) {
+    err.classList.add('show');
+    return;
+  }
+
+  setLoading('forgotBtn', true);
+  try {
+    const adminDocRef = doc(db, 'admins', email);
+    const adminDocSnap = await getDoc(adminDocRef);
+    const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+    
+    if (!isMasterEmail && !adminDocSnap.exists()) {
+      const qEmail = query(collection(db, 'admins'), where('email', '==', email));
+      const qSnap = await getDocs(qEmail);
+      if (qSnap.empty) {
+        throw new Error('not_admin');
+      }
+    }
+
+    await sendPasswordResetEmail(auth, email);
+    setLoading('forgotBtn', false);
+    succ.classList.add('show');
+  } catch(e) {
+    setLoading('forgotBtn', false);
+    console.error("Forgot password failed:", e);
+    err.classList.add('show');
   }
 };
 

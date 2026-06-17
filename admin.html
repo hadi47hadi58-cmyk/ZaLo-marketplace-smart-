@@ -497,9 +497,16 @@
 <script src="https://www.google.com/recaptcha/enterprise.js?render=6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z"></script>
 </head>
 <body>
+<script>
+  (function() {
+    if (sessionStorage.getItem('admin_security_unlocked') === 'true') {
+      document.write('<style>#passcode-screen { display: none !important; }</style>');
+    }
+  })();
+</script>
 
 <!-- SECURITY PASSCODE LOCKED SCREEN -->
-<div id="passcode-screen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:99999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
+<div id="passcode-screen" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:99999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
   <div style="text-align:center; margin-bottom:30px;">
     <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
     <div style="font-size:18px; font-weight:800; color:#fff;">دخول الإدارة العامة</div>

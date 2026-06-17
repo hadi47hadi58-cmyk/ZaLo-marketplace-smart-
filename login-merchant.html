@@ -242,11 +242,20 @@
 <script src="https://www.google.com/recaptcha/enterprise.js?render=6LebGBwtAAAAAIXPshb0XvGiXZYsRXPB4r1cyO9z"></script>
 </head>
 <body>
+<script>
+  (function() {
+    const unlocked = sessionStorage.getItem('merchant_security_unlocked') === 'true';
+    const cachedEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
+    if (unlocked || !cachedEnabled) {
+      document.write('<style>#passcode-screen { display: none !important; }</style>');
+    }
+  })();
+</script>
 
 <div class="bg-dots"></div>
 
 <!-- PASSCODE SCREEN -->
-<div id="passcode-screen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif;">
+<div id="passcode-screen" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif;">
   <div style="text-align:center; margin-bottom:30px;">
     <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
     <div style="font-size:18px; font-weight:800; color:#fff;">دخول التجار المعتمدين</div>
