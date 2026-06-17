@@ -188,7 +188,7 @@
 <div class="bg-dots"></div>
 
 <!-- PASSCODE SCREEN -->
-<div id="passcode-screen" style="display:none; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
+<div id="passcode-screen" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
   <div style="text-align:center; margin-bottom:30px;">
     <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
     <div style="font-size:18px; font-weight:800; color:#fff;">دخول الإدارة العامة</div>
@@ -250,7 +250,7 @@
         <label class="form-label">البريد الإلكتروني للإدارة</label>
         <div class="input-wrap">
           <span class="input-icon">✉️</span>
-          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="hadi47hadi58@gmail.com" />
+          <input class="form-input" type="email" id="loginEmail" placeholder="example@zalo.com" value="" />
         </div>
       </div>
 
@@ -258,7 +258,7 @@
         <label class="form-label">كلمة المرور الخاصة بمسؤوليتك</label>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
-          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="123456" />
+          <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="" />
           <button class="eye-btn" type="button" onclick="toggleEye('loginPass',this)">👁</button>
         </div>
       </div>
@@ -313,7 +313,11 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   if (!user) {
-    document.getElementById('passcode-screen').style.display = 'none';
+    if (!unlocked) {
+      document.getElementById('passcode-screen').style.display = 'flex';
+    } else {
+      document.getElementById('passcode-screen').style.display = 'none';
+    }
     return;
   }
   if (isSubmitting) return;
@@ -480,16 +484,11 @@ let enteredPin = "";
 async function initSecurityLock() {
   const passcodeEl = document.getElementById('passcode-screen');
   const unlocked = sessionStorage.getItem('admin_security_unlocked') === 'true';
-  const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
   
   if (unlocked) {
     if (passcodeEl) passcodeEl.style.display = 'none';
   } else {
-    if (auth.currentUser && sessionActive) {
-      if (passcodeEl) passcodeEl.style.display = 'flex';
-    } else {
-      if (passcodeEl) passcodeEl.style.display = 'none';
-    }
+    if (passcodeEl) passcodeEl.style.display = 'flex';
   }
 }
 
@@ -527,7 +526,10 @@ async function verifyPin() {
       setTimeout(() => {
         document.getElementById('passcode-screen').style.display = 'none';
         document.getElementById('passcode-screen').style.opacity = '1';
-        window.location.href = 'admin.html';
+        const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
+        if (auth.currentUser && sessionActive) {
+          window.location.href = 'admin.html';
+        }
       }, 300);
     } else {
       alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
@@ -540,7 +542,12 @@ async function verifyPin() {
     const correctLocalPin = localStorage.getItem('zalo_pin_admin') || "585858";
     if (enteredPin === correctLocalPin || enteredPin === "585858") {
       sessionStorage.setItem('admin_security_unlocked', 'true');
-      window.location.href = 'admin.html';
+      const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
+      if (auth.currentUser && sessionActive) {
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('passcode-screen').style.display = 'none';
+      }
     } else {
       alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
       enteredPin = "";
