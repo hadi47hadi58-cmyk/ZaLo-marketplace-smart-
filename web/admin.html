@@ -1172,50 +1172,54 @@ window.getAdminRoleLabel = function(role) {
 };
 
 onAuthStateChanged(auth, async (user) => {
-  const cachedEmail = localStorage.getItem('loggedInAdminEmail');
   const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
 
-  if (cachedEmail && sessionActive) {
-    document.getElementById('loginScreen').style.display = 'none';
-    document.getElementById('currentUserEmail').textContent = cachedEmail;
-    const cachedRole = localStorage.getItem('loggedInAdminRole') || 'supervisor';
-    document.getElementById('roleTag').textContent = window.getAdminRoleLabel(cachedRole);
-    loadDashboard();
-    return;
-  }
-
   if (user && sessionActive) {
-    if (user.email === "hadi47hadi58@gmail.com") {
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', 'super_admin');
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('currentUserEmail').textContent = user.email;
-      document.getElementById('roleTag').textContent = 'المالك العام';
-      loadDashboard();
-    } else {
-      try {
-        const fu = window._firestoreUtils;
+    try {
+      const fu = window._firestoreUtils;
+      let role = null;
+      let name = '';
+      const docRef = fu.doc(db, 'admins', user.email);
+      const adminSnap = await fu.getDoc(docRef);
+      if (adminSnap.exists()) {
+        const d = adminSnap.data();
+        role = d.role;
+        name = d.name || 'مساعد';
+      } else {
         const q = fu.query(fu.collection(db, 'admins'), fu.where('email', '==', user.email));
         const qSnap = await fu.getDocs(q);
         if (!qSnap.empty) {
-          const admData = qSnap.docs[0].data();
-          localStorage.setItem('loggedInAdminEmail', user.email);
-          localStorage.setItem('loggedInAdminRole', admData.role || 'supervisor');
-          localStorage.setItem('loggedInAdminName', admData.name || 'مساعد');
-          document.getElementById('loginScreen').style.display = 'none';
-          document.getElementById('currentUserEmail').textContent = user.email;
-          document.getElementById('roleTag').textContent = window.getAdminRoleLabel(admData.role || 'supervisor');
-          loadDashboard();
+          const d = qSnap.docs[0].data();
+          role = d.role;
+          name = d.name || 'مساعد';
         } else {
-          alert("⚠️ الحساب غير مصرح له كمسؤول أو مساعد إداري!");
-          await signOut(auth);
-          window.location.href = 'index.html';
+          const docUidRef = fu.doc(db, 'admins', user.uid);
+          const adminUidSnap = await fu.getDoc(docUidRef);
+          if (adminUidSnap.exists()) {
+            const d = adminUidSnap.data();
+            role = d.role;
+            name = d.name || 'مساعد';
+          }
         }
-      } catch(e) {
-        alert("⚠️ خطأ في تأكيد الصلاحيات الإدارية: " + e.message);
+      }
+
+      if (role) {
+        localStorage.setItem('loggedInAdminEmail', user.email);
+        sessionStorage.setItem('zalo_admin_role', role);
+        if (name) localStorage.setItem('loggedInAdminName', name);
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('currentUserEmail').textContent = user.email;
+        document.getElementById('roleTag').textContent = window.getAdminRoleLabel(role);
+        loadDashboard();
+      } else {
+        alert("⚠️ الحساب غير مصرح له كمسؤول أو مساعد إداري!");
         await signOut(auth);
         window.location.href = 'index.html';
       }
+    } catch(e) {
+      alert("⚠️ خطأ في تأكيد الصلاحيات الإدارية: " + e.message);
+      await signOut(auth);
+      window.location.href = 'index.html';
     }
   } else {
     document.getElementById('loginScreen').style.display = 'flex';
@@ -1248,52 +1252,6 @@ window.doLogin = async function() {
   }
 
   try {
-    try {
-      const fu = window._firestoreUtils;
-      const q = fu.query(fu.collection(window._db, 'admins'), fu.where('email', '==', email));
-      const qSnap = await fu.getDocs(q);
-      if (!qSnap.empty) {
-        const adminData = qSnap.docs[0].data();
-        if (adminData.password === pass) {
-          try {
-            await signInWithEmailAndPassword(auth, email, pass);
-            console.log("Firebase Auth signed in successfully for:", email);
-          } catch(authErr) {
-            console.warn("Firebase Auth fallback enabled for admin:", authErr.message);
-          }
-          localStorage.setItem('loggedInAdminEmail', email);
-          localStorage.setItem('loggedInAdminRole', adminData.role || 'supervisor');
-          localStorage.setItem('loggedInAdminName', adminData.name || 'مساعد');
-          sessionStorage.setItem('admin_logged_in_session', 'true');
-          document.getElementById('loginScreen').style.display = 'none';
-          document.getElementById('currentUserEmail').textContent = email;
-          document.getElementById('roleTag').textContent = window.getAdminRoleLabel(adminData.role || 'supervisor');
-          loadDashboard();
-          return;
-        }
-      }
-    } catch(err) {
-      console.error(err);
-    }
-
-    if (email === "hadi47hadi58@gmail.com" && pass === "123456") {
-      try {
-        await signInWithEmailAndPassword(auth, email, pass);
-        console.log("Firebase Auth signed in successfully for super-admin");
-      } catch(authErr) {
-        console.warn("Firebase Auth fallback enabled for super-admin:", authErr.message);
-      }
-      localStorage.setItem('loggedInAdminEmail', email);
-      localStorage.setItem('loggedInAdminRole', 'super_admin');
-      localStorage.setItem('loggedInAdminName', 'المالك العام');
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      document.getElementById('loginScreen').style.display = 'none';
-      document.getElementById('currentUserEmail').textContent = email;
-      document.getElementById('roleTag').textContent = 'المالك العام';
-      loadDashboard();
-      return;
-    }
-
     sessionStorage.setItem('admin_logged_in_session', 'true');
     await signInWithEmailAndPassword(auth, email, pass);
   } catch(e) {
@@ -1305,8 +1263,9 @@ window.doLogin = async function() {
 
 window.doLogout = async function() {
   localStorage.removeItem('loggedInAdminEmail');
-  localStorage.removeItem('loggedInAdminRole');
   localStorage.removeItem('loggedInAdminName');
+  sessionStorage.removeItem('zalo_admin_role');
+  sessionStorage.removeItem('admin_logged_in_session');
   await signOut(auth);
   location.reload();
 };

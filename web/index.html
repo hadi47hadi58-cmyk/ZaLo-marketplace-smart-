@@ -821,6 +821,19 @@ window.saveOrder=async(data)=>{
     await ad(col(db,'orders'),{...data,orderNumber:onum,status:'pending',createdAt:sts()});
     document.getElementById('o-num').textContent=onum;
     G('success');
+
+    // Auto-notify merchant on WhatsApp immediately
+    try {
+      const cName = data.customer || "زبون مألوف";
+      const pNames = data.product || "منتج عام";
+      const total = data.price || 0;
+      const mPhoneRaw = (_store?.wa || "0698694010").replace(/\D/g, '');
+      const mPhone = mPhoneRaw.startsWith('0') ? '213' + mPhoneRaw.slice(1) : mPhoneRaw;
+      const merchantMsg = encodeURIComponent(`طلب جديد! العميل ${cName} طلب المنتجات: ${pNames}. المجموع: ${total} دج.`);
+      window.open(`https://wa.me/${mPhone}?text=${merchantMsg}`, '_blank');
+    } catch(waErr) {
+      console.warn("Auto WhatsApp notify error:", waErr);
+    }
   }catch(e){toast('⚠️ حدث خطأ في الخادم ولكن تم تصنيف طلبك محلياً برقم #ZL-'+Date.now().toString().slice(-4),'err'); G('success');}
 };
 

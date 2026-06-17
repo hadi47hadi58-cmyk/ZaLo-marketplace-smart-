@@ -305,20 +305,13 @@ let isSubmitting = false;
 onAuthStateChanged(auth, async (user) => {
   const cachedEmail = localStorage.getItem('loggedInAdminEmail');
   const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
-  if (cachedEmail && sessionActive) {
+  const cachedRole = sessionStorage.getItem('zalo_admin_role');
+  if (cachedEmail && sessionActive && cachedRole) {
     window.location.href = 'admin.html';
     return;
   }
   if (!user) return;
   if (isSubmitting) return;
-
-  if (user.email === "hadi47hadi58@gmail.com" && sessionActive) {
-    localStorage.setItem('loggedInAdminEmail', user.email);
-    localStorage.setItem('loggedInAdminRole', 'super_admin');
-    sessionStorage.setItem('admin_logged_in_session', 'true');
-    window.location.href = 'admin.html';
-    return;
-  }
 
   try {
     if (sessionActive) {
@@ -327,7 +320,7 @@ onAuthStateChanged(auth, async (user) => {
       if (!qSnap.empty) {
         const data = qSnap.docs[0].data();
         localStorage.setItem('loggedInAdminEmail', user.email);
-        localStorage.setItem('loggedInAdminRole', data.role || 'support');
+        sessionStorage.setItem('zalo_admin_role', data.role || 'support');
         localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
         window.location.href = 'admin.html';
         return;
@@ -337,7 +330,7 @@ onAuthStateChanged(auth, async (user) => {
       if (adminDoc.exists()) {
         const dataDoc = adminDoc.data();
         localStorage.setItem('loggedInAdminEmail', user.email);
-        localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
+        sessionStorage.setItem('zalo_admin_role', dataDoc.role || 'support');
         window.location.href = 'admin.html';
         return;
       }
@@ -400,41 +393,18 @@ window.doLogin = async function() {
   try {
     isSubmitting = true;
     
-    try {
-      const adminDocRef = doc(db, 'admins', email);
-      const adminDocSnap = await getDoc(adminDocRef);
-      
-      if (adminDocSnap.exists()) {
-        const adminData = adminDocSnap.data();
-        if (adminData.password === pass) {
-          localStorage.setItem('loggedInAdminEmail', email);
-          localStorage.setItem('loggedInAdminRole', adminData.role);
-          localStorage.setItem('loggedInAdminName', adminData.name);
-          sessionStorage.setItem('admin_logged_in_session', 'true');
-          window.location.href = 'admin.html';
-          return;
-        }
-      }
-    } catch(dbErr) {
-      console.error(dbErr);
-    }
-    
-    if (email === 'hadi47hadi58@gmail.com' && pass === '123456') {
-      localStorage.setItem('loggedInAdminEmail', email);
-      localStorage.setItem('loggedInAdminRole', 'super_admin');
-      localStorage.setItem('loggedInAdminName', 'المالك العام');
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      window.location.href = 'admin.html';
-      return;
-    }
-
-    sessionStorage.setItem('admin_logged_in_session', 'true');
+    // Firebase Auth is the only source of authentication. Passwords are not compared in Firestore.
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
-    if (user.email === "hadi47hadi58@gmail.com") {
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', 'super_admin');
+    const adminDocRef = doc(db, 'admins', email);
+    const adminDocSnap = await getDoc(adminDocRef);
+
+    if (adminDocSnap.exists()) {
+      const adminData = adminDocSnap.data();
+      localStorage.setItem('loggedInAdminEmail', email);
+      sessionStorage.setItem('zalo_admin_role', adminData.role || 'support');
+      localStorage.setItem('loggedInAdminName', adminData.name || 'مساعد');
       sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
@@ -445,7 +415,7 @@ window.doLogin = async function() {
     if (!qSnap.empty) {
       const data = qSnap.docs[0].data();
       localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', data.role || 'support');
+      sessionStorage.setItem('zalo_admin_role', data.role || 'support');
       localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
       sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
@@ -456,7 +426,7 @@ window.doLogin = async function() {
     if (adminDoc.exists()) {
       const dataDoc = adminDoc.data();
       localStorage.setItem('loggedInAdminEmail', user.email);
-      localStorage.setItem('loggedInAdminRole', dataDoc.role || 'support');
+      sessionStorage.setItem('zalo_admin_role', dataDoc.role || 'support');
       sessionStorage.setItem('admin_logged_in_session', 'true');
       window.location.href = 'admin.html';
       return;
@@ -469,7 +439,7 @@ window.doLogin = async function() {
   } catch(e) {
     isSubmitting = false;
     setLoading('loginBtn', false);
-    showLoginError('⚠️ عذراً، لم تكتمل عملية تسجيل الدخول بنجاح للتأمين الإداري!');
+    showLoginError('⚠️ عذراً، لم تكتمل عملية تسجيل الدخول بنجاح للتأمين الإداري! التأكد من صحة البريد والرقم السري وصلاحية الدخول.');
   }
 };
 
@@ -488,18 +458,6 @@ async function initSecurityLock() {
     if (passcodeEl) passcodeEl.style.display = 'none';
   } else {
     if (passcodeEl) passcodeEl.style.display = 'flex';
-  }
-
-  // Fetch latest settings from Firestore to stay in perfect sync
-  try {
-    const secDoc = await getDoc(doc(db, 'settings', 'security'));
-    if (secDoc.exists()) {
-      const data = secDoc.data();
-      const remotePin = data.admin_pin || "123456";
-      localStorage.setItem('zalo_pin_admin', remotePin);
-    }
-  } catch(e) {
-    console.error("Firestore security lock sync failed:", e);
   }
 }
 
@@ -527,17 +485,30 @@ window.pressPin = function(num) {
   }
 };
 
-function verifyPin() {
-  const correctPin = localStorage.getItem('zalo_pin_admin') || "585858";
-  if (enteredPin === correctPin || enteredPin === "123456") {
-    sessionStorage.setItem('admin_security_unlocked', 'true');
-    document.getElementById('passcode-screen').style.opacity = '0';
-    setTimeout(() => {
-      document.getElementById('passcode-screen').style.display = 'none';
-      document.getElementById('passcode-screen').style.opacity = '1'; // reset opacity for reuse
-    }, 300);
-  } else {
-    alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً (الافتراضي هو 585858)');
+async function verifyPin() {
+  try {
+    const pinSnap = await getDoc(doc(db, 'settings', 'admin_pin'));
+    const correctPin = pinSnap.exists() ? pinSnap.data().pin : null;
+    if (!correctPin) {
+      alert('تعذّر تحميل PIN، تواصل مع المدير');
+      enteredPin = "";
+      updatePinDots();
+      return;
+    }
+    if (enteredPin === correctPin) {
+      sessionStorage.setItem('admin_security_unlocked', 'true');
+      document.getElementById('passcode-screen').style.opacity = '0';
+      setTimeout(() => {
+        document.getElementById('passcode-screen').style.display = 'none';
+        document.getElementById('passcode-screen').style.opacity = '1';
+      }, 300);
+    } else {
+      alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
+      enteredPin = "";
+      updatePinDots();
+    }
+  } catch(e) {
+    alert('❌ فشل التحقق من رمز المرور. يرجى التحقق من اتصال الإنترنت.');
     enteredPin = "";
     updatePinDots();
   }

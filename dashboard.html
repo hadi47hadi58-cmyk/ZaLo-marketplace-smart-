@@ -1046,47 +1046,11 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-function syncStoreToLocalStorage() {
+async function syncStoreToLocalStorage() {
   try {
-    const localStores = JSON.parse(localStorage.getItem('zalo_stores')) || [];
-    const existingIndex = localStores.findIndex(s => s.storeId === shopId);
-    
-    const storeObj = {
-      storeId: shopId,
-      municipalityId: "el-menia", // default municipality so it shows up on client-side right away
-      storeName: shopData.storeName || "محل زالو المعتمد",
-      ownerName: shopData.ownerName || "تاجر شريك",
-      phone: shopData.whatsapp || shopData.phone || "0698694010",
-      address: shopData.address || "وسط المدينة",
-      image: shopData.logoURL || "https://images.unsplash.com/photo-1610945265064-0e34e5519bbf?auto=format&fit=crop&w=600&q=80",
-      category: shopData.category || "هواتف وإلكترونيات"
-    };
-
-    if (existingIndex > -1) {
-      localStores[existingIndex] = { ...localStores[existingIndex], ...storeObj };
-    } else {
-      localStores.push(storeObj);
-    }
-    
-    localStorage.setItem('zalo_stores', JSON.stringify(localStores));
-    
-    // Also inject default categories for this store in client-side db replica
-    const localCats = JSON.parse(localStorage.getItem('zalo_categories')) || [];
-    const catsForStore = [
-      { categoryId: "cat_phones", storeId: shopId, categoryName: "هواتف" },
-      { categoryId: "cat_electronic", storeId: shopId, categoryName: "إلكترونيات" },
-      { categoryId: "cat_parts", storeId: shopId, categoryName: "قطع غيار" },
-      { categoryId: "cat_food", storeId: shopId, categoryName: "مواد غذائية" },
-      { categoryId: "cat_clothes", storeId: shopId, categoryName: "ملابس" },
-      { categoryId: "cat_services", storeId: shopId, categoryName: "خدمات" }
-    ];
-    
-    catsForStore.forEach(c => {
-      if (!localCats.some(lc => lc.categoryId === c.categoryId && lc.storeId === c.storeId)) {
-        localCats.push(c);
-      }
-    });
-    localStorage.setItem('zalo_categories', JSON.stringify(localCats));
+    const storesSnap = await getDocs(collection(db, 'shops'));
+    const stores = storesSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+    console.log("Stores synced from Firestore:", stores);
   } catch(e) {
     console.error("Local storage store synchronization error:", e);
   }
