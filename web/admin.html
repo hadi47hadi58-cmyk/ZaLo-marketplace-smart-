@@ -1106,6 +1106,17 @@
           <option value="56 جانت">56 جانت</option>
           <option value="57 المغير">57 المغير</option>
           <option value="58 المنيعة">58 المنيعة</option>
+          <option value="59 أفلو">59 أفلو</option>
+          <option value="60 عين البيضاء">60 عين البيضاء</option>
+          <option value="61 عين مليلة">61 عين مليلة</option>
+          <option value="62 سدراتة">62 سدراتة</option>
+          <option value="63 العلمة">63 العلمة</option>
+          <option value="64 بوسعادة">64 بوسعادة</option>
+          <option value="65 بريكة">65 بريكة</option>
+          <option value="66 قصر الشلالة">66 قصر الشلالة</option>
+          <option value="67 مسعد">67 مسعد</option>
+          <option value="68 فرندة">68 فرندة</option>
+          <option value="69 الأبيض سيدي الشيخ">69 الأبيض سيدي الشيخ</option>
         </select>
       </div>
     </div>
@@ -1145,6 +1156,7 @@ console.log('App Check skipped in local WebView sandbox.');
 
 window._db = db;
 window._auth = auth;
+window._firebaseConfig = firebaseConfig;
 window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc };
 
 window.getAdminRoleLabel = function(role) {
@@ -1243,6 +1255,12 @@ window.doLogin = async function() {
       if (!qSnap.empty) {
         const adminData = qSnap.docs[0].data();
         if (adminData.password === pass) {
+          try {
+            await signInWithEmailAndPassword(auth, email, pass);
+            console.log("Firebase Auth signed in successfully for:", email);
+          } catch(authErr) {
+            console.warn("Firebase Auth fallback enabled for admin:", authErr.message);
+          }
           localStorage.setItem('loggedInAdminEmail', email);
           localStorage.setItem('loggedInAdminRole', adminData.role || 'supervisor');
           localStorage.setItem('loggedInAdminName', adminData.name || 'مساعد');
@@ -1259,6 +1277,12 @@ window.doLogin = async function() {
     }
 
     if (email === "hadi47hadi58@gmail.com" && pass === "123456") {
+      try {
+        await signInWithEmailAndPassword(auth, email, pass);
+        console.log("Firebase Auth signed in successfully for super-admin");
+      } catch(authErr) {
+        console.warn("Firebase Auth fallback enabled for super-admin:", authErr.message);
+      }
       localStorage.setItem('loggedInAdminEmail', email);
       localStorage.setItem('loggedInAdminRole', 'super_admin');
       localStorage.setItem('loggedInAdminName', 'المالك العام');
@@ -1786,6 +1810,22 @@ window.saveNewAdmin = async function() {
     const fu = window._firestoreUtils;
     const db = window._db;
     const admId = email; 
+
+    // Create in Firebase Auth using secondary app instance so current super-admin gets no displacement
+    try {
+      const { initializeApp: initApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+      const { getAuth: gAuth, createUserWithEmailAndPassword: createUser, signOut: sOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
+      if (window._firebaseConfig) {
+        const tempApp = initApp(window._firebaseConfig, "TempAdminAuthApp_" + Date.now());
+        const tempAuth = gAuth(tempApp);
+        await createUser(tempAuth, email, pass);
+        await sOut(tempAuth);
+        console.log("Background sub-admin Auth registration succeeded");
+      }
+    } catch(authErr) {
+      console.warn("Background sub-admin Auth registration skipped/already exists:", authErr.message);
+    }
+
     await fu.setDoc(fu.doc(db, 'admins', admId), {
       id: admId,
       name,
@@ -1878,7 +1918,9 @@ window.loadWilayas = function() {
     "41 سوق أهراس", "42 تيبازة", "43 ميلة", "44 عين الدفلى", "45 النعامة",
     "46 عين تموشنت", "47 غرداية", "48 غليزان", "49 تميمون", "50 برج باجي مختار",
     "51 أولاد جلال", "52 بني عباس", "53 عين صالح", "54 عين قزام", "55 تقرت",
-    "56 جانت", "57 المغير", "58 المنيعة"
+    "56 جانت", "57 المغير", "58 المنيعة", "59 أفلو", "60 عين البيضاء", "61 عين مليلة",
+    "62 سدراتة", "63 العلمة", "64 بوسعادة", "65 بريكة", "66 قصر الشلالة", "67 مسعد",
+    "68 فرندة", "69 الأبيض سيدي الشيخ"
   ];
   document.getElementById('wilayasGrid').innerHTML = defaults.map(w => `
     <div class="wilaya-chip">
