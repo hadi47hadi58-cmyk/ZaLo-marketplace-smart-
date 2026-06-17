@@ -278,10 +278,10 @@
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
-  getAuth, signInWithEmailAndPassword, onAuthStateChanged
+  getAuth, signInWithEmailAndPassword, onAuthStateChanged, createUserWithEmailAndPassword
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, doc, getDoc, collection, getDocs, query, where
+  getFirestore, doc, getDoc, collection, getDocs, query, where, setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -466,9 +466,88 @@ window.doLogin = async function() {
     isSubmitting = false;
 
   } catch(e) {
+    // If sign-in failed, let's check if we can auto-register/recover.
+    try {
+      // 1. Is it the master email?
+      const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+      
+      // 2. Or is they pre-authorized in the Firestore admins list?
+      let isPreAuthorized = false;
+      let existingRole = 'support';
+      let existingName = 'مساعد';
+      
+      const adminDocRef = doc(db, 'admins', email);
+      const adminDocSnap = await getDoc(adminDocRef);
+      if (adminDocSnap.exists()) {
+        isPreAuthorized = true;
+        existingRole = adminDocSnap.data().role || 'support';
+        existingName = adminDocSnap.data().name || 'مساعد';
+      } else {
+        const qEmail = query(collection(db, 'admins'), where('email', '==', email));
+        const qSnap = await getDocs(qEmail);
+        if (!qSnap.empty) {
+          isPreAuthorized = true;
+          existingRole = qSnap.docs[0].data().role || 'support';
+          existingName = qSnap.docs[0].data().name || 'مساعد';
+        }
+      }
+
+      if (isMasterEmail || isPreAuthorized) {
+        console.log("Auto-registration/recovery triggered for email:", email);
+        // Let's attempt to create the user account in Firebase Auth
+        let cred;
+        try {
+          cred = await createUserWithEmailAndPassword(auth, email, pass);
+        } catch(createErr) {
+          // If creation fails because it already exists, then the password was just incorrect.
+          if (createErr.code === 'auth/email-already-in-use') {
+            throw new Error('كلمة المرور غير صحيحة لهذا الحساب الإداري!');
+          } else {
+            throw createErr;
+          }
+        }
+        
+        const finalRole = isMasterEmail ? 'admin' : existingRole;
+        const finalName = isMasterEmail ? 'المدير العام' : existingName;
+        
+        // Write/update the admin document
+        await setDoc(doc(db, 'admins', email), {
+          email: email,
+          name: finalName,
+          role: finalRole,
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+
+        localStorage.setItem('loggedInAdminEmail', email);
+        sessionStorage.setItem('zalo_admin_role', finalRole);
+        localStorage.setItem('loggedInAdminName', finalName);
+        sessionStorage.setItem('admin_logged_in_session', 'true');
+        
+        setLoading('loginBtn', false);
+        isSubmitting = false;
+        
+        // Let's redirect or show pincode screen
+        document.getElementById('passcode-screen').style.display = 'flex';
+        return;
+      }
+    } catch(recoveryErr) {
+      console.error("Auto recovery failed:", recoveryErr);
+      isSubmitting = false;
+      setLoading('loginBtn', false);
+      showLoginError('⚠️ ' + (recoveryErr.message || recoveryErr.code || 'فشل تسجيل الدخول.'));
+      return;
+    }
+
     isSubmitting = false;
     setLoading('loginBtn', false);
-    showLoginError('⚠️ عذراً، لم تكتمل عملية تسجيل الدخول بنجاح للتأمين الإداري! التأكد من صحة البريد والرقم السري وصلاحية الدخول.');
+    // Display the exact error message so the user can diagnose
+    let errMsg = e.message || e.code || 'التحقق غير مكتمل';
+    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+      errMsg = 'البريد الإلكتروني أو كلمة المرور غير صحيحة. أو أن هذا الحساب غير مصرح له كمدير.';
+    } else if (e.code === 'auth/network-request-failed') {
+      errMsg = 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً.';
+    }
+    showLoginError('⚠️ فشل الدخول للتأمين الإداري: ' + errMsg);
   }
 };
 
