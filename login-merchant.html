@@ -474,15 +474,64 @@ function hideLoginError() {
 }
 
 window.doLogin = async function() {
+  await loginMerchant();
+};
+
+function showError(msg) {
+  showLoginError(msg);
+}
+
+function showSuccess(msg) {
+  alert(msg);
+}
+
+async function registerMerchant() {
+  const storeName = document.getElementById('regStoreName')?.value || '';
+  const ownerName = document.getElementById('regOwnerName')?.value || '';
+  const email = document.getElementById('regEmail')?.value || '';
+  const phone = document.getElementById('regPhone')?.value || '';
+  const whatsapp = document.getElementById('regWhatsapp')?.value || '';
+  const wilaya = document.getElementById('regWilaya')?.value || '';
+  const commune = document.getElementById('regCommune')?.value || '';
+  const category = document.getElementById('regCategory')?.value || '';
+  const description = document.getElementById('regDescription')?.value || '';
+  const pass = document.getElementById('regPass')?.value || '';
+
+  // الخطوة 1 — لا تبحث في Firestore — فقط حفظ الطلب مباشرة
+  const requestData = {
+    storeName: storeName,
+    ownerName: ownerName,
+    email: email,
+    phone: phone,
+    whatsapp: whatsapp,
+    wilaya: wilaya,
+    commune: commune,
+    category: category,
+    description: description,
+    tempPassword: pass, // كلمة المرور التي اختارها
+    status: 'pending',
+    regNumber: 'ZL-' + Date.now(),
+    submittedAt: serverTimestamp()
+  };
+
+  // الخطوة 2 — احفظ الطلب مباشرة بدون أي تحقق مسبق
+  const { addDoc, collection } = window; // fallback if needed
+  await addDoc(collection(db, 'merchant_requests'), requestData);
+
+  // الخطوة 3 — أظهر رسالة نجاح
+  showSuccess('تم استلام طلبك! سنتواصل معك خلال 24 ساعة على رقم ' + phone);
+}
+
+async function loginMerchant() {
   const email = document.getElementById('loginEmail').value.trim().toLowerCase();
   const pass = document.getElementById('loginPass').value;
   hideLoginError();
 
-  if (!email) { showLoginError('⚠️ يرجى إدخال البريد الإلكتروني'); return; }
-  if (!pass) { showLoginError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
+  if (!email) { showError('⚠️ يرجى إدخال البريد الإلكتروني'); return; }
+  if (!pass) { showError('⚠️ أدخل كلمة المرور الخاصة بحسابك'); return; }
 
   setLoading('loginBtn', true);
-  
+
   // Trigger reCAPTCHA Enterprise execution
   try {
     if (typeof grecaptcha !== 'undefined' && grecaptcha.enterprise) {
@@ -507,7 +556,6 @@ window.doLogin = async function() {
   if (email === 'merchant@zalo.com' && pass === '12345678') {
     try {
       isSubmitting = true;
-      setLoading('loginBtn', true);
       let cred;
       try {
         cred = await signInWithEmailAndPassword(auth, email, pass);
@@ -555,97 +603,122 @@ window.doLogin = async function() {
   }
 
   try {
-    isSubmitting = true;
-    await signInWithEmailAndPassword(auth, email, pass);
-    window.location.href = 'dashboard.html';
-  } catch(e) {
-    isSubmitting = false;
-    setLoading('loginBtn', false);
-
-    // Self-healing check for approved/pending merchant registrants
+    // أولاً جرب الدخول المباشر بـ Firebase Auth
     try {
-      let qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', email)));
-      if (qSnap.empty) {
-        // Fallback for capitalized first letter: e.g., Hadi47hadi58@gmail.com
-        const capitalizedEmail = email.charAt(0).toUpperCase() + email.slice(1);
-        qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', capitalizedEmail)));
+      isSubmitting = true;
+      await signInWithEmailAndPassword(auth, email, pass);
+      window.location.href = 'dashboard.html';
+      return;
+    } catch (authErr) {
+      isSubmitting = false;
+      // إذا لم يكن الحساب موجوداً في Auth تحقق من merchant_requests
+      if (authErr.code !== 'auth/user-not-found' &&
+          authErr.code !== 'auth/invalid-credential' &&
+          authErr.code !== 'auth/invalid-email') {
+        throw authErr;
       }
-      if (qSnap.empty) {
-        // Fallback for raw typed uppercase
-        qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', email.toUpperCase())));
-      }
-      if (!qSnap.empty) {
-        const reqDoc = qSnap.docs[0];
-        const reqData = reqDoc.data();
-        const reqStatus = reqData.status;
-
-        if (reqStatus === 'approved') {
-          try {
-            isSubmitting = true;
-            setLoading('loginBtn', true);
-            const cred = await createUserWithEmailAndPassword(auth, email, pass);
-            const user = cred.user;
-
-            await setDoc(doc(db, 'users', user.uid), {
-              uid: user.uid,
-              displayName: reqData.ownerName || reqData.storeName || email.split('@')[0],
-              email: email,
-              phone: reqData.phone || '',
-              role: 'merchant',
-              status: 'active',
-              createdAt: serverTimestamp()
-            });
-
-            await setDoc(doc(db, 'shops', user.uid), {
-              storeName: reqData.storeName || '',
-              ownerName: reqData.ownerName || '',
-              email: email,
-              phone: reqData.phone || '',
-              whatsapp: reqData.whatsapp || reqData.phone || '',
-              wilaya: reqData.wilaya || '',
-              commune: reqData.commune || '',
-              address: reqData.address || '',
-              category: reqData.category || '',
-              workHours: reqData.workHours || '',
-              description: reqData.description || '',
-              rcNumber: reqData.rcNumber || '',
-              storeType: reqData.storeType || 'registered',
-              logoURL: reqData.logoURL || '',
-              facebookURL: reqData.facebook || reqData.facebookURL || '',
-              instagramURL: reqData.instagram || reqData.instagramURL || '',
-              tiktokURL: reqData.tiktokURL || '',
-              telegramURL: reqData.telegramURL || '',
-              status: 'active',
-              subscription: 'basic',
-              createdAt: serverTimestamp()
-            });
-
-            isSubmitting = false;
-            setLoading('loginBtn', false);
-            window.location.href = 'dashboard.html';
-            return;
-          } catch(signUpError) {
-            isSubmitting = false;
-            setLoading('loginBtn', false);
-            if (signUpError.code === 'auth/email-already-in-use') {
-              showLoginError('⚠️ الحساب موجود بالفعل، كود المرور المدخل غير صحيح!');
-            } else {
-              showLoginError('⚠️ فشل التفعيل التلقائي: ' + signUpError.message);
-            }
-            return;
-          }
-        } else {
-          showLoginError(`⏳ طلب متجرك قيد المراجعة والتدقيق الأمني حالياً. رقم المعاملة: ${reqData.regNumber || 'مستمر'}. يرجى الانتظار لحين قبول الملف وتفعيله من قِبل الإدارة.`);
-          return;
-        }
-      }
-    } catch(dbErr) {
-      console.error(dbErr);
     }
 
-    showLoginError('⚠️ البريد الإلكتروني أو كلمة المرور غير صحيحة!');
+    // ابحث في merchant_requests
+    let q = query(collection(db, 'merchant_requests'),
+                    where('email', '==', email));
+    let snap = await getDocs(q);
+
+    if (snap.empty) {
+      // Fallback capitalized first letter
+      const capitalizedEmail = email.charAt(0).toUpperCase() + email.slice(1);
+      q = query(collection(db, 'merchant_requests'), where('email', '==', capitalizedEmail));
+      snap = await getDocs(q);
+    }
+    if (snap.empty) {
+      q = query(collection(db, 'merchant_requests'), where('email', '==', email.toUpperCase()));
+      snap = await getDocs(q);
+    }
+
+    if (snap.empty) {
+      showError('لا يوجد طلب بهذا البريد، قدّم طلب شراكة أولاً');
+      setLoading('loginBtn', false);
+      return;
+    }
+
+    const reqData = snap.docs[0].data();
+
+    if (reqData.status === 'pending') {
+      showError('طلبك قيد المراجعة، سنتواصل معك قريباً');
+      setLoading('loginBtn', false);
+      return;
+    }
+
+    if (reqData.status === 'rejected') {
+      showError('تم رفض طلبك، تواصل مع الدعم على واتساب');
+      setLoading('loginBtn', false);
+      return;
+    }
+
+    if (reqData.status === 'approved') {
+      try {
+        setLoading('loginBtn', true);
+        isSubmitting = true;
+        // أنشئ حساب Firebase Auth أول مرة فقط
+        const cred = await createUserWithEmailAndPassword(auth, email,
+                           reqData.tempPassword || pass);
+        const uid = cred.user.uid;
+
+        // أنشئ وثيقة المستخدم
+        await setDoc(doc(db, 'users', uid), {
+          uid: uid,
+          name: reqData.ownerName || reqData.storeName || email.split('@')[0],
+          email: email,
+          phone: reqData.phone || '',
+          role: 'merchant',
+          status: 'active',
+          createdAt: serverTimestamp()
+        });
+
+        // أنشئ وثيقة المتجر
+        await setDoc(doc(db, 'shops', uid), {
+          ownerId: uid,
+          storeName: reqData.storeName || '',
+          ownerName: reqData.ownerName || '',
+          email: email,
+          phone: reqData.phone || '',
+          whatsapp: reqData.whatsapp || reqData.phone || '',
+          wilaya: reqData.wilaya || '',
+          commune: reqData.commune || '',
+          category: reqData.category || '',
+          description: reqData.description || '',
+          status: 'active',
+          rating: 5.0,
+          createdAt: serverTimestamp()
+        });
+
+        window.location.href = 'dashboard.html';
+      } catch (authCreateErr) {
+        isSubmitting = false;
+        setLoading('loginBtn', false);
+        if (authCreateErr.code === 'auth/email-already-in-use') {
+          showError('الحساب موجود في النظام، جرب الدخول المباشر؛ قد تكون كلمة المرور غير صحيحة');
+        } else {
+          showError('حدث خطأ أثناء تفعيل الحساب: ' + authCreateErr.message);
+        }
+      }
+    }
+
+  } catch (err) {
+    isSubmitting = false;
+    setLoading('loginBtn', false);
+    const errors = {
+      'auth/email-already-in-use': 'الحساب موجود، جرب تسجيل الدخول مباشرة',
+      'auth/wrong-password': 'كلمة المرور غير صحيحة',
+      'auth/invalid-credential': 'كلمة المرور غير صحيحة أو الحساب غير مطابق',
+      'auth/network-request-failed': 'تحقق من اتصالك بالإنترنت'
+    };
+    showError(errors[err.code] || 'حدث خطأ: ' + err.message);
   }
-};
+}
+
+window.registerMerchant = registerMerchant;
+window.loginMerchant = loginMerchant;
 
 window.doForgot = async function() {
   const email = document.getElementById('forgotEmail').value.trim().toLowerCase();

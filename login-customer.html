@@ -656,61 +656,78 @@ window.doLogin = async function() {
 };
 
 window.doRegister = async function() {
-  const name = document.getElementById('regName').value.trim();
-  const email = document.getElementById('regEmail').value.trim().toLowerCase();
-  const phone = document.getElementById('regPhone').value.trim();
-  const pass = document.getElementById('regPass').value;
-  const pass2 = document.getElementById('regPass2').value;
-  const terms = document.getElementById('termsCheck').checked;
+  await registerCustomer();
+};
 
-  const errEl = document.getElementById('regError');
-  errEl.classList.remove('show');
+function showError(msg) {
+  showRegError(msg);
+}
 
-  if (!name || !email || !phone || !pass || !pass2) {
-    showRegError('⚠️ يرجى ملء كافة تفاصيل الزبون للدراسة');
-    return;
+function showLoading(val) {
+  setLoading('regBtn', val);
+}
+
+async function registerCustomer() {
+  const name = (document.getElementById('reg-name') || document.getElementById('regName')).value.trim();
+  const email = (document.getElementById('reg-email') || document.getElementById('regEmail')).value.trim().toLowerCase();
+  const phone = (document.getElementById('reg-phone') || document.getElementById('regPhone')).value.trim();
+  const wilaya = (document.getElementById('reg-wilaya') || document.getElementById('regWilaya')).value;
+  const pass = (document.getElementById('reg-pass') || document.getElementById('regPass')).value;
+  const passConfirm = (document.getElementById('reg-pass-confirm') || document.getElementById('regPass2')).value;
+
+  // تحقق محلي فقط قبل الإرسال
+  if (!name || !email || !phone || !wilaya || !pass) {
+    showError('يرجى ملء جميع الحقول'); return;
+  }
+  if (pass !== passConfirm) {
+    showError('كلمتا المرور غير متطابقتين'); return;
   }
   if (pass.length < 6) {
-    showRegError('⚠️ الرمز السري ضعيف، عين 6 رموز على الأقل');
-    return;
-  }
-  if (pass !== pass2) {
-    showRegError('⚠️ كلمات المرور المدخلة غير متطابقة!');
-    return;
-  }
-  if (!terms) {
-    showRegError('⚠️ يجب الموافقة الصريحة على الشروط لإنشاء عضوية');
-    return;
+    showError('كلمة المرور يجب أن تكون 6 أحرف على الأقل'); return;
   }
 
-  setLoading('regBtn', true);
   try {
+    showLoading(true);
     isSubmitting = true;
-    const cred = await createUserWithEmailAndPassword(auth, email, pass);
-    const user = cred.user;
 
-    const selectedWilaya = document.getElementById('regWilaya')?.value || '16 الجزائر';
-    await setDoc(doc(db, 'users', user.uid), {
-      uid: user.uid,
+    // الخطوة 1 — Firebase Auth ينشئ الحساب فوراً
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    const uid = cred.user.uid;
+
+    // الخطوة 2 — حفظ البيانات في Firestore
+    await setDoc(doc(db, 'users', uid), {
+      uid: uid,
       name: name,
       email: email,
       phone: phone,
+      wilaya: wilaya,
       role: 'customer',
-      wilaya: selectedWilaya,
+      status: 'active',
       createdAt: serverTimestamp()
     });
 
     document.getElementById('regSuccess').classList.add('show');
+
+    // الخطوة 3 — توجيه مباشر
     setTimeout(() => {
       window.location.href = 'index.html';
-    }, 1500);
+    }, 1000);
 
-  } catch(e) {
+  } catch (err) {
     isSubmitting = false;
-    setLoading('regBtn', false);
-    showRegError('⚠️ ' + (e.message || 'حدث خطأ بالشبكة'));
+    // رسائل خطأ Firebase بالعربية
+    const errors = {
+      'auth/email-already-in-use': 'هذا البريد مسجّل مسبقاً، جرب تسجيل الدخول',
+      'auth/invalid-email': 'صيغة البريد الإلكتروني غير صحيحة',
+      'auth/weak-password': 'كلمة المرور ضعيفة جداً، استخدم 6 أحرف على الأقل',
+      'auth/network-request-failed': 'تحقق من اتصالك بالإنترنت'
+    };
+    showError(errors[err.code] || 'حدث خطأ، حاول مرة أخرى');
+    showLoading(false);
   }
-};
+}
+
+window.registerCustomer = registerCustomer;
 
 function showRegError(msg) {
   const el = document.getElementById('regError');
