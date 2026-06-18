@@ -505,7 +505,7 @@ window.doLogin = async function() {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
-    const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+    const isMasterEmail = (email === 'zinzinochop@gmail.com');
 
     if (isMasterEmail) {
       localStorage.setItem('loggedInAdminEmail', email);
@@ -581,7 +581,7 @@ window.doLogin = async function() {
     // If sign-in failed, let's check if we can auto-register/recover.
     try {
       // 1. Is it the master email?
-      const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+      const isMasterEmail = (email === 'zinzinochop@gmail.com');
       
       // 2. Or is they pre-authorized in the Firestore admins list?
       let isPreAuthorized = false;
@@ -823,7 +823,7 @@ window.onGoogleIdTokenFailed = function(reason) {
 async function handleGoogleUserSuccess(user) {
   try {
     const email = user.email.toLowerCase();
-    const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+    const isMasterEmail = (email === 'zinzinochop@gmail.com');
     
     let isPreAuthorized = false;
     let existingRole = isMasterEmail ? 'admin' : 'support';
@@ -917,7 +917,7 @@ window.doForgot = async function() {
   try {
     const adminDocRef = doc(db, 'admins', email);
     const adminDocSnap = await getDoc(adminDocRef);
-    const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+    const isMasterEmail = (email === 'zinzinochop@gmail.com');
     
     if (!isMasterEmail && !adminDocSnap.exists()) {
       const qEmail = query(collection(db, 'admins'), where('email', '==', email));

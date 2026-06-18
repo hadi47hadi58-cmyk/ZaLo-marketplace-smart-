@@ -10,7 +10,7 @@ const SEED_MUNICIPALITIES = [
 ];
 
 const SEED_USERS = [
-    { uid: "user_hadi", email: "hadi47hadi58@gmail.com", name: "الزبون الجزائري الذكي", phone: "0666112233", role: "customer", status: "ACTIVE" },
+    { uid: "user_hadi", email: "zinzinochop@gmail.com", name: "الزبون الجزائري الذكي", phone: "0666112233", role: "customer", status: "ACTIVE" },
     { uid: "user_merchant", email: "merchant@zalo.dz", name: "أحمد بن زكري (تاجر السلام)", phone: "0555334455", role: "merchant", status: "ACTIVE" },
     { uid: "user_admin", email: "admin@zalo.dz", name: "مسؤول المراجعة والتدقيق", phone: "0770559988", role: "admin", status: "ACTIVE" },
     { uid: "user_manager", email: "manager@zalo.dz", name: "المدير العام للنظام", phone: "0660447711", role: "manager", status: "ACTIVE" }

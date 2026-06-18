@@ -10,7 +10,7 @@ export class RegisterDto {
   @IsNotEmpty({ message: 'الاسم مطلوب' })
   name: string;
 
-  @ApiProperty({ description: 'البريد الإلكتروني الفريد', example: 'hadi47hadi58@gmail.com' })
+  @ApiProperty({ description: 'البريد الإلكتروني الفريد', example: 'zinzinochop@gmail.com' })
   @IsEmail({}, { message: 'بريد إلكتروني غير صالح' })
   email: string;
 
@@ -36,7 +36,7 @@ export class RegisterDto {
 }
 
 export class LoginDto {
-  @ApiProperty({ description: 'البريد الإلكتروني للتبليغ ودراسة السلة', example: 'hadi47hadi58@gmail.com' })
+  @ApiProperty({ description: 'البريد الإلكتروني للتبليغ ودراسة السلة', example: 'zinzinochop@gmail.com' })
   @IsEmail()
   email: string;
 

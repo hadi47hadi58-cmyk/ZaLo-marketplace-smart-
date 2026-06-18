@@ -31,7 +31,7 @@ import com.example.viewmodel.EcomViewModel
 fun LoginScreen(
     viewModel: EcomViewModel
 ) {
-    var email by remember { mutableStateOf("hadi47hadi58@gmail.com") }
+    var email by remember { mutableStateOf("zinzinochop@gmail.com") }
     var password by remember { mutableStateOf("••••••••") }
     
     Box(

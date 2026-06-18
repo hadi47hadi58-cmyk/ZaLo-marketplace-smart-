@@ -7,7 +7,7 @@ import { AuditService } from '../audit/audit.service';
 export class AuthService {
   // Mock In-Memory Database storage representing users mapped to PostgreSQL
   private users: any[] = [
-    { id: 1, email: "hadi47hadi58@gmail.com", passwordHash: "hashed_passwd123", name: "عبد الهادي نجم الدين", role: "CUSTOMER", status: "ACTIVE", wilaya: "الجزائر", commune: "المرسى", phone: "0555000111", loyaltyPoints: 1250 },
+    { id: 1, email: "zinzinochop@gmail.com", passwordHash: "hashed_passwd123", name: "عبد الهادي نجم الدين", role: "CUSTOMER", status: "ACTIVE", wilaya: "الجزائر", commune: "المرسى", phone: "0555000111", loyaltyPoints: 1250 },
     { id: 2, email: "merchant@zalo.dz", passwordHash: "hashed_passwd123", name: "أحمد بن زكري", role: "MERCHANT", status: "ACTIVE", wilaya: "وهران", commune: "سيدي الهواري", phone: "0555222333", loyaltyPoints: 340 },
     { id: 3, email: "admin@zalo.dz", passwordHash: "hashed_passwd123", name: "مشرف المنصة الرئيسي", role: "ADMIN", status: "ACTIVE", wilaya: "الجزائر", commune: "حيدرة", phone: "0555444555", loyaltyPoints: 9999 }
   ];

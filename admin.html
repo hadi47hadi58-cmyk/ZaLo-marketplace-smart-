@@ -548,7 +548,7 @@
   <div class="login-box">
     <div class="login-logo">ZaLo</div>
     <div class="login-sub">لوحة الإدارة والمراجعة الشاملة</div>
-    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="hadi47hadi58@gmail.com" />
+    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="zinzinochop@gmail.com" />
     <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="123456" />
     <button class="login-btn" onclick="doLogin()">تأكيد الهوية كمدير</button>
     <div class="login-error" id="loginError">عذراً، هذا الحساب غير معتمد كمدير للنظام</div>
@@ -1229,7 +1229,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('roleTag').textContent = window.getAdminRoleLabel(role);
 
         // Hide admins page link and security lock settings from non-owner
-        const isOwner = user.email === 'hadi47hadi58@gmail.com';
+        const isOwner = user.email === 'zinzinochop@gmail.com';
         const navAdmins = document.getElementById('nav-item-admins');
         const secLockCard = document.getElementById('security-lock-settings-card');
         if (!isOwner) {
@@ -1953,7 +1953,7 @@ window.loadReports = function() {
 
 window.showPage = function(page) {
   const loggedEmail = localStorage.getItem('loggedInAdminEmail') || '';
-  if (page === 'admins' && loggedEmail !== 'hadi47hadi58@gmail.com') {
+  if (page === 'admins' && loggedEmail !== 'zinzinochop@gmail.com') {
     window.showToast('🔒 قسم المشرفين متاح لمالك التطبيق فقط');
     return;
   }

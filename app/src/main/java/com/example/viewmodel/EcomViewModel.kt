@@ -89,7 +89,7 @@ class EcomViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             repository.seedInitialData()
             // Auto-login to customer initially for smooth preview
-            login("hadi47hadi58@gmail.com")
+            login("zinzinochop@gmail.com")
         }
     }
 

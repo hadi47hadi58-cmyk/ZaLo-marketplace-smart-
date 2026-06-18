@@ -198,7 +198,7 @@ class EcomRepository(private val dao: EcomDao) {
             // Seed Customers
             val c1 = dao.insertUser(
                 User(
-                    email = "hadi47hadi58@gmail.com",
+                    email = "zinzinochop@gmail.com",
                     name = "العميل الجزائري الذكي",
                     role = "CUSTOMER",
                     loyaltyPoints = 1250,
