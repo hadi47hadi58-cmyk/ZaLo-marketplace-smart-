@@ -298,7 +298,10 @@
       </div>
 
       <div class="form-group">
-        <label class="form-label">كلمة المرور الخاصة بمسؤوليتك</label>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <label class="form-label" style="margin-bottom: 0;">كلمة المرور الخاصة بمسؤوليتك</label>
+          <a href="#" onclick="window.handleForgotPassword(); return false;" style="font-size: 13px; color: #c9a84c; font-weight: bold; text-decoration: none;">نسيت كلمة المرور؟</a>
+        </div>
         <div class="input-wrap">
           <span class="input-icon">🔒</span>
           <input class="form-input" type="password" id="loginPass" placeholder="••••••••" value="" />
@@ -307,7 +310,7 @@
       </div>
 
       <div class="forgot-link">
-        <a href="#" onclick="showForgot();return false">نسيت كلمة المرور؟</a>
+        <a href="#" onclick="window.handleForgotPassword(); return false;">هل نسيت كلمة المرور؟ تعيين الآن</a>
       </div>
 
       <button class="submit-btn" id="loginBtn" onclick="doLogin()">تأكيد دخول النظام الإداري</button>
@@ -463,6 +466,14 @@ onAuthStateChanged(auth, async (user) => {
       localStorage.setItem('loggedInAdminName', name);
       sessionStorage.setItem('admin_logged_in_session', 'true');
       
+      if (isMasterEmail) {
+        try {
+          await setupInitialPinIfMissing();
+        } catch(pinErr) {
+          console.warn("Failed checking initial PIN setup:", pinErr);
+        }
+      }
+      
       if (unlocked) {
         window.location.href = 'admin.html';
       } else {
@@ -610,8 +621,12 @@ window.pressPin = function(num) {
 async function verifyPin() {
   try {
     const pinSnap = await getDoc(doc(db, 'settings', 'security'));
-    const correctPin = pinSnap.exists() ? (pinSnap.data().admin_pin || "585858") : "585858";
-    if (enteredPin === correctPin || enteredPin === "585858") {
+    if (!pinSnap.exists() || !pinSnap.data().admin_pin) {
+      alert('⚠️ لم يتم إعداد رمز الأمان بعد، تواصل مع المدير العام لإعداده أولاً');
+      return;
+    }
+    const correctPin = pinSnap.data().admin_pin;
+    if (enteredPin === correctPin) {
       sessionStorage.setItem('admin_security_unlocked', 'true');
       document.getElementById('passcode-screen').style.opacity = '0';
       setTimeout(() => {
@@ -629,23 +644,40 @@ async function verifyPin() {
     }
   } catch(e) {
     console.warn("Firestore fetch pin failed: ", e);
-    // Fallback to localstorage or fallback PIN "585858" if offline or rules block
-    const correctLocalPin = localStorage.getItem('zalo_pin_admin') || "585858";
-    if (enteredPin === correctLocalPin || enteredPin === "585858") {
-      sessionStorage.setItem('admin_security_unlocked', 'true');
-      const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
-      if (auth.currentUser && sessionActive) {
-        window.location.href = 'admin.html';
-      } else {
-        document.getElementById('passcode-screen').style.display = 'none';
-      }
-    } else {
-      alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً');
-      enteredPin = "";
-      updatePinDots();
+    alert('⚠️ تعذّر التحقق من رمز الأمان، تحقق من اتصالك بالإنترنت وحاول مجدداً');
+  }
+}
+
+async function setupInitialPinIfMissing() {
+  if (auth.currentUser?.email !== 'zinzinochop@gmail.com') return;
+  const pinSnap = await getDoc(doc(db, 'settings', 'security'));
+  if (!pinSnap.exists() || !pinSnap.data().admin_pin) {
+    const newPin = prompt('لم يتم إعداد رمز أمان بعد. أدخل رمزاً من 6 أرقام لإنشائه الآن:');
+    if (newPin && /^\d{6}$/.test(newPin)) {
+      await setDoc(doc(db, 'settings', 'security'), { admin_pin: newPin }, { merge: true });
+      alert('✅ تم إنشاء رمز الأمان بنجاح، احفظه في مكان آمن');
     }
   }
 }
+
+window.handleForgotPassword = async function() {
+  const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+  if (!email) {
+    showLoginError('⚠️ أدخل البريد الإلكتروني أولاً ثم اضغط نسيت كلمة المرور');
+    return;
+  }
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert('✅ تم إرسال رابط إعادة تعيين كلمة المرور إلى ' + email + '. تحقق من بريدك الإلكتروني (وملف الرسائل غير المرغوب فيها).');
+  } catch (err) {
+    const errors = {
+      'auth/user-not-found': 'لا يوجد حساب بهذا البريد في Firebase Authentication بعد. أنشئه أولاً من Firebase Console.',
+      'auth/invalid-email': 'صيغة البريد الإلكتروني غير صحيحة',
+      'auth/network-request-failed': 'تحقق من اتصالك بالإنترنت'
+    };
+    showLoginError(errors[err.code] || 'تعذّر إرسال رابط إعادة التعيين: ' + err.message);
+  }
+};
 
 window.resetPin = function() {
   enteredPin = "";

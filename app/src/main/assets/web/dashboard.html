@@ -984,17 +984,16 @@ onAuthStateChanged(auth, async (user) => {
       }
 
       if (reqData) {
-        // Heal the 'shops' document with real request statistics & inputs instead of dummy Algiers placeholders
         shopData = {
           storeName: reqData.storeName || "متجري الشريك المعتمد",
           ownerName: reqData.ownerName || "تاجر شريك",
           email: user.email,
-          phone: reqData.phone || "0698694010",
-          whatsapp: reqData.whatsapp || reqData.phone || "0698694010",
-          wilaya: reqData.wilaya || "58 المنيعة",
-          commune: reqData.commune || "المنيعة",
-          address: reqData.address || "وسط المدينة",
-          category: reqData.category || "ملابس وأزياء",
+          phone: reqData.phone || "",
+          whatsapp: reqData.whatsapp || reqData.phone || "",
+          wilaya: reqData.wilaya || "",
+          commune: reqData.commune || "",
+          address: reqData.address || "",
+          category: reqData.category || "عام",
           workHours: reqData.workHours || "08:00 - 20:00",
           description: reqData.description || "",
           logoURL: reqData.logoURL || "",
@@ -1006,16 +1005,23 @@ onAuthStateChanged(auth, async (user) => {
           subscription: 'basic',
           createdAt: serverTimestamp()
         };
+        await setDoc(doc(db, 'shops', user.uid), shopData);
       } else {
-        // Fallback dummy
-        shopData = { storeName: "متجري المعتمد الجديد", wilaya: "16 الجزائر", category: "هواتف وإلكترونيات", whatsapp: "0698694010", status: "active", subscription: "basic" };
+        throw new Error("No real shop document or registration request exists in Firestore.");
       }
-      await setDoc(doc(db, 'shops', user.uid), shopData);
     }
     initDashboard();
   } catch(e) {
-    shopData = { storeName: "متجري التجريبي الرائد", wilaya: "16 الجزائر", category: "أخرى", whatsapp: "0698694010", status: "active", subscription: "basic" };
-    initDashboard();
+    console.error("Dashboard initialization failed:", e);
+    // Show a clean, beautiful empty state telling the merchant resources are missing or check internet
+    document.body.innerHTML = `
+      <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background-color:#0d1710;color:#fff;font-family:'Cairo',sans-serif;padding:20px;text-align:center;direction:rtl;">
+        <div style="font-size:64px;margin-bottom:20px;">🏪</div>
+        <h2 style="font-size:20px;color:#c9a84c;margin-bottom:10px;">عذراً، لم نتمكن من جلب بيانات متجرك</h2>
+        <p style="font-size:14px;color:#a3bfa8;max-width:400px;line-height:1.6;margin-bottom:24px;">يرجى التحقق من اتصالك بالإنترنت، أو التأكد من أن حساب المتجر الخاص بك مفعل من قبل الإدارة العامة لمنصة ZaLo.</p>
+        <button onclick="window.location.reload()" style="background-color:#1a5c2a;color:#fff;border:1px solid #c9a84c;padding:10px 24px;font-size:14px;border-radius:8px;cursor:pointer;font-weight:bold;font-family:'Cairo';">🔄 إعادة المحاولة</button>
+      </div>
+    `;
   }
 });
 
