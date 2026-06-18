@@ -611,6 +611,12 @@ onAuthStateChanged(auth, async (user) => {
   const profileF = document.getElementById('profileForm');
   const tabsArea = document.getElementById('tabsArea');
 
+  // Explicitly clear form inputs on any auth state update to prevent caching/sensitive leak!
+  const loginEmailInput = document.getElementById('loginEmail');
+  const loginPassInput = document.getElementById('loginPass');
+  if (loginEmailInput) loginEmailInput.value = '';
+  if (loginPassInput) loginPassInput.value = '';
+
   if (!user) {
     if (profileF) profileF.style.display = 'none';
     if (loginF) loginF.style.display = 'block';

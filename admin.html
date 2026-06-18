@@ -1191,6 +1191,12 @@ window.getAdminRoleLabel = function(role) {
 onAuthStateChanged(auth, async (user) => {
   const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
 
+  // Explicitly reset/clear input fields to prevent caching/leak/residual values
+  const loginEmailInput = document.getElementById('loginEmail');
+  const loginPassInput = document.getElementById('loginPass');
+  if (loginEmailInput) loginEmailInput.value = '';
+  if (loginPassInput) loginPassInput.value = '';
+
   if (user && sessionActive) {
     try {
       const fu = window._firestoreUtils;

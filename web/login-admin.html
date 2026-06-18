@@ -398,47 +398,50 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   if (!user) {
-    if (!unlocked) {
-      document.getElementById('passcode-screen').style.display = 'flex';
-    } else {
-      document.getElementById('passcode-screen').style.display = 'none';
-    }
+    document.getElementById('passcode-screen').style.display = 'none';
+    // Clear credentials in form inputs clearly on logout/not logged in
+    const loginEmailInput = document.getElementById('loginEmail');
+    const loginPassInput = document.getElementById('loginPass');
+    if (loginEmailInput) loginEmailInput.value = '';
+    if (loginPassInput) loginPassInput.value = '';
     return;
   }
   if (isSubmitting) return;
 
   try {
-    if (sessionActive) {
-      const qEmail = query(collection(db, 'admins'), where('email', '==', user.email));
+    const email = user.email.toLowerCase();
+    const isMasterEmail = (email === 'zinzinochop@gmail.com');
+    let isAdminAuthorized = false;
+    let role = 'support';
+    let name = 'مساعد';
+    
+    if (isMasterEmail) {
+      role = 'super_admin';
+      name = 'المدير العام';
+      isAdminAuthorized = true;
+      // background sync/create to ensure it registers!
+      try {
+        await setDoc(doc(db, 'admins', email), {
+          email: email,
+          uid: user.uid,
+          name: name,
+          role: role,
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+        await setDoc(doc(db, 'admins', user.uid), {
+          email: email,
+          uid: user.uid,
+          name: name,
+          role: role,
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+      } catch(syncErr) {
+        console.warn("Background master admin sync failed:", syncErr);
+      }
+    } else {
+      const qEmail = query(collection(db, 'admins'), where('email', '==', email));
       const qSnap = await getDocs(qEmail);
-      let isAdminAuthorized = false;
-      let role = 'support';
-      let name = 'مساعد';
-      
-      if (user.email && user.email.toLowerCase() === 'zinzinochop@gmail.com') {
-        role = 'super_admin';
-        name = 'المدير العام';
-        isAdminAuthorized = true;
-        // background sync/create to ensure it registers!
-        try {
-          await setDoc(doc(db, 'admins', user.email.toLowerCase()), {
-            email: user.email.toLowerCase(),
-            uid: user.uid,
-            name: name,
-            role: role,
-            createdAt: new Date().toISOString()
-          }, { merge: true });
-          await setDoc(doc(db, 'admins', user.uid), {
-            email: user.email.toLowerCase(),
-            uid: user.uid,
-            name: name,
-            role: role,
-            createdAt: new Date().toISOString()
-          }, { merge: true });
-        } catch(syncErr) {
-          console.warn("Background master admin sync failed:", syncErr);
-        }
-      } else if (!qSnap.empty) {
+      if (!qSnap.empty) {
         const data = qSnap.docs[0].data();
         role = data.role || 'support';
         name = data.name || 'مساعد';
@@ -452,22 +455,27 @@ onAuthStateChanged(auth, async (user) => {
           isAdminAuthorized = true;
         }
       }
+    }
 
-      if (isAdminAuthorized) {
-        localStorage.setItem('loggedInAdminEmail', user.email);
-        sessionStorage.setItem('zalo_admin_role', role);
-        localStorage.setItem('loggedInAdminName', name);
-        
-        if (unlocked) {
-          window.location.href = 'admin.html';
-        } else {
-          document.getElementById('passcode-screen').style.display = 'flex';
-        }
-        return;
+    if (isAdminAuthorized) {
+      localStorage.setItem('loggedInAdminEmail', email);
+      sessionStorage.setItem('zalo_admin_role', role);
+      localStorage.setItem('loggedInAdminName', name);
+      sessionStorage.setItem('admin_logged_in_session', 'true');
+      
+      if (unlocked) {
+        window.location.href = 'admin.html';
+      } else {
+        document.getElementById('passcode-screen').style.display = 'flex';
       }
+      return;
+    } else {
+      console.warn("Unauthorized master or admin user attempt:", email);
+      showLoginError('⚠️ عذراً، هذا الحساب غير مصرح له كمسؤول في قاعدة البيانات.');
+      await signOut(auth);
     }
   } catch(e) {
-    console.error(e);
+    console.error("Auth status sync failed:", e);
   }
 });
 
@@ -523,183 +531,35 @@ window.doLogin = async function() {
 
   try {
     isSubmitting = true;
-    
-    // Firebase Auth is the only source of authentication. Passwords are not compared in Firestore.
-    const cred = await signInWithEmailAndPassword(auth, email, pass);
-    const user = cred.user;
+    sessionStorage.setItem('admin_logged_in_session', 'true');
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    sessionStorage.removeItem('admin_logged_in_session');
+    isSubmitting = false;
+    setLoading('loginBtn', false);
 
     const isMasterEmail = (email === 'zinzinochop@gmail.com');
-
     if (isMasterEmail) {
-      localStorage.setItem('loggedInAdminEmail', email);
-      sessionStorage.setItem('zalo_admin_role', 'super_admin');
-      localStorage.setItem('loggedInAdminName', 'المدير العام');
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      
-      // Auto-update db in background if possible
       try {
-        await setDoc(doc(db, 'admins', email), {
-          email: email,
-          uid: user.uid,
-          name: 'المدير العام',
-          role: 'super_admin',
-          createdAt: new Date().toISOString()
-        }, { merge: true });
-        await setDoc(doc(db, 'admins', user.uid), {
-          email: email,
-          uid: user.uid,
-          name: 'المدير العام',
-          role: 'super_admin',
-          createdAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (dbErr) {
-        console.warn("Could not write master admin to DB:", dbErr);
-      }
-      
-      setLoading('loginBtn', false);
-      isSubmitting = false;
-      document.getElementById('passcode-screen').style.display = 'flex';
-      return;
-    }
-
-    const adminDocRef = doc(db, 'admins', email);
-    const adminDocSnap = await getDoc(adminDocRef);
-
-    if (adminDocSnap.exists()) {
-      const adminData = adminDocSnap.data();
-      localStorage.setItem('loggedInAdminEmail', email);
-      sessionStorage.setItem('zalo_admin_role', adminData.role || 'support');
-      localStorage.setItem('loggedInAdminName', adminData.name || 'مساعد');
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      setLoading('loginBtn', false);
-      isSubmitting = false;
-      document.getElementById('passcode-screen').style.display = 'flex';
-      return;
-    }
-
-    const qEmail = query(collection(db, 'admins'), where('email', '==', user.email));
-    const qSnap = await getDocs(qEmail);
-    if (!qSnap.empty) {
-      const data = qSnap.docs[0].data();
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      sessionStorage.setItem('zalo_admin_role', data.role || 'support');
-      localStorage.setItem('loggedInAdminName', data.name || 'مساعد');
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      setLoading('loginBtn', false);
-      isSubmitting = false;
-      document.getElementById('passcode-screen').style.display = 'flex';
-      return;
-    }
-
-    const adminDoc = await getDoc(doc(db, 'admins', user.uid));
-    if (adminDoc.exists()) {
-      const dataDoc = adminDoc.data();
-      localStorage.setItem('loggedInAdminEmail', user.email);
-      sessionStorage.setItem('zalo_admin_role', dataDoc.role || 'support');
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      setLoading('loginBtn', false);
-      isSubmitting = false;
-      document.getElementById('passcode-screen').style.display = 'flex';
-      return;
-    }
-
-    showLoginError('⚠️ عذراً، هذا الحساب غير مصرح له بالدخول كمدير أو مشرف!');
-    setLoading('loginBtn', false);
-    isSubmitting = false;
-
-  } catch(e) {
-    // If sign-in failed, let's check if we can auto-register/recover.
-    try {
-      // 1. Is it the master email?
-      const isMasterEmail = (email === 'zinzinochop@gmail.com');
-      
-      // 2. Or is they pre-authorized in the Firestore admins list?
-      let isPreAuthorized = false;
-      let existingRole = 'support';
-      let existingName = 'مساعد';
-      
-      if (!isMasterEmail) {
-        try {
-          const adminDocRef = doc(db, 'admins', email);
-          const adminDocSnap = await getDoc(adminDocRef);
-          if (adminDocSnap.exists()) {
-            isPreAuthorized = true;
-            existingRole = adminDocSnap.data().role || 'support';
-            existingName = adminDocSnap.data().name || 'مساعد';
-          } else {
-            const qEmail = query(collection(db, 'admins'), where('email', '==', email));
-            const qSnap = await getDocs(qEmail);
-            if (!qSnap.empty) {
-              isPreAuthorized = true;
-              existingRole = qSnap.docs[0].data().role || 'support';
-              existingName = qSnap.docs[0].data().name || 'مساعد';
-            }
-          }
-        } catch (dbErr) {
-          console.warn("Could not read DB for pre-authorization:", dbErr);
-        }
-      }
-
-      if (isMasterEmail || isPreAuthorized) {
-        console.log("Auto-registration/recovery triggered for email:", email);
-        // Let's attempt to create the user account in Firebase Auth
-        let cred;
-        try {
-          cred = await createUserWithEmailAndPassword(auth, email, pass);
-        } catch(createErr) {
-          // If creation fails because it already exists, then the password was just incorrect.
-          if (createErr.code === 'auth/email-already-in-use') {
-            throw new Error('كلمة المرور غير صحيحة لهذا الحساب الإداري!');
-          } else {
-            throw createErr;
-          }
-        }
-        
-        const finalRole = isMasterEmail ? 'admin' : existingRole;
-        const finalName = isMasterEmail ? 'المدير العام' : existingName;
-        
-        // Write/update the admin document
-        try {
-          await setDoc(doc(db, 'admins', email), {
-            email: email,
-            name: finalName,
-            role: finalRole,
-            createdAt: new Date().toISOString()
-          }, { merge: true });
-        } catch (dbErr) {
-          console.warn("Could not write newly recovered admin to DB:", dbErr);
-        }
-
-        localStorage.setItem('loggedInAdminEmail', email);
-        sessionStorage.setItem('zalo_admin_role', finalRole);
-        localStorage.setItem('loggedInAdminName', finalName);
         sessionStorage.setItem('admin_logged_in_session', 'true');
-        
-        setLoading('loginBtn', false);
-        isSubmitting = false;
-        
-        // Let's redirect or show pincode screen
-        document.getElementById('passcode-screen').style.display = 'flex';
-        return;
+        await createUserWithEmailAndPassword(auth, email, pass);
+      } catch(createErr) {
+        sessionStorage.removeItem('admin_logged_in_session');
+        if (createErr.code === 'auth/email-already-in-use') {
+          showLoginError('⚠️ كلمة المرور غير صحيحة لهذا الحساب الإداري!');
+        } else {
+          showLoginError('⚠️ فشل إنشاء أو معالجة حساب المدير: ' + createErr.message);
+        }
       }
-    } catch(recoveryErr) {
-      console.error("Auto recovery failed:", recoveryErr);
-      isSubmitting = false;
-      setLoading('loginBtn', false);
-      showLoginError('⚠️ ' + (recoveryErr.message || recoveryErr.code || 'فشل تسجيل الدخول.'));
-      return;
+    } else {
+      let errMsg = e.message || e.code || 'التحقق غير مكتمل';
+      if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
+        errMsg = 'البريد الإلكتروني أو كلمة المرور غير صحيحة. أو أن هذا الحساب غير مصرح له كمدير.';
+      } else if (e.code === 'auth/network-request-failed') {
+        errMsg = 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً.';
+      }
+      showLoginError('⚠️ فشل الدخول للتأمين الإداري: ' + errMsg);
     }
-
-    isSubmitting = false;
-    setLoading('loginBtn', false);
-    // Display the exact error message so the user can diagnose
-    let errMsg = e.message || e.code || 'التحقق غير مكتمل';
-    if (e.code === 'auth/invalid-credential' || e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found') {
-      errMsg = 'البريد الإلكتروني أو كلمة المرور غير صحيحة. أو أن هذا الحساب غير مصرح له كمدير.';
-    } else if (e.code === 'auth/network-request-failed') {
-      errMsg = 'يرجى التحقق من اتصالك بالإنترنت والمحاولة مجدداً.';
-    }
-    showLoginError('⚠️ فشل الدخول للتأمين الإداري: ' + errMsg);
   }
 };
 
@@ -852,77 +712,8 @@ window.onGoogleIdTokenFailed = function(reason) {
 
 async function handleGoogleUserSuccess(user) {
   try {
-    const email = user.email.toLowerCase();
-    const isMasterEmail = (email === 'zinzinochop@gmail.com');
-    
-    let isPreAuthorized = false;
-    let existingRole = isMasterEmail ? 'admin' : 'support';
-    let existingName = isMasterEmail ? 'المدير العام' : 'مساعد';
-    
-    if (!isMasterEmail) {
-      try {
-        // Check 1: Document ID == email
-        const adminDocRef = doc(db, 'admins', email);
-        const adminDocSnap = await getDoc(adminDocRef);
-        if (adminDocSnap.exists()) {
-          isPreAuthorized = true;
-          existingRole = adminDocSnap.data().role || 'support';
-          existingName = adminDocSnap.data().name || 'مساعد';
-        } else {
-          // Check 2: Query where email == email
-          const qEmail = query(collection(db, 'admins'), where('email', '==', email));
-          const qSnap = await getDocs(qEmail);
-          if (!qSnap.empty) {
-            isPreAuthorized = true;
-            existingRole = qSnap.docs[0].data().role || 'support';
-            existingName = qSnap.docs[0].data().name || 'مساعد';
-          } else {
-            // Check 3: Document ID == UID (user.uid)
-            const uidDocRef = doc(db, 'admins', user.uid);
-            const uidDocSnap = await getDoc(uidDocRef);
-            if (uidDocSnap.exists()) {
-              isPreAuthorized = true;
-              existingRole = uidDocSnap.data().role || 'support';
-              existingName = uidDocSnap.data().name || 'مساعد';
-            }
-          }
-        }
-      } catch (dbErr) {
-        console.warn("Could not query admins pre-authorization collection:", dbErr);
-      }
-    }
-
-    if (isMasterEmail || isPreAuthorized) {
-      const finalRole = isMasterEmail ? 'admin' : existingRole;
-      const finalName = isMasterEmail ? 'المدير العام' : existingName;
-      
-      // Merge/save the admin info with the actual uid
-      try {
-        await setDoc(doc(db, 'admins', email), {
-          email: email,
-          uid: user.uid,
-          name: finalName,
-          role: finalRole,
-          createdAt: new Date().toISOString()
-        }, { merge: true });
-      } catch (dbErr) {
-        console.warn("Could not save logged-in admin details to DB:", dbErr);
-      }
-
-      localStorage.setItem('loggedInAdminEmail', email);
-      sessionStorage.setItem('zalo_admin_role', finalRole);
-      localStorage.setItem('loggedInAdminName', finalName);
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      
-      setLoading('googleBtn', false);
-      
-      // Show passcode screen to enter the 6 digit pin
-      document.getElementById('passcode-screen').style.display = 'flex';
-      initSecurityLock();
-    } else {
-      setLoading('googleBtn', false);
-      showLoginError('⚠️ عذراً، هذا الحساب غير مصرح له كمسؤول في قاعدة البيانات.');
-    }
+    sessionStorage.setItem('admin_logged_in_session', 'true');
+    console.log("Logged in successfully via Google, waiting for auth state sync...");
   } catch (err) {
     setLoading('googleBtn', false);
     console.error("Admin validation/creation failure:", err);
