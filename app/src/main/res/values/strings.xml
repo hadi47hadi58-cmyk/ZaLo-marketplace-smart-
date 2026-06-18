@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">ZaLo Smart</string>
+    <string name="app_name">Zalo Smart</string>
+    <string name="google_web_client_id">393402903971-fg3qtj6m3c4ctifr5o2uc9gvlriknt8q.apps.googleusercontent.com</string>
 </resources>
