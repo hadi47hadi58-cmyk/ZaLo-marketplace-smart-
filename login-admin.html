@@ -415,7 +415,30 @@ onAuthStateChanged(auth, async (user) => {
       let role = 'support';
       let name = 'مساعد';
       
-      if (!qSnap.empty) {
+      if (user.email && user.email.toLowerCase() === 'zinzinochop@gmail.com') {
+        role = 'super_admin';
+        name = 'المدير العام';
+        isAdminAuthorized = true;
+        // background sync/create to ensure it registers!
+        try {
+          await setDoc(doc(db, 'admins', user.email.toLowerCase()), {
+            email: user.email.toLowerCase(),
+            uid: user.uid,
+            name: name,
+            role: role,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+          await setDoc(doc(db, 'admins', user.uid), {
+            email: user.email.toLowerCase(),
+            uid: user.uid,
+            name: name,
+            role: role,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(syncErr) {
+          console.warn("Background master admin sync failed:", syncErr);
+        }
+      } else if (!qSnap.empty) {
         const data = qSnap.docs[0].data();
         role = data.role || 'support';
         name = data.name || 'مساعد';
@@ -509,7 +532,7 @@ window.doLogin = async function() {
 
     if (isMasterEmail) {
       localStorage.setItem('loggedInAdminEmail', email);
-      sessionStorage.setItem('zalo_admin_role', 'admin');
+      sessionStorage.setItem('zalo_admin_role', 'super_admin');
       localStorage.setItem('loggedInAdminName', 'المدير العام');
       sessionStorage.setItem('admin_logged_in_session', 'true');
       
@@ -519,7 +542,14 @@ window.doLogin = async function() {
           email: email,
           uid: user.uid,
           name: 'المدير العام',
-          role: 'admin',
+          role: 'super_admin',
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+        await setDoc(doc(db, 'admins', user.uid), {
+          email: email,
+          uid: user.uid,
+          name: 'المدير العام',
+          role: 'super_admin',
           createdAt: new Date().toISOString()
         }, { merge: true });
       } catch (dbErr) {

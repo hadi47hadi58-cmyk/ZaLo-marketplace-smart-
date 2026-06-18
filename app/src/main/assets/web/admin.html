@@ -539,8 +539,8 @@
   <div class="login-box">
     <div class="login-logo">ZaLo</div>
     <div class="login-sub">لوحة الإدارة والمراجعة الشاملة</div>
-    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="zinzinochop@gmail.com" />
-    <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="123456" />
+    <input class="login-input" type="email" id="loginEmail" placeholder="البريد الإلكتروني المعتمد" value="" />
+    <input class="login-input" type="password" id="loginPass" placeholder="كلمة المرور" value="" />
     <button class="login-btn" onclick="doLogin()">تأكيد الهوية كمدير</button>
     <div class="login-error" id="loginError">عذراً، هذا الحساب غير معتمد كمدير للنظام</div>
   </div>
@@ -1186,26 +1186,51 @@ onAuthStateChanged(auth, async (user) => {
       const fu = window._firestoreUtils;
       let role = null;
       let name = '';
-      const docRef = fu.doc(db, 'admins', user.email);
-      const adminSnap = await fu.getDoc(docRef);
-      if (adminSnap.exists()) {
-        const d = adminSnap.data();
-        role = d.role;
-        name = d.name || 'مساعد';
+      if (user.email && user.email.toLowerCase() === 'zinzinochop@gmail.com') {
+        role = 'super_admin';
+        name = 'المدير العام';
+        
+        // background sync/create to ensure it registers!
+        try {
+          await fu.setDoc(fu.doc(db, 'admins', user.email.toLowerCase()), {
+            email: user.email.toLowerCase(),
+            uid: user.uid,
+            name: name,
+            role: role,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+          await fu.setDoc(fu.doc(db, 'admins', user.uid), {
+            email: user.email.toLowerCase(),
+            uid: user.uid,
+            name: name,
+            role: role,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+        } catch(syncErr) {
+          console.warn("Background master admin sync failed:", syncErr);
+        }
       } else {
-        const q = fu.query(fu.collection(db, 'admins'), fu.where('email', '==', user.email));
-        const qSnap = await fu.getDocs(q);
-        if (!qSnap.empty) {
-          const d = qSnap.docs[0].data();
+        const docRef = fu.doc(db, 'admins', user.email);
+        const adminSnap = await fu.getDoc(docRef);
+        if (adminSnap.exists()) {
+          const d = adminSnap.data();
           role = d.role;
           name = d.name || 'مساعد';
         } else {
-          const docUidRef = fu.doc(db, 'admins', user.uid);
-          const adminUidSnap = await fu.getDoc(docUidRef);
-          if (adminUidSnap.exists()) {
-            const d = adminUidSnap.data();
+          const q = fu.query(fu.collection(db, 'admins'), fu.where('email', '==', user.email));
+          const qSnap = await fu.getDocs(q);
+          if (!qSnap.empty) {
+            const d = qSnap.docs[0].data();
             role = d.role;
             name = d.name || 'مساعد';
+          } else {
+            const docUidRef = fu.doc(db, 'admins', user.uid);
+            const adminUidSnap = await fu.getDoc(docUidRef);
+            if (adminUidSnap.exists()) {
+              const d = adminUidSnap.data();
+              role = d.role;
+              name = d.name || 'مساعد';
+            }
           }
         }
       }
