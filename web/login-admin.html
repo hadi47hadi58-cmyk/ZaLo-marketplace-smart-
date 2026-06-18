@@ -505,6 +505,33 @@ window.doLogin = async function() {
     const cred = await signInWithEmailAndPassword(auth, email, pass);
     const user = cred.user;
 
+    const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
+
+    if (isMasterEmail) {
+      localStorage.setItem('loggedInAdminEmail', email);
+      sessionStorage.setItem('zalo_admin_role', 'admin');
+      localStorage.setItem('loggedInAdminName', 'المدير العام');
+      sessionStorage.setItem('admin_logged_in_session', 'true');
+      
+      // Auto-update db in background if possible
+      try {
+        await setDoc(doc(db, 'admins', email), {
+          email: email,
+          uid: user.uid,
+          name: 'المدير العام',
+          role: 'admin',
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (dbErr) {
+        console.warn("Could not write master admin to DB:", dbErr);
+      }
+      
+      setLoading('loginBtn', false);
+      isSubmitting = false;
+      document.getElementById('passcode-screen').style.display = 'flex';
+      return;
+    }
+
     const adminDocRef = doc(db, 'admins', email);
     const adminDocSnap = await getDoc(adminDocRef);
 
@@ -561,19 +588,25 @@ window.doLogin = async function() {
       let existingRole = 'support';
       let existingName = 'مساعد';
       
-      const adminDocRef = doc(db, 'admins', email);
-      const adminDocSnap = await getDoc(adminDocRef);
-      if (adminDocSnap.exists()) {
-        isPreAuthorized = true;
-        existingRole = adminDocSnap.data().role || 'support';
-        existingName = adminDocSnap.data().name || 'مساعد';
-      } else {
-        const qEmail = query(collection(db, 'admins'), where('email', '==', email));
-        const qSnap = await getDocs(qEmail);
-        if (!qSnap.empty) {
-          isPreAuthorized = true;
-          existingRole = qSnap.docs[0].data().role || 'support';
-          existingName = qSnap.docs[0].data().name || 'مساعد';
+      if (!isMasterEmail) {
+        try {
+          const adminDocRef = doc(db, 'admins', email);
+          const adminDocSnap = await getDoc(adminDocRef);
+          if (adminDocSnap.exists()) {
+            isPreAuthorized = true;
+            existingRole = adminDocSnap.data().role || 'support';
+            existingName = adminDocSnap.data().name || 'مساعد';
+          } else {
+            const qEmail = query(collection(db, 'admins'), where('email', '==', email));
+            const qSnap = await getDocs(qEmail);
+            if (!qSnap.empty) {
+              isPreAuthorized = true;
+              existingRole = qSnap.docs[0].data().role || 'support';
+              existingName = qSnap.docs[0].data().name || 'مساعد';
+            }
+          }
+        } catch (dbErr) {
+          console.warn("Could not read DB for pre-authorization:", dbErr);
         }
       }
 
@@ -596,12 +629,16 @@ window.doLogin = async function() {
         const finalName = isMasterEmail ? 'المدير العام' : existingName;
         
         // Write/update the admin document
-        await setDoc(doc(db, 'admins', email), {
-          email: email,
-          name: finalName,
-          role: finalRole,
-          createdAt: new Date().toISOString()
-        }, { merge: true });
+        try {
+          await setDoc(doc(db, 'admins', email), {
+            email: email,
+            name: finalName,
+            role: finalRole,
+            createdAt: new Date().toISOString()
+          }, { merge: true });
+        } catch (dbErr) {
+          console.warn("Could not write newly recovered admin to DB:", dbErr);
+        }
 
         localStorage.setItem('loggedInAdminEmail', email);
         sessionStorage.setItem('zalo_admin_role', finalRole);
@@ -792,30 +829,36 @@ async function handleGoogleUserSuccess(user) {
     let existingRole = isMasterEmail ? 'admin' : 'support';
     let existingName = isMasterEmail ? 'المدير العام' : 'مساعد';
     
-    // Check 1: Document ID == email
-    const adminDocRef = doc(db, 'admins', email);
-    const adminDocSnap = await getDoc(adminDocRef);
-    if (adminDocSnap.exists()) {
-      isPreAuthorized = true;
-      existingRole = adminDocSnap.data().role || 'support';
-      existingName = adminDocSnap.data().name || 'مساعد';
-    } else {
-      // Check 2: Query where email == email
-      const qEmail = query(collection(db, 'admins'), where('email', '==', email));
-      const qSnap = await getDocs(qEmail);
-      if (!qSnap.empty) {
-        isPreAuthorized = true;
-        existingRole = qSnap.docs[0].data().role || 'support';
-        existingName = qSnap.docs[0].data().name || 'مساعد';
-      } else {
-        // Check 3: Document ID == UID (user.uid)
-        const uidDocRef = doc(db, 'admins', user.uid);
-        const uidDocSnap = await getDoc(uidDocRef);
-        if (uidDocSnap.exists()) {
+    if (!isMasterEmail) {
+      try {
+        // Check 1: Document ID == email
+        const adminDocRef = doc(db, 'admins', email);
+        const adminDocSnap = await getDoc(adminDocRef);
+        if (adminDocSnap.exists()) {
           isPreAuthorized = true;
-          existingRole = uidDocSnap.data().role || 'support';
-          existingName = uidDocSnap.data().name || 'مساعد';
+          existingRole = adminDocSnap.data().role || 'support';
+          existingName = adminDocSnap.data().name || 'مساعد';
+        } else {
+          // Check 2: Query where email == email
+          const qEmail = query(collection(db, 'admins'), where('email', '==', email));
+          const qSnap = await getDocs(qEmail);
+          if (!qSnap.empty) {
+            isPreAuthorized = true;
+            existingRole = qSnap.docs[0].data().role || 'support';
+            existingName = qSnap.docs[0].data().name || 'مساعد';
+          } else {
+            // Check 3: Document ID == UID (user.uid)
+            const uidDocRef = doc(db, 'admins', user.uid);
+            const uidDocSnap = await getDoc(uidDocRef);
+            if (uidDocSnap.exists()) {
+              isPreAuthorized = true;
+              existingRole = uidDocSnap.data().role || 'support';
+              existingName = uidDocSnap.data().name || 'مساعد';
+            }
+          }
         }
+      } catch (dbErr) {
+        console.warn("Could not query admins pre-authorization collection:", dbErr);
       }
     }
 
@@ -824,13 +867,17 @@ async function handleGoogleUserSuccess(user) {
       const finalName = isMasterEmail ? 'المدير العام' : existingName;
       
       // Merge/save the admin info with the actual uid
-      await setDoc(doc(db, 'admins', email), {
-        email: email,
-        uid: user.uid,
-        name: finalName,
-        role: finalRole,
-        createdAt: new Date().toISOString()
-      }, { merge: true });
+      try {
+        await setDoc(doc(db, 'admins', email), {
+          email: email,
+          uid: user.uid,
+          name: finalName,
+          role: finalRole,
+          createdAt: new Date().toISOString()
+        }, { merge: true });
+      } catch (dbErr) {
+        console.warn("Could not save logged-in admin details to DB:", dbErr);
+      }
 
       localStorage.setItem('loggedInAdminEmail', email);
       sessionStorage.setItem('zalo_admin_role', finalRole);
