@@ -789,10 +789,10 @@ async function handleGoogleUserSuccess(user) {
     const isMasterEmail = (email === 'hadi47hadi58@gmail.com');
     
     let isPreAuthorized = false;
-    let existingRole = 'support';
-    let existingName = 'مساعد';
+    let existingRole = isMasterEmail ? 'admin' : 'support';
+    let existingName = isMasterEmail ? 'المدير العام' : 'مساعد';
     
-    // Check document under email
+    // Check 1: Document ID == email
     const adminDocRef = doc(db, 'admins', email);
     const adminDocSnap = await getDoc(adminDocRef);
     if (adminDocSnap.exists()) {
@@ -800,13 +800,22 @@ async function handleGoogleUserSuccess(user) {
       existingRole = adminDocSnap.data().role || 'support';
       existingName = adminDocSnap.data().name || 'مساعد';
     } else {
-      // Check query email
+      // Check 2: Query where email == email
       const qEmail = query(collection(db, 'admins'), where('email', '==', email));
       const qSnap = await getDocs(qEmail);
       if (!qSnap.empty) {
         isPreAuthorized = true;
         existingRole = qSnap.docs[0].data().role || 'support';
         existingName = qSnap.docs[0].data().name || 'مساعد';
+      } else {
+        // Check 3: Document ID == UID (user.uid)
+        const uidDocRef = doc(db, 'admins', user.uid);
+        const uidDocSnap = await getDoc(uidDocRef);
+        if (uidDocSnap.exists()) {
+          isPreAuthorized = true;
+          existingRole = uidDocSnap.data().role || 'support';
+          existingName = uidDocSnap.data().name || 'مساعد';
+        }
       }
     }
 

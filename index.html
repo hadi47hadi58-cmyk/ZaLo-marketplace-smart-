@@ -1197,7 +1197,7 @@ function back(){
 }
 function toast(msg,type){const t=document.getElementById('toast');t.innerHTML=msg;t.className='toast show '+(type||'');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),3200);}
 function openWA(num,msg){const n=num.replace(/\D/g,'');const i=n.startsWith('0')?'213'+n.slice(1):n;window.open('https://wa.me/'+i+'?text='+encodeURIComponent(msg),'_blank');}
-function openLink(url){window.open(url,'_blank');}
+function openLink(url){if(url.startsWith('http')||url.startsWith('//')){window.open(url,'_blank');}else{window.location.href=url;}}
 // Open side, trigger visually
 function openSide(){document.getElementById('sidemenu').classList.add('open');document.getElementById('overlay').classList.add('show');}
 function closeSide(){document.getElementById('sidemenu').classList.remove('open');document.getElementById('overlay').classList.remove('show');}
