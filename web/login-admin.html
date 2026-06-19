@@ -263,6 +263,7 @@
     submitBtn.style.opacity = '0.7';
 
     try {
+      sessionStorage.setItem('admin_logged_in_session', 'true');
       await signInWithEmailAndPassword(auth, email, pass);
       window.location.href = 'admin.html';
     } catch (error) {

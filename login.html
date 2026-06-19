@@ -460,6 +460,7 @@
 
       // Route 1: Admin
       if (AD_LIST.includes(email)) {
+        sessionStorage.setItem('admin_logged_in_session', 'true');
         window.location.href = 'admin.html';
         return;
       }
@@ -520,7 +521,51 @@
     const provider = new GoogleAuthProvider();
     errorEl.style.display = 'none';
     try {
-      await signInWithPopup(auth, provider);
+      const res = await signInWithPopup(auth, provider);
+      const user = res.user;
+      const email = user.email ? user.email.toLowerCase() : '';
+      
+      localStorage.setItem('user_email', email);
+
+      // Route 1: Admin
+      if (AD_LIST.includes(email)) {
+        sessionStorage.setItem('admin_logged_in_session', 'true');
+        window.location.href = 'admin.html';
+        return;
+      }
+
+      // Route 2: Active Store / Product manager
+      const shopSnap = await getDoc(doc(db, 'shops', user.uid));
+      if (shopSnap.exists()) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      // Route 3: Pending approved Merchant requests
+      const qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', email)));
+      if (!qSnap.empty) {
+        const reqData = qSnap.docs[0].data();
+        const shopData = {
+          storeName: reqData.storeName || "متجري الشريك المعتمد",
+          ownerName: reqData.ownerName || "تاجر شريك",
+          email: user.email,
+          phone: reqData.phone || "",
+          whatsapp: reqData.whatsapp || reqData.phone || "",
+          wilaya: reqData.wilaya || "",
+          commune: reqData.commune || "",
+          address: reqData.address || "",
+          category: reqData.category || "عام",
+          workHours: "08:00 - 20:00",
+          description: reqData.description || "",
+          status: 'active',
+          subscription: 'basic',
+          createdAt: serverTimestamp()
+        };
+        await setDoc(doc(db, 'shops', user.uid), shopData);
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
       window.location.href = 'index.html';
     } catch (error) {
       console.error(error);

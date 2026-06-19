@@ -1189,13 +1189,26 @@ window.getAdminRoleLabel = function(role) {
 };
 
 onAuthStateChanged(auth, async (user) => {
-  const sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
+  let sessionActive = sessionStorage.getItem('admin_logged_in_session') === 'true';
 
   // Explicitly reset/clear input fields to prevent caching/leak/residual values
   const loginEmailInput = document.getElementById('loginEmail');
   const loginPassInput = document.getElementById('loginPass');
   if (loginEmailInput) loginEmailInput.value = '';
   if (loginPassInput) loginPassInput.value = '';
+
+  const isOwner = user && user.email && (
+    user.email.toLowerCase() === 'zinzinochop@gmail.com' || 
+    user.email.toLowerCase() === 'admin@zalo.dz' || 
+    user.email.toLowerCase() === 'admin@zalo.com' ||
+    user.email.toLowerCase() === 'manager@zalo.dz' ||
+    user.email.toLowerCase() === 'manager@zalo.com'
+  );
+
+  if (isOwner && !sessionActive) {
+    sessionStorage.setItem('admin_logged_in_session', 'true');
+    sessionActive = true;
+  }
 
   if (user && sessionActive) {
     try {
