@@ -192,7 +192,7 @@ fun PureWebContainerScreen(
                         mixedContentMode = WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
                     }
                     addJavascriptInterface(WebAppInterface(activity, this), "AndroidInterface")
-                    loadUrl("file:///android_asset/web/index.html")
+                    loadUrl("file:///android_asset/web/splash.html")
                     webView = this
                     activity.currentWebView = this
                 }
