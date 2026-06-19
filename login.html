@@ -320,28 +320,7 @@
         <span>تأكيد وتسجيل الدخول الموحد</span> <i class="fa-solid fa-arrow-left"></i>
       </button>
 
-      <div class="separator">جرّب هذه الرسائل للاختبار السريع</div>
-
-      <!-- Quick Test Accounts Grid -->
-      <div class="demo-grid">
-        <div class="demo-card" onclick="quickFill('admin@zalo.com', '12345678')">
-          <i class="fa-solid fa-user-shield" style="color:#ff6666"></i>
-          <span class="role-name">حساب إداري</span>
-          <span class="role-email">admin@zalo.com</span>
-        </div>
-        <div class="demo-card" onclick="quickFill('merchant@zalo.com', '12345678')">
-          <i class="fa-solid fa-store" style="color:var(--gold2)"></i>
-          <span class="role-name">حساب تاجر</span>
-          <span class="role-email">merchant@zalo.com</span>
-        </div>
-        <div class="demo-card" onclick="quickFill('customer@zalo.com', '12345678')">
-          <i class="fa-solid fa-shopping-bag" style="color:#9cdcb0"></i>
-          <span class="role-name">حساب عميل</span>
-          <span class="role-email">أي بريد زبون</span>
-        </div>
-      </div>
-
-      <div class="separator">أو الدخول الآمن البديل</div>
+      <div class="separator">أو الدخول الآمن عبر Google</div>
 
       <button type="button" class="google-btn" id="googleBtn">
         <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="G" style="width:18px;height:18px;border-radius:50%">
@@ -351,43 +330,6 @@
 
     <div style="text-align: center; margin-top: 20px; font-size: 13px;">
       <a href="register-step1.html" style="color: var(--gold2); text-decoration: none; font-weight: 800;">تقديم طلب شريك تجاري جديد <i class="fa-solid fa-arrow-left"></i></a>
-    </div>
-  </div>
-
-  <!-- HOW IT WORKS INFO SECTION -->
-  <div class="info-section">
-    <div class="info-title">
-      💡 <span>كيف يعمل النظام الموحد؟</span>
-    </div>
-    <div class="timeline">
-      <div class="timeline-item">
-        <div class="timeline-num">1</div>
-        <div class="timeline-text">
-          <h4>رابط واحد فقط</h4>
-          <p>يستخدم الجميع رابطاً موحداً آمناً بغض النظر عن مستوى الحساب (زبون، تاجر شراكة، مدير المنصة).</p>
-        </div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-num">2</div>
-        <div class="timeline-text">
-          <h4>الكشف الذكي</h4>
-          <p>عند بدء كتابة بريدك الإلكتروني، يتعرف محرك Firebase/Firestore تلقائياً وعبر الذكاء الهيكلي على طبيعة وتصنيف حسابك.</p>
-        </div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-num">3</div>
-        <div class="timeline-text">
-          <h4>توجيه فوري وآمن</h4>
-          <p>بمجرد إدخال كلمة المرور الصحيحة بنجاح، يتم فحص وتأهيل الحساب للانتقال التلقائي للوحة القيادة المخصصة.</p>
-        </div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-num">4</div>
-        <div class="timeline-text">
-          <h4>تجربة مستخدم راقية</h4>
-          <p>نفس الاستمارة تخدم الجميع بشكل موحد وواضح دون تشتيت أو تعقيد.</p>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -502,12 +444,6 @@
       performDetection(val);
     }, 400);
   });
-
-  window.quickFill = function(email, pass) {
-    emailInput.value = email;
-    document.getElementById('loginPass').value = pass;
-    performDetection(email);
-  }
 
   // Form submission and routing
   form.addEventListener('submit', async (e) => {

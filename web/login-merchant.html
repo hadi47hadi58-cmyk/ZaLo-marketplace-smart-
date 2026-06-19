@@ -216,13 +216,6 @@
       <button type="submit" class="submit-btn" id="submitBtn">
         <span>دخول لوحة المتجر</span> <i class="fa-solid fa-circle-arrow-left"></i>
       </button>
-
-      <div class="separator">حساب تجريبي للاختبار والمراجعة</div>
-
-      <button type="button" class="demo-btn" id="demoBtn">
-        <i class="fa-solid fa-wand-magic-sparkles"></i>
-        <span>الدخول السريع كتاجر تجريبي (Demo)</span>
-      </button>
     </form>
 
     <div class="footer-links" style="justify-content: center; margin-top: 24px;">
@@ -343,25 +336,6 @@
         arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
       }
       showError(arabicError);
-      submitBtn.disabled = false;
-      submitBtn.style.opacity = '1';
-    }
-  });
-
-  document.getElementById('demoBtn').addEventListener('click', async () => {
-    document.getElementById('loginEmail').value = 'merchant@zalo.com';
-    document.getElementById('loginPass').value = '12345678';
-    
-    errorEl.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.7';
-
-    try {
-      const cred = await signInWithEmailAndPassword(auth, 'merchant@zalo.com', '12345678');
-      await verifyMerchantAndRedirect(cred.user);
-    } catch (error) {
-      console.error(error);
-      showError("فشل الدخول السريع بالحساب التجريبي، يرجى إدخال البيانات يدوياً.");
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
     }

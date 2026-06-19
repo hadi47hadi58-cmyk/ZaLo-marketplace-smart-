@@ -209,13 +209,6 @@
       <button type="submit" class="submit-btn" id="submitBtn">
         <span>دخول غرف الرقابة</span> <i class="fa-solid fa-circle-arrow-left"></i>
       </button>
-
-      <div class="separator">مشرف عام تجريبي للاختبار</div>
-
-      <button type="button" class="demo-btn" id="demoBtn">
-        <i class="fa-solid fa-unlock-keyhole"></i>
-        <span>الدخول السريع كمسؤول تجريبي (Demo)</span>
-      </button>
     </form>
   </div>
 
@@ -281,25 +274,6 @@
         arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
       }
       showError(arabicError);
-      submitBtn.disabled = false;
-      submitBtn.style.opacity = '1';
-    }
-  });
-
-  document.getElementById('demoBtn').addEventListener('click', async () => {
-    document.getElementById('loginEmail').value = 'zinzinochop@gmail.com';
-    document.getElementById('loginPass').value = '12345678';
-    
-    errorEl.style.display = 'none';
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.7';
-
-    try {
-      await signInWithEmailAndPassword(auth, 'zinzinochop@gmail.com', '12345678');
-      window.location.href = 'admin.html';
-    } catch (error) {
-      console.error(error);
-      showError("فشل الدخول السريع كمسؤول، يرجى كتابة البيانات يدوياً.");
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
     }
