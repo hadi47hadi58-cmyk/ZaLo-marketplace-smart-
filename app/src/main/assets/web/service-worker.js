@@ -1,11 +1,8 @@
-const CACHE_NAME = 'zalo-v1';
+const CACHE_NAME = 'zalo-v2';
 const ASSETS = [
   './',
   './index.html',
   './login.html',
-  './login-customer.html',
-  './login-merchant.html',
-  './login-admin.html',
   './dashboard.html',
   './logo.svg',
   './style.css',

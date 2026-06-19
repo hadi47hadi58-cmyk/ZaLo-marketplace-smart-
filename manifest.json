@@ -61,23 +61,10 @@
   ],
   "shortcuts": [
     {
-      "name": "تسجيل دخول الزبون",
-      "short_name": "الزبون",
-      "description": "تسجيل الدخول إلى حساب الزبون لشراء السلع",
-      "url": "login-customer.html",
-      "icons": [
-        {
-          "src": "icon-192.svg",
-          "sizes": "192x192",
-          "type": "image/svg+xml"
-        }
-      ]
-    },
-    {
-      "name": "لوحة التاجر",
-      "short_name": "التاجر",
-      "description": "إدارة المنتجات والمبيعات والطلبات للتاجر",
-      "url": "login-merchant.html",
+      "name": "تسجيل الدخول",
+      "short_name": "الدخول",
+      "description": "تسجيل الدخول الآمن الموحد لزالو",
+      "url": "login.html",
       "icons": [
         {
           "src": "icon-192.svg",
