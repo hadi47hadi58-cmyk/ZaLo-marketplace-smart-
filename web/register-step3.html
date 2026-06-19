@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل جديد - الخطوة 3</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #1a5c2a;
+      --green-light: #2d7a3a;
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --red: #e53935;
+      --gray: #666;
+      --bg: #f5f5f5;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: linear-gradient(135deg, #f5f5f5, #e8f0ea);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      width: 100%;
+      max-width: 450px;
+      background: white;
+      border-radius: 16px;
+      padding: 32px 24px;
+      box-shadow: 0 10px 40px rgba(26,92,42,0.15);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .logo-large { font-size: 50px; margin-bottom: 12px; }
+    .title {
+      font-size: 24px;
+      font-weight: 900;
+      color: #1a5c2a;
+    }
+    .progress-bar {
+      display: flex;
+      gap: 8px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+    .progress-step {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      background: #e0e0e0;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 12px;
+    }
+    .progress-step.active {
+      background: #1a5c2a;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 700;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    input:focus {
+      border-color: #1a5c2a;
+      box-shadow: 0 0 0 3px rgba(26,92,42,0.1);
+    }
+    .error-msg {
+      background: #ffebee;
+      color: #c0392b;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      display: none;
+    }
+    .error-msg.show { display: block; }
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+    .btn {
+      flex: 1;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-submit {
+      background: linear-gradient(135deg, #1a5c2a, #2d7a3a);
+      color: white;
+    }
+    .btn-submit:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(26,92,42,0.3);
+    }
+    .btn-submit:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .btn-back {
+      background: #e0e0e0;
+      color: #1a1a1a;
+    }
+    .loading { display: none; text-align: center; font-size: 12px; color: #666; margin-top: 10px; }
+    .loading.show { display: block; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <div class="logo-large">🏛️</div>
+    <div class="title">الخطوة 3: البيانات الأمنية</div>
+  </div>
+
+  <div class="progress-bar">
+    <div class="progress-step active">1</div>
+    <div class="progress-step active">2</div>
+    <div class="progress-step active">3</div>
+  </div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <form onsubmit="completeRegistration(event)" id="step3Form">
+    <div class="form-group">
+      <label for="email">البريد الإلكتروني</label>
+      <input 
+        type="email" 
+        id="email" 
+        placeholder="example@gmail.com"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="password">كلمة المرور</label>
+      <input 
+        type="password" 
+        id="password" 
+        placeholder="••••••••"
+        minlength="8"
+        required
+      >
+    </div>
+
+    <div class="form-group">
+      <label for="confirmPassword">تأكيد كلمة المرور</label>
+      <input 
+        type="password" 
+        id="confirmPassword" 
+        placeholder="••••••••"
+        required
+      >
+    </div>
+
+    <div class="buttons">
+      <button type="button" class="btn btn-back" onclick="goToStep2()">← رجوع</button>
+      <button type="submit" class="btn btn-submit" id="submitBtn">✅ إنشاء الحساب</button>
+    </div>
+    <div class="loading" id="loading">⏳ جاري إنشاء الحساب...</div>
+  </form>
+</div>
+
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+  import { getFirestore, doc, setDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
+    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
+    projectId: "zalo-marketplace-smart-final",
+    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
+    messagingSenderId: "393402903971",
+    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const userType = sessionStorage.getItem('reg_userType') || 'customer';
+  const fullName = sessionStorage.getItem('reg_fullName') || '';
+  const phone = sessionStorage.getItem('reg_phone') || '';
+  const wilaya = sessionStorage.getItem('reg_wilaya') || '';
+  const commune = sessionStorage.getItem('reg_commune') || '';
+
+  window.goToStep2 = function() {
+    window.location.href = 'register-step2.html';
+  };
+
+  window.completeRegistration = async function(e) {
+    e.preventDefault();
+
+    const email = document.getElementById('email').value.trim().toLowerCase();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const errorMsg = document.getElementById('errorMsg');
+    const submitBtn = document.getElementById('submitBtn');
+    const loading = document.getElementById('loading');
+
+    // Validation
+    if (password !== confirmPassword) {
+      errorMsg.textContent = 'كلمات المرور غير متطابقة';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    if (password.length < 8) {
+      errorMsg.textContent = 'كلمة المرور يجب أن تكون 8 أحرف على الأقل';
+      errorMsg.classList.add('show');
+      return;
+    }
+
+    submitBtn.disabled = true;
+    loading.classList.add('show');
+    errorMsg.classList.remove('show');
+
+    try {
+      // Create user in Firebase Auth
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+      const uid = cred.user.uid;
+
+      // Save user data in Firestore
+      await setDoc(doc(db, 'users', uid), {
+        uid: uid,
+        name: fullName,
+        email: email,
+        phone: phone,
+        wilaya: wilaya,
+        commune: commune,
+        role: userType,
+        status: 'active',
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+
+      // If merchant, create shop request
+      if (userType === 'merchant') {
+        await addDoc(collection(db, 'merchant_requests'), {
+          regNumber: 'ZL-' + Date.now(),
+          ownerName: fullName,
+          email: email,
+          phone: phone,
+          whatsapp: phone,
+          wilaya: wilaya,
+          commune: commune,
+          status: 'pending',
+          createdAt: new Date()
+        });
+      }
+
+      // Save session and redirect
+      localStorage.setItem('user_uid', uid);
+      localStorage.setItem('user_email', email);
+      localStorage.setItem('user_role', userType);
+      sessionStorage.setItem('user_logged_in', 'true');
+
+      // Clear registration data
+      sessionStorage.removeItem('reg_userType');
+      sessionStorage.removeItem('reg_fullName');
+      sessionStorage.removeItem('reg_phone');
+      sessionStorage.removeItem('reg_wilaya');
+      sessionStorage.removeItem('reg_commune');
+
+      // Redirect
+      const redirectUrl = userType === 'merchant' ? 'dashboard.html' : 'index.html';
+      window.location.href = redirectUrl;
+
+    } catch (err) {
+      console.error(err);
+      const errors = {
+        'auth/email-already-in-use': 'هذا البريد مسجل مسبقاً',
+        'auth/invalid-email': 'صيغة البريد غير صحيحة',
+        'auth/weak-password': 'كلمة المرور ضعيفة جداً',
+        'auth/network-request-failed': 'تحقق من اتصالك بالإنترنت'
+      };
+      
+      errorMsg.textContent = errors[err.code] || 'حدث خطأ: ' + err.message;
+      errorMsg.classList.add('show');
+    } finally {
+      submitBtn.disabled = false;
+      loading.classList.remove('show');
+    }
+  };
+</script>
+
+</body>
+</html>
