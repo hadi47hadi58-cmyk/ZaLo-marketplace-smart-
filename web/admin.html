@@ -1192,7 +1192,7 @@ onAuthStateChanged(auth, async (user) => {
       const fu = window._firestoreUtils;
       let role = null;
       let name = '';
-      if (user.email && user.email.toLowerCase() === 'zinzinochop@gmail.com') {
+      if (user.email && (user.email.toLowerCase() === 'admin@zalo.dz' || user.email.toLowerCase() === 'admin@zalo.com')) {
         role = 'super_admin';
         name = 'المدير العام';
         
@@ -1250,7 +1250,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('roleTag').textContent = window.getAdminRoleLabel(role);
 
         // Hide admins page link and security lock settings from non-owner
-        const isOwner = user.email === 'zinzinochop@gmail.com';
+        const isOwner = user.email === 'admin@zalo.dz' || user.email === 'admin@zalo.com';
         const navAdmins = document.getElementById('nav-item-admins');
         const secLockCard = document.getElementById('security-lock-settings-card');
         if (!isOwner) {
@@ -1974,7 +1974,7 @@ window.loadReports = function() {
 
 window.showPage = function(page) {
   const loggedEmail = localStorage.getItem('loggedInAdminEmail') || '';
-  if (page === 'admins' && loggedEmail !== 'zinzinochop@gmail.com') {
+  if (page === 'admins' && loggedEmail !== 'admin@zalo.dz' && loggedEmail !== 'admin@zalo.com') {
     window.showToast('🔒 قسم المشرفين متاح لمالك التطبيق فقط');
     return;
   }

@@ -225,10 +225,6 @@
 
 <div class="wrapper">
 
-  <a href="index.html" class="back-btn">
-    <i class="fa-solid fa-arrow-right"></i> الرئيسية العامة
-  </a>
-
   <!-- LOGO BRAND AREA -->
   <div class="logo-area" style="margin-top: 16px;">
     <div class="logo-outer">
@@ -243,10 +239,10 @@
   <div class="card">
     <!-- Account Detected Badge -->
     <div class="badge-container">
-      <div class="detected-badge badge-customer" id="roleBadge">
-        <i class="fa-solid fa-circle-user" id="badgeIcon"></i>
-        <span id="badgeText">حساب عميل / زبون</span>
-      </div>
+      <a href="index.html" class="detected-badge badge-customer" id="roleBadge" style="text-decoration: none;">
+        <i class="fa-solid fa-house" id="badgeIcon"></i>
+        <span id="badgeText">الواجهة الرئيسية</span>
+      </a>
     </div>
 
     <div class="error-msg" id="errorMessage"></div>
@@ -316,7 +312,6 @@
   const badgeText = document.getElementById('badgeText');
 
   const AD_LIST = [
-    'zinzinochop@gmail.com',
     'admin@zalo.dz',
     'admin@zalo.com',
     'manager@zalo.dz',
@@ -342,8 +337,8 @@
       badgeText.innerHTML = '🏪 حساب تاجر وشريك معتمد';
     } else {
       roleBadge.classList.add('badge-customer');
-      badgeIcon.className = 'fa-solid fa-circle-user';
-      badgeText.innerHTML = '👤 حساب عميل / زبون زايلو';
+      badgeIcon.className = 'fa-solid fa-house';
+      badgeText.innerHTML = 'الواجهة الرئيسية';
     }
   }
 
