@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>ZaLo - تسجيل دخول الزبائن</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a5c2a">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --green: #1a5c2a;
+      --green-light: #2d7a3a;
+      --green-dark: #071a0b;
+      --gold: #c9a84c;
+      --gold2: #e8c97a;
+      --bg: #080e0a;
+      --card: #111a14;
+      --border: #1e3028;
+      --text: #e8f0ea;
+      --text2: #7a9e83;
+      --red: #ff4d4d;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26,92,42,0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .wrapper {
+      width: 100%; max-width: 420px;
+      position: relative; z-index: 10;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(16px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    .logo-area {
+      text-align: center; margin-bottom: 20px;
+    }
+    .logo-img {
+      width: 80px; height: 80px;
+      margin: 0 auto 10px;
+      display: block;
+    }
+    .brand-title {
+      font-size: 22px; font-weight: 900; color: #fff;
+    }
+    .brand-subtitle {
+      font-size: 13px; color: var(--gold2); font-weight: 600;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+    }
+
+    .card-title {
+      font-size: 18px; font-weight: 800; color: #fff;
+      margin-bottom: 6px; text-align: center;
+    }
+    .card-desc {
+      font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 18px; text-align: right;
+    }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 700;
+      color: var(--gold2); margin-bottom: 6px;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .input-icon {
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%); color: var(--text2); font-size: 14px;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 38px 12px 14px;
+      color: #fff; font-family: inherit; font-size: 14px;
+      transition: all 0.25s ease;
+    }
+    .form-input:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201,168,76,0.15);
+      background: rgba(0,0,0,0.35);
+    }
+
+    .submit-btn {
+      width: 100%; background: var(--green);
+      border: 1px solid var(--gold);
+      color: #fff; font-family: inherit; font-size: 15px; font-weight: 800;
+      padding: 13px; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(26,92,42,0.25);
+      transition: all 0.25s ease;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover {
+      background: var(--green-light); transform: translateY(-1px);
+    }
+    .submit-btn:active { transform: translateY(0); }
+
+    .separator {
+      display: flex; align-items: center; text-align: center;
+      margin: 20px 0; color: var(--text2); font-size: 12px;
+    }
+    .separator::before, .separator::after {
+      content: ''; flex: 1; border-bottom: 1px solid var(--border);
+    }
+    .separator:not(:empty)::before { margin-left: 10px; }
+    .separator:not(:empty)::after { margin-right: 10px; }
+
+    .google-btn {
+      width: 100%; background: #fff; color: #111; border: none;
+      font-family: inherit; font-size: 14px; font-weight: 700;
+      padding: 12px; border-radius: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .google-btn:hover { background: #f2f2f2; transform: translateY(-1px); }
+
+    .error-msg {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.2);
+      color: var(--red); padding: 10px; border-radius: 12px;
+      font-size: 12px; margin-bottom: 16px; text-align: center;
+      display: none;
+    }
+
+    .footer-links {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 18px; font-size: 13px;
+    }
+    .footer-links a { color: var(--gold2); text-decoration: none; font-weight: 700; }
+    .footer-links a:hover { text-decoration: underline; }
+
+    .back-btn {
+      position: absolute; top: 12px; right: 12px;
+      color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .back-btn:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <a href="login.html" class="back-btn">
+    <i class="fa-solid fa-arrow-right"></i> البوابة الموحدة
+  </a>
+
+  <!-- LOGO BRAND AREA -->
+  <div class="logo-area">
+    <img src="logo.svg" alt="ZaLo" class="logo-img" onerror="this.src='icon-192.svg'" />
+    <h1 class="brand-title">بوابة الزبائن</h1>
+    <p class="brand-subtitle">السوق الذكي الجزائري الموحد</p>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">تسجيل الدخول الآمن</h2>
+    <p class="card-desc">أهلاً بك مجدداً في سوقك الذكي</p>
+
+    <div class="error-msg" id="errorMessage"></div>
+
+    <form id="customerLoginForm">
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-envelope input-icon"></i>
+          <input type="email" class="form-input" id="loginEmail" placeholder="example@gmail.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">كلمة المرور</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" class="form-input" id="loginPass" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span>تسجيل الدخول</span> <i class="fa-solid fa-circle-arrow-left"></i>
+      </button>
+
+      <div class="separator">أو استخدام حساب جوجل</div>
+
+      <button type="button" class="google-btn" id="googleBtn">
+        <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="G" style="width:18px;height:18px;border-radius:50%">
+        <span>الدخول عبر Google</span>
+      </button>
+    </form>
+
+    <div class="footer-links">
+      <a href="register-step1.html">اصنع حساب زبون جديد <i class="fa-solid fa-user-plus"></i></a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase Modular SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const cfg = {
+    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
+    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
+    projectId: "zalo-marketplace-smart-final",
+    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
+    messagingSenderId: "393402903971",
+    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
+  };
+
+  const app = initializeApp(cfg);
+  const auth = getAuth(app);
+
+  const form = document.getElementById('customerLoginForm');
+  const errorEl = document.getElementById('errorMessage');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showError(msg) {
+    errorEl.innerHTML = msg;
+    errorEl.style.display = 'block';
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.style.display = 'none';
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value;
+
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      await signInWithEmailAndPassword(auth, email, pass);
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error(error);
+      let arabicError = "أو كلمة المرور خطأ، يرجى إعادة المحاولة الكلمة أو البريد غير صحيح.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+      } else if (error.code === 'auth/invalid-email') {
+        arabicError = "صيغة البريد الإلكتروني غير صالحة.";
+      } else if (error.code === 'auth/network-request-failed') {
+        arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
+      }
+      showError(arabicError);
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  });
+
+  document.getElementById('googleBtn').addEventListener('click', async () => {
+    const provider = new GoogleAuthProvider();
+    errorEl.style.display = 'none';
+    try {
+      await signInWithPopup(auth, provider);
+      window.location.href = 'index.html';
+    } catch (error) {
+      console.error(error);
+      showError("فشل تسجيل الدخول باستخدام حساب Google.");
+    }
+  });
+</script>
+
+</body>
+</html>

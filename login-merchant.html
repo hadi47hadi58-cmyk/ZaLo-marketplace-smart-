@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>ZaLo - بوابة التجار الشركاء</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#1a5c2a">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --green: #1a5c2a;
+      --green-light: #2d7a3a;
+      --green-dark: #071a0b;
+      --gold: #c9a84c;
+      --gold2: #e8c97a;
+      --bg: #080e0a;
+      --card: #111a14;
+      --border: #1e3028;
+      --text: #e8f0ea;
+      --text2: #7a9e83;
+      --red: #ff4d4d;
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
+
+    body {
+      font-family: 'Cairo', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      position: relative;
+      overflow-y: auto;
+    }
+
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 50% -20%, rgba(26,92,42,0.2) 0%, transparent 60%);
+      pointer-events: none;
+    }
+
+    .wrapper {
+      width: 100%; max-width: 420px;
+      position: relative; z-index: 10;
+      animation: fadeUp 0.4s ease;
+    }
+    @keyframes fadeUp {
+      from { opacity:0; transform: translateY(16px); }
+      to { opacity:1; transform: translateY(0); }
+    }
+
+    .logo-area {
+      text-align: center; margin-bottom: 20px;
+    }
+    .logo-img {
+      width: 80px; height: 80px;
+      margin: 0 auto 10px;
+      display: block;
+    }
+    .brand-title {
+      font-size: 22px; font-weight: 900; color: #fff;
+    }
+    .brand-subtitle {
+      font-size: 13px; color: var(--gold2); font-weight: 600;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 24px 20px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.55);
+    }
+
+    .card-title {
+      font-size: 18px; font-weight: 800; color: #fff;
+      margin-bottom: 6px; text-align: center;
+    }
+    .card-desc {
+      font-size: 13px; color: var(--text2); text-align: center; margin-bottom: 22px;
+    }
+
+    .form-group {
+      margin-bottom: 18px; text-align: right;
+    }
+    .form-label {
+      display: block; font-size: 13px; font-weight: 700;
+      color: var(--gold2); margin-bottom: 6px;
+    }
+    .input-wrapper {
+      position: relative;
+    }
+    .input-icon {
+      position: absolute; right: 14px; top: 50%;
+      transform: translateY(-50%); color: var(--text2); font-size: 14px;
+    }
+    .form-input {
+      width: 100%;
+      background: rgba(0,0,0,0.2);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 12px 38px 12px 14px;
+      color: #fff; font-family: inherit; font-size: 14px;
+      transition: all 0.25s ease;
+    }
+    .form-input:focus {
+      outline: none; border-color: var(--gold);
+      box-shadow: 0 0 10px rgba(201,168,76,0.15);
+      background: rgba(0,0,0,0.35);
+    }
+
+    .submit-btn {
+      width: 100%; background: var(--green);
+      border: 1px solid var(--gold);
+      color: #fff; font-family: inherit; font-size: 15px; font-weight: 800;
+      padding: 13px; border-radius: 14px; cursor: pointer;
+      box-shadow: 0 8px 24px rgba(26,92,42,0.25);
+      transition: all 0.25s ease;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover {
+      background: var(--green-light); transform: translateY(-1px);
+    }
+    .submit-btn:active { transform: translateY(0); }
+
+    .separator {
+      display: flex; align-items: center; text-align: center;
+      margin: 20px 0; color: var(--text2); font-size: 12px;
+    }
+    .separator::before, .separator::after {
+      content: ''; flex: 1; border-bottom: 1px solid var(--border);
+    }
+    .separator:not(:empty)::before { margin-left: 10px; }
+    .separator:not(:empty)::after { margin-right: 10px; }
+
+    .demo-btn {
+      width: 100%; background: rgba(201,168,76,0.1); color: var(--gold2);
+      border: 1px dashed var(--gold);
+      font-family: inherit; font-size: 14px; font-weight: 700;
+      padding: 12px; border-radius: 14px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    .demo-btn:hover { background: rgba(201,168,76,0.18); transform: translateY(-1px); }
+
+    .error-msg {
+      background: rgba(255, 77, 77, 0.1);
+      border: 1px solid rgba(255, 77, 77, 0.2);
+      color: var(--red); padding: 10px; border-radius: 12px;
+      font-size: 12px; margin-bottom: 16px; text-align: center;
+      display: none;
+    }
+
+    .footer-links {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 18px; font-size: 13px;
+    }
+    .footer-links a { color: var(--gold2); text-decoration: none; font-weight: 700; }
+    .footer-links a:hover { text-decoration: underline; }
+
+    .back-btn {
+      position: absolute; top: 12px; right: 12px;
+      color: var(--text2); text-decoration: none; font-size: 13px; font-weight: 700;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .back-btn:hover { color: #fff; }
+  </style>
+</head>
+<body>
+
+<div class="wrapper">
+
+  <a href="login.html" class="back-btn">
+    <i class="fa-solid fa-arrow-right"></i> البوابة الموحدة
+  </a>
+
+  <!-- LOGO BRAND AREA -->
+  <div class="logo-area">
+    <img src="logo.svg" alt="ZaLo" class="logo-img" onerror="this.src='icon-192.svg'" />
+    <h1 class="brand-title">بوابة التجار والشركاء</h1>
+    <p class="brand-subtitle">إدارة المنتجات، الطلبات والمبيعات</p>
+  </div>
+
+  <div class="card">
+    <h2 class="card-title">تسجيل دخول التاجر</h2>
+    <p class="card-desc">تحكم بمتجرك وتواصل مع زبائنك بسهولة</p>
+
+    <div class="error-msg" id="errorMessage"></div>
+
+    <form id="merchantLoginForm">
+      <div class="form-group">
+        <label class="form-label">البريد الإلكتروني للتاجر</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-store input-icon"></i>
+          <input type="email" class="form-input" id="loginEmail" placeholder="merchant@brand.com" required>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">كلمة المرور الآمنة</label>
+        <div class="input-wrapper">
+          <i class="fa-solid fa-lock input-icon"></i>
+          <input type="password" class="form-input" id="loginPass" placeholder="••••••••" required>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span>دخول لوحة المتجر</span> <i class="fa-solid fa-circle-arrow-left"></i>
+      </button>
+
+      <div class="separator">حساب تجريبي للاختبار والمراجعة</div>
+
+      <button type="button" class="demo-btn" id="demoBtn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>الدخول السريع كتاجر تجريبي (Demo)</span>
+      </button>
+    </form>
+
+    <div class="footer-links" style="justify-content: center; margin-top: 24px;">
+      <a href="register-step1.html">تقديم طلب تسجيل شريك تجاري جديد <i class="fa-solid fa-arrow-left"></i></a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Firebase Modular SDK -->
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+  const cfg = {
+    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
+    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
+    projectId: "zalo-marketplace-smart-final",
+    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
+    messagingSenderId: "393402903971",
+    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
+  };
+
+  const app = initializeApp(cfg);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  const form = document.getElementById('merchantLoginForm');
+  const errorEl = document.getElementById('errorMessage');
+  const submitBtn = document.getElementById('submitBtn');
+
+  function showError(msg) {
+    errorEl.innerHTML = msg;
+    errorEl.style.display = 'block';
+  }
+
+  async function verifyMerchantAndRedirect(user) {
+    try {
+      // Check if a shop doc exists
+      const shopSnap = await getDoc(doc(db, 'shops', user.uid));
+      if (shopSnap.exists()) {
+        window.location.href = 'dashboard.html';
+        return;
+      }
+
+      // If not, self-heal via merchant_requests
+      const uEmail = user.email ? user.email.trim().toLowerCase() : '';
+      if (uEmail) {
+        let qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail)));
+        if (qSnap.empty) {
+          const capitalizedEmail = uEmail.charAt(0).toUpperCase() + uEmail.slice(1);
+          qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', capitalizedEmail)));
+        }
+        if (qSnap.empty) {
+          qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail.toUpperCase())));
+        }
+
+        if (!qSnap.empty) {
+          const reqData = qSnap.docs[0].data();
+          const shopData = {
+            storeName: reqData.storeName || "متجري الشريك المعتمد",
+            ownerName: reqData.ownerName || "تاجر شريك",
+            email: user.email,
+            phone: reqData.phone || "",
+            whatsapp: reqData.whatsapp || reqData.phone || "",
+            wilaya: reqData.wilaya || "",
+            commune: reqData.commune || "",
+            address: reqData.address || "",
+            category: reqData.category || "عام",
+            workHours: reqData.workHours || "08:00 - 20:00",
+            description: reqData.description || "",
+            logoURL: reqData.logoURL || "",
+            facebookURL: reqData.facebook || reqData.facebookURL || "",
+            instagramURL: reqData.instagram || reqData.instagramURL || "",
+            tiktokURL: reqData.tiktokURL || "",
+            telegramURL: reqData.telegramURL || "",
+            status: 'active',
+            subscription: 'basic',
+            createdAt: serverTimestamp()
+          };
+          await setDoc(doc(db, 'shops', user.uid), shopData);
+          window.location.href = 'dashboard.html';
+          return;
+        }
+      }
+
+      // Neither exists! Show alert
+      showError("عذراً! الحساب المعروض غير مسجل كتاجر نشط في منصة ZaLo. يرجى تقديم طلب تسجيل متجر أولاً.");
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+
+    } catch (err) {
+      console.error(err);
+      showError("حدث خطأ أثناء فحص حالة تفعيل المتجر. يرجى مراجعة الدعم الفني.");
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  }
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    errorEl.style.display = 'none';
+    const email = document.getElementById('loginEmail').value.trim();
+    const pass = document.getElementById('loginPass').value;
+
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      await verifyMerchantAndRedirect(cred.user);
+    } catch (error) {
+      console.error(error);
+      let arabicError = "الكلمة أو البريد غير صحيح، يرجى إعادة المحاولة.";
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
+      } else if (error.code === 'auth/invalid-email') {
+        arabicError = "صيغة البريد الإلكتروني غير صالحة.";
+      } else if (error.code === 'auth/network-request-failed') {
+        arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
+      }
+      showError(arabicError);
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  });
+
+  document.getElementById('demoBtn').addEventListener('click', async () => {
+    document.getElementById('loginEmail').value = 'merchant@zalo.com';
+    document.getElementById('loginPass').value = '12345678';
+    
+    errorEl.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, 'merchant@zalo.com', '12345678');
+      await verifyMerchantAndRedirect(cred.user);
+    } catch (error) {
+      console.error(error);
+      showError("فشل الدخول السريع بالحساب التجريبي، يرجى إدخال البيانات يدوياً.");
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  });
+</script>
+
+</body>
+</html>
