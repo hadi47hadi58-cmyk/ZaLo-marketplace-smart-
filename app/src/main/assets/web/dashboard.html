@@ -482,6 +482,19 @@
     .analytics-grid { grid-template-columns: 1fr; }
     .products-grid { grid-template-columns: repeat(2,1fr); }
   }
+  @media (max-width: 480px) {
+    #main { padding: 12px; }
+    .stats-row { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 12px; }
+    .scard { padding: 10px; }
+    .scard-val { font-size: 18px; }
+    .scard-lbl { font-size: 10px; }
+    .sec-head { flex-direction: row; gap: 8px; align-items: center; justify-content: space-between; }
+    .sec-title { font-size: 13px; }
+    .btn { padding: 6px 10px; font-size: 11px; }
+    .products-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .prod-img { height: 100px; }
+    .chart-box { padding: 10px; }
+  }
   #sideOverlay {
     display: none; position: fixed; inset:0;
     background: rgba(0,0,0,0.5); z-index:199;
@@ -1573,6 +1586,30 @@ window.saveProduct = async function() {
   goPage('products');
 };
 
+function updateDashboardStats() {
+  try {
+    const sProdEl = document.getElementById('sProd');
+    if (sProdEl) sProdEl.textContent = allProducts ? allProducts.length : 0;
+
+    const sOrdersEl = document.getElementById('sOrders');
+    if (sOrdersEl) {
+      sOrdersEl.textContent = (allOrders || []).filter(o => o && o.status === 'pending').length;
+    }
+
+    const rev = (allOrders || []).filter(o => o && (o.status === 'delivered' || o.status === 'confirmed')).reduce((sum, item) => sum + (item.price || item.total || 0), 0);
+    const sRevenueEl = document.getElementById('sRevenue');
+    if (sRevenueEl) sRevenueEl.textContent = rev.toLocaleString();
+
+    const sRatingEl = document.getElementById('sRating');
+    if (sRatingEl) sRatingEl.textContent = "4.9 ★";
+
+    renderHomeOrders((allOrders || []).slice(0, 3));
+    renderHomeProducts((allProducts || []).slice(0, 3));
+  } catch(e) {
+    console.error("Error in updateDashboardStats:", e);
+  }
+}
+
 let ordersListenerSet = false;
 async function loadOrders() {
   if (ordersListenerSet) return;
@@ -1582,28 +1619,25 @@ async function loadOrders() {
     onSnapshot(qOrders, (snap) => {
       allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
       renderOrders(allOrders);
-
-      // Dynamically calculate and display stats from Firestore
-      const sProdEl = document.getElementById('sProd');
-      if (sProdEl) sProdEl.textContent = allProducts.length;
-
-      const sOrdersEl = document.getElementById('sOrders');
-      if (sOrdersEl) sOrdersEl.textContent = allOrders.filter(o => o && o.status === 'pending').length;
-
-      const rev = allOrders.filter(o => o && (o.status === 'delivered' || o.status === 'confirmed')).reduce((sum, item) => sum + (item.price || item.total || 0), 0);
-      const sRevenueEl = document.getElementById('sRevenue');
-      if (sRevenueEl) sRevenueEl.textContent = rev.toLocaleString();
-
-      const sRatingEl = document.getElementById('sRating');
-      if (sRatingEl) sRatingEl.textContent = "4.9 ★";
-
-      renderHomeOrders(allOrders.slice(0, 3));
-      renderHomeProducts(allProducts.slice(0, 3));
-    }, err => {
-      console.error("Realtime orders load error:", err);
+      updateDashboardStats();
+    }, async (err) => {
+      console.warn("Realtime onSnapshot failed, attempting fallback static fetch:", err);
+      try {
+        const snap = await getDocs(qOrders);
+        allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        renderOrders(allOrders);
+        updateDashboardStats();
+      } catch(fallbackErr) {
+        console.error("Orders fallback fetch failed:", fallbackErr);
+        const wrap = document.getElementById('ordersWrap');
+        if (wrap) wrap.innerHTML = `<div class="empty"><div class="empty-i">🛒</div><div class="empty-t">قائمتكم فارغة من أي طلبيات شراء حالياً</div></div>`;
+        const homeOrders = document.getElementById('homeOrders');
+        if (homeOrders) homeOrders.innerHTML = `<div class="empty">لا طلبيات مستوردة اليوم</div>`;
+        updateDashboardStats();
+      }
     });
   } catch(e) {
-    console.error("Initial loadOrders error:", e);
+    console.error("Initial loadOrders setup error:", e);
   }
 }
 

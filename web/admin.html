@@ -235,9 +235,10 @@
 
   .table-wrap {
     background: var(--card); border: 1px solid var(--border);
-    border-radius: 14px; overflow: hidden;
+    border-radius: 14px; overflow: hidden; overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
-  table { width: 100%; border-collapse: collapse; }
+  table { width: 100%; border-collapse: collapse; min-width: 800px; }
   thead tr { background: var(--bg3); }
   th {
     padding: 12px 14px; text-align: right;
