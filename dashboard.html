@@ -1829,11 +1829,71 @@ window.updateOrderStatus = async function(id, status) {
   loadHome();
 };
 
+window.merchantUpdateDriver = async function(orderId) {
+  const name = document.getElementById('moDriverName').value.trim();
+  const phone = document.getElementById('moDriverPhone').value.trim();
+  
+  try {
+    await updateDoc(doc(db, 'orders', orderId), {
+      driverName: name,
+      driverPhone: phone,
+      driverWhatsapp: phone
+    });
+    showToast('🟢 تم تحديث وحفظ بيانات سائق الشحن!');
+    
+    // update local state
+    allOrders = allOrders.map(o => o.id === orderId ? { ...o, driverName: name, driverPhone: phone } : o);
+    renderOrders(allOrders);
+    
+    // keep details open but update view
+    viewOrder(orderId);
+  } catch(e) {
+    showToast('⚠️ فشل في الحفظ السحابي لمعلومات السائق','err');
+  }
+};
+
+window.merchantOverrideStatus = async function(orderId) {
+  const selectedStatus = document.getElementById('moStatusSelect').value;
+  try {
+    await updateDoc(doc(db, 'orders', orderId), {
+      status: selectedStatus
+    });
+    showToast('🚀 تم تجاوز وبث حالة الشحن سحابياً!');
+    
+    // update local state
+    allOrders = allOrders.map(o => o.id === orderId ? { ...o, status: selectedStatus } : o);
+    renderOrders(allOrders);
+    
+    // keep details open but update view
+    viewOrder(orderId);
+  } catch(e) {
+    showToast('⚠️ فشل في تسييل الشحنة سحابياً','err');
+  }
+};
+
 window.viewOrder = function(id) {
   const o = allOrders.find(x => x.id === id);
   if(!o) return;
+  
+  const driverName = o.driverName || '';
+  const driverPhone = o.driverPhone || '';
+  
+  let statusBadge = '';
+  if (o.status === 'pending') statusBadge = '⏳ قيد الانتظار والمراجعة';
+  else if (o.status === 'confirmed' || o.status === 'accepted') statusBadge = '✅ مؤكد وحجز السلعة';
+  else if (o.status === 'left_store') statusBadge = '🏪 خرجت من المتجر مع المندوب';
+  else if (o.status === 'in_shipping') statusBadge = '🏢 في مركز فرز الولاية';
+  else if (o.status === 'out_for_delivery') statusBadge = '🏍️ قيد التوصيل الفعلي';
+  else if (o.status === 'delivered') statusBadge = '📦 تمت عملية التسليم والتحصيل';
+  else if (o.status === 'returned') statusBadge = '❌ شحنة مسترجعة تالفة/مرفوضة';
+  else statusBadge = o.status;
+
   document.getElementById('orderModalContent').innerHTML = `
+    <!-- General Details -->
     <div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
+        <span style="color:var(--text2)">حالة الشحنة الكلية</span><span style="font-weight:700;color:var(--gold);">${statusBadge}</span>
+      </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:13px">
         <span style="color:var(--text2)">الزبون المعني</span><span style="font-weight:700">${o.customer || o.customerName || '-'}</span>
       </div>
@@ -1847,9 +1907,11 @@ window.viewOrder = function(id) {
         <span style="color:var(--text2)">العنوان بالتفصيل</span><span>${o.address || '-'}</span>
       </div>
       <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:13px">
-        <span style="color:var(--text2)">ألية السداد المقررة</span><span>اليدوي عند الاستلام</span>
+        <span style="color:var(--text2)">السداد المقرر</span><span>الدفع عند الاستلام (COD)</span>
       </div>
     </div>
+
+    <!-- Basket content -->
     <div style="background:var(--bg3);border-radius:10px;padding:14px;margin-bottom:12px">
       <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:700">محتوى الشحنة الفعلي</div>
       <div style="display:flex;justify-content:space-between;font-size:13px">
@@ -1857,6 +1919,33 @@ window.viewOrder = function(id) {
         <span style="color:var(--gold)">${(o.price || o.total || 0).toLocaleString()} دج</span>
       </div>
     </div>
+
+    <!-- Active Delivery Driver Configuration -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;text-align:right;">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:700;display:flex;align-items:center;gap:4px;">🏍️ مندوب التوصيل المالي للشحنة:</div>
+      
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:8px;">
+        <input id="moDriverName" class="fi" placeholder="اسم السائق الثلاثي" value="${driverName}" style="font-size:12px; height:36px; padding:0 8px; margin:0; border:1px solid var(--border); border-radius:8px; background:var(--bg);">
+        <input id="moDriverPhone" class="fi" placeholder="رقم هاتف السائق" value="${driverPhone}" type="tel" style="font-size:12px; height:36px; padding:0 8px; margin:0; border:1px solid var(--border); border-radius:8px; background:var(--bg);">
+      </div>
+      <button class="btn btn-g" onclick="merchantUpdateDriver('${o.id}')" style="width:100%; font-size:11px; padding:6px; border-radius:6px; height:auto; font-weight:800; background:rgba(26,92,42,0.1); color:var(--g1); stroke:none; border:1px solid var(--g1);">💾 حفظ/تعديل معلومات السائق محلياً وسحابياً</button>
+    </div>
+
+    <!-- Manual Status Override -->
+    <div style="background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;text-align:right;">
+      <div style="font-size:11px;color:var(--text2);margin-bottom:8px;font-weight:700;">🔄 إجبار وتجاوز مسار الشحن سحابياً:</div>
+      <select id="moStatusSelect" class="fsel" style="background:#fff; font-size:12px; height:36px; padding:0 8px; margin-bottom:8px; width:100%; border:1px solid var(--border); border-radius:8px;">
+        <option value="pending" ${o.status==='pending'?'selected':''}>⏳ قيد المراجعة والانتظار</option>
+        <option value="confirmed" ${o.status==='confirmed'?'selected':''}>✅ تأكيد العقد وحجز السلعة</option>
+        <option value="left_store" ${o.status==='left_store'?'selected':''}>🏪 خرج مع مندوب التوصيل</option>
+        <option value="in_shipping" ${o.status==='in_shipping'?'selected':''}>🏢 متواجد بمركز فرز الولاية</option>
+        <option value="out_for_delivery" ${o.status==='out_for_delivery'?'selected':''}>🏍️ قيد الطواف في طريق التسليم</option>
+        <option value="delivered" ${o.status==='delivered'?'selected':''}>📦 تم التسليم كلياً والتحصيل</option>
+        <option value="returned" ${o.status==='returned'?'selected':''}>❌ رفض الاستلام أو إرجاع الشحنة</option>
+      </select>
+      <button class="btn btn-o" onclick="merchantOverrideStatus('${o.id}')" style="width:100%; font-size:11px; padding:6px; border-radius:6px; height:auto; font-weight:800;">🚀 فرض بث الحالة المحددة</button>
+    </div>
+
     <div style="display:flex;gap:8px">
       ${o.status==='pending'?`<button class="btn btn-g" style="flex:1" onclick="updateOrderStatus('${o.id}','confirmed');closeModal('orderModal')">قبول وتثبيت الطلب</button>`:''}
       ${o.phone?`<a href="https://wa.me/213${o.phone.replace(/^0/,'')}" target="_blank" style="flex:1"><button class="btn btn-o" style="width:100%">تأكيد عبر واتساب</button></a>`:''}

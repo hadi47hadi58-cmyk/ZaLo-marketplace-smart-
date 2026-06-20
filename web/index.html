@@ -240,8 +240,9 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
   <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn">الولايات</div></div></div>
   <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn">جميع الأقسام</div></div></div>
   <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn">جميع المنتجات</div></div></div>
-  <div class="sm-sec">للتجار</div>
+  <div class="sm-sec">للتجار والسائقين</div>
   <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
+  <div class="smi" onclick="closeSide();G('driver-portal')"><span class="si">🏍️</span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
   <div class="sm-sec">تواصل معنا وإدارة</div>
   <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
   <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
@@ -512,14 +513,102 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 <div id="s-myorders" class="screen">
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title">مشترياتي وطلباتي</div></div>
+    <div class="tb-center"><div class="tb-title">حقيبة مشترياتي وتتبعها</div></div>
     <div style="width:34px"></div>
   </div>
   <div class="content">
-    <div class="empty" id="mo-empty"><div class="ei">📦</div><p>سجل دخولك أو اكتب رقم هاتفك لعرض الطلبات المودعة</p></div>
+    <div id="mo-auth-container" style="padding: 20px 16px; text-align: center; background: #fff; margin-bottom: 12px; border-bottom: 1px solid var(--bd);">
+      <div style="font-size: 40px; margin-bottom: 8px;">📱</div>
+      <h3 style="font-size: 15px; font-weight: 800; color: var(--g1); margin-bottom: 6px;">تتبع طلبياتك بالرقم الفوري</h3>
+      <p style="font-size: 11px; color: var(--gray); line-height: 1.5; margin-bottom: 14px;">أدخل رقم هاتفك المستعمل أثناء الطلب لمراقبة مسار التوصيل وبث وموافاة السائقين فورياً.</p>
+      <div style="display: flex; gap: 8px; justify-content: center;">
+        <input id="cPhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="max-width: 250px; text-align: center; font-weight: bold; border-radius: 12px; background: #fdfdfd; font-size: 14px; margin:0;" type="tel">
+        <button onclick="searchCustomerOrders()" style="background: var(--g1); color: #fff; border: none; border-radius: 12px; padding: 0 16px; font-weight: bold; font-family: 'Cairo'; font-size: 13px; cursor: pointer; height: 42px;">🔍 بحث مالي</button>
+      </div>
+      <div id="cActivePhoneBadge" style="display: none; margin-top: 10px; font-size: 11px; font-weight: bold; color: var(--gold);">
+        🟢 الرقم المتابع حالياً: <span id="cActivePhoneVal"></span> | <span onclick="clearCustomerSession()" style="color: var(--red); cursor: pointer; text-decoration: underline;">تغيير الرقم</span>
+      </div>
+    </div>
+    
+    <div class="empty" id="mo-empty"><div class="ei">📦</div><p>أدخل هاتف الشراء بالأعلى لعرض كافة المعاملات وخط سير الشحن المباشر.</p></div>
     <div id="mo-list" style="padding:10px 14px 80px"></div>
   </div>
 </div>
+
+<!-- DRIVER PORTAL -->
+<div id="s-driver-portal" class="screen">
+  <div class="topbar">
+    <button class="back-btn" onclick="back()">←</button>
+    <div class="tb-center"><div class="tb-title">بوابة السائقين والموزعين</div></div>
+    <div style="width:34px"></div>
+  </div>
+  <div class="content" style="padding-bottom: 100px;">
+    <!-- Driver Identification Board (if not identified) -->
+    <div id="driver-auth-board" style="padding: 24px 16px; display: block;">
+      <div style="background: #fff; border: 1.5px solid var(--bd); border-radius: 20px; padding: 24px 16px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.04);">
+        <div style="font-size: 56px; margin-bottom: 12px;">🏍️</div>
+        <h3 style="font-size: 17px; font-weight: 800; color: var(--g1); margin-bottom: 8px;">تفعيل سجل وهوية الشحن والتوظيف</h3>
+        <p style="font-size: 11.5px; color: var(--gray); line-height: 1.6; margin-bottom: 18px;">
+          مرحباً بك في شبكة موزعي وسائقي ZaLo الأحرار. أدخل اسمك ورقم هاتفك والولاية التي تود تغطيتها وتوصيل طلبياتها لتصفح شحنات المتاجر فوراً وبث تحديثات العمل للزبائن.
+        </p>
+        <div class="fg" style="text-align: right;"><label style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">👤 الاسم الثلاثي الكامل للسائق *</label><input class="fi" id="dRegName" placeholder="مثال: محمد بلقاسم" style="margin-bottom:12px;"></div>
+        <div class="fg" style="text-align: right;"><label style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">📱 رقم هاتف العمل النشط (واتساب) *</label><input class="fi" id="dRegPhone" placeholder="06XXXXXXXX أو 07XXXXXXXX" type="tel" style="margin-bottom:12px;"></div>
+        <div class="fg" style="text-align: right;">
+          <label style="font-weight:700; font-size:12px; margin-bottom:4px; display:block;">📍 ولاية التغطية والعمل النشطة *</label>
+          <select class="fsel" id="dRegWilaya" style="background:#fff; height:42px; border-radius:12px; margin-bottom:12px; border:1px solid var(--bd); font-family:'Cairo'; padding:0 8px; width:100%;"></select>
+        </div>
+        <button class="btn-p" onclick="saveDriverProfile()" style="width: 100%; margin-top: 14px; background:var(--g1); color:#fff; border:none; padding:12px; border-radius:12px; font-size:14px; font-family:'Cairo'; font-weight:bold; cursor:pointer;">💾 تسجيل وحفظ الهوية محلياً والبدء</button>
+      </div>
+    </div>
+
+    <!-- Active Driver Workspace -->
+    <div id="driver-workspace-board" style="display: none; padding: 14px 12px;">
+      <!-- Profile Header -->
+      <div style="background: linear-gradient(135deg, var(--g1) 0%, var(--g3) 100%); color: #fff; padding: 18px 14px; border-radius: 16px; border: 1.5px solid var(--gold); display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; box-shadow: 0 4px 12px rgba(26,92,42,0.15);">
+        <div style="text-align:right;">
+          <div style="font-size: 15px; font-weight: 800; display: flex; align-items: center; gap: 6px;">🏍️ <span id="dwName">محمد</span></div>
+          <div id="dwWilaya" style="font-size: 11px; color: var(--gold); font-weight: 700; margin-top: 3px;">الولاية: 31 وهران</div>
+          <div id="dwPhone" style="font-size: 11px; opacity: 0.8; margin-top: 2px;">هاتف: 0698000000</div>
+        </div>
+        <button onclick="logoutDriver()" style="background: rgba(229,57,53,0.2); color:#fff; border: 1px solid rgba(229,57,53,0.5); padding: 6px 12px; border-radius: 10px; font-family:'Cairo'; font-size:11px; font-weight:bold; cursor:pointer;">خروج ✕</button>
+      </div>
+
+      <!-- Quick Wilaya Shift Filter -->
+      <div style="background: #fff; border-radius: 12px; border: 1.5px solid var(--bd); padding: 10px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;">
+        <span style="font-size: 11.5px; font-weight: 800; color: var(--text); flex-shrink: 0;">📍 فلترة ولاية التوزيع الحالية:</span>
+        <select class="fsel" id="dwShiftFilter" style="padding: 6px 10px; font-size: 12px; height: 34px; margin: 0; width: auto; flex:1; font-family:'Cairo';" onchange="loadDriverPortalOrders()"></select>
+      </div>
+
+      <!-- Quick Tabs Navigation Header -->
+      <div style="display: flex; gap: 6px; margin-bottom: 14px;">
+        <button class="tbtn on" id="dTabAvailBtn" onclick="toggleDriverTab('avail')" style="flex:1; padding:10px 4px; font-size:11.5px;">📦 المتاحة (<span id="dwCountAvail">0</span>)</button>
+        <button class="tbtn" id="dTabMyActiveBtn" onclick="toggleDriverTab('myactive')" style="flex:1; padding:10px 4px; font-size:11.5px;">🏍️ جارية (<span id="dwCountMyActive">0</span>)</button>
+        <button class="tbtn" id="dTabMyDoneBtn" onclick="toggleDriverTab('mydone')" style="flex:1; padding:10px 4px; font-size:11.5px;">✅ تمت وتاريخي (<span id="dwCountMyDone">0</span>)</button>
+      </div>
+
+      <!-- Tab Content Area -->
+      <div id="driverOrdersContainer"></div>
+    </div>
+  </div>
+</div>
+
+<style>
+.tbtn {
+  background: #f1f5f3;
+  border: 1.5px solid var(--bd);
+  color: var(--gray);
+  border-radius: 10px;
+  font-family: 'Cairo';
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tbtn.on {
+  background: var(--g1);
+  color: #fff;
+  border-color: var(--g1);
+}
+</style>
 
 <!-- NOTIF -->
 <div id="s-notif" class="screen">
@@ -691,7 +780,7 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc,setDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc,setDoc,onSnapshot,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const cfg={apiKey:"AIzaSy"+"DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",authDomain:"zalo-marketplace-smart-final.firebaseapp.com",projectId:"zalo-marketplace-smart-final",storageBucket:"zalo-marketplace-smart-final.firebasestorage.app",messagingSenderId:"393402903971",appId:"1:393402903971:web:7c521e8cb7b823d306be16"};
@@ -700,7 +789,7 @@ const db=getFirestore(fa);
 const auth=getAuth(fa);
 const st=getStorage(fa);
 window._db=db;window._auth=auth;window._st=st;
-window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc,setDoc,createUserWithEmailAndPassword};
+window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc,setDoc,createUserWithEmailAndPassword,onSnapshot,updateDoc};
 
 onAuthStateChanged(auth,u=>{window._user=u;});
 
@@ -1500,9 +1589,422 @@ window.rBack = rBack;
 window.fillComm2 = fillComm2;
 window.filePick = filePick;
 
+// ==========================================
+// REAL-TIME DRIVER PORTAL & CUSTOMER TRACKING IMPLEMENTATION
+// ==========================================
+
+// Driver Profile & Session
+window.saveDriverProfile = function() {
+  const name = document.getElementById('dRegName').value.trim();
+  const phone = document.getElementById('dRegPhone').value.trim();
+  const wilaya = document.getElementById('dRegWilaya').value;
+  if (!name || !phone || !wilaya) {
+    alert('⚠️ يرجى ملء كافة حقول التسجيل وهوية الموزع');
+    return;
+  }
+  const prof = { name, phone, wilaya };
+  localStorage.setItem('zalo_driver_profile', JSON.stringify(prof));
+  toast('🟢 تم حفظ وتثبيت هوية الشحن والبدء!');
+  checkDriverSession();
+};
+
+window.logoutDriver = function() {
+  if(confirm('هل تود بالتأكيد تسجيل الخروج وتصفير الجلسة الحالية لخدمتك؟')) {
+    localStorage.removeItem('zalo_driver_profile');
+    checkDriverSession();
+  }
+};
+
+window.checkDriverSession = function() {
+  const raw = localStorage.getItem('zalo_driver_profile');
+  const regBoard = document.getElementById('driver-auth-board');
+  const workBoard = document.getElementById('driver-workspace-board');
+  if (raw) {
+    const prof = JSON.parse(raw);
+    if(regBoard) regBoard.style.display = 'none';
+    if(workBoard) workBoard.style.display = 'block';
+    
+    // Fill workspace header
+    document.getElementById('dwName').textContent = prof.name;
+    document.getElementById('dwWilaya').innerHTML = '📍 ولاية التغطية الرئيسية: <span style="color:#ffd700">' + prof.wilaya + '</span>';
+    document.getElementById('dwPhone').textContent = '📱 هاتف العمل: ' + prof.phone;
+    
+    // Fill the quick wilaya shift filter to make sure it selects driver's core wilaya
+    const filter = document.getElementById('dwShiftFilter');
+    if (filter) {
+      if (filter.options.length === 0) {
+        WILAYAS.forEach(w => {
+          const o = document.createElement('option');
+          o.value = w.n;
+          o.textContent = w.n;
+          filter.appendChild(o);
+        });
+      }
+      filter.value = prof.wilaya;
+    }
+
+    loadDriverPortalOrders();
+  } else {
+    if(regBoard) regBoard.style.display = 'block';
+    if(workBoard) workBoard.style.display = 'none';
+    
+    // Populate the registration selection
+    const sel = document.getElementById('dRegWilaya');
+    if (sel && sel.options.length === 0) {
+      WILAYAS.forEach(w => {
+        const o = document.createElement('option');
+        o.value = w.n;
+        o.textContent = w.n;
+        sel.appendChild(o);
+      });
+    }
+  }
+};
+
+window.driverActiveTab = 'avail';
+window.toggleDriverTab = function(tabName) {
+  window.driverActiveTab = tabName;
+  document.getElementById('dTabAvailBtn').classList.toggle('on', tabName === 'avail');
+  document.getElementById('dTabMyActiveBtn').classList.toggle('on', tabName === 'myactive');
+  document.getElementById('dTabMyDoneBtn').classList.toggle('on', tabName === 'mydone');
+  
+  // Re-render
+  renderDriverOrdersList();
+};
+
+window.driverAllOrdersList = [];
+window.loadDriverPortalOrders = function() {
+  const filterVal = document.getElementById('dwShiftFilter').value;
+  const container = document.getElementById('driverOrdersContainer');
+  container.innerHTML = '<div style="text-align:center;padding:30px;color:#888;"><div class="spinner" style="margin: 0 auto 10px;"></div>جاري استيراد الطلبيات سحابياً...</div>';
+  
+  const db = window._db;
+  const q = window._ff.query(window._ff.collection(db, 'orders'));
+  
+  // Realtime driver snapshot
+  if (window.driverUnsubscribe) window.driverUnsubscribe();
+  
+  window.driverUnsubscribe = window._ff.onSnapshot(q, (snap) => {
+    const list = [];
+    snap.forEach(docSnap => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+    window.driverAllOrdersList = list;
+    renderDriverOrdersList();
+  }, (err) => {
+    console.error(err);
+    container.innerHTML = '<div style="text-align:center;padding:20px;color:red;">⚠️ خطأ في الاستعلام السحابي</div>';
+  });
+};
+
+window.renderDriverOrdersList = function() {
+  const filterVal = document.getElementById('dwShiftFilter').value;
+  const rawProf = localStorage.getItem('zalo_driver_profile');
+  if(!rawProf) return;
+  const prof = JSON.parse(rawProf);
+  
+  const container = document.getElementById('driverOrdersContainer');
+  if(!container) return;
+  
+  const list = window.driverAllOrdersList || [];
+  
+  // Filter out to three queues
+  // Avail: orders in the selected wilaya without registered driver, and status NOT delivered / NOT returned, and status !== 'pending'
+  const avail = list.filter(o => o.wilaya === filterVal && !o.driverPhone && o.status !== 'pending' && o.status !== 'delivered' && o.status !== 'returned');
+  
+  // My Active: orders assigned to this driver with status NOT delivered and NOT returned
+  const myactive = list.filter(o => o.driverPhone === prof.phone && o.status !== 'delivered' && o.status !== 'returned');
+  
+  // My Done: orders assigned to this driver with status delivered or returned
+  const mydone = list.filter(o => o.driverPhone === prof.phone && (o.status === 'delivered' || o.status === 'returned'));
+  
+  // Update counts
+  document.getElementById('dwCountAvail').textContent = avail.length;
+  document.getElementById('dwCountMyActive').textContent = myactive.length;
+  document.getElementById('dwCountMyDone').textContent = mydone.length;
+  
+  let targetList = [];
+  if (window.driverActiveTab === 'avail') targetList = avail;
+  else if (window.driverActiveTab === 'myactive') targetList = myactive;
+  else if (window.driverActiveTab === 'mydone') targetList = mydone;
+  
+  if (targetList.length === 0) {
+    container.innerHTML = '<div class="empty" style="padding:40px 10px;"><div class="ei">📦</div><p style="font-size:12px;color:#888;">لا توجد أي شحنات مدرجة في هذا القسم حالياً.</p></div>';
+    return;
+  }
+  
+  container.innerHTML = targetList.map(o => {
+    let actionsHTML = '';
+    let badgeHTML = '';
+    
+    // Check status
+    let stIcon = '⏳';
+    let stLbl = 'قيد الانتظار';
+    let stCol = '#f0a500';
+    if (o.status === 'confirmed' || o.status === 'accepted') { stIcon = '✅'; stLbl = 'مقبول ومؤكد من المتجر'; stCol = '#25a860'; }
+    else if (o.status === 'left_store') { stIcon = '🏪'; stLbl = 'خرجت من المتجر'; stCol = '#007bff'; }
+    else if (o.status === 'in_shipping') { stIcon = '🏢'; stLbl = 'في مركز الفرز والفرز'; stCol = '#6f42c1'; }
+    else if (o.status === 'out_for_delivery') { stIcon = '🏍️'; stLbl = 'مع السائق (الطريق)'; stCol = '#fd7e14'; }
+    else if (o.status === 'delivered') { stIcon = '📦'; stLbl = 'تم التسليم المعتمد'; stCol = '#2b8a3e'; }
+    else if (o.status === 'returned') { stIcon = '❌'; stLbl = 'مسترجعة ومرفوضة'; stCol = '#dc3545'; }
+
+    badgeHTML = `<span style="display:inline-block; padding:3px 8px; border-radius:12px; font-size:11px; font-weight:bold; background:rgba(0,0,0,0.05); color:${stCol}; border:1px solid ${stCol}; margin-bottom:8px;">${stIcon} ${stLbl}</span>`;
+
+    if (window.driverActiveTab === 'avail') {
+      actionsHTML = `
+        <button class="btn-p" onclick="driverAssignOrder('${o.id}')" style="width:100%; font-size:12px; padding:8px; border-radius:8px; cursor:pointer; margin-top:8px;">🏍️ قبول وتعيين الشحنة لي للتسليم</button>
+      `;
+    } else if (window.driverActiveTab === 'myactive') {
+      actionsHTML = `
+        <div style="margin-top:10px; border-top:1.5px dashed var(--bd); padding-top:10px;">
+          <div style="font-size:11px; font-weight:bold; color:var(--text); margin-bottom:6px;">🔄 تحديث خطوات شحن المعاملة:</div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px; margin-bottom:6px;">
+            <button onclick="driverUpdateStatus('${o.id}','in_shipping')" style="background:#6f42c1; color:#fff; border:none; padding:8px 4px; border-radius:6px; font-size:11px; font-family:'Cairo'; font-weight:bold; cursor:pointer;">🏢 مركز الفرز</button>
+            <button onclick="driverUpdateStatus('${o.id}','out_for_delivery')" style="background:#fd7e14; color:#fff; border:none; padding:8px 4px; border-radius:6px; font-size:11px; font-family:'Cairo'; font-weight:bold; cursor:pointer;">🏍️ في الطريق</button>
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:6px;">
+            <button onclick="driverUpdateStatus('${o.id}','delivered')" style="background:#2b8a3e; color:#fff; border:none; padding:8px 4px; border-radius:6px; font-size:11px; font-family:'Cairo'; font-weight:bold; cursor:pointer;">📦 تم التسليم</button>
+            <button onclick="driverUpdateStatus('${o.id}','returned')" style="background:#dc3545; color:#fff; border:none; padding:8px 4px; border-radius:6px; font-size:11px; font-family:'Cairo'; font-weight:bold; cursor:pointer;">❌ رفض وإرجاع</button>
+          </div>
+        </div>
+      `;
+    }
+
+    return `
+      <div style="background:#fff; border:1.5px solid var(--bd); border-radius:14px; padding:12px; margin-bottom:12px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); text-align:right;">
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:4px;">
+          <div>
+            <div style="font-weight:800; font-size:13px; color:var(--g1);">${o.customer || o.customerName || 'مشتري وفير'}</div>
+            <div style="font-size:11px; color:#888;">شحنة رقم: <code style="font-family:monospace; font-weight:bold;">#${o.id.substring(0,8)}</code></div>
+          </div>
+          <div style="font-weight:700; font-size:13px; color:var(--gold);">${(o.price || o.total || 0).toLocaleString()} دج</div>
+        </div>
+        
+        <div style="font-size:11.5px; margin:6px 0; color:var(--text); line-height:1.5;">
+          📍 <strong>الولاية:</strong> ${o.wilaya || '-'} <br/>
+          🏢 <strong>العنوان الكامل:</strong> ${o.address || '-'} <br/>
+          📱 <strong>الهاتف الفعلي:</strong> <a href="tel:${o.phone}" style="color:var(--g1); font-weight:bold; text-decoration:underline;">${o.phone || '-'}</a>
+          ${o.phone ? ` | <a href="https://wa.me/213${o.phone.replace(/^0/,'')}" target="_blank" style="color:#25d366; font-weight:bold; text-decoration:underline;">💬 واتساب</a>` : ''}
+        </div>
+        
+        <div style="font-size:11px; color:#555; background:#fafafa; border-radius:8px; padding:6px; margin:6px 0; border:1px solid #eee;">
+          🛒 <strong>محتوى السلة:</strong> ${o.product || 'سلعة ومشتريات متعددة'} (${o.qty || 1} قطعة)
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+          ${badgeHTML}
+        </div>
+        ${actionsHTML}
+      </div>
+    `;
+  }).join('');
+};
+
+window.driverAssignOrder = async function(orderId) {
+  const rawProf = localStorage.getItem('zalo_driver_profile');
+  if(!rawProf) return;
+  const prof = JSON.parse(rawProf);
+  
+  const db = window._db;
+  try {
+    await window._ff.updateDoc(window._ff.doc(db, 'orders', orderId), {
+      driverName: prof.name,
+      driverPhone: prof.phone,
+      driverWhatsapp: prof.phone,
+      status: 'left_store'
+    });
+    toast('🏍️ تم قبول الشحنة وبدء تسييل نقلها بنجاح!');
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث عائق أثناء الحفظ السحابي');
+  }
+};
+
+window.driverUpdateStatus = async function(orderId, nextStatus) {
+  const db = window._db;
+  try {
+    await window._ff.updateDoc(window._ff.doc(db, 'orders', orderId), {
+      status: nextStatus
+    });
+    toast('🚀 تم بث تحديث حالة التسليم المباشر للمشتري!');
+  } catch(e) {
+    console.error(e);
+    alert('❌ فشل في إرسال التحديث السحابي');
+  }
+};
+
+// Customer Tracking Operations
+window.clearCustomerSession = function() {
+  localStorage.removeItem('zalo_customer_tracked_phone');
+  document.getElementById('cActivePhoneBadge').style.display = 'none';
+  document.getElementById('cPhoneInput').value = '';
+  document.getElementById('mo-empty').style.display = 'block';
+  document.getElementById('mo-list').innerHTML = '';
+  if(window.customerUnsubscribe) {
+    window.customerUnsubscribe();
+    window.customerUnsubscribe = null;
+  }
+};
+
+window.searchCustomerOrders = function() {
+  const phone = document.getElementById('cPhoneInput').value.trim();
+  if(!phone || phone.length < 8) {
+    alert('⚠️ يرجى كتابة رقم هاتف صحيح لعرض طلبات المشحونة');
+    return;
+  }
+  localStorage.setItem('zalo_customer_tracked_phone', phone);
+  setupRealtimeTrackingListener(phone);
+};
+
+window.setupRealtimeTrackingListener = function(phone) {
+  document.getElementById('cActivePhoneBadge').style.display = 'block';
+  document.getElementById('cActivePhoneVal').textContent = phone;
+  
+  const listEl = document.getElementById('mo-list');
+  const emptyEl = document.getElementById('mo-empty');
+  listEl.innerHTML = '<div style="text-align:center;padding:30px;color:#888;"><div class="spinner" style="margin: 0 auto 10px;"></div>جاري البحث والمزامنة المباشرة...</div>';
+  emptyEl.style.display = 'none';
+
+  const db = window._db;
+  const q = window._ff.query(window._ff.collection(db, 'orders'));
+  
+  if(window.customerUnsubscribe) window.customerUnsubscribe();
+
+  window.customerUnsubscribe = window._ff.onSnapshot(q, (snap) => {
+    const list = [];
+    snap.forEach(docSnap => {
+      const data = docSnap.data();
+      if(data.phone === phone || (data.phone && data.phone.endsWith(phone)) || (phone.endsWith(data.phone))) {
+        list.push({ id: docSnap.id, ...data });
+      }
+    });
+    
+    if(list.length === 0) {
+      emptyEl.style.display = 'block';
+      emptyEl.innerHTML = '<div class="ei">📦</div><p style="font-size:12px;color:#888;">لم يتم العثور على أي طلبيات مسجلة تحت الهاتف ' + phone + '</p>';
+      listEl.innerHTML = '';
+      return;
+    }
+    
+    emptyEl.style.display = 'none';
+    listEl.innerHTML = list.map(o => {
+      const timelineHTML = renderTrackingTimeline(o);
+      
+      const drHTML = o.driverName ? `
+        <div style="background:rgba(26,92,42,0.04); border:1px solid rgba(26,92,42,0.1); border-radius:10px; padding:10px; margin-top:10px; text-align:right;">
+          <div style="font-size:11px; font-weight:700; color:var(--g1); margin-bottom:4px;">👤 سائق التوصيل المعيد والمطالب بالشحنة:</div>
+          <div style="font-size:12px; font-weight:800; color:var(--text);">${o.driverName}</div>
+          <div style="margin-top:4px; display:flex; gap:6px;">
+            <a href="tel:${o.driverPhone}" style="background:var(--g1); color:#fff; border-radius:6px; padding:3px 8px; font-size:10px; font-weight:bold; display:inline-block;">📞 اتصل بالسائق</a>
+            <a href="https://wa.me/213${o.driverPhone.replace(/^0/,'')}" target="_blank" style="background:#25d366; color:#fff; border-radius:6px; padding:3px 8px; font-size:10px; font-weight:bold; display:inline-block;">💬 تواصل واتساب</a>
+          </div>
+        </div>
+      ` : `
+        <div style="background:#fafafa; border:1px solid #eee; border-radius:10px; padding:10px; margin-top:10px; text-align:center; font-size:11px; color:#999;">
+          ⏳ بانتظار تعيين مندوب التوصيل بالولاية فورياً...
+        </div>
+      `;
+
+      return `
+        <div style="background:#fff; border:1.5px solid var(--bd); border-radius:16px; padding:14px; margin-bottom:16px; box-shadow:0 3px 10px rgba(0,0,0,0.02); text-align:right;">
+          <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+            <span style="font-size:11px; color:#999;">رقم المعاملة: <code>#${o.id.substring(0,8)}</code></span>
+            <span style="font-size:12px; font-weight:800; color:var(--gold);">${(o.price || o.total || 0).toLocaleString()} دج</span>
+          </div>
+          <div style="font-size:13px; font-weight:800; color:var(--text); margin-bottom:4px;">سلعة: ${o.product || 'سلعة متعددة'}</div>
+          
+          ${timelineHTML}
+          ${drHTML}
+        </div>
+      `;
+    }).join('');
+  });
+};
+
+window.renderTrackingTimeline = function(order) {
+  const s = order.status || 'pending';
+  const steps = [
+    { key: 'pending', label: '⏳ بانتظار التأكيد' },
+    { key: 'confirmed', label: '✅ قبول العقد وحجز البضاعة' },
+    { key: 'left_store', label: '🏪 خرج من المتجر' },
+    { key: 'in_shipping', label: '🏢 مركز الفرز' },
+    { key: 'out_for_delivery', label: '🏍️ مع السائق (الطريق)' },
+    { key: 'delivered', label: '📦 تم التسليم والتحصيل' }
+  ];
+
+  if (s === 'returned') {
+    return `
+      <div style="background:rgba(220,53,69,0.05); color:#dc3545; border-radius:10px; padding:12px; font-size:12px; font-weight:700; text-align:center; margin:10px 0;">
+        ❌ تم إلغاء توصيل الشحنة أو رفض استلامها وإرجاع البضاعة
+      </div>
+    `;
+  }
+
+  let curIndex = steps.findIndex(x => x.key === s);
+  if(s === 'accepted') curIndex = 1;
+  if(curIndex === -1) curIndex = 0;
+
+  let html = `
+    <div style="margin: 14px 0 10px; text-align: right; direction: rtl;">
+      <div style="display: flex; justify-content: space-between; align-items: center; position: relative; margin-bottom: 8px;">
+        <div style="position: absolute; left: 10px; right: 10px; height: 3px; background: #e0e0e0; z-index: 1; top: 10px;"></div>
+        <div style="position: absolute; left: 10px; right: 10px; height: 3px; background: var(--g1); z-index: 2; top: 10px; width: ${ (curIndex / (steps.length - 1)) * 100 }%; transition: width 0.3s;"></div>
+  `;
+
+  steps.forEach((step, idx) => {
+    const isDone = idx <= curIndex;
+    const isCurrent = idx === curIndex;
+    const dotCol = isDone ? 'var(--g1)' : '#e0e0e0';
+    const borderCol = isCurrent ? 'var(--gold)' : 'transparent';
+    const borderVal = isCurrent ? '3px solid var(--gold)' : 'none';
+    const innerDot = isDone ? '✓' : '';
+    
+    html += `
+        <div style="z-index: 3; text-align: center; display: flex; flex-direction: column; align-items: center; width: 24px;">
+          <div style="width: 20px; height: 20px; border-radius: 50%; background: ${dotCol}; color:#fff; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; border:${borderVal}; font-family:'Cairo';">${innerDot}</div>
+        </div>
+    `;
+  });
+
+  html += `
+      </div>
+      <div style="font-size: 11px; font-weight:bold; color: var(--g1); text-align:center; margin-top:5px; background:rgba(26,92,42,0.06); padding:4px; border-radius:6px;">
+        مرحلة الخط الشاحن الحالية: ${steps[curIndex].label}
+      </div>
+    </div>
+  `;
+
+  return html;
+};
+
+// Expose driver functions globally
+window.saveDriverProfile = saveDriverProfile;
+window.logoutDriver = logoutDriver;
+window.checkDriverSession = checkDriverSession;
+window.toggleDriverTab = toggleDriverTab;
+window.loadDriverPortalOrders = loadDriverPortalOrders;
+window.driverAssignOrder = driverAssignOrder;
+window.driverUpdateStatus = driverUpdateStatus;
+window.searchCustomerOrders = searchCustomerOrders;
+window.clearCustomerSession = clearCustomerSession;
+
 document.addEventListener('DOMContentLoaded',()=>{
   renderW();
   initSecurityLock();
+  
+  // Checking driver session on app boot
+  try {
+    checkDriverSession();
+  } catch(e) { console.error('Driver session boot error:', e); }
+
+  // Checking customer session on app boot
+  try {
+    const custPhone = localStorage.getItem('zalo_customer_tracked_phone');
+    if (custPhone) {
+      document.getElementById('cPhoneInput').value = custPhone;
+      setupRealtimeTrackingListener(custPhone);
+    }
+  } catch(e) {}
   
   // Bulletproof listener for sidebar menu triggers to bypass any inline HTML scoping issues
   document.querySelectorAll('.tb-menu').forEach(btn => {
