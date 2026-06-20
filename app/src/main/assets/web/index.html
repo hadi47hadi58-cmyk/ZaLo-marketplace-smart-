@@ -235,14 +235,39 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
     <div class="sm-title">ZaLo</div>
     <div class="sm-sub">السوق الذكي الجزائري</div>
   </div>
+  <!-- DYNAMIC PROFILE CARD -->
+  <div id="sm-profile-card" style="padding: 16px; background: #fdfdfd; border-bottom: 1px solid rgba(0,0,0,0.06); text-align: right;">
+    <!-- Guest State -->
+    <div id="sm-profile-guest" style="display:block;">
+      <div style="font-size: 13px; font-weight: 800; color: #555; margin-bottom: 6px;">👤 تتصفح كزائر مجهول</div>
+      <button onclick="closeSide();openLink('login-customer.html')" style="background: var(--g1); color: #fff; border: none; border-radius: 8px; padding: 6px 12px; font-size: 11.5px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%;">🔑 دخول الزبائن أو إنشاء حساب</button>
+    </div>
+    <!-- Logged in State -->
+    <div id="sm-profile-user" style="display:none;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--g1); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;" id="sm-user-avatar">?</div>
+        <div style="flex: 1; min-width: 0;">
+          <div style="font-size: 13px; font-weight: 800; color: #111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="sm-user-name">تحميل...</div>
+          <div style="font-size: 10px; color: #777; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="sm-user-email">email@zalo.dz</div>
+        </div>
+      </div>
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+        <div id="sm-user-badge" style="display:inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; background: rgba(26,92,42,0.1); color: var(--g1);">زبون معتمد</div>
+      </div>
+      <div style="display: flex; gap: 6px; width: 100%;">
+        <button id="sm-user-action-btn" class="btn-p" style="flex:1; width:auto; border: none; border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin: 0; background: var(--g1); color: #fff;">📦 سلة مشترياتي</button>
+        <button onclick="logoutCustomerAccount()" style="background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; flex-shrink:0;">خروج ✕</button>
+      </div>
+    </div>
+  </div>
   <div class="sm-sec">القائمة</div>
   <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn">الرئيسية</div></div></div>
   <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn">الولايات</div></div></div>
   <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn">جميع الأقسام</div></div></div>
   <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn">جميع المنتجات</div></div></div>
-  <div class="sm-sec">للتجار والسائقين</div>
-  <div class="smi" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
-  <div class="smi" onclick="closeSide();G('driver-portal')"><span class="si">🏍️</span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
+  <div class="sm-sec" id="sm-driver-sec" style="display:none;">للتجار والسائقين</div>
+  <div class="smi" id="sm-unified-login-item" style="display:none;" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
+  <div class="smi" id="sm-driver-portal-item" style="display:none;" onclick="closeSide();G('driver-portal')"><span class="si">🏍️</span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
   <div class="sm-sec">تواصل معنا وإدارة</div>
   <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
   <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
@@ -791,7 +816,121 @@ const st=getStorage(fa);
 window._db=db;window._auth=auth;window._st=st;
 window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc,setDoc,createUserWithEmailAndPassword,onSnapshot,updateDoc};
 
-onAuthStateChanged(auth,u=>{window._user=u;});
+onAuthStateChanged(auth, async (u) => {
+  window._user = u;
+  const guestEl = document.getElementById('sm-profile-guest');
+  const userEl = document.getElementById('sm-profile-user');
+  const driverSec = document.getElementById('sm-driver-sec');
+  const loginItem = document.getElementById('sm-unified-login-item');
+  const portalItem = document.getElementById('sm-driver-portal-item');
+
+  // Logic to determine if driver should be shown
+  const isDriver = localStorage.getItem('is_driver') === 'true' || window.location.search.includes('driver=true');
+  if (isDriver) {
+    if (driverSec) driverSec.style.display = 'block';
+    if (portalItem) portalItem.style.display = 'block';
+  } else {
+    if (driverSec) driverSec.style.display = 'none';
+    if (portalItem) portalItem.style.display = 'none';
+  }
+  if (loginItem) {
+    loginItem.style.display = 'none'; // hidden by default to guests, shown to merchants or when driver is on
+    if (isDriver) loginItem.style.display = 'block';
+  }
+
+  if (guestEl && userEl) {
+    if (u) {
+      guestEl.style.display = 'none';
+      userEl.style.display = 'block';
+      
+      const email = u.email || '';
+      document.getElementById('sm-user-email').textContent = email;
+      document.getElementById('sm-user-name').textContent = email.split('@')[0];
+      document.getElementById('sm-user-avatar').textContent = email.charAt(0).toUpperCase();
+      
+      try {
+        const userDoc = await getDoc(doc(db, 'users', u.uid));
+        if (userDoc.exists()) {
+          const udata = userDoc.data();
+          const name = udata.name || email.split('@')[0];
+          document.getElementById('sm-user-name').textContent = name;
+          document.getElementById('sm-user-avatar').textContent = name.charAt(0).toUpperCase();
+          
+          if (udata.role === 'merchant') {
+            document.getElementById('sm-user-badge').textContent = 'متجر شريك 🏪';
+            document.getElementById('sm-user-badge').style.background = 'rgba(201,168,76,0.1)';
+            document.getElementById('sm-user-badge').style.color = 'var(--gold)';
+            document.getElementById('sm-user-action-btn').innerHTML = '🏪 لوحة المتجر';
+            document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'dashboard.html'; };
+            
+            // Merchants can see driver portals and unified log-in
+            if (driverSec) driverSec.style.display = 'block';
+            if (loginItem) loginItem.style.display = 'block';
+            if (portalItem) portalItem.style.display = 'block';
+          } else if (udata.role === 'admin') {
+            document.getElementById('sm-user-badge').textContent = 'مدير عام 👑';
+            document.getElementById('sm-user-badge').style.background = 'rgba(255,77,77,0.1)';
+            document.getElementById('sm-user-badge').style.color = 'var(--red)';
+            document.getElementById('sm-user-action-btn').innerHTML = '👑 لوحة المدير';
+            document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'admin.html'; };
+            
+            // Admins can see driver portals and unified log-in
+            if (driverSec) driverSec.style.display = 'block';
+            if (loginItem) loginItem.style.display = 'block';
+            if (portalItem) portalItem.style.display = 'block';
+          } else {
+            // Customer role
+            document.getElementById('sm-user-badge').textContent = 'زبون معتمد 👤';
+            document.getElementById('sm-user-badge').style.background = 'rgba(26,92,42,0.1)';
+            document.getElementById('sm-user-badge').style.color = 'var(--g1)';
+            document.getElementById('sm-user-action-btn').innerHTML = '📦 سلة مشترياتي';
+            document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); G('myorders'); };
+            
+            // Auto-fill active phone based on customer's phone!
+            if (udata.phone) {
+              const cPhoneInput = document.getElementById('cPhoneInput');
+              if (cPhoneInput && !cPhoneInput.value) {
+                cPhoneInput.value = udata.phone;
+                localStorage.setItem('zalo_customer_tracked_phone', udata.phone);
+                setTimeout(() => {
+                  if (window.setupRealtimeTrackingListener) {
+                    window.setupRealtimeTrackingListener(udata.phone);
+                  }
+                }, 500);
+              }
+            }
+          }
+        }
+      } catch(e) {
+        console.warn("User profile doc fetch error:", e);
+      }
+    } else {
+      guestEl.style.display = 'block';
+      userEl.style.display = 'none';
+    }
+  }
+});
+
+window.logoutCustomerAccount = async function() {
+  if (confirm('هل تود بالتأكيد الخروج من حسابك المنظم؟')) {
+    try {
+      await auth.signOut();
+      localStorage.removeItem('user_uid');
+      localStorage.removeItem('user_email');
+      localStorage.removeItem('user_role');
+      sessionStorage.removeItem('user_logged_in');
+      
+      // Clear customer session
+      if (window.clearCustomerSession) window.clearCustomerSession();
+      
+      toast('👋 تم تسجيل الخروج بنجاح!');
+      setTimeout(() => { window.location.reload(); }, 600);
+    } catch(e) {
+      console.error(e);
+      alert('⚠️ فشل تسجيل الخروج');
+    }
+  }
+};
 
 window.defaultStoreSVG = `<svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="32" fill="#142218"/><path d="M14 26h36l-3 22H17L14 26z" fill="#0d1710" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><path d="M12 26l3-6h34l3 6H12z" fill="var(--gold)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 20l-1 6M25 20v6M32 20v6M39 20v6M46 20l1 6" stroke="#0d1710" stroke-width="1.5"/><path d="M24 35h16v13H24V35z" fill="#0d1710" stroke="var(--gold)" stroke-width="1.5"/><circle cx="27" cy="41" r="1.5" fill="var(--gold)"/></svg>`;
 
@@ -1230,6 +1369,8 @@ function openStore(id,name,wa,logo){
 
 function openProd(id,name,price,img,emoji){
   _prod={id,name,price,img,emoji};_qty=1;
+  window._storeLoading = true;
+  _store = null; // Clear previous store completely to prevent leaking target shopId
   
   // Backup template HTML
   const wrObj = document.getElementById('prod-detail-wrapper');
@@ -1245,7 +1386,7 @@ function openProd(id,name,price,img,emoji){
   // Set normal details
   document.getElementById('pd-name').textContent=name;
   document.getElementById('pd-price').textContent=price.toLocaleString()+' دج';
-  document.getElementById('pd-store').textContent='🏪 '+( _store ? _store.name : 'محل شريك معتمد');
+  document.getElementById('pd-store').textContent='🏪 جاري فحص ومزامنة المتجر الموفر...';
   document.getElementById('qty-v').textContent=1;
   const wrap=document.getElementById('pd-img-wrap');
   if (wrap) {
@@ -1255,22 +1396,76 @@ function openProd(id,name,price,img,emoji){
   // Manage closed status indicators
   const closedBanner = document.getElementById('pd-store-closed-banner');
   const actionsWrap = document.getElementById('pd-order-actions-wrap');
-  const isClosed = (_store && _store.storeOpen === false);
-  if (closedBanner) closedBanner.style.display = isClosed ? 'block' : 'none';
-  if (actionsWrap) actionsWrap.style.display = isClosed ? 'none' : 'flex';
+  if (closedBanner) closedBanner.style.display = 'none';
+  if (actionsWrap) actionsWrap.style.display = 'flex';
 
-  // Async query to fetch if this product contains Landing Page metadata
+  // Async query to fetch product and its original store details to populate checkout parameters
   try {
     const { doc, getDoc } = window._ff;
-    getDoc(doc(window._db, 'products', id)).then(pDoc => {
+    getDoc(doc(window._db, 'products', id)).then(async (pDoc) => {
       if (pDoc.exists) {
         const p = pDoc.data();
+        const prodStoreId = p.storeId || 'direct';
+        const prodStoreName = p.shopName || p.store || 'محل شريك معتمد';
+
+        if (prodStoreId && prodStoreId !== 'direct') {
+          try {
+            const shopDoc = await getDoc(doc(window._db, 'shops', prodStoreId));
+            if (shopDoc.exists()) {
+              const sData = shopDoc.data();
+              _store = {
+                id: prodStoreId,
+                name: sData.storeName || prodStoreName,
+                wa: sData.whatsapp || sData.phone || '0698694010',
+                logo: sData.logoURL || sData.logo || '',
+                storeOpen: sData.status !== 'closed'
+              };
+            } else {
+              _store = {
+                id: prodStoreId,
+                name: prodStoreName,
+                wa: '0698694010',
+                logo: '',
+                storeOpen: true
+              };
+            }
+          } catch(shopErr) {
+            console.error("Shop resolve error:", shopErr);
+            _store = {
+              id: prodStoreId,
+              name: prodStoreName,
+              wa: '0698694010',
+              logo: '',
+              storeOpen: true
+            };
+          }
+        } else {
+          _store = { id: 'direct', name: 'خدمة ZaLo المباشرة', wa: '0698694010', logo: '', storeOpen: true };
+        }
+
+        // Update UI dynamically
+        const pdStoreEl = document.getElementById('pd-store');
+        if (pdStoreEl) pdStoreEl.textContent = '🏪 ' + (_store ? _store.name : 'محل شريك معتمد');
+
+        const closedBanner = document.getElementById('pd-store-closed-banner');
+        const actionsWrap = document.getElementById('pd-order-actions-wrap');
+        const isClosed = (_store && _store.storeOpen === false);
+        if (closedBanner) closedBanner.style.display = isClosed ? 'block' : 'none';
+        if (actionsWrap) actionsWrap.style.display = isClosed ? 'none' : 'flex';
+
         if (p.isLandingPage) {
           renderLandingPageLayout({ id, ...p });
         }
       }
-    }).catch(() => {});
-  } catch(e) {}
+      window._storeLoading = false;
+    }).catch((prodErr) => {
+      console.warn("Product fetch error:", prodErr);
+      window._storeLoading = false;
+    });
+  } catch(e) {
+    console.warn("Offline or DB error", e);
+    window._storeLoading = false;
+  }
 
   G('proddetail');
 }
@@ -1420,6 +1615,10 @@ window.renderLandingPageLayout = function(p) {
 };
 
 window.placeLandingPageOrder = function(prodId) {
+  if (window._storeLoading) {
+    toast('⏳ جاري تأمين وتأكيد تفاصيل المتجر والتوصيل، يرجى الانتظار ثانية...', 'info');
+    return;
+  }
   const name = document.getElementById('lpOrderName').value.trim();
   const phone = document.getElementById('lpOrderPhone').value.trim();
   const wil = document.getElementById('lpOrderWil').value;
@@ -1450,6 +1649,10 @@ window.placeLandingPageOrder = function(prodId) {
 };
 function chQty(d){_qty=Math.max(1,_qty+d);document.getElementById('qty-v').textContent=_qty;}
 function goOrd(){
+  if (window._storeLoading) {
+    toast('⏳ جاري تأمين وتأكيد تفاصيل المتجر والتوصيل، يرجى الانتظار ثانية...', 'info');
+    return;
+  }
   document.getElementById('o-prod').textContent=_prod?.name||'—';
   document.getElementById('o-store').textContent=(_store?.name || 'محل محلي شريك');
   document.getElementById('o-qty').textContent=_qty;
@@ -1461,6 +1664,10 @@ function goOrd(){
 }
 function selPay(el){document.querySelectorAll('.pop').forEach(p=>p.classList.remove('on'));el.classList.add('on');}
 function placeOrder(){
+  if (window._storeLoading) {
+    toast('⏳ جاري تأمين وتأكيد تفاصيل المتجر والتوصيل، يرجى الانتظار ثانية...', 'info');
+    return;
+  }
   const name=document.getElementById('o-name').value.trim();
   const phone=document.getElementById('o-phone').value.trim();
   const addr=document.getElementById('o-addr').value.trim();

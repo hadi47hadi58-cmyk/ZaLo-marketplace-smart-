@@ -1747,27 +1747,57 @@ async function loadOrders() {
   if (ordersListenerSet) return;
   ordersListenerSet = true;
   try {
-    const qOrders = query(collection(db, 'orders'), where('storeId', '==', shopId));
-    onSnapshot(qOrders, (snap) => {
-      allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
+    const sName = shopData?.storeName || '';
+    const q1 = query(collection(db, 'orders'), where('storeId', '==', shopId));
+    
+    let docsMap = new Map();
+    
+    function updateCombined(docs, sourceKey) {
+      // Clear previous docs from this source
+      for (let [id, val] of docsMap.entries()) {
+        if (val._source === sourceKey) docsMap.delete(id);
+      }
+      docs.forEach(d => {
+        d._source = sourceKey;
+        docsMap.set(d.id, d);
+      });
+      allOrders = Array.from(docsMap.values());
+      // Sort desc
+      allOrders.sort((a, b) => {
+        const t1 = a.createdAt?.seconds || 0;
+        const t2 = b.createdAt?.seconds || 0;
+        return t2 - t1;
+      });
       renderOrders(allOrders);
       updateDashboardStats();
+    }
+
+    onSnapshot(q1, (snap) => {
+      const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+      updateCombined(docs, 'q1');
     }, async (err) => {
-      console.warn("Realtime onSnapshot failed, attempting fallback static fetch:", err);
+      console.warn("Realtime q1 failed, attempting static:", err);
       try {
-        const snap = await getDocs(qOrders);
-        allOrders = snap.docs.map(d => ({id: d.id, ...d.data()}));
-        renderOrders(allOrders);
-        updateDashboardStats();
-      } catch(fallbackErr) {
-        console.error("Orders fallback fetch failed:", fallbackErr);
-        const wrap = document.getElementById('ordersWrap');
-        if (wrap) wrap.innerHTML = `<div class="empty"><div class="empty-i">🛒</div><div class="empty-t">قائمتكم فارغة من أي طلبيات شراء حالياً</div></div>`;
-        const homeOrders = document.getElementById('homeOrders');
-        if (homeOrders) homeOrders.innerHTML = `<div class="empty">لا طلبيات مستوردة اليوم</div>`;
-        updateDashboardStats();
-      }
+        const snap = await getDocs(q1);
+        const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        updateCombined(docs, 'q1');
+      } catch(e) { console.error(e); }
     });
+
+    if (sName && sName !== "متجر مجهول" && sName !== "متجري الشريك المعتمد") {
+      const q2 = query(collection(db, 'orders'), where('store', '==', sName));
+      onSnapshot(q2, (snap) => {
+        const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+        updateCombined(docs, 'q2');
+      }, async (err) => {
+        console.warn("Realtime q2 failed, attempting static:", err);
+        try {
+          const snap = await getDocs(q2);
+          const docs = snap.docs.map(d => ({id: d.id, ...d.data()}));
+          updateCombined(docs, 'q2');
+        } catch(e) { console.error(e); }
+      });
+    }
   } catch(e) {
     console.error("Initial loadOrders setup error:", e);
   }
