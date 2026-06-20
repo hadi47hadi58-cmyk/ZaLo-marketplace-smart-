@@ -1,4 +1,4 @@
-const CACHE_NAME = 'zalo-v3';
+const CACHE_NAME = 'zalo-v5';
 const ASSETS = [
   './',
   './index.html',
