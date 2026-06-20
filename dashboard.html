@@ -534,6 +534,9 @@
     <div class="nav-item" onclick="goPage('profile')">
       <span class="ni"><i class="fa-solid fa-store"></i></span> معلومات المتجر
     </div>
+    <div class="nav-item" onclick="window.location.href='register-step1.html'" style="color:var(--gold2); font-weight:700;">
+      <span class="ni"><i class="fa-solid fa-store" style="color:var(--gold);"></i></span> افتح متجراً جديداً 🚀
+    </div>
   </nav>
   <div class="sidebar-foot">
     <button class="logout-btn" onclick="doLogout()"><i class="fa-solid fa-sign-out-alt"></i> تسجيل الخروج</button>
@@ -560,6 +563,21 @@
       <div class="scard o"><div class="scard-icon">🛒</div><div class="scard-val" id="sOrders">-</div><div class="scard-lbl">الطلبات قيد المراجعة</div></div>
       <div class="scard b"><div class="scard-icon">💰</div><div class="scard-val" id="sRevenue">-</div><div class="scard-lbl">إجمالي المبيعات (دج)</div></div>
       <div class="scard r"><div class="scard-icon">⭐</div><div class="scard-val" id="sRating">-</div><div class="scard-lbl">تقييم المتجر المعياري</div></div>
+    </div>
+
+    <!-- PROMO BANNER FOR EXPANDING STORE / NEW MERCHANTS -->
+    <div style="background: linear-gradient(135deg, var(--green-dark) 0%, var(--card) 100%); border: 1px solid var(--border); border-radius: 14px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 15px; margin: 18px 0; flex-wrap: wrap; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+      <div style="flex: 1; min-width: 250px;">
+        <h4 style="font-size: 16px; font-weight: 800; color: var(--gold2); margin-bottom: 6px; display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-store" style="color: var(--gold);"></i> افتح متجرك وضاعف مبيعاتك
+        </h4>
+        <p style="font-size: 12px; color: var(--text2); line-height: 1.6;">
+          هل تملك فروعاً أخرى أو تريد بدء نشاط تجاري جديد؟ أطلق متجراً مرخصاً فوراً عبر منصتنا المتكاملة وابدأ البيع وضاعف أرباحك!
+        </p>
+      </div>
+      <button class="btn" onclick="window.location.href='register-step1.html'" style="background: var(--gold); color: #0a0f0d; border-radius: 10px; border: none; font-weight: 800; padding: 12px 24px; font-size: 13px; font-family: 'Cairo', sans-serif; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; min-height: 48px; box-shadow: 0 4px 15px rgba(201, 168, 76, 0.2);" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
+        <span>افتح متجراً الآن</span> <i class="fa-solid fa-arrow-left"></i>
+      </button>
     </div>
 
     <div class="sec-head">
