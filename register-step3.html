@@ -131,6 +131,107 @@
     }
     .loading { display: none; text-align: center; font-size: 12px; color: #666; margin-top: 10px; }
     .loading.show { display: block; }
+
+    /* Merchant Styles */
+    .merchant-section {
+      border-top: 1.5px dashed #1a5c2a;
+      padding-top: 16px;
+      margin-top: 16px;
+    }
+    .type-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .tbtn {
+      flex: 1;
+      padding: 10px 6px;
+      border-radius: 8px;
+      border: 2px solid #e0e0e0;
+      background: #fff;
+      font-family: 'Cairo', sans-serif;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      text-align: center;
+      line-height: 1.5;
+      transition: all .2s;
+    }
+    .tbtn.on {
+      border-color: #1a5c2a;
+      background: #f0f8f0;
+      color: #1a5c2a;
+    }
+    .file-box {
+      border: 2px dashed #e0e0e0;
+      border-radius: 12px;
+      padding: 16px;
+      text-align: center;
+      background: #fafafa;
+      cursor: pointer;
+      transition: all .2s;
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .file-box input[type="file"] {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      opacity: 0;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      font-size: 0;
+    }
+    .file-box.has {
+      border-color: #2d7a3a;
+      background: #f0fff4;
+    }
+    .fbi {
+      font-size: 26px;
+      margin-bottom: 4px;
+      pointer-events: none;
+    }
+    .fbl {
+      font-size: 11px;
+      color: #666;
+      pointer-events: none;
+    }
+    .fbh {
+      font-size: 9px;
+      color: #bbb;
+      margin-top: 2px;
+      pointer-events: none;
+    }
+    .file-box.has .fbl {
+      color: #1a5c2a;
+      font-weight: 700;
+    }
+    .ibox {
+      background: #fffbeb;
+      border: 1.5px solid #fde68a;
+      border-radius: 9px;
+      padding: 9px 11px;
+      font-size: 11px;
+      color: #92400e;
+      line-height: 1.6;
+      margin-bottom: 12px;
+    }
+    .fsel {
+      width: 100%;
+      padding: 12px;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 14px;
+      outline: none;
+      background: #fff;
+    }
+    .fsel:focus {
+      border-color: #1a5c2a;
+    }
   </style>
 </head>
 <body>
@@ -138,7 +239,7 @@
 <div class="container">
   <div class="header">
     <div class="logo-large">🏛️</div>
-    <div class="title">الخطوة 3: البيانات الأمنية</div>
+    <div class="title">الخطوة 3: البيانات والمستندات</div>
   </div>
 
   <div class="progress-bar">
@@ -151,7 +252,7 @@
 
   <form onsubmit="completeRegistration(event)" id="step3Form">
     <div class="form-group">
-      <label for="email">البريد الإلكتروني</label>
+      <label for="email">البريد الإلكتروني حساب الدخول *</label>
       <input 
         type="email" 
         id="email" 
@@ -161,7 +262,7 @@
     </div>
 
     <div class="form-group">
-      <label for="password">كلمة المرور</label>
+      <label for="password">كلمة المرور *</label>
       <input 
         type="password" 
         id="password" 
@@ -172,13 +273,126 @@
     </div>
 
     <div class="form-group">
-      <label for="confirmPassword">تأكيد كلمة المرور</label>
+      <label for="confirmPassword">تأكيد كلمة المرور *</label>
       <input 
         type="password" 
         id="confirmPassword" 
         placeholder="••••••••"
         required
       >
+    </div>
+
+    <!-- Merchant documents and credentials segment -->
+    <div id="merchantSection" class="merchant-section" style="display: none;">
+      <h3 style="font-size: 14px; font-weight: 800; color: #1a5c2a; margin-bottom: 12px; border-bottom: 2px solid #1a5c2a; padding-bottom: 4px; display: inline-flex; align-items: center; gap: 4px;">🏪 تفعيل المتجر والمستندات الأمنية</h3>
+      
+      <div class="form-group">
+        <label for="storeName">🏪 الاسم التجاري للمحل / العلامة التجارية *</label>
+        <input type="text" id="storeName" placeholder="مثال: ميكرو تك باتنة">
+      </div>
+
+      <div class="form-group">
+        <label for="category">📁 تخصص فئة النشاط التجاري *</label>
+        <select class="fsel" id="category">
+          <option value="">اختر التخصص...</option>
+          <option>هواتف وإلكترونيات</option>
+          <option>أثاث ومنزل</option>
+          <option>ملابس وأزياء</option>
+          <option>أحذية وحقائب</option>
+          <option>مواد غذائية</option>
+          <option>ألعاب وهدايا</option>
+          <option>سيارات وقطع غيار</option>
+          <option>رياضية ولياقة</option>
+          <option>عقارات كراء وبيع</option>
+          <option>صحة ومكملات غذائية</option>
+          <option>خردوات ومواد بناء</option>
+          <option>أدوات ومعدات</option>
+          <option>تجميل وعناية</option>
+          <option>كتب وقرطاسية</option>
+          <option>خدمات ومهن حرة</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label style="margin-bottom: 6px; display: block;">🏷️ فئة التسجيل المطلوبة *</label>
+        <div class="type-row">
+          <button type="button" class="tbtn on" id="tb-r" onclick="setType('registered',this)">🏢 متجر قانوني مرخص<br><small style="font-weight:400;font-size:10px">بحوزة سجل تجاري رسمي</small></button>
+          <button type="button" class="tbtn" id="tb-f" onclick="setType('free',this)">🆓 صانع حر وعائلي<br><small style="font-weight:400;font-size:10px">تعهد وتصريح شرفي</small></button>
+        </div>
+      </div>
+
+      <!-- Docs for registered merchant -->
+      <div id="docs-r">
+        <div class="ibox">📋 <strong>الملف الرسمي للتاجر المرخص:</strong> يرجى رفع سجل الهيئة مع بطاقة التعريف الوطنية وشعار متجرك المعتمد.</div>
+        
+        <div class="form-group">
+          <label>📄 نسخة السجل التجاري * (PDF أو صورة واضحة)</label>
+          <div class="file-box" id="fb-rc">
+            <input type="file" id="f-rc" accept=".pdf,image/*" onchange="filePick(this,'fb-rc','fl-rc')">
+            <div class="fbi">📄</div>
+            <div class="fbl" id="fl-rc">اضغط هنا لرفع مستند السجل</div>
+            <div class="fbh">PDF أو صورة واضحة</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>🪪 بطاقة الهوية الوطنية * (الوجه الأمامي)</label>
+          <div class="file-box" id="fb-idfront">
+            <input type="file" id="f-idfront" accept="image/*" onchange="filePick(this,'fb-idfront','fl-idfront')">
+            <div class="fbi">🪪</div>
+            <div class="fbl" id="fl-idfront">الوجه الأمامي للبطاقة</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>🔢 رقم وتاريخ قيد السجل التجاري رسمي *</label>
+          <input type="text" id="rcNumber" placeholder="مثال: 00-12345678">
+        </div>
+      </div>
+
+      <!-- Docs for free merchant -->
+      <div id="docs-f" style="display: none;">
+        <div class="ibox">🪪 <strong>تاجر المهن الحرة والعائلية:</strong> مستند بطاقة الهوية الوطنية مع رفع تصريح شرفي لممارسة نشاط تجاري.</div>
+        
+        <div class="form-group">
+          <label>✍️ تصريح شرفي لممارسة نشاط تجاري * (صورة أو PDF)</label>
+          <div class="file-box" id="fb-honor">
+            <input type="file" id="f-honor" accept=".pdf,image/*" onchange="filePick(this,'fb-honor','fl-honor')">
+            <div class="fbi">✍️</div>
+            <div class="fbl" id="fl-honor">اضغط هنا لرفع التصريح الشرفي للنشاط الجاري</div>
+            <div class="fbh">تعهد خطي أو تصريح بممارسة نشاط بالتوقيع</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>🪪 بطاقة الهوية الوطنية * (الوجه الأمامي)</label>
+          <div class="file-box" id="fb-idf">
+            <input type="file" id="f-idf" accept="image/*" onchange="filePick(this,'fb-idf','fl-idf')">
+            <div class="fbi">🪪</div>
+            <div class="fbl" id="fl-idf">رفع الوجه الأمامي للبطاقة الوطنية</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Common Assets -->
+      <div class="form-group" style="margin-top: 12px;">
+        <label>🖼️ الشعار التجاري لمتجرك الخاص * (مهم جداً)</label>
+        <div class="file-box" id="fb-logo">
+          <input type="file" id="f-logo" accept="image/*" onchange="filePick(this,'fb-logo','fl-logo')">
+          <div class="fbi">🖼️</div>
+          <div class="fbl" id="fl-logo">اضغط لاختيار صورة الشعار</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>📸 صورة واجهة المحل أو ورشة الانتاج (اختياري)</label>
+        <div class="file-box" id="fb-front">
+          <input type="file" id="f-front" accept="image/*" onchange="filePick(this,'fb-front','fl-front')">
+          <div class="fbi">📸</div>
+          <div class="fbl" id="fl-front">صورة تميز واجهة متجرك</div>
+        </div>
+      </div>
     </div>
 
     <div class="buttons">
@@ -213,8 +427,40 @@
   const wilaya = sessionStorage.getItem('reg_wilaya') || '';
   const commune = sessionStorage.getItem('reg_commune') || '';
 
+  // Handle showing additional merchant fields
+  if (userType === 'merchant') {
+    const sect = document.getElementById('merchantSection');
+    if (sect) sect.style.display = 'block';
+  }
+
   window.goToStep2 = function() {
     window.location.href = 'register-step2.html';
+  };
+
+  window._stype = 'registered';
+  
+  window.setType = function(type, el) {
+    window._stype = type;
+    document.getElementById('tb-r').classList.toggle('on', type === 'registered');
+    document.getElementById('tb-f').classList.toggle('on', type === 'free');
+    document.getElementById('docs-r').style.display = type === 'registered' ? 'block' : 'none';
+    document.getElementById('docs-f').style.display = type === 'free' ? 'block' : 'none';
+  };
+
+  window.filePick = function(input, boxId, labelId) {
+    const f = input.files[0];
+    if(!f) return;
+    if(labelId) document.getElementById(labelId).textContent = '⏳ جاري التحميل...';
+    const reader = new FileReader();
+    reader.onload = function(e){
+      input.dataset.base64 = e.target.result;
+      if(labelId) document.getElementById(labelId).textContent = '✅ ' + f.name;
+      if(boxId) document.getElementById(boxId)?.classList.add('has');
+    };
+    reader.onerror = function(){
+      if(labelId) document.getElementById(labelId).textContent = '❌ خطأ في القراءة';
+    };
+    reader.readAsDataURL(f);
   };
 
   window.completeRegistration = async function(e) {
@@ -240,6 +486,55 @@
       return;
     }
 
+    let storeName = '';
+    let category = '';
+    let storeType = 'registered';
+    let getB64 = id => document.getElementById(id)?.dataset?.base64 || '';
+    
+    let logoB64 = '';
+    let frontFile = '';
+    let rcFile = '';
+    let idFront = '';
+    let idBack = '';
+    let rcnum = '';
+
+    if (userType === 'merchant') {
+      storeName = document.getElementById('storeName').value.trim();
+      category = document.getElementById('category').value;
+      storeType = window._stype || 'registered';
+      
+      logoB64 = getB64('f-logo');
+      frontFile = getB64('f-front');
+      rcFile = storeType === 'registered' ? getB64('f-rc') : '';
+      idFront = storeType === 'registered' ? getB64('f-idfront') : getB64('f-idf');
+      idBack = storeType === 'free' ? getB64('f-honor') : ''; // honorary declaration for free merchants
+      rcnum = storeType === 'registered' ? document.getElementById('rcNumber').value.trim() : '';
+
+      if (!storeName || !category) {
+        errorMsg.textContent = 'الرجاء كتابة الاسم التجاري وتحديد فئة النشاط أولاً';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (!logoB64) {
+        errorMsg.textContent = 'شعار المتجر مطلوب لتهيئته للزبائن';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (storeType === 'registered' && (!rcFile || !idFront || !rcnum)) {
+        errorMsg.textContent = 'يرجى تقديم السجل التجاري، الوجه الأمامي للهوية، ورقم القيد للتاجر المرخص';
+        errorMsg.classList.add('show');
+        return;
+      }
+
+      if (storeType === 'free' && (!idFront || !idBack)) {
+        errorMsg.textContent = 'يرجى تقديم نسخة التصريح الشرفي وصورة الهوية كتاجر حر';
+        errorMsg.classList.add('show');
+        return;
+      }
+    }
+
     submitBtn.disabled = true;
     loading.classList.add('show');
     errorMsg.classList.remove('show');
@@ -263,17 +558,52 @@
         updatedAt: new Date()
       });
 
-      // If merchant, create shop request
+      // If merchant, create shop request and shop document
       if (userType === 'merchant') {
-        await addDoc(collection(db, 'merchant_requests'), {
-          regNumber: 'ZL-' + Date.now(),
+        const rnum = 'REG-' + Date.now().toString().slice(-6);
+
+        // Save shop profile
+        await setDoc(doc(db, 'shops', uid), {
+          storeName: storeName,
           ownerName: fullName,
           email: email,
           phone: phone,
           whatsapp: phone,
           wilaya: wilaya,
           commune: commune,
-          status: 'pending',
+          address: commune + ' - ' + wilaya,
+          category: category,
+          workHours: '08:00 - 20:00',
+          description: 'شريك شبكة ZaLo المعتمد والموثق جغرافياً لخدمة زبائن ولاية ' + wilaya,
+          rcNumber: rcnum,
+          storeType: storeType,
+          logoURL: logoB64 || '',
+          frontURL: frontFile || '',
+          status: 'active',
+          subscription: 'basic',
+          createdAt: new Date()
+        });
+
+        // Save request logs for control panel
+        await setDoc(doc(db, 'merchant_requests', uid), {
+          uid: uid,
+          regNumber: rnum,
+          storeName: storeName,
+          ownerName: fullName,
+          email: email,
+          phone: phone,
+          whatsapp: phone,
+          wilaya: wilaya,
+          commune: commune,
+          category: category,
+          storeType: storeType,
+          rcNumber: rcnum,
+          logoURL: logoB64,
+          frontFile: frontFile,
+          rcFile: rcFile,
+          idFront: idFront,
+          idBack: idBack, // Storing Honorary declaration under idBack safely
+          status: 'approved',
           createdAt: new Date()
         });
       }
