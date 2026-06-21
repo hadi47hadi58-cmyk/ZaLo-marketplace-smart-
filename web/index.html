@@ -44,10 +44,10 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .ptbar{background:var(--g1);padding:10px 14px 14px;text-align:center;flex-shrink:0}
 .ptbar h2{color:#fff;font-size:16px;font-weight:800}
 .bnav{position:fixed;bottom:0;left:0;right:0;background:var(--g1);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,0.1)}
-.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 4px;cursor:pointer;border-top:3px solid transparent}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 2px;cursor:pointer;border-top:3px solid transparent;min-width:0;overflow:hidden}
 .bn.on{border-top-color:var(--gold)}
 .bni{font-size:20px;color:rgba(255,255,255,.7)}
-.bnl{font-size:9px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:600}
+.bnl{font-size:9px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
 .bn.on .bni,.bn.on .bnl{color:#fff}
 .content{flex:1;overflow-y:auto;padding-bottom:70px}
 .home-body{display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:#fff;min-height:calc(100vh - 130px)}

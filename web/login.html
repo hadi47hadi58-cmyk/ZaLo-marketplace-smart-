@@ -28,7 +28,7 @@
 
     * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color: transparent; }
 
-    body {
+    html, body {
       font-family: 'Cairo', sans-serif;
       background: var(--bg);
       color: var(--text);
@@ -41,6 +41,9 @@
       padding: 24px 16px;
       position: relative;
       overflow-y: auto;
+      overflow-x: hidden;
+      width: 100%;
+      max-width: 100%;
     }
 
     body::before {

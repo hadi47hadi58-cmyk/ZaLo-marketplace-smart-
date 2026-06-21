@@ -38,11 +38,14 @@
     --blue: #1976d2;
   }
   * { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
-  body {
+  html, body {
     font-family: 'Cairo', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
+    overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
   }
 
   #sidebar {
