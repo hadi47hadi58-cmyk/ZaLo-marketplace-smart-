@@ -23,7 +23,7 @@
 <style>
 :root{--g1:#1a5c2a;--g2:#2d7a3a;--g3:#3d9e4e;--gold:#c9a84c;--gold2:#e8c97a;--bg:#fafafa;--white:#fff;--text:#1a1a1a;--gray:#666;--bd:#e0e0e0;--red:#e53935}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden}
+html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;max-width:100%}
 #splash{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
 #splash.hide{opacity:0;pointer-events:none}
 .sp-img{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(201,168,76,.6));animation:spPop .9s cubic-bezier(.34,1.56,.64,1) both}
@@ -284,6 +284,77 @@ body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-h
 .nitem .nt{font-size:13px;font-weight:700}
 .nitem .ns{font-size:11px;color:var(--gray);margin-top:1px}
 .back-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:15px;font-family:'Cairo',sans-serif}
+
+/* Responsive adjustments for smaller screens */
+@media screen and (max-width: 640px) {
+  .btn-gm, .btn-p, .btn-s, .btn-wa {
+    max-width: 100%;
+  }
+  .cats-grid, .pgrid {
+    padding: 10px 10px 80px;
+    gap: 8px;
+  }
+  .home-body {
+    padding: 16px 12px;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .home-title {
+    font-size: 20px;
+    margin-bottom: 12px;
+  }
+  .hcircle {
+    min-width: 75px;
+  }
+  .hcircle-icon {
+    width: 65px;
+    height: 65px;
+    font-size: 24px;
+  }
+  .hcircle-label {
+    font-size: 11px;
+  }
+  .pcard-img {
+    height: 120px;
+    font-size: 38px;
+  }
+  .cats-grid, .pgrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 8px 8px 80px;
+  }
+  .comm-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+  }
+  .comm-popup {
+    padding: 16px;
+    border-radius: 16px;
+  }
+}
+
+@media screen and (max-width: 360px) {
+  .home-title {
+    font-size: 18px;
+  }
+  .cats-grid, .pgrid {
+    grid-template-columns: 1fr; /* Single column for extremely small screens to prevent clipping */
+  }
+  .wchips {
+    grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
+  }
+  .wchip {
+    padding: 8px 4px;
+    font-size: 10px;
+  }
+}
+
+/* Base break-word helper */
+.tb-title, .hcircle-label, .sname, .pd-name, .pcard-name, .comm-title, .suc-title, .suc-sub {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
 </style>
 </head>
 <body>
