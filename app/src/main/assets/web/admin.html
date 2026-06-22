@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ZaLo Marketplace Smart-Spark Final Version Update (Sync Trigger) -->
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -23,13 +24,84 @@
     --orange: #f57c00;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body {
+  html, body {
     font-family: 'Cairo', sans-serif;
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
     overflow-x: hidden;
+    width: 100%;
+    max-width: 100%;
   }
+
+  @media (min-width: 641px) {
+    html {
+      background: radial-gradient(circle at center, #1b3823 0%, #07130b 100%) !important;
+      height: 100vh !important;
+      overflow: hidden !important;
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+    }
+    body {
+      width: 410px !important;
+      height: 860px !important;
+      max-height: calc(100vh - 40px) !important;
+      position: relative !important;
+      margin: 0 auto !important;
+      background: var(--bg) !important;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.6) !important;
+      border: 10px solid #1c2b20 !important;
+      border-radius: 38px !important;
+      overflow: hidden !important;
+      display: flex !important;
+      flex-direction: column !important;
+      box-sizing: border-box !important;
+    }
+    #loginScreen {
+      position: absolute !important;
+      border-radius: 28px !important;
+    }
+    #sidebar {
+      position: absolute !important;
+      top: 0 !important;
+      bottom: 0 !important;
+      right: -240px !important;
+      width: 240px !important;
+      height: 100% !important;
+      transition: right 0.3s ease !important;
+    }
+    #sidebar.open {
+      right: 0 !important;
+    }
+    #topbar {
+      position: absolute !important;
+      right: 0 !important;
+      left: 0 !important;
+      width: 100% !important;
+    }
+    #main {
+      margin-right: 0 !important;
+      margin-top: 58px !important;
+      padding: 12px !important;
+      overflow-y: auto !important;
+      height: calc(100% - 58px) !important;
+    }
+    #menuToggle {
+      display: flex !important;
+    }
+    .overlay {
+      position: absolute !important;
+    }
+  }
+
+  #main > .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    width: 100%;
+  }
+
+
 
   #loginScreen {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
@@ -177,6 +249,13 @@
 
   .page { display: none; }
   .page.active { display: block; }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-8px); }
+    40%, 80% { transform: translateX(8px); }
+  }
+  .shake { animation: shake 0.4s ease-in-out; }
 
   .stats-grid {
     display: grid;
@@ -507,7 +586,7 @@
     <div style="font-size:13px; color:rgba(255,255,255,0.6); margin-top:6px;">يرجى إدخال رمز المرور السري المكون من 6 أرقام للدخول للوحة التحكم الإدارية</div>
   </div>
   
-  <div style="display:flex; gap:16px; margin-bottom:40px;" id="pin-dots">
+  <div style="display:flex; gap:16px; margin-bottom:24px;" id="pin-dots">
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
@@ -515,6 +594,8 @@
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
     <div style="width:14px; height:14px; border-radius:50%; border:2px solid #ccc; background:transparent; transition: all 0.2s;"></div>
   </div>
+
+  <div id="pin-error-msg" style="color:#ff6b6b; font-size:13px; font-weight:700; background:rgba(255,107,107,0.1); padding:6px 14px; border-radius:15px; border:1px solid rgba(255,107,107,0.2); margin-top:-8px; margin-bottom:20px; transition:all 0.3s ease; opacity:0; transform:translateY(-15px); pointer-events:none; text-align:center; min-height: 32px; display: flex; align-items: center; justify-content: center;">❌ رمز المرور المدخل غير صحيح! حاول مجدداً</div>
   
   <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:16px; justify-content:center; max-width:280px; direction:ltr;">
     <button onclick="pressPin('1')" style="width:70px; height:70px; border-radius:50%; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); color:#fff; font-size:24px; font-weight:700; cursor:pointer;" onmousedown="this.style.background='rgba(37,168,96,0.2)'" onmouseup="this.style.background='rgba(255,255,255,0.03)'">1</button>
@@ -783,8 +864,9 @@
 
   <!-- REPORTS PAGE -->
   <div class="page" id="page-reports">
-    <div class="section-header">
+    <div class="section-header" style="justify-content: space-between; align-items: center; display: flex; flex-wrap: wrap; gap: 10px;">
       <div class="section-title">📈 تقارير حركة منصة ZaLo ونسب المبيعات الحالية</div>
+      <button class="btn btn-g" onclick="printAdminReport()" style="background:#cc9a00; border-color:#cc9a00; display:flex; align-items:center; gap:6.5px; font-weight:700; font-family:'Cairo', sans-serif;"><i class="fa-solid fa-print"></i> طباعة ملف تقرير إداري شامل</button>
     </div>
     <div class="chart-card" style="margin-bottom:14px">
       <div class="chart-title">📊 إحصاءات عامة ومؤشرات أداء المحلات وشبكة التسليم</div>
@@ -1143,7 +1225,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc }
+import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc, getDoc }
   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -1165,7 +1247,7 @@ console.log('App Check skipped in local WebView sandbox.');
 window._db = db;
 window._auth = auth;
 window._firebaseConfig = firebaseConfig;
-window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc };
+window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc, getDoc };
 
 window.getAdminRoleLabel = function(role) {
   switch (role) {
@@ -1206,7 +1288,7 @@ onAuthStateChanged(auth, async (user) => {
       const fu = window._firestoreUtils;
       let role = null;
       let name = '';
-      if (user.email && (user.email.toLowerCase() === 'zinzinochop@gmail.com' || user.email.toLowerCase() === 'admin@zalo.dz' || user.email.toLowerCase() === 'admin@zalo.com')) {
+      if (user.email && user.email.toLowerCase() === 'zinzinochop@gmail.com') {
         role = 'super_admin';
         name = 'المدير العام';
         
@@ -1264,7 +1346,7 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('roleTag').textContent = window.getAdminRoleLabel(role);
 
         // Hide admins page link and security lock settings from non-owner
-        const isOwner = user.email === 'zinzinochop@gmail.com' || user.email === 'admin@zalo.dz' || user.email === 'admin@zalo.com';
+        const isOwner = user.email === 'zinzinochop@gmail.com';
         const navAdmins = document.getElementById('nav-item-admins');
         const secLockCard = document.getElementById('security-lock-settings-card');
         if (!isOwner) {
@@ -1342,42 +1424,39 @@ window.loadDashboard = async function() {
   try {
     const sSnap = await fu.getDocs(fu.collection(db, 'shops'));
     const shops = sSnap.docs.map(d => ({id:d.id, ...d.data()}));
-    document.getElementById('statMerchants').textContent = shops.length > 0 ? shops.length : "12";
+    document.getElementById('statMerchants').textContent = shops.length;
 
     const rSnap = await fu.getDocs(fu.collection(db, 'merchant_requests'));
     const requests = rSnap.docs.map(d => ({id:d.id, ...d.data()}));
     const pendingReqs = requests.filter(r => r.status === 'pending');
-    document.getElementById('statPending').textContent = pendingReqs.length > 0 ? pendingReqs.length : "3";
-    document.getElementById('pendingBadge').textContent = pendingReqs.length > 0 ? pendingReqs.length : "3";
+    document.getElementById('statPending').textContent = pendingReqs.length;
+    document.getElementById('pendingBadge').textContent = pendingReqs.length;
 
     const pSnap = await fu.getDocs(fu.collection(db, 'products'));
-    document.getElementById('statProducts').textContent = pSnap.size > 0 ? pSnap.size : "85";
+    document.getElementById('statProducts').textContent = pSnap.size;
 
     const uSnap = await fu.getDocs(fu.collection(db, 'users'));
-    document.getElementById('statUsers').textContent = uSnap.size > 0 ? uSnap.size : "156";
+    document.getElementById('statUsers').textContent = uSnap.size;
 
-    window._allMerchants = shops.length > 0 ? shops : getSampleMerchants();
-    window._allRequests = requests.length > 0 ? requests : getSampleRequests();
-    window._allProducts = pSnap.size > 0 ? pSnap.docs.map(d=>({id:d.id,...d.data()})) : getSampleProducts();
-    window._allUsers = uSnap.size > 0 ? uSnap.docs.map(d=>({id:d.id,...d.data()})) : getSampleUsers();
+    window._allMerchants = shops;
+    window._allRequests = requests;
+    window._allProducts = pSnap.docs.map(d=>({id:d.id,...d.data()}));
+    window._allUsers = uSnap.docs.map(d=>({id:d.id,...d.data()}));
 
     try{
       const ordSnap=await fu.getDocs(fu.collection(db,'orders'));
       window._allOrders = ordSnap.docs.map(d=>({id:d.id,...d.data()}));
     } catch(err){
-      window._allOrders = getSampleOrders();
+      window._allOrders = [];
     }
 
-    // Load admins
+    // Load admins strictly from Firestore
     let admins = [];
     try {
       const qSnap = await fu.getDocs(fu.collection(db, 'admins'));
       admins = qSnap.docs.map(d => ({id:d.id, ...d.data()}));
     } catch(err) {
-      admins = [
-        {id:'adm1', name:'ياسين عتوم', email:'yacine@zalo.com', role:'supervisor', wilaya:'06 بجاية', phone:'0551234567'},
-        {id:'adm2', name:'فاطمة الزهراء', email:'fatima@zalo.com', role:'assistant', wilaya:'16 الجزائر', phone:'0661234567'}
-      ];
+      console.warn("Firestore fetch admins failed:", err);
     }
     window._allAdmins = admins;
 
@@ -1391,7 +1470,14 @@ window.loadDashboard = async function() {
     }
 
   } catch(e) {
-    loadMockDashboard();
+    console.error("Dashboard real data load failed:", e);
+    // Maintain healthy empty arrays instead of mock triggers
+    window._allMerchants = [];
+    window._allRequests = [];
+    window._allProducts = [];
+    window._allUsers = [];
+    window._allOrders = [];
+    window._allAdmins = [];
   }
 };
 
@@ -1760,6 +1846,11 @@ function renderOrdersTable(ords) {
 
 function renderUsersTable(usrs) {
   const tbody = document.getElementById('usersTable');
+  if (!tbody) return;
+  if (!usrs || usrs.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5"><div style="text-align:center;padding:30px;color:#7a9e83;font-weight:bold;">لا يوجد مستخدمون مسجّلون بعد</div></td></tr>`;
+    return;
+  }
   tbody.innerHTML = usrs.map(u => `
     <tr>
       <td><strong>${u.displayName || u.name || '-'}</strong></td>
@@ -1789,6 +1880,10 @@ function getAdminRoleLabel(role) {
 function renderAdminsTable(admins) {
   const tbody = document.getElementById('adminsTable');
   if (!tbody) return;
+  if (!admins || admins.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6"><div style="text-align:center;padding:30px;color:#7a9e83;font-weight:bold;">لا يوجد مشرفون مسجّلون بعد</div></td></tr>`;
+    return;
+  }
   tbody.innerHTML = admins.map(a => `
     <tr>
       <td><strong>${a.name || '-'}</strong></td>
@@ -1877,6 +1972,8 @@ window.saveNewAdmin = async function() {
   }
 };
 
+window._currentAdminPinInMemory = '123456';
+
 window.saveSecuritySettingsToFirestore = async function() {
   try {
     const custEnabled = localStorage.getItem('zalo_lock_customer_enabled') === 'true';
@@ -1884,7 +1981,7 @@ window.saveSecuritySettingsToFirestore = async function() {
     const merchEnabled = localStorage.getItem('zalo_lock_merchant_enabled') === 'true';
     const merchPin = localStorage.getItem('zalo_pin_merchant') || '1234';
     const adminEnabled = localStorage.getItem('zalo_lock_admin_enabled') === 'true';
-    const adminPin = localStorage.getItem('zalo_pin_admin') || '123456';
+    const adminPin = window._currentAdminPinInMemory || '123456';
     
     await setDoc(doc(db, 'settings', 'security'), {
       customer_enabled: custEnabled,
@@ -1916,7 +2013,11 @@ window.savePIN = async function(type) {
     window.showToast(`⚠️ يرجى تعيين كود يتكون من ${requiredLen} أرقام تماماً`);
     return;
   }
-  localStorage.setItem(`zalo_pin_${type}`, code);
+  if (type === 'admin') {
+    window._currentAdminPinInMemory = code;
+  } else {
+    localStorage.setItem(`zalo_pin_${type}`, code);
+  }
   await window.saveSecuritySettingsToFirestore();
   window.showToast(`✅ تم حفظ رمز تأمين بوابة ${type === 'customer' ? 'الزبائن' : (type === 'merchant' ? 'التجار' : 'المدير')} بنجاح: ${code}`);
 };
@@ -1988,7 +2089,7 @@ window.loadReports = function() {
 
 window.showPage = function(page) {
   const loggedEmail = localStorage.getItem('loggedInAdminEmail') || '';
-  if (page === 'admins' && loggedEmail !== 'zinzinochop@gmail.com' && loggedEmail !== 'admin@zalo.dz' && loggedEmail !== 'admin@zalo.com') {
+  if (page === 'admins' && loggedEmail !== 'zinzinochop@gmail.com') {
     window.showToast('🔒 قسم المشرفين متاح لمالك التطبيق فقط');
     return;
   }
@@ -2033,7 +2134,7 @@ window.showPage = function(page) {
           localStorage.setItem('zalo_lock_merchant_enabled', data.merchant_enabled ? 'true' : 'false');
           localStorage.setItem('zalo_pin_merchant', data.merchant_pin || '1234');
           localStorage.setItem('zalo_lock_admin_enabled', data.admin_enabled ? 'true' : 'false');
-          localStorage.setItem('zalo_pin_admin', data.admin_pin || '123456');
+          window._currentAdminPinInMemory = data.admin_pin || '123456';
         }
       } catch(e) {
         console.error("Failed to pre-fetch security config:", e);
@@ -2068,7 +2169,7 @@ window.showPage = function(page) {
         if (admLocked) admTgl.classList.add('on');
         else admTgl.classList.remove('on');
       }
-      const admPin = localStorage.getItem('zalo_pin_admin') || '123456';
+      const admPin = window._currentAdminPinInMemory || '123456';
       const admInput = document.getElementById('pin-input-admin');
       if (admInput) admInput.value = admPin;
     })();
@@ -2378,10 +2479,16 @@ window.pressPin = function(num) {
 
 async function verifyPin() {
   try {
-    const secDocRef = window._firestoreUtils.doc(db, 'settings', 'security');
-    const pinSnap = await window._firestoreUtils.getDoc(secDocRef);
-    const correctPin = pinSnap.exists() ? (pinSnap.data().admin_pin || "585858") : "585858";
-    if (enteredPin === correctPin || enteredPin === "123456" || enteredPin === "585858") {
+    const fu = window._firestoreUtils;
+    const db = window._db;
+    const secDocRef = fu.doc(db, 'settings', 'security');
+    const pinSnap = await fu.getDoc(secDocRef);
+    if (!pinSnap.exists() || !pinSnap.data().admin_pin) {
+      alert('⚠️ لم يتم إعداد رمز الأمان بعد، تواصل مع المدير العام لإعداده أولاً');
+      return;
+    }
+    const correctPin = pinSnap.data().admin_pin;
+    if (enteredPin === correctPin) {
       sessionStorage.setItem('admin_security_unlocked', 'true');
       document.getElementById('passcode-screen').style.opacity = '0';
       setTimeout(() => {
@@ -2389,25 +2496,30 @@ async function verifyPin() {
         document.getElementById('passcode-screen').style.opacity = '1';
       }, 300);
     } else {
-      alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً (الافتراضي هو 585858)');
+      const dotsEl = document.getElementById('pin-dots');
+      const errMsgEl = document.getElementById('pin-error-msg');
+      
+      if (dotsEl) {
+        dotsEl.classList.remove('shake');
+        void dotsEl.offsetWidth; // trigger reflow
+        dotsEl.classList.add('shake');
+      }
+      
+      if (errMsgEl) {
+        errMsgEl.style.opacity = '1';
+        errMsgEl.style.transform = 'translateY(0)';
+        setTimeout(() => {
+          errMsgEl.style.opacity = '0';
+          errMsgEl.style.transform = 'translateY(-15px)';
+        }, 3000);
+      }
+
       enteredPin = "";
       updatePinDots();
     }
   } catch(e) {
     console.warn("Firestore fetch pin failed: ", e);
-    const correctPin = localStorage.getItem('zalo_pin_admin') || "585858";
-    if (enteredPin === correctPin || enteredPin === "123456" || enteredPin === "585858") {
-      sessionStorage.setItem('admin_security_unlocked', 'true');
-      document.getElementById('passcode-screen').style.opacity = '0';
-      setTimeout(() => {
-        document.getElementById('passcode-screen').style.display = 'none';
-        document.getElementById('passcode-screen').style.opacity = '1';
-      }, 300);
-    } else {
-      alert('❌ رمز المرور المدخل غير صحيح! حاول مجدداً (الافتراضي هو 585858)');
-      enteredPin = "";
-      updatePinDots();
-    }
+    alert('⚠️ تعذّر التحقق من رمز الأمان، تحقق من اتصالك بالإنترنت وحاول مجدداً');
   }
 }
 
@@ -2421,6 +2533,147 @@ window.backspacePin = function() {
     enteredPin = enteredPin.slice(0, -1);
     updatePinDots();
   }
+};
+
+window.printAdminReport = function() {
+  const printWindow = window.open('', '_blank', 'width=1000,height=800');
+  
+  let shopsHtml = '';
+  const merchants = window._allMerchants || [];
+  merchants.forEach((s, idx) => {
+    shopsHtml += `
+      <tr>
+        <td>${idx+1}</td>
+        <td>${s.storeName || 'محل تجاري'}</td>
+        <td>${s.ownerName || 'شريك معتمد'}</td>
+        <td>${s.wilaya || 'غير محدد'}</td>
+        <td>${s.whatsapp || s.phone || ''}</td>
+        <td>${s.category || 'عام'}</td>
+        <td><span class="status-b" style="background:#e3f2fd; color:#1565c0;">نشط</span></td>
+      </tr>
+    `;
+  });
+
+  let ordersHtml = '';
+  let totalRevenue = 0;
+  const orders = window._allOrders || [];
+  orders.forEach((o, idx) => {
+    const total = parseFloat(o.totalPrice || o.total || 0);
+    totalRevenue += total;
+    ordersHtml += `
+      <tr>
+        <td>${idx+1}</td>
+        <td>${o.customerName || 'زبون زالو'}</td>
+        <td>${o.wilaya || 'غير محدد'} - ${o.commune || ''}</td>
+        <td>${o.phone || ''}</td>
+        <td style="color:#1a5c2a; font-weight:700;">${total} دج</td>
+        <td><span class="status-b">${o.status || 'معلق'}</span></td>
+      </tr>
+    `;
+  });
+
+  const content = `
+    <html dir="rtl" lang="ar">
+    <head>
+      <title>تقرير الإدارة العليا العام لمنصة ZaLo</title>
+      <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap');
+        body { font-family: 'Cairo', sans-serif; padding: 30px; color: #333; background: #fff; line-height: 1.6; }
+        .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 3px double #1a5c2a; padding-bottom: 20px; margin-bottom: 30px; }
+        .header-title-sec h1 { margin: 0; color: #1a5c2a; font-size: 20px; font-weight: 900; }
+        .header-title-sec p { margin: 5px 0 0; font-size: 12px; color: #666; }
+        .stats-summary { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 30px; }
+        .stat-box { background: #fbfbfb; border: 1px solid #e0e0e0; border-radius: 10px; padding: 15px; text-align: center; }
+        .stat-box .val { font-size: 18px; font-weight: 900; color: #1a5c2a; margin-top: 5px; }
+        .stat-box .lbl { font-size: 11px; color: #666; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+        th, td { border: 1px solid #e0e0e0; padding: 8px 10px; text-align: right; font-size: 11px; }
+        th { background: #f5f5f5; color: #1a5c2a; font-weight: 700; }
+        .status-b { font-size: 10px; padding: 2px 6px; border-radius: 4px; background: #e8f5e9; color: #2e7d32; }
+        .sec-title-print { font-size: 14px; font-weight: 800; color: #1a5c2a; border-right: 4px solid #1a5c2a; padding-right: 10px; margin-bottom: 15px; }
+        .footer-sec { border-top: 1px solid #e0e0e0; padding-top: 15px; text-align: center; font-size: 11px; color: #999; margin-top: 50px; }
+      </style>
+    </head>
+    <body>
+      <div class="header">
+        <div class="header-title-sec">
+          <h1>منصة ZaLo - التقرير الرقابي والإداري الشامل للمنصة</h1>
+          <p>تقرير إحصائي ولائي مركزي لأداء المتاجر، الزبائن وحركات البيع والشحن المقيدة بنظام ZaLo</p>
+        </div>
+        <div style="text-align: left; font-size: 11px; color: #666;">
+          <div>تاريخ استخراج الملف: ${new Date().toLocaleDateString('ar-DZ')}</div>
+          <div>الجهة المصدرة: خلية الرقابة والتسيير الإداري</div>
+        </div>
+      </div>
+
+      <div class="stats-summary">
+        <div class="stat-box">
+          <div class="lbl">إجمالي المتاجر المعتمدة</div>
+          <div class="val">${merchants.length} متاجر</div>
+        </div>
+        <div class="stat-box">
+          <div class="lbl">الملفات المعروضة للجمهور</div>
+          <div class="val">${window._allProducts ? window._allProducts.length : 0} سلع</div>
+        </div>
+        <div class="stat-box">
+          <div class="lbl">حجم التداولات / الإيرادات</div>
+          <div class="val">${totalRevenue} دج</div>
+        </div>
+        <div class="stat-box">
+          <div class="lbl">إجمالي طلبات الشحن النشطة</div>
+          <div class="val">${orders.length} طلبات</div>
+        </div>
+      </div>
+
+      <div class="sec-title-print">🏪 المحلات والشركاء التجاريين النشطين بالشبكة</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th>مسمى المتجر والنشاط</th>
+            <th>المدير المسؤول</th>
+            <th>التمركز الجغرافي / الولاية</th>
+            <th>رقم هاتف الاتصال فوري</th>
+            <th>الفئة الغالبة للمنتجات</th>
+            <th>حالة الاعتماد</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${shopsHtml || '<tr><td colspan="7" style="text-align:center;">لا يوجد متاجر مسجلة حالياً بالمنصة</td></tr>'}
+        </tbody>
+      </table>
+
+      <div class="sec-title-print">📦 حركات وطلبات الشحن النشطة (إدارة مركزية)</div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 50px;">#</th>
+            <th>اسم العميل</th>
+            <th>وجهة الشحن والتسليم</th>
+            <th>رقم الهاتف</th>
+            <th>المبلغ الإجمالي المودع</th>
+            <th>حالة الشحن والتأمين</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ordersHtml || '<tr><td colspan="6" style="text-align:center;">لا توجد طلبات زبائن مسجلة في قاعدة البيانات</td></tr>'}
+        </tbody>
+      </table>
+
+      <div class="footer-sec">
+        هذا التقرير سري وخاص بالإدارة التشغيلية ويخضع لضمان الأمان والتدقيق الإداري لمنصة ZaLo الجزائرية الشاملة © 2026.
+      </div>
+
+      <script>
+        window.onload = function() {
+          window.print();
+        }
+      <\/script>
+    </body>
+    </html>
+  `;
+  printWindow.document.write(content);
+  printWindow.document.close();
 };
 
 initSecurityLock();

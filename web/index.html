@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- ZaLo Marketplace Smart-Spark Final Version Update (Sync Trigger) -->
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -19,10 +20,81 @@
   }
 </script>
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
 :root{--g1:#1a5c2a;--g2:#2d7a3a;--g3:#3d9e4e;--gold:#c9a84c;--gold2:#e8c97a;--bg:#fafafa;--white:#fff;--text:#1a1a1a;--gray:#666;--bd:#e0e0e0;--red:#e53935}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;max-width:100%}
+
+@media (min-width: 641px) {
+  html {
+    background: radial-gradient(circle at center, #1b3823 0%, #07130b 100%) !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body {
+    width: 410px !important;
+    height: 860px !important;
+    max-height: calc(100vh - 40px) !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    background: var(--bg) !important;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6) !important;
+    border: 10px solid #1c2b20 !important;
+    border-radius: 38px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  .screen {
+    min-height: 100% !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+  .bnav {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+  }
+  .topbar {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    width: 100% !important;
+    z-index: 999 !important;
+  }
+  .sidemenu {
+    position: absolute !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+  .popup-ov {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  #splash {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+}
+
 #splash{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
 #splash.hide{opacity:0;pointer-events:none}
 .sp-img{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(201,168,76,.6));animation:spPop .9s cubic-bezier(.34,1.56,.64,1) both}
@@ -54,13 +126,13 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .home-logo-box{width:120px;height:120px;background:#f5f5f5;border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 3px 15px rgba(0,0,0,.15)}
 .home-logo-box img{width:104px;height:104px;object-fit:contain}
 .home-title{font-size:24px;font-weight:900;color:var(--text);text-align:center;line-height:1.3;margin-bottom:18px}
-.btn-gm{width:100%;max-width:320px;background:var(--g2);color:#fff;border:none;border-radius:30px;padding:15px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:12px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .15s;box-shadow:0 4px 12px rgba(45,122,58,0.25)}
-.btn-gm:active{transform:scale(.97);background:var(--g1)}
-.home-circles{display:flex;flex-wrap:wrap;gap:16px;margin-top:24px;justify-content:center}
-.hcircle{display:flex;flex-direction:column;align-items:center;cursor:pointer;min-width:90px}
-.hcircle-icon{width:80px;height:80px;border-radius:50%;background:var(--g2);display:flex;align-items:center;justify-content:center;font-size:30px;margin-bottom:8px;box-shadow:0 4px 15px rgba(26,92,42,.3);transition:all .2s;color:#fff;font-weight:900}
-.hcircle:active .hcircle-icon{transform:scale(.93)}
-.hcircle-label{font-size:13px;font-weight:700;color:var(--text);text-align:center}
+.btn-gm{width:100%;max-width:320px;background:linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);color:#fff;border:none;border-radius:18px;padding:16px;font-family:'Cairo',sans-serif;font-size:14.5px;font-weight:800;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 6px 20px rgba(26,92,42,0.2)}
+.btn-gm:active{transform:scale(.98);filter:brightness(1.15)}
+.home-circles{display:flex;flex-wrap:wrap;gap:16px;margin-top:24px;justify-content:center;width:100%;max-width:340px}
+.hcircle{display:flex;flex-direction:column;align-items:center;cursor:pointer;flex:1;min-width:90px}
+.hcircle-icon{width:76px;height:76px;border-radius:24px;background:linear-gradient(135deg, var(--g2) 0%, var(--g1) 100%);display:flex;align-items:center;justify-content:center;font-size:26px;margin-bottom:10px;box-shadow:0 6px 18px rgba(26,92,42,0.18);transition:all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);color:#fff}
+.hcircle:hover .hcircle-icon, .hcircle:active .hcircle-icon{transform:translateY(-6px) scale(1.05);box-shadow:0 12px 25px rgba(26,92,42,0.3)}
+.hcircle-label{font-size:12.5px;font-weight:800;color:var(--text);text-align:center}
 .wchips-wrap{padding:16px 12px 80px}
 .wchips{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;justify-content:center}
 .wchip{background:#fff;color:var(--text);border:1.5px solid var(--bd);padding:12px 6px;min-height:48px;border-radius:12px;font-size:11px;font-weight:700;text-align:center;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;box-shadow:0 1.5px 4px rgba(0,0,0,0.02)}
@@ -75,11 +147,80 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .comm-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px;width:100%;box-sizing:border-box;padding:4px 2px}
 .comm-item{width:100%;padding:11px 4px;border-radius:12px;margin:0;cursor:pointer;font-size:12px;font-weight:700;border:1.5px solid var(--bd);background:#fcfcfc;color:var(--text);transition:all .15s;text-align:center;box-sizing:border-box;display:flex;align-items:center;justify-content:center;gap:4px;box-shadow:0 1px 3px rgba(0,0,0,0.02)}
 .comm-item:active,.comm-item.sel{background:var(--g1);color:#fff !important;border-color:var(--g1);box-shadow:0 4px 12px rgba(26,92,42,0.25)}
-.cats-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:14px 14px 80px}
-.cat-card{background:#fff;border-radius:14px;overflow:hidden;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.07);border:1.5px solid var(--bd);transition:all .2s}
-.cat-card:active{transform:scale(.97);border-color:var(--g2)}
-.cat-img{height:130px;background:linear-gradient(135deg,#f0f8f0,#e8f5e9);display:flex;align-items:center;justify-content:center;font-size:56px}
-.cat-lbl{padding:11px;text-align:center;font-size:14px;font-weight:800}
+.cats-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px 16px 90px}
+.cat-card{background:#ffffff;border-radius:18px;overflow:hidden;cursor:pointer;box-shadow:0 4px 15px rgba(0,0,0,.04);border:1.5px solid var(--bd);transition:all .25s cubic-bezier(0.4, 0, 0.2, 1)}
+.cat-card:hover, .cat-card:active{transform:translateY(-4px);box-shadow:0 8px 25px rgba(26,92,42,0.12);border-color:var(--g2)}
+.cat-img{height:120px;background:linear-gradient(135deg,#f3fcf5 0%, #e8f5e9 100%);display:flex;align-items:center;justify-content:center;font-size:52px;transition:all .25s ease}
+.cat-card:hover .cat-img, .cat-card:active .cat-img{background:linear-gradient(135deg,#e8f5e9 0%, #c8e6c9 100%);font-size:58px}
+.cat-lbl{padding:12px 8px;text-align:center;font-size:13.5px;font-weight:800;color:var(--text)}
+
+#realtime-notification-container {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  z-index: 200000;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: none;
+  font-family: 'Cairo', sans-serif;
+  direction: rtl;
+}
+.rt-toast {
+  background: rgba(26, 92, 42, 0.98);
+  color: #fff;
+  border-radius: 20px;
+  padding: 14px 18px;
+  box-shadow: 0 12px 35px rgba(0,0,0,0.3);
+  border: 1.5px solid var(--gold2);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transform: translateY(-80px);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  pointer-events: auto;
+}
+.rt-toast.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+.rt-toast-icon {
+  font-size: 28px;
+}
+.rt-toast-body {
+  flex: 1;
+}
+.rt-toast-title {
+  font-weight: 900;
+  font-size: 13.5px;
+  color: var(--gold2);
+}
+.rt-toast-desc {
+  font-size: 11.5px;
+  margin-top: 3px;
+  color: rgba(255,255,255,0.92);
+  line-height: 1.4;
+}
+.rt-toast-btn {
+  background: #fff;
+  color: var(--g1);
+  border: none;
+  border-radius: 20px;
+  padding: 6px 14px;
+  font-size: 11.5px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: 'Cairo', sans-serif;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.15);
+}
+.rt-toast-btn:hover, .rt-toast-btn:active {
+  background: var(--gold);
+  color: #000;
+}
 .slist{padding:10px 14px 80px}
 .scard{background:#fff;border-radius:14px;margin-bottom:10px;border:1.5px solid var(--bd);display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
 .scard:active{border-color:var(--g2);background:#f9fdf9}
@@ -298,6 +439,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 </div>
 
 <div id="toast" class="toast"></div>
+<div id="realtime-notification-container"></div>
 <div class="overlay" id="overlay" onclick="closeSide()"></div>
 <div class="sidemenu" id="sidemenu">
   <div class="sm-hd">
@@ -332,18 +474,18 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     </div>
   </div>
   <div class="sm-sec">القائمة</div>
-  <div class="smi" onclick="closeSide();G('home')"><span class="si">🏠</span><div><div class="sn">الرئيسية</div></div></div>
-  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si">📍</span><div><div class="sn">الولايات</div></div></div>
-  <div class="smi" onclick="closeSide();G('cats')"><span class="si">📁</span><div><div class="sn">جميع الأقسام</div></div></div>
-  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si">📦</span><div><div class="sn">جميع المنتجات</div></div></div>
+  <div class="smi" onclick="closeSide();G('home')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-house"></i></span><div><div class="sn">الرئيسية</div></div></div>
+  <div class="smi" onclick="closeSide();G('wilayas')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-location-dot"></i></span><div><div class="sn">الولايات</div></div></div>
+  <div class="smi" onclick="closeSide();G('cats')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-folder-open"></i></span><div><div class="sn">جميع الأقسام</div></div></div>
+  <div class="smi" onclick="closeSide();G('all-prods')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-box"></i></span><div><div class="sn">جميع المنتجات</div></div></div>
   <div class="sm-sec" id="sm-driver-sec" style="display:none;">للتجار والسائقين</div>
-  <div class="smi" id="sm-unified-login-item" style="display:none;" onclick="closeSide();openLink('login.html')"><span class="si">🔐</span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
-  <div class="smi" id="sm-driver-portal-item" style="display:none;" onclick="closeSide();G('driver-portal')"><span class="si">🏍️</span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
+  <div class="smi" id="sm-unified-login-item" style="display:none;" onclick="closeSide();openLink('login.html')"><span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
+  <div class="smi" id="sm-driver-portal-item" style="display:none;" onclick="closeSide();G('driver-portal')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-motorcycle"></i></span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
   <div class="sm-sec">تواصل معنا وإدارة</div>
-  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si">💬</span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
-  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si">🌐</span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
-  <div class="smi" onclick="closeSide();G('about')"><span class="si">📖</span><div><div class="sn">من نحن</div><div class="sd">حول منصة ZaLo الذكية</div></div></div>
-  <div class="smi" onclick="closeSide();forceUpdateApp()"><span class="si">🔄</span><div><div class="sn" style="color:var(--red); font-weight:800;">تحديث التطبيق ومسح الكاش</div><div class="sd">لحل مشكلة تأخر ظهور التحديثات فورا</div></div></div>
+  <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si" style="color:#25d366"><i class="fa-brands fa-whatsapp"></i></span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
+  <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-globe"></i></span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
+  <div class="smi" onclick="closeSide();G('about')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-book"></i></span><div><div class="sn">من نحن</div><div class="sd">حول منصة ZaLo الذكية</div></div></div>
+  <div class="smi" onclick="closeSide();forceUpdateApp()"><span class="si" style="color:var(--red)"><i class="fa-solid fa-arrows-rotate"></i></span><div><div class="sn" style="color:var(--red); font-weight:800;">تحديث التطبيق ومسح الكاش 🔄</div><div class="sd">لحل مشكلة تأخر ظهور التحديثات فورا</div></div></div>
   <div class="sm-footer"><p>© 2026 ZaLo - السوق الذكي</p></div>
 </div>
 <div id="app" style="display:none">
@@ -372,14 +514,14 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <div class="home-body">
       <div class="home-logo-box"><img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/120x120/1a5c2a/white?text=ZaLo'"></div>
       <div class="home-title">ZaLo<br>السوق الذكي الجزائري</div>
-      <button class="btn-gm" onclick="G('wilayas')">🛍️ تسوق في كل الولايات الـ69 الآن</button>
+      <button class="btn-gm" onclick="G('wilayas')"><i class="fa-solid fa-bag-shopping" style="margin-left:6px"></i> تسوق في كل الولايات الـ69 الآن</button>
       <div class="home-circles">
         <div class="hcircle" onclick="G('cats')">
-          <div class="hcircle-icon" style="font-size:22px">⊞<br><span style="font-size:9px;font-weight:700">الأقسام</span></div>
+          <div class="hcircle-icon" style="font-size:24px"><i class="fa-solid fa-grip"></i></div>
           <div class="hcircle-label">جميع الأقسام</div>
         </div>
         <div class="hcircle" onclick="G('all-prods')">
-          <div class="hcircle-icon">📦</div>
+          <div class="hcircle-icon" style="font-size:24px"><i class="fa-solid fa-box-open"></i></div>
           <div class="hcircle-label">جميع المنتجات</div>
         </div>
       </div>
@@ -400,11 +542,11 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     </div>
   </div>
   <div class="bnav">
-    <div class="bn on" onclick="G('home')"><div class="bni">🏠</div><div class="bnl">الرئيسية</div></div>
-    <div class="bn" onclick="G('myorders')"><div class="bni">🛍️</div><div class="bnl">طلباتي</div></div>
-    <div class="bn" onclick="G('wilayas')"><div class="bni">📍</div><div class="bnl">الولايات</div></div>
-    <div class="bn" onclick="G('search')"><div class="bni">🔍</div><div class="bnl">بحث سريع</div></div>
-    <div class="bn" onclick="openLink('login.html')"><div class="bni">👤</div><div class="bnl">بوابتي الكبرى</div></div>
+    <div class="bn on" onclick="G('home')"><div class="bni"><i class="fa-solid fa-house"></i></div><div class="bnl">الرئيسية</div></div>
+    <div class="bn" onclick="G('myorders')"><div class="bni"><i class="fa-solid fa-bag-shopping"></i></div><div class="bnl">طلباتي</div></div>
+    <div class="bn" onclick="G('wilayas')"><div class="bni"><i class="fa-solid fa-location-dot"></i></div><div class="bnl">الولايات</div></div>
+    <div class="bn" onclick="G('search')"><div class="bni"><i class="fa-solid fa-magnifying-glass"></i></div><div class="bnl">بحث سريع</div></div>
+    <div class="bn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">بوابتي الكبرى</div></div>
   </div>
 </div>
 
@@ -711,12 +853,16 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
     <div class="tb-center"><div class="tb-title">مركز الإشعارات</div></div>
-    <div style="width:34px"></div>
+    <button onclick="clearAllNotifications()" style="border:none; background:transparent; color:#fff; font-size:18px; cursor:pointer; font-family:'Cairo'; font-weight:700; display:flex; align-items:center; gap:4px; padding:4px;" title="مسح الكل">🗑️ <span style="font-size:11px;">مسح</span></button>
   </div>
-  <div class="content">
-    <div class="notif-list">
-      <div class="nitem unread"><span class="ni">🎉</span><div><div class="nt">مرحباً بك في ZaLo!</div><div class="ns">أهلاً بك في أكبر سوق ذكي مجاني يغطي جميع ولايات الجزائر الـ69.</div></div></div>
-      <div class="nitem unread"><span class="ni">🏪</span><div><div class="nt">افتح متجرك المعتمد الآن</div><div class="ns">زد حجم تجارتك مجاناً واربط متجرك ببريدك وواتسابك الخاص.</div></div></div>
+  <div class="content" style="padding: 14px 12px 100px;">
+    <div id="notif-empty-state" style="display:none; text-align:center; padding:50px 20px; color:#c9a84c;">
+      <div style="font-size:48px; margin-bottom:12px;">🔔</div>
+      <p style="font-size:13px; font-weight:700;">لا توجد أي إشعارات جديدة حالياً!</p>
+      <p style="font-size:11px; color:#aaa; margin-top:4px;">تحديثات الشحنات والطلبات ستظهر هنا مباشرة تلقائياً.</p>
+    </div>
+    <div id="notif-dyn-list" class="notif-list">
+      <!-- Dynamic list loaded via JavaScript -->
     </div>
   </div>
 </div>
@@ -876,7 +1022,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc,setDoc,onSnapshot,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc,setDoc,onSnapshot,limit,orderBy,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 const cfg={apiKey:"AIzaSy"+"DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",authDomain:"zalo-marketplace-smart-final.firebaseapp.com",projectId:"zalo-marketplace-smart-final",storageBucket:"zalo-marketplace-smart-final.firebasestorage.app",messagingSenderId:"393402903971",appId:"1:393402903971:web:7c521e8cb7b823d306be16"};
@@ -891,24 +1037,6 @@ onAuthStateChanged(auth, async (u) => {
   window._user = u;
   const guestEl = document.getElementById('sm-profile-guest');
   const userEl = document.getElementById('sm-profile-user');
-  const driverSec = document.getElementById('sm-driver-sec');
-  const loginItem = document.getElementById('sm-unified-login-item');
-  const portalItem = document.getElementById('sm-driver-portal-item');
-
-  // Logic to determine if driver should be shown
-  const isDriver = localStorage.getItem('is_driver') === 'true' || window.location.search.includes('driver=true');
-  if (isDriver) {
-    if (driverSec) driverSec.style.display = 'block';
-    if (portalItem) portalItem.style.display = 'block';
-  } else {
-    if (driverSec) driverSec.style.display = 'none';
-    if (portalItem) portalItem.style.display = 'none';
-  }
-  if (loginItem) {
-    loginItem.style.display = 'none'; // hidden by default to guests, shown to merchants or when driver is on
-    if (isDriver) loginItem.style.display = 'block';
-  }
-
   if (guestEl && userEl) {
     if (u) {
       guestEl.style.display = 'none';
@@ -933,22 +1061,12 @@ onAuthStateChanged(auth, async (u) => {
             document.getElementById('sm-user-badge').style.color = 'var(--gold)';
             document.getElementById('sm-user-action-btn').innerHTML = '🏪 لوحة المتجر';
             document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'dashboard.html'; };
-            
-            // Merchants can see driver portals and unified log-in
-            if (driverSec) driverSec.style.display = 'block';
-            if (loginItem) loginItem.style.display = 'block';
-            if (portalItem) portalItem.style.display = 'block';
           } else if (udata.role === 'admin') {
             document.getElementById('sm-user-badge').textContent = 'مدير عام 👑';
             document.getElementById('sm-user-badge').style.background = 'rgba(255,77,77,0.1)';
             document.getElementById('sm-user-badge').style.color = 'var(--red)';
             document.getElementById('sm-user-action-btn').innerHTML = '👑 لوحة المدير';
             document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'admin.html'; };
-            
-            // Admins can see driver portals and unified log-in
-            if (driverSec) driverSec.style.display = 'block';
-            if (loginItem) loginItem.style.display = 'block';
-            if (portalItem) portalItem.style.display = 'block';
           } else {
             // Customer role
             document.getElementById('sm-user-badge').textContent = 'زبون معتمد 👤';
@@ -1002,6 +1120,109 @@ window.logoutCustomerAccount = async function() {
     }
   }
 };
+
+// Real-time toast implementation
+function showRealtimeToast(icon, title, desc, actionText, actionCallback) {
+  const container = document.getElementById('realtime-notification-container');
+  if (!container) return;
+
+  const toast = document.createElement('div');
+  toast.className = 'rt-toast';
+  
+  let btnHtml = '';
+  if (actionText && actionCallback) {
+    btnHtml = `<button class="rt-toast-btn">${actionText}</button>`;
+  }
+
+  toast.innerHTML = `
+    <div class="rt-toast-icon">${icon}</div>
+    <div class="rt-toast-body">
+      <div class="rt-toast-title">${title}</div>
+      <div class="rt-toast-desc">${desc}</div>
+    </div>
+    ${btnHtml}
+  `;
+
+  if (actionText && actionCallback) {
+    toast.querySelector('.rt-toast-btn').onclick = () => {
+      actionCallback();
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 400);
+    };
+  }
+
+  container.appendChild(toast);
+  
+  setTimeout(() => toast.classList.add('show'), 50);
+
+  setTimeout(() => {
+    if (toast.parentNode) {
+      toast.classList.remove('show');
+      setTimeout(() => toast.remove(), 400);
+    }
+  }, 6000);
+}
+
+// Subscriptions to shops and products live triggers
+let loadedShops = false;
+try {
+  const qShops = query(collection(db, "shops"), limit(50));
+  onSnapshot(qShops, snapshot => {
+    snapshot.docChanges().forEach(change => {
+      const data = change.doc.data();
+      const id = change.doc.id;
+      if (change.type === "added") {
+        if (loadedShops) {
+          showRealtimeToast(
+            "🏪",
+            "شريك تجاري جديد انضم للمنصة!",
+            `المتجر "${data.storeName || 'محل جديد'}" من ولاية ${data.wilaya || 'الجزائر'} جاهز الآن للبيع!`,
+            "استكشف المتجر",
+            () => {
+              if (window.showShopDetails) {
+                window.showShopDetails(id);
+              } else if (window.viewShop) {
+                window.viewShop(id, data.storeName);
+              } else {
+                window.location.hash = "#shops";
+              }
+            }
+          );
+        }
+      }
+    });
+    loadedShops = true;
+  }, err => console.log("Realtime shops sub:", err));
+} catch(e) { console.log(e); }
+
+let loadedProducts = false;
+try {
+  const qProducts = query(collection(db, "products"), limit(50));
+  onSnapshot(qProducts, snapshot => {
+    snapshot.docChanges().forEach(change => {
+      const data = change.doc.data();
+      const id = change.doc.id;
+      if (change.type === "added") {
+        if (loadedProducts) {
+          showRealtimeToast(
+            "📦",
+            "سلعة جديدة معروضة للبيع!",
+            `تم إضافة منتج جديد: "${data.name || 'منتج جديد'}" بقيمة ${data.price || 0} دج!`,
+            "شاهد التفاصيل",
+            () => {
+              if (window.showProductDetails) {
+                window.showProductDetails(id);
+              } else {
+                window.location.hash = "#products";
+              }
+            }
+          );
+        }
+      }
+    });
+    loadedProducts = true;
+  }, err => console.log("Realtime products sub:", err));
+} catch(e) { console.log(e); }
 
 window.defaultStoreSVG = `<svg viewBox="0 0 64 64" style="width:100%; height:100%; display:block;" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="32" cy="32" r="32" fill="#142218"/><path d="M14 26h36l-3 22H17L14 26z" fill="#0d1710" stroke="var(--gold)" stroke-width="2" stroke-linejoin="round"/><path d="M12 26l3-6h34l3 6H12z" fill="var(--gold)" stroke="var(--gold)" stroke-width="1.5" stroke-linejoin="round"/><path d="M18 20l-1 6M25 20v6M32 20v6M39 20v6M46 20l1 6" stroke="#0d1710" stroke-width="1.5"/><path d="M24 35h16v13H24V35z" fill="#0d1710" stroke="var(--gold)" stroke-width="1.5"/><circle cx="27" cy="41" r="1.5" fill="var(--gold)"/></svg>`;
 
@@ -1160,6 +1381,7 @@ window.submitMerchant=async()=>{
         rcNumber: rcnum,
         storeType: window._stype || 'registered',
         logoURL: logoB64 || '',
+        frontURL: frontFile || '',
         facebookURL: fb,
         instagramURL: ig,
         tiktokURL: tiktok,
@@ -1353,6 +1575,12 @@ function openStore(id,name,wa,logo){
   
   document.getElementById('prod-sname').textContent=name;
   
+  // Reset precise background and logo placeholder
+  const headerEl = document.getElementById('store-profile-header');
+  if (headerEl) {
+    headerEl.style.backgroundImage = 'linear-gradient(135deg, #0d1a12 0%, #050a07 100%)';
+  }
+
   // Update Profile Header with initial available parameters
   document.getElementById('store-profile-name').textContent = name;
   const pImg = document.getElementById('store-profile-logo');
@@ -1391,6 +1619,19 @@ function openStore(id,name,wa,logo){
         // Populate precise location details
         const details_loc = s.commune ? `${s.wilaya} - ${s.commune}` : (s.wilaya || 'شريك شبكة ZaLo');
         document.getElementById('store-profile-wilcom').textContent = details_loc;
+
+        // Set background banner storefront image
+        if (headerEl) {
+          if (s.frontURL && s.frontURL.trim().length > 0) {
+            headerEl.style.backgroundImage = `linear-gradient(135deg, rgba(13, 26, 18, 0.85) 0%, rgba(5, 10, 7, 0.95) 100%), url(${s.frontURL})`;
+            headerEl.style.backgroundSize = 'cover';
+            headerEl.style.backgroundPosition = 'center';
+          } else if (s.frontFile && s.frontFile.trim().length > 0) {
+            headerEl.style.backgroundImage = `linear-gradient(135deg, rgba(13, 26, 18, 0.85) 0%, rgba(5, 10, 7, 0.95) 100%), url(${s.frontFile})`;
+            headerEl.style.backgroundSize = 'cover';
+            headerEl.style.backgroundPosition = 'center';
+          }
+        }
 
         // Populate precise shop-custom logo if exists
         if (s.logoURL && s.logoURL.trim().length > 0) {
@@ -1882,13 +2123,26 @@ window.saveDriverProfile = function() {
   }
   const prof = { name, phone, wilaya };
   localStorage.setItem('zalo_driver_profile', JSON.stringify(prof));
+  localStorage.setItem('is_driver', 'true');
   toast('🟢 تم حفظ وتثبيت هوية الشحن والبدء!');
   checkDriverSession();
+  
+  const dSec = document.getElementById('sm-driver-sec');
+  const dPortal = document.getElementById('sm-driver-portal-item');
+  if (dSec) dSec.style.display = 'block';
+  if (dPortal) dPortal.style.display = 'block';
 };
 
 window.logoutDriver = function() {
   if(confirm('هل تود بالتأكيد تسجيل الخروج وتصفير الجلسة الحالية لخدمتك؟')) {
     localStorage.removeItem('zalo_driver_profile');
+    localStorage.removeItem('is_driver');
+    
+    const dSec = document.getElementById('sm-driver-sec');
+    const dPortal = document.getElementById('sm-driver-portal-item');
+    if (dSec) dSec.style.display = 'none';
+    if (dPortal) dPortal.style.display = 'none';
+    
     checkDriverSession();
   }
 };
@@ -1898,6 +2152,7 @@ window.checkDriverSession = function() {
   const regBoard = document.getElementById('driver-auth-board');
   const workBoard = document.getElementById('driver-workspace-board');
   if (raw) {
+    localStorage.setItem('is_driver', 'true');
     const prof = JSON.parse(raw);
     if(regBoard) regBoard.style.display = 'none';
     if(workBoard) workBoard.style.display = 'block';
@@ -2148,12 +2403,40 @@ window.setupRealtimeTrackingListener = function(phone) {
   
   if(window.customerUnsubscribe) window.customerUnsubscribe();
 
-  window.customerUnsubscribe = window._ff.onSnapshot(q, (snap) => {
+  window.customerUnsubscribe = window._db ? window._ff.onSnapshot(q, (snap) => {
     const list = [];
     snap.forEach(docSnap => {
       const data = docSnap.data();
+      const orderId = docSnap.id;
       if(data.phone === phone || (data.phone && data.phone.endsWith(phone)) || (phone.endsWith(data.phone))) {
-        list.push({ id: docSnap.id, ...data });
+        list.push({ id: orderId, ...data });
+        
+        // Dynamic Notification trigger on order status change
+        const statusKey = `zalo_order_status_${orderId}`;
+        const previousStatus = localStorage.getItem(statusKey);
+        const currentStatus = data.status || 'pending';
+        
+        if (previousStatus && previousStatus !== currentStatus) {
+          const productName = data.product || 'شحنة متعددة السلع';
+          let statusText = 'قيد المراجعة والتحقق';
+          let statusIcon = '⏳';
+          if (currentStatus === 'confirmed') { statusText = 'مقبولة وتأكيد حجز البضاعة'; statusIcon = '✅'; }
+          else if (currentStatus === 'left_store') { statusText = 'خرجت الشحنة من المتجر'; statusIcon = '🏪'; }
+          else if (currentStatus === 'in_shipping') { statusText = 'وصلت إلى مركز الفرز الولائي'; statusIcon = '🏢'; }
+          else if (currentStatus === 'out_for_delivery') { statusText = 'مع السائق في الطريق للتسليم'; statusIcon = '🏍️'; }
+          else if (currentStatus === 'delivered') { statusText = 'تم التسليم والتحصيل بنجاح'; statusIcon = '📦'; }
+          else if (currentStatus === 'returned') { statusText = 'تم إلغاء التوصيل أو رفض الشحنة'; statusIcon = '❌'; }
+          else if (currentStatus === 'accepted') { statusText = 'مقيدة وبانتظار الخروج للتوصيل'; statusIcon = '⚙️'; }
+          
+          if (typeof window.addNotification === 'function') {
+            window.addNotification(
+              `تحديث الطلب #${orderId.substring(0,6)}`,
+              `تغيرت حالة سلعتك (${productName}) إلى: ${statusText}`,
+              statusIcon
+            );
+          }
+        }
+        localStorage.setItem(statusKey, currentStatus);
       }
     });
     
@@ -2196,7 +2479,7 @@ window.setupRealtimeTrackingListener = function(phone) {
         </div>
       `;
     }).join('');
-  });
+  }) : null;
 };
 
 window.renderTrackingTimeline = function(order) {
@@ -2255,6 +2538,222 @@ window.renderTrackingTimeline = function(order) {
   return html;
 };
 
+// ====== DYNAMIC NOTIFICATIONS SYSTEM ======
+window.playNotificationBeep = function() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gainNode1 = audioCtx.createGain();
+    const gainNode2 = audioCtx.createGain();
+    
+    osc1.connect(gainNode1);
+    gainNode1.connect(audioCtx.destination);
+    
+    osc1.frequency.setValueAtTime(880, audioCtx.currentTime);
+    gainNode1.gain.setValueAtTime(0.12, audioCtx.currentTime); 
+    gainNode1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    
+    osc1.start();
+    osc1.stop(audioCtx.currentTime + 0.15);
+    
+    setTimeout(() => {
+      osc2.connect(gainNode2);
+      gainNode2.connect(audioCtx.destination);
+      osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime);
+      gainNode2.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gainNode2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc2.start();
+      osc2.stop(audioCtx.currentTime + 0.3);
+    }, 100);
+  } catch(e) {
+    console.warn("AudioContext warning:", e);
+  }
+};
+
+window.getNotifications = function() {
+  const data = localStorage.getItem('zalo_notifications_list_v2');
+  if (data) {
+    try {
+      return JSON.parse(data);
+    } catch(e) {
+      return [];
+    }
+  }
+  const onboarding = [
+    {
+      id: "init_1",
+      title: "مرحباً بك في ZaLo! 🏛️",
+      text: "أهلاً بك في أكبر سوق ذكي دائم ومجاني لخدمة المتاجر والسائقين وتوصيل الشحنات عبر 69 ولاية جزائرية.",
+      icon: "🎉",
+      read: false,
+      timestamp: Date.now() - 600000
+    },
+    {
+      id: "init_2",
+      title: "تتبع شحنتك بثوانٍ 📦",
+      text: "أدخل رقم هاتفك في صفحة 'طلباتي' لمتابعة حالة شاحنتك بنظام التنبيه والرنين المباشر فور تغيرها من تاجر أو سائق.",
+      icon: "🔔",
+      read: false,
+      timestamp: Date.now() - 3600000
+    }
+  ];
+  localStorage.setItem('zalo_notifications_list_v2', JSON.stringify(onboarding));
+  return onboarding;
+};
+
+window.saveNotifications = function(list) {
+  localStorage.setItem('zalo_notifications_list_v2', JSON.stringify(list));
+  updateBellBadge();
+  renderNotifications();
+};
+
+window.addNotification = function(title, text, icon = "🔔") {
+  const list = getNotifications();
+  const duplicate = list.find(n => n.title === title && n.text === text && (Date.now() - n.timestamp < 300000));
+  if (duplicate) return;
+
+  const notif = {
+    id: "notif_" + Math.random().toString(36).substring(2, 9),
+    title,
+    text,
+    icon,
+    read: false,
+    timestamp: Date.now()
+  };
+  list.unshift(notif);
+  saveNotifications(list);
+  playNotificationBeep();
+  showElegantToast(icon + " " + title, text);
+};
+
+window.showElegantToast = function(title, body) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 82px;
+    left: 12px;
+    right: 12px;
+    background: rgba(8, 14, 10, 0.95);
+    border: 1.5px solid var(--gold);
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    color: #fff;
+    direction: rtl;
+    text-align: right;
+    z-index: 999999;
+    font-family: 'Cairo';
+    animation: slideUpToast 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+  `;
+  
+  if (!document.getElementById('toast-anim-css')) {
+    const style = document.createElement('style');
+    style.id = 'toast-anim-css';
+    style.innerHTML = `
+      @keyframes slideUpToast {
+        from { transform: translateY(120%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes fadeOutToast {
+        to { opacity: 0; transform: scale(0.95); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  toast.innerHTML = `
+    <div style="font-size: 13px; font-weight: 800; color: var(--gold2); display: flex; align-items:center; gap: 6px; margin-bottom: 2px;">${title}</div>
+    <div style="font-size: 11px; opacity: 0.9; line-height: 1.4;">${body}</div>
+  `;
+  
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'fadeOutToast 0.4s ease forwards';
+    setTimeout(() => toast.remove(), 450);
+  }, 4500);
+};
+
+window.renderNotifications = function() {
+  const list = getNotifications();
+  const listEl = document.getElementById('notif-dyn-list');
+  const emptyEl = document.getElementById('notif-empty-state');
+  if(!listEl) return;
+
+  if (list.length === 0) {
+    listEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  
+  if (emptyEl) emptyEl.style.display = 'none';
+  listEl.innerHTML = list.map(n => {
+    const timeStr = formatArabicTime(n.timestamp);
+    return `
+      <div class="nitem ${n.read ? '' : 'unread'}" style="position:relative; margin-bottom: 12px; padding: 14px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition:all 0.2s; gap:10px; display:flex;" id="ncell_${n.id}">
+        <span class="ni" style="font-size: 24px; flex-shrink:0;">${n.icon || '🔔'}</span>
+        <div style="flex:1; text-align: right;">
+          <div class="nt" style="font-size: 13px; font-weight: 800; color: var(--text);">${n.title}</div>
+          <div class="ns" style="font-size: 11.5px; color: var(--gray); margin-top: 3px; line-height: 1.4;">${n.text}</div>
+          <div style="margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 10px; color: #aaa; font-weight: 600;">🕒 ${timeStr}</span>
+            <div style="display:flex; gap: 6px;">
+              ${!n.read ? `<button onclick="markNotificationRead('${n.id}')" style="background: rgba(26,92,42,0.1); color: var(--g1); border:none; padding:3px 10px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="تحديد كمقروء">✔ مقروء</button>` : ''}
+              <button onclick="deleteNotification('${n.id}')" style="background: rgba(220,53,69,0.08); color: #dc3545; border:none; padding:3px 8px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="حذف">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.markNotificationRead = function(id) {
+  const list = getNotifications();
+  const index = list.findIndex(n => n.id === id);
+  if (index !== -1) {
+    list[index].read = true;
+    saveNotifications(list);
+  }
+};
+
+window.deleteNotification = function(id) {
+  const list = getNotifications().filter(n => n.id !== id);
+  saveNotifications(list);
+};
+
+window.clearAllNotifications = function() {
+  saveNotifications([]);
+};
+
+window.updateBellBadge = function() {
+  const list = getNotifications();
+  const unreadCount = list.filter(n => !n.read).length;
+  const badge = document.getElementById('nb');
+  if (badge) {
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+};
+
+function formatArabicTime(timestamp) {
+  const diff = Date.now() - timestamp;
+  if (diff < 60000) return 'الآن';
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `منذ ${mins} د`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `منذ ${hours} سا`;
+  return new Date(timestamp).toLocaleDateString('ar-DZ', { day: 'numeric', month: 'short' });
+}
+
 // Expose driver functions globally
 window.saveDriverProfile = saveDriverProfile;
 window.logoutDriver = logoutDriver;
@@ -2269,6 +2768,10 @@ window.clearCustomerSession = clearCustomerSession;
 document.addEventListener('DOMContentLoaded',()=>{
   renderW();
   initSecurityLock();
+  try {
+    updateBellBadge();
+    renderNotifications();
+  } catch(e) { console.error('Notifications init error:', e); }
   
   // Checking driver session on app boot
   try {
