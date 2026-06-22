@@ -26,72 +26,166 @@
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;max-width:100%}
 
-@media (min-width: 641px) {
-  html {
-    background: radial-gradient(circle at center, #1b3823 0%, #07130b 100%) !important;
-    height: 100vh !important;
-    overflow: hidden !important;
-    display: flex !important;
-    align-items: center !important;
-    justify-content: center !important;
-  }
-  body {
-    width: 410px !important;
-    height: 860px !important;
-    max-height: calc(100vh - 40px) !important;
-    position: relative !important;
-    margin: 0 auto !important;
-    background: var(--bg) !important;
-    box-shadow: 0 25px 50px rgba(0,0,0,0.6) !important;
-    border: 10px solid #1c2b20 !important;
-    border-radius: 38px !important;
-    overflow: hidden !important;
-    display: flex !important;
-    flex-direction: column !important;
-    box-sizing: border-box !important;
-  }
-  .screen {
-    min-height: 100% !important;
-    height: 100% !important;
-    width: 100% !important;
-  }
-  .bnav {
-    position: absolute !important;
-    bottom: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-  }
-  .topbar {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
-    width: 100% !important;
-    z-index: 999 !important;
-  }
+/* Adaptive Responsive System - Replacing mock phone container with a full fluid design */
+html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;margin:0;padding:0;overflow-x:hidden!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+*{box-sizing:border-box !important;-webkit-tap-highlight-color:transparent}
+
+/* Overlay and mobile sidebar resets */
+.overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 100050;
+  display: none;
+}
+.overlay.show {
+  display: block;
+}
+
+/* Base scroll container helper for screens */
+.screen {
+  display: none;
+  min-height: 100vh;
+  background: var(--bg);
+  flex-direction: column;
+  width: 100% !important;
+  max-width: 100% !important;
+  overflow-x: hidden !important;
+  box-sizing: border-box !important;
+}
+.screen.active {
+  display: flex !important;
+}
+
+/* Sidebar Responsive Logic */
+.sidemenu {
+  position: fixed;
+  top: 0;
+  right: -300px; /* default hidden */
+  width: 280px;
+  height: 100vh;
+  background: #fff;
+  z-index: 100100;
+  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid rgba(0,0,0,0.08);
+}
+.sidemenu.open {
+  right: 0 !important;
+}
+
+/* Desktop Pinned Sidebar - On Screens >= 1025px (Computer) */
+@media (min-width: 1025px) {
   .sidemenu {
-    position: absolute !important;
-    height: 100% !important;
-    width: 100% !important;
-  }
-  .popup-ov {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
+    position: fixed !important;
     right: 0 !important;
-    bottom: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-  }
-  #splash {
-    position: absolute !important;
     top: 0 !important;
-    left: 0 !important;
-    right: 0 !important;
     bottom: 0 !important;
+    width: 280px !important;
+    height: 100vh !important;
+    display: flex !important;
+    box-shadow: none !important;
+    border-left: 1px solid rgba(0,0,0,0.08) !important;
+    z-index: 1000 !important;
+    transform: none !important;
+  }
+  /* Since it is pinned, hide close button & show menu naturally */
+  .sm-close {
+    display: none !important;
+  }
+  .tb-menu {
+    display: none !important;
+  }
+  /* Offset content for the pinned sidebar on desktop */
+  .screen {
+    padding-right: 280px !important;
     width: 100% !important;
-    height: 100% !important;
+    max-width: 100% !important;
+  }
+  /* Topbar fixed width alongside pinned sidebar */
+  .topbar {
+    right: 280px !important;
+    left: 0 !important;
+    width: auto !important;
+  }
+  /* Bottom navigation is hidden on desktop because sidebar is always open */
+  .bnav {
+    display: none !important;
+  }
+  .content {
+    padding-bottom: 24px !important; /* No extra spacing needed for bottom nav on desktop */
+  }
+  .overlay.show {
+    display: none !important; /* No overlay on desktop */
+  }
+}
+
+/* Modern Centric Wrapper for General Sections on Computer */
+.home-body {
+  max-width: 1000px !important;
+  margin: 0 auto !important;
+  width: 100% !important;
+}
+
+/* Global Responsive Grid Column Specification */
+.cats-grid, .pgrid {
+  display: grid !important;
+  grid-template-columns: 1fr !important; /* Mobile (Phone): Single Column by default! */
+  gap: 16px !important;
+  padding: 16px !important;
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+}
+
+/* Tablets (min-width: 768px): 2 columns */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .cats-grid, .pgrid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 16px !important;
+  }
+}
+
+/* Computers (min-width: 1025px): 4 columns */
+@media (min-width: 1025px) {
+  .cats-grid, .pgrid {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 20px !important;
+    padding: 24px !important;
+  }
+}
+
+/* Computer Large (min-width: 1440px): 5 columns */
+@media (min-width: 1440px) {
+  .cats-grid, .pgrid {
+    grid-template-columns: repeat(5, 1fr) !important;
+  }
+}
+
+/* Stores List (slist) responsive style */
+.slist {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+  padding: 16px 16px 80px !important;
+  width: 100% !important;
+  max-width: 1200px !important;
+  margin: 0 auto !important;
+}
+
+@media (min-width: 768px) {
+  .slist {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+}
+
+@media (min-width: 1200px) {
+  .slist {
+    grid-template-columns: repeat(3, 1fr) !important;
   }
 }
 
@@ -357,13 +451,14 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .back-btn{background:rgba(255,255,255,.2);border:none;color:#fff;padding:7px 10px;border-radius:9px;cursor:pointer;font-size:15px;font-family:'Cairo',sans-serif}
 
 /* Responsive adjustments for smaller screens */
-@media screen and (max-width: 640px) {
+@media screen and (max-width: 767px) {
   .btn-gm, .btn-p, .btn-s, .btn-wa {
     max-width: 100%;
   }
   .cats-grid, .pgrid {
+    grid-template-columns: 1fr !important; /* Force 1 column on mobile phones */
     padding: 10px 10px 80px;
-    gap: 8px;
+    gap: 12px;
   }
   .home-body {
     padding: 16px 12px;
@@ -390,11 +485,6 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     height: 120px;
     font-size: 38px;
   }
-  .cats-grid, .pgrid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    padding: 8px 8px 80px;
-  }
   .comm-grid {
     grid-template-columns: repeat(2, 1fr);
     gap: 6px;
@@ -408,9 +498,6 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 @media screen and (max-width: 360px) {
   .home-title {
     font-size: 18px;
-  }
-  .cats-grid, .pgrid {
-    grid-template-columns: 1fr; /* Single column for extremely small screens to prevent clipping */
   }
   .wchips {
     grid-template-columns: repeat(auto-fill, minmax(85px, 1fr));
