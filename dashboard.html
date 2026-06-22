@@ -96,7 +96,7 @@
     background: var(--bg2);
     border-left: 1px solid var(--border);
     display: flex; flex-direction: column;
-    z-index: 200; transition: right 0.3s ease;
+    z-index: 200; transition: transform 0.3s ease, visibility 0.3s ease;
   }
   .sidebar-head {
     padding: 18px 14px;
@@ -519,9 +519,18 @@
   }
   .chat-send:hover { background: var(--green-light); }
 
-  @media (max-width: 768px) {
-    #sidebar { right: -230px; }
-    #sidebar.open { right: 0; box-shadow: -8px 0 32px rgba(0,0,0,0.5); }
+  @media (max-width: 1024px) {
+    #sidebar {
+      right: 0 !important;
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s !important;
+    }
+    #sidebar.open {
+      transform: translateX(0) !important;
+      visibility: visible !important;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.5) !important;
+    }
     #topbar { right: 0; }
     #main { margin-right: 0; }
     #menuBtn { display: flex !important; }

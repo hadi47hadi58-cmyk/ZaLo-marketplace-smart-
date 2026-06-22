@@ -136,7 +136,7 @@
     border-left: 1px solid var(--border);
     display: flex; flex-direction: column;
     z-index: 100;
-    transition: right 0.3s;
+    transition: transform 0.3s, visibility 0.3s;
   }
   .sidebar-logo {
     padding: 20px 16px;
@@ -528,8 +528,17 @@
   .toggle.on::after { right: calc(100% - 21px); }
 
   @media (max-width: 1024px) {
-    #sidebar { right: -240px; }
-    #sidebar.open { right: 0; }
+    #sidebar {
+      right: 0 !important;
+      transform: translateX(100%);
+      visibility: hidden;
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s !important;
+    }
+    #sidebar.open {
+      transform: translateX(0) !important;
+      visibility: visible !important;
+      box-shadow: -8px 0 32px rgba(0,0,0,0.5) !important;
+    }
     #topbar { right: 0; }
     #main { margin-right: 0; }
     .chart-grid { grid-template-columns: 1fr; }

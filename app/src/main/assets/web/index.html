@@ -63,19 +63,22 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .sidemenu {
   position: fixed;
   top: 0;
-  right: -300px; /* default hidden */
+  right: 0; /* aligned to the right edge */
   width: 280px;
   height: 100vh;
   background: #fff;
   z-index: 100100;
-  transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateX(100%); /* completely offscreen */
+  visibility: hidden; /* avoid layout scale out and scrolling gutter issues */
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), visibility 0.3s;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   border-left: 1px solid rgba(0,0,0,0.08);
 }
 .sidemenu.open {
-  right: 0 !important;
+  transform: translateX(0) !important;
+  visibility: visible !important;
 }
 
 /* Desktop Pinned Sidebar - On Screens >= 1025px (Computer) */
@@ -88,10 +91,11 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     width: 280px !important;
     height: 100vh !important;
     display: flex !important;
+    transform: none !important; /* disabled transform on desktop */
+    visibility: visible !important; /* disabled visibility hidden on desktop */
     box-shadow: none !important;
     border-left: 1px solid rgba(0,0,0,0.08) !important;
     z-index: 1000 !important;
-    transform: none !important;
   }
   /* Since it is pinned, hide close button & show menu naturally */
   .sm-close {
