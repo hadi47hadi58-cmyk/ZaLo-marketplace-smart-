@@ -24,6 +24,66 @@
 :root{--g1:#1a5c2a;--g2:#2d7a3a;--g3:#3d9e4e;--gold:#c9a84c;--gold2:#e8c97a;--bg:#fafafa;--white:#fff;--text:#1a1a1a;--gray:#666;--bd:#e0e0e0;--red:#e53935}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;max-width:100%}
+
+@media (min-width: 641px) {
+  html {
+    background: radial-gradient(circle at center, #1b3823 0%, #07130b 100%) !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  body {
+    width: 410px !important;
+    height: 860px !important;
+    max-height: calc(100vh - 40px) !important;
+    position: relative !important;
+    margin: 0 auto !important;
+    background: var(--bg) !important;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6) !important;
+    border: 10px solid #1c2b20 !important;
+    border-radius: 38px !important;
+    overflow: hidden !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  .screen {
+    min-height: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+  }
+  .bnav {
+    position: absolute !important;
+    width: 100% !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+  .topbar {
+    position: sticky !important;
+    width: 100% !important;
+  }
+  .sidemenu {
+    position: absolute !important;
+    height: 100% !important;
+  }
+  .overlay {
+    position: absolute !important;
+  }
+  .toast {
+    position: absolute !important;
+    bottom: 80px !important;
+    width: 90% !important;
+    left: 5% !important;
+  }
+}
 #splash{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
 #splash.hide{opacity:0;pointer-events:none}
 .sp-img{width:180px;height:180px;object-fit:contain;filter:drop-shadow(0 0 30px rgba(201,168,76,.6));animation:spPop .9s cubic-bezier(.34,1.56,.64,1) both}
@@ -782,12 +842,16 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   <div class="topbar">
     <button class="back-btn" onclick="back()">←</button>
     <div class="tb-center"><div class="tb-title">مركز الإشعارات</div></div>
-    <div style="width:34px"></div>
+    <button onclick="clearAllNotifications()" style="border:none; background:transparent; color:#fff; font-size:18px; cursor:pointer; font-family:'Cairo'; font-weight:700; display:flex; align-items:center; gap:4px; padding:4px;" title="مسح الكل">🗑️ <span style="font-size:11px;">مسح</span></button>
   </div>
-  <div class="content">
-    <div class="notif-list">
-      <div class="nitem unread"><span class="ni">🎉</span><div><div class="nt">مرحباً بك في ZaLo!</div><div class="ns">أهلاً بك في أكبر سوق ذكي مجاني يغطي جميع ولايات الجزائر الـ69.</div></div></div>
-      <div class="nitem unread"><span class="ni">🏪</span><div><div class="nt">افتح متجرك المعتمد الآن</div><div class="ns">زد حجم تجارتك مجاناً واربط متجرك ببريدك وواتسابك الخاص.</div></div></div>
+  <div class="content" style="padding: 14px 12px 100px;">
+    <div id="notif-empty-state" style="display:none; text-align:center; padding:50px 20px; color:#c9a84c;">
+      <div style="font-size:48px; margin-bottom:12px;">🔔</div>
+      <p style="font-size:13px; font-weight:700;">لا توجد أي إشعارات جديدة حالياً!</p>
+      <p style="font-size:11px; color:#aaa; margin-top:4px;">تحديثات الشحنات والطلبات ستظهر هنا مباشرة تلقائياً.</p>
+    </div>
+    <div id="notif-dyn-list" class="notif-list">
+      <!-- Dynamic list loaded via JavaScript -->
     </div>
   </div>
 </div>
@@ -2328,12 +2392,40 @@ window.setupRealtimeTrackingListener = function(phone) {
   
   if(window.customerUnsubscribe) window.customerUnsubscribe();
 
-  window.customerUnsubscribe = window._ff.onSnapshot(q, (snap) => {
+  window.customerUnsubscribe = window._db ? window._ff.onSnapshot(q, (snap) => {
     const list = [];
     snap.forEach(docSnap => {
       const data = docSnap.data();
+      const orderId = docSnap.id;
       if(data.phone === phone || (data.phone && data.phone.endsWith(phone)) || (phone.endsWith(data.phone))) {
-        list.push({ id: docSnap.id, ...data });
+        list.push({ id: orderId, ...data });
+        
+        // Dynamic Notification trigger on order status change
+        const statusKey = `zalo_order_status_${orderId}`;
+        const previousStatus = localStorage.getItem(statusKey);
+        const currentStatus = data.status || 'pending';
+        
+        if (previousStatus && previousStatus !== currentStatus) {
+          const productName = data.product || 'شحنة متعددة السلع';
+          let statusText = 'قيد المراجعة والتحقق';
+          let statusIcon = '⏳';
+          if (currentStatus === 'confirmed') { statusText = 'مقبولة وتأكيد حجز البضاعة'; statusIcon = '✅'; }
+          else if (currentStatus === 'left_store') { statusText = 'خرجت الشحنة من المتجر'; statusIcon = '🏪'; }
+          else if (currentStatus === 'in_shipping') { statusText = 'وصلت إلى مركز الفرز الولائي'; statusIcon = '🏢'; }
+          else if (currentStatus === 'out_for_delivery') { statusText = 'مع السائق في الطريق للتسليم'; statusIcon = '🏍️'; }
+          else if (currentStatus === 'delivered') { statusText = 'تم التسليم والتحصيل بنجاح'; statusIcon = '📦'; }
+          else if (currentStatus === 'returned') { statusText = 'تم إلغاء التوصيل أو رفض الشحنة'; statusIcon = '❌'; }
+          else if (currentStatus === 'accepted') { statusText = 'مقيدة وبانتظار الخروج للتوصيل'; statusIcon = '⚙️'; }
+          
+          if (typeof window.addNotification === 'function') {
+            window.addNotification(
+              `تحديث الطلب #${orderId.substring(0,6)}`,
+              `تغيرت حالة سلعتك (${productName}) إلى: ${statusText}`,
+              statusIcon
+            );
+          }
+        }
+        localStorage.setItem(statusKey, currentStatus);
       }
     });
     
@@ -2376,7 +2468,7 @@ window.setupRealtimeTrackingListener = function(phone) {
         </div>
       `;
     }).join('');
-  });
+  }) : null;
 };
 
 window.renderTrackingTimeline = function(order) {
@@ -2435,6 +2527,222 @@ window.renderTrackingTimeline = function(order) {
   return html;
 };
 
+// ====== DYNAMIC NOTIFICATIONS SYSTEM ======
+window.playNotificationBeep = function() {
+  try {
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gainNode1 = audioCtx.createGain();
+    const gainNode2 = audioCtx.createGain();
+    
+    osc1.connect(gainNode1);
+    gainNode1.connect(audioCtx.destination);
+    
+    osc1.frequency.setValueAtTime(880, audioCtx.currentTime);
+    gainNode1.gain.setValueAtTime(0.12, audioCtx.currentTime); 
+    gainNode1.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.15);
+    
+    osc1.start();
+    osc1.stop(audioCtx.currentTime + 0.15);
+    
+    setTimeout(() => {
+      osc2.connect(gainNode2);
+      gainNode2.connect(audioCtx.destination);
+      osc2.frequency.setValueAtTime(1046.50, audioCtx.currentTime);
+      gainNode2.gain.setValueAtTime(0.12, audioCtx.currentTime);
+      gainNode2.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+      osc2.start();
+      osc2.stop(audioCtx.currentTime + 0.3);
+    }, 100);
+  } catch(e) {
+    console.warn("AudioContext warning:", e);
+  }
+};
+
+window.getNotifications = function() {
+  const data = localStorage.getItem('zalo_notifications_list_v2');
+  if (data) {
+    try {
+      return JSON.parse(data);
+    } catch(e) {
+      return [];
+    }
+  }
+  const onboarding = [
+    {
+      id: "init_1",
+      title: "مرحباً بك في ZaLo! 🏛️",
+      text: "أهلاً بك في أكبر سوق ذكي دائم ومجاني لخدمة المتاجر والسائقين وتوصيل الشحنات عبر 69 ولاية جزائرية.",
+      icon: "🎉",
+      read: false,
+      timestamp: Date.now() - 600000
+    },
+    {
+      id: "init_2",
+      title: "تتبع شحنتك بثوانٍ 📦",
+      text: "أدخل رقم هاتفك في صفحة 'طلباتي' لمتابعة حالة شاحنتك بنظام التنبيه والرنين المباشر فور تغيرها من تاجر أو سائق.",
+      icon: "🔔",
+      read: false,
+      timestamp: Date.now() - 3600000
+    }
+  ];
+  localStorage.setItem('zalo_notifications_list_v2', JSON.stringify(onboarding));
+  return onboarding;
+};
+
+window.saveNotifications = function(list) {
+  localStorage.setItem('zalo_notifications_list_v2', JSON.stringify(list));
+  updateBellBadge();
+  renderNotifications();
+};
+
+window.addNotification = function(title, text, icon = "🔔") {
+  const list = getNotifications();
+  const duplicate = list.find(n => n.title === title && n.text === text && (Date.now() - n.timestamp < 300000));
+  if (duplicate) return;
+
+  const notif = {
+    id: "notif_" + Math.random().toString(36).substring(2, 9),
+    title,
+    text,
+    icon,
+    read: false,
+    timestamp: Date.now()
+  };
+  list.unshift(notif);
+  saveNotifications(list);
+  playNotificationBeep();
+  showElegantToast(icon + " " + title, text);
+};
+
+window.showElegantToast = function(title, body) {
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.style.cssText = `
+    position: fixed;
+    bottom: 82px;
+    left: 12px;
+    right: 12px;
+    background: rgba(8, 14, 10, 0.95);
+    border: 1.5px solid var(--gold);
+    border-radius: 14px;
+    padding: 12px 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    color: #fff;
+    direction: rtl;
+    text-align: right;
+    z-index: 999999;
+    font-family: 'Cairo';
+    animation: slideUpToast 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+  `;
+  
+  if (!document.getElementById('toast-anim-css')) {
+    const style = document.createElement('style');
+    style.id = 'toast-anim-css';
+    style.innerHTML = `
+      @keyframes slideUpToast {
+        from { transform: translateY(120%); opacity: 0; }
+        to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes fadeOutToast {
+        to { opacity: 0; transform: scale(0.95); }
+      }
+    `;
+    document.head.appendChild(style);
+  }
+  
+  toast.innerHTML = `
+    <div style="font-size: 13px; font-weight: 800; color: var(--gold2); display: flex; align-items:center; gap: 6px; margin-bottom: 2px;">${title}</div>
+    <div style="font-size: 11px; opacity: 0.9; line-height: 1.4;">${body}</div>
+  `;
+  
+  document.body.appendChild(toast);
+  setTimeout(() => {
+    toast.style.animation = 'fadeOutToast 0.4s ease forwards';
+    setTimeout(() => toast.remove(), 450);
+  }, 4500);
+};
+
+window.renderNotifications = function() {
+  const list = getNotifications();
+  const listEl = document.getElementById('notif-dyn-list');
+  const emptyEl = document.getElementById('notif-empty-state');
+  if(!listEl) return;
+
+  if (list.length === 0) {
+    listEl.innerHTML = '';
+    if (emptyEl) emptyEl.style.display = 'block';
+    return;
+  }
+  
+  if (emptyEl) emptyEl.style.display = 'none';
+  listEl.innerHTML = list.map(n => {
+    const timeStr = formatArabicTime(n.timestamp);
+    return `
+      <div class="nitem ${n.read ? '' : 'unread'}" style="position:relative; margin-bottom: 12px; padding: 14px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition:all 0.2s; gap:10px; display:flex;" id="ncell_${n.id}">
+        <span class="ni" style="font-size: 24px; flex-shrink:0;">${n.icon || '🔔'}</span>
+        <div style="flex:1; text-align: right;">
+          <div class="nt" style="font-size: 13px; font-weight: 800; color: var(--text);">${n.title}</div>
+          <div class="ns" style="font-size: 11.5px; color: var(--gray); margin-top: 3px; line-height: 1.4;">${n.text}</div>
+          <div style="margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 10px; color: #aaa; font-weight: 600;">🕒 ${timeStr}</span>
+            <div style="display:flex; gap: 6px;">
+              ${!n.read ? `<button onclick="markNotificationRead('${n.id}')" style="background: rgba(26,92,42,0.1); color: var(--g1); border:none; padding:3px 10px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="تحديد كمقروء">✔ مقروء</button>` : ''}
+              <button onclick="deleteNotification('${n.id}')" style="background: rgba(220,53,69,0.08); color: #dc3545; border:none; padding:3px 8px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="حذف">🗑️</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
+
+window.markNotificationRead = function(id) {
+  const list = getNotifications();
+  const index = list.findIndex(n => n.id === id);
+  if (index !== -1) {
+    list[index].read = true;
+    saveNotifications(list);
+  }
+};
+
+window.deleteNotification = function(id) {
+  const list = getNotifications().filter(n => n.id !== id);
+  saveNotifications(list);
+};
+
+window.clearAllNotifications = function() {
+  saveNotifications([]);
+};
+
+window.updateBellBadge = function() {
+  const list = getNotifications();
+  const unreadCount = list.filter(n => !n.read).length;
+  const badge = document.getElementById('nb');
+  if (badge) {
+    if (unreadCount > 0) {
+      badge.textContent = unreadCount;
+      badge.style.display = 'flex';
+    } else {
+      badge.style.display = 'none';
+    }
+  }
+};
+
+function formatArabicTime(timestamp) {
+  const diff = Date.now() - timestamp;
+  if (diff < 60000) return 'الآن';
+  const mins = Math.floor(diff / 60000);
+  if (mins < 60) return `منذ ${mins} د`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `منذ ${hours} سا`;
+  return new Date(timestamp).toLocaleDateString('ar-DZ', { day: 'numeric', month: 'short' });
+}
+
 // Expose driver functions globally
 window.saveDriverProfile = saveDriverProfile;
 window.logoutDriver = logoutDriver;
@@ -2449,6 +2757,10 @@ window.clearCustomerSession = clearCustomerSession;
 document.addEventListener('DOMContentLoaded',()=>{
   renderW();
   initSecurityLock();
+  try {
+    updateBellBadge();
+    renderNotifications();
+  } catch(e) { console.error('Notifications init error:', e); }
   
   // Checking driver session on app boot
   try {
