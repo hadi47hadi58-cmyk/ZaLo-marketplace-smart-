@@ -26,64 +26,63 @@
 html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;max-width:100%}
 
 @media (min-width: 641px) {
-  body {
+  html {
     background: radial-gradient(circle at center, #1b3823 0%, #07130b 100%) !important;
+    height: 100vh !important;
+    overflow: hidden !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
-  .screen {
-    max-width: 600px !important;
+  body {
+    width: 410px !important;
+    height: 860px !important;
+    max-height: calc(100vh - 40px) !important;
+    position: relative !important;
     margin: 0 auto !important;
     background: var(--bg) !important;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5) !important;
-    border-left: 2px solid rgba(201,168,76,0.2) !important;
-    border-right: 2px solid rgba(201,168,76,0.2) !important;
-    position: relative !important;
-    min-height: 100vh !important;
-    display: none;
-  }
-  .screen.active {
+    box-shadow: 0 25px 50px rgba(0,0,0,0.6) !important;
+    border: 10px solid #1c2b20 !important;
+    border-radius: 38px !important;
+    overflow: hidden !important;
     display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  .screen {
+    min-height: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
   }
   .bnav {
-    position: fixed !important;
+    position: absolute !important;
     width: 100% !important;
-    max-width: 600px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
+    left: 0 !important;
+    right: 0 !important;
     bottom: 0 !important;
   }
   .topbar {
-    position: sticky !important;
+    position: absolute !important;
     top: 0 !important;
     width: 100% !important;
-    max-width: 600px !important;
-    margin: 0 auto !important;
-    z-index: 999 !important;
   }
   .sidemenu {
-    position: fixed !important;
+    position: absolute !important;
     height: 100% !important;
-    max-width: 600px !important;
-    width: 100% !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
   }
   .overlay {
-    position: fixed !important;
-    width: 100% !important;
-    max-width: 600px !important;
-    left: 50% !important;
-    right: auto !important;
-    transform: translateX(-50%) !important;
+    position: absolute !important;
   }
   .toast {
-    position: fixed !important;
-    bottom: 82px !important;
-    max-width: 560px !important;
+    position: absolute !important;
+    bottom: 80px !important;
     width: 90% !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
+    left: 5% !important;
   }
 }
 #splash{position:fixed;top:0;left:0;right:0;bottom:0;background:linear-gradient(160deg,#071a0b,#1a5c2a);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:9999;transition:opacity .8s}
