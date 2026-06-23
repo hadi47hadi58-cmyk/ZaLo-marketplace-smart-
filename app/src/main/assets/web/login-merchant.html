@@ -185,7 +185,7 @@
 
   <!-- LOGO BRAND AREA -->
   <div class="logo-area">
-    <img src="logo.svg" alt="ZaLo" class="logo-img" onerror="this.src='icon-192.svg'" />
+    <img src="assets/logo.svg" alt="ZaLo" class="logo-img" onerror="this.src='assets/icon-192.svg'" />
     <h1 class="brand-title">بوابة التجار والشركاء</h1>
     <p class="brand-subtitle">إدارة المنتجات، الطلبات والمبيعات</p>
   </div>
@@ -215,6 +215,13 @@
 
       <button type="submit" class="submit-btn" id="submitBtn">
         <span>دخول لوحة المتجر</span> <i class="fa-solid fa-circle-arrow-left"></i>
+      </button>
+
+      <div class="separator">حساب تجريبي للاختبار والمراجعة</div>
+
+      <button type="button" class="demo-btn" id="demoBtn">
+        <i class="fa-solid fa-wand-magic-sparkles"></i>
+        <span>الدخول السريع كتاجر تجريبي (Demo)</span>
       </button>
     </form>
 
@@ -255,12 +262,14 @@
 
   async function verifyMerchantAndRedirect(user) {
     try {
+      // Check if a shop doc exists
       const shopSnap = await getDoc(doc(db, 'shops', user.uid));
       if (shopSnap.exists()) {
         window.location.href = 'dashboard.html';
         return;
       }
 
+      // If not, self-heal via merchant_requests
       const uEmail = user.email ? user.email.trim().toLowerCase() : '';
       if (uEmail) {
         let qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail)));
@@ -301,6 +310,7 @@
         }
       }
 
+      // Neither exists! Show alert
       showError("عذراً! الحساب المعروض غير مسجل كتاجر نشط في منصة ZaLo. يرجى تقديم طلب تسجيل متجر أولاً.");
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
@@ -336,6 +346,25 @@
         arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
       }
       showError(arabicError);
+      submitBtn.disabled = false;
+      submitBtn.style.opacity = '1';
+    }
+  });
+
+  document.getElementById('demoBtn').addEventListener('click', async () => {
+    document.getElementById('loginEmail').value = 'merchant@zalo.com';
+    document.getElementById('loginPass').value = '12345678';
+    
+    errorEl.style.display = 'none';
+    submitBtn.disabled = true;
+    submitBtn.style.opacity = '0.7';
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, 'merchant@zalo.com', '12345678');
+      await verifyMerchantAndRedirect(cred.user);
+    } catch (error) {
+      console.error(error);
+      showError("فشل الدخول السريع بالحساب التجريبي، يرجى إدخال البيانات يدوياً.");
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
     }

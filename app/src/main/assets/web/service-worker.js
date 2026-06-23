@@ -4,10 +4,10 @@ const ASSETS = [
   './index.html',
   './login.html',
   './dashboard.html',
-  './logo.svg',
-  './style.css',
-  './icon-192.svg',
-  './icon-512.svg',
+  './assets/logo.svg',
+  './css/style.css',
+  './assets/icon-192.svg',
+  './assets/icon-512.svg',
   './manifest.json',
   './offline.html'
 ];
@@ -15,7 +15,7 @@ const ASSETS = [
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      // Resilient install: try to cache all but do not brick PWA if one is missing
+      // Resilient install: try to add all but don't fail standard install if one minor asset is missing
       return Promise.allSettled(
         ASSETS.map(asset => {
           return cache.add(asset).catch(err => {
@@ -47,6 +47,7 @@ self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
 
   const url = new URL(e.request.url);
+  // Keep external requests (like Firebase SDKs CDN, maps, etc.) online-only or handle gracefully
   if (url.origin !== self.location.origin) {
     return;
   }
@@ -54,6 +55,7 @@ self.addEventListener('fetch', (e) => {
   e.respondWith(
     fetch(e.request)
       .then((response) => {
+        // Cache newly fetched valid asset responses
         if (response && response.status === 200 && response.type === 'basic') {
           const responseToCache = response.clone();
           caches.open(CACHE_NAME).then((cache) => {
@@ -63,6 +65,7 @@ self.addEventListener('fetch', (e) => {
         return response;
       })
       .catch(() => {
+        // Fallback strategy: check cache first, then if HTML, render offline page
         return caches.match(e.request).then((cachedResponse) => {
           if (cachedResponse) {
             return cachedResponse;

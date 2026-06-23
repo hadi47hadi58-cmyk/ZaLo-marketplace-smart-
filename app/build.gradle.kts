@@ -132,3 +132,5 @@ val copyWebAssets by tasks.registering(Copy::class) {
 tasks.matching { it.name.startsWith("preBuild") }.configureEach {
     dependsOn(copyWebAssets)
 }
+
+

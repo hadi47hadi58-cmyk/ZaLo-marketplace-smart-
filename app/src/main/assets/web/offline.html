@@ -173,6 +173,7 @@
   <div class="container">
     <div class="logo-container">
       <div class="logo-glow"></div>
+      <!-- Adaptive Vector Logo embedded -->
       <svg class="logo-svg" viewBox="0 0 192 192">
         <defs>
           <linearGradient id="gBg" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -211,15 +212,18 @@
       const btn = document.querySelector('.btn-retry');
       const icon = btn.querySelector('i');
       
+      // Add loading state style
       btn.style.opacity = '0.7';
       btn.style.pointerEvents = 'none';
       icon.classList.add('fa-spin');
       
       setTimeout(() => {
+        // Reload page to test connection
         window.location.reload();
       }, 800);
     }
 
+    // Automatically retry once network connection is recovered
     window.addEventListener('online', () => {
       window.location.reload();
     });

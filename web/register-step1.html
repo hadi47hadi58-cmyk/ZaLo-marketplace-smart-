@@ -213,6 +213,7 @@
   function selectType(type) {
     document.getElementById('userType').value = type;
     document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
+    // Since we handle both admin and merchant or customer, admin cannot self sign-up here (restricted)
     event.currentTarget.classList.add('selected');
   }
 
