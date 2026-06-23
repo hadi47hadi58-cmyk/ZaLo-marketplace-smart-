@@ -8,27 +8,29 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root {
-    --green: #1a5c2a;
-    --green-light: #2d7a3a;
-    --green-dark: #071a0b;
-    --gold: #c9a84c;
-    --bg: #0a0f0d;
-    --bg2: #111a14;
-    --bg3: #162019;
-    --card: #1a2820;
-    --border: #2a3d30;
-    --text: #e8f0ea;
-    --text2: #9ab8a0;
-    --red: #e53935;
-    --blue: #1976d2;
-    --orange: #f57c00;
+    --brand-green: oklch(0.35 0.08 145);
+    --brand-gold: oklch(0.72 0.13 75);
+    --green: oklch(0.35 0.08 145);
+    --green-light: oklch(0.42 0.09 145);
+    --green-dark: oklch(0.20 0.05 145);
+    --gold: oklch(0.72 0.13 75);
+    --bg: #f8fafc;
+    --bg2: #ffffff;
+    --bg3: #f1f5f9;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #0f172a;
+    --text2: #475569;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --orange: #f97316;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   html, body {
     font-family: 'Cairo', sans-serif;
     background: var(--bg);
     color: var(--text);
-    min-height: 100vh;
+    min-height: 100dvh;
     overflow-x: hidden;
     width: 100%;
     max-width: 100%;
@@ -42,7 +44,7 @@
       bottom: 0 !important;
       right: 0 !important;
       width: 240px !important;
-      height: 100vh !important;
+      height: 100dvh !important;
       display: flex !important;
       box-shadow: none !important;
       border-left: 1px solid rgba(0,0,0,0.08) !important;
@@ -60,7 +62,7 @@
       width: calc(100% - 240px) !important;
       margin-top: 58px !important;
       padding: 24px !important;
-      height: calc(100vh - 58px) !important;
+      height: calc(100dvh - 58px) !important;
       overflow-y: auto !important;
     }
     #topbar {
@@ -222,7 +224,7 @@
     margin-right: 240px;
     margin-top: 60px;
     padding: 20px;
-    min-height: calc(100vh - 60px);
+    min-height: calc(100dvh - 60px);
   }
 
   .page { display: none; }

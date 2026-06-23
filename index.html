@@ -22,12 +22,26 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
-:root{--g1:#1a5c2a;--g2:#2d7a3a;--g3:#3d9e4e;--gold:#c9a84c;--gold2:#e8c97a;--bg:#fafafa;--white:#fff;--text:#1a1a1a;--gray:#666;--bd:#e0e0e0;--red:#e53935}
+:root {
+  --brand-green: oklch(0.35 0.08 145);
+  --brand-gold: oklch(0.72 0.13 75);
+  --g1: oklch(0.35 0.08 145);
+  --g2: oklch(0.42 0.09 145);
+  --g3: oklch(0.50 0.10 145);
+  --gold: oklch(0.72 0.13 75);
+  --gold2: oklch(0.80 0.10 75);
+  --bg: #ffffff;
+  --white: #ffffff;
+  --text: #0f172a;
+  --gray: #64748b;
+  --bd: #e2e8f0;
+  --red: #ef4444;
+}
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;width:100%;max-width:100%}
+html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;overflow-x:hidden;width:100%;max-width:100%}
 
 /* Adaptive Responsive System - Replacing mock phone container with a full fluid design */
-html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;margin:0;padding:0;overflow-x:hidden!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}
+html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);min-height:100dvh;margin:0;padding:0;overflow-x:hidden!important;width:100%!important;max-width:100%!important;box-sizing:border-box!important}
 *{box-sizing:border-box !important;-webkit-tap-highlight-color:transparent}
 
 /* Overlay and mobile sidebar resets */
@@ -47,7 +61,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 /* Base scroll container helper for screens */
 .screen {
   display: none;
-  min-height: 100vh;
+  min-height: 100dvh;
   background: var(--bg);
   flex-direction: column;
   width: 100% !important;
@@ -65,7 +79,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   top: 0;
   right: 0; /* aligned to the right edge */
   width: 280px;
-  height: 100vh;
+  height: 100dvh;
   background: #fff;
   z-index: 100100;
   transform: translateX(100%); /* completely offscreen */
@@ -89,7 +103,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     top: 0 !important;
     bottom: 0 !important;
     width: 280px !important;
-    height: 100vh !important;
+    height: 100dvh !important;
     display: flex !important;
     transform: none !important; /* disabled transform on desktop */
     visibility: visible !important; /* disabled visibility hidden on desktop */
@@ -200,30 +214,30 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .sp-bar{margin-top:40px;width:180px;height:4px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden}
 .sp-fill{height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--gold2));animation:loadB 2.2s .6s forwards}
 @keyframes loadB{to{width:100%}}
-.screen{display:none;min-height:100vh;background:var(--bg);flex-direction:column}
+.screen{display:none;min-height:100dvh;background:var(--bg);flex-direction:column}
 .screen.active{display:flex}
-.topbar{background:var(--g1);padding:0 14px;height:60px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.1)}
+.topbar{background:var(--g1);padding:0 14px;height:56px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;position:sticky;top:0;z-index:100;box-shadow:0 2px 10px rgba(0,0,0,0.05)}
 .tb-bell{position:relative;cursor:pointer;font-size:22px;color:#fff}
 .tb-badge{position:absolute;top:-6px;right:-6px;background:var(--red);color:#fff;width:18px;height:18px;border-radius:50%;font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700}
 .tb-center{display:flex;flex-direction:column;align-items:center;flex:1}
-.tb-logo-img{width:36px;height:36px;object-fit:contain;border-radius:50%;border:2px solid var(--gold)}
+.tb-logo-img{width:32px;height:32px;object-fit:contain;border-radius:50%;border:2px solid var(--gold)}
 .tb-title{color:#fff;font-weight:900;font-size:13px;letter-spacing:.5px;margin-top:1px}
 .tb-menu{cursor:pointer;display:flex;flex-direction:column;gap:5px;width:48px;height:48px;align-items:center;justify-content:center;z-index:9999;box-sizing:border-box}
 .tb-menu *{pointer-events:none}
 .tb-menu span{display:block;width:24px;height:3px;background:#fff;border-radius:2px}
 .ptbar{background:var(--g1);padding:10px 14px 14px;text-align:center;flex-shrink:0}
 .ptbar h2{color:#fff;font-size:16px;font-weight:800}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--g1);display:flex;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,0.1)}
-.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:10px 2px;cursor:pointer;border-top:3px solid transparent;min-width:0;overflow:hidden}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--g1);display:flex;height:56px;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;cursor:pointer;border-top:3px solid transparent;min-width:0;overflow:hidden}
 .bn.on{border-top-color:var(--gold)}
-.bni{font-size:20px;color:rgba(255,255,255,.7)}
-.bnl{font-size:9px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.bni{font-size:18px;color:rgba(255,255,255,.7)}
+.bnl{font-size:9px;color:rgba(255,255,255,.7);margin-top:1px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
 .bn.on .bni,.bn.on .bnl{color:#fff}
 .content{flex:1;overflow-y:auto;padding-bottom:70px}
-.home-body{display:flex;flex-direction:column;align-items:center;padding:24px 16px;background:#fff;min-height:calc(100vh - 130px)}
-.home-logo-box{width:120px;height:120px;background:#f5f5f5;border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:14px;box-shadow:0 3px 15px rgba(0,0,0,.15)}
-.home-logo-box img{width:104px;height:104px;object-fit:contain}
-.home-title{font-size:24px;font-weight:900;color:var(--text);text-align:center;line-height:1.3;margin-bottom:18px}
+.home-body{display:flex;flex-direction:column;align-items:center;padding:20px 16px;background:var(--bg);min-height:calc(100dvh - 112px);gap:12px;}
+.home-logo-box{width:96px;height:96px;background:#f8fafc;border-radius:20px;display:flex;align-items:center;justify-content:center;margin-bottom:4px;box-shadow:0 3px 15px rgba(0,0,0,.05);border:1px solid var(--bd)}
+.home-logo-box img{width:80px;height:80px;object-fit:contain}
+.home-title{font-size:22px;font-weight:900;color:var(--text);text-align:center;line-height:1.3;margin-bottom:4px}
 .btn-gm{width:100%;max-width:320px;background:linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%);color:#fff;border:none;border-radius:18px;padding:16px;font-family:'Cairo',sans-serif;font-size:14.5px;font-weight:800;cursor:pointer;margin-bottom:14px;display:flex;align-items:center;justify-content:center;gap:8px;transition:all 0.2s cubic-bezier(0.4, 0, 0.2, 1);box-shadow:0 6px 20px rgba(26,92,42,0.2)}
 .btn-gm:active{transform:scale(.98);filter:brightness(1.15)}
 .home-circles{display:flex;flex-wrap:wrap;gap:16px;margin-top:24px;justify-content:center;width:100%;max-width:340px}
@@ -593,46 +607,95 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 </div>
 <!-- HOME -->
 <div id="s-home" class="screen active">
-  <div class="topbar">
-    <div class="tb-bell" onclick="G('notif')">🔔<div class="tb-badge" id="nb">2</div></div>
+  <div class="topbar" style="height: 56px;">
+    <div class="tb-bell" onclick="G('notif')">🔔<div class="tb-badge" id="nb">0</div></div>
     <div class="tb-center">
       <img class="tb-logo-img" src="logo.svg" alt="" onerror="this.src='https://placehold.co/40x40/1a5c2a/white?text=ZaLo'">
-      <div class="tb-title">ZaLo smart marketplace</div>
+      <div class="tb-title">ZaLo السوق الذكي</div>
     </div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
   <div class="content">
-    <div class="home-body">
-      <div class="home-logo-box"><img src="logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/120x120/1a5c2a/white?text=ZaLo'"></div>
-      <div class="home-title">ZaLo<br>السوق الذكي الجزائري</div>
-      <button class="btn-gm" onclick="G('wilayas')"><i class="fa-solid fa-bag-shopping" style="margin-left:6px"></i> تسوق في كل الولايات الـ69 الآن</button>
-      <div class="home-circles">
-        <div class="hcircle" onclick="G('cats')">
-          <div class="hcircle-icon" style="font-size:24px"><i class="fa-solid fa-grip"></i></div>
-          <div class="hcircle-label">جميع الأقسام</div>
+    <div class="home-body" style="padding: 16px; gap: 12px;">
+      <!-- Small Logo -->
+      <img src="logo.svg" style="height: 48px; width: 48px; object-fit: contain; margin: 0 auto; display: block;" alt="ZaLo" onerror="this.src='https://placehold.co/48x48/1a5c2a/white?text=ZaLo'">
+      
+      <!-- text-xl Heading -->
+      <h1 class="home-title" style="font-size: 20px; font-weight: 900; color: var(--g1); text-align: center; margin-bottom: 4px;">ZaLo السوق الذكي</h1>
+      
+      <!-- Button "تسوق في 58 ولاية" -->
+      <button class="btn-gm" onclick="G('wilayas')" style="width: 100%; max-width: 340px; margin: 0 auto; height: 48px; border-radius: 14px; background: var(--g1); font-weight: 800; font-size: 14px; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(26,92,42,0.15);">
+        <i class="fa-solid fa-location-dot"></i> تسوق في 58 ولاية الآن
+      </button>
+      
+      <!-- Network Icons Grid - styled beautifully (height 14 equivalent / h-14) -->
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 340px; margin: 0 auto;">
+        <div onclick="G('cats')" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <i class="fa-solid fa-grip" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
+          <span style="font-size: 9px; font-weight: bold; color: var(--text);">الأقسام</span>
         </div>
-        <div class="hcircle" onclick="G('all-prods')">
-          <div class="hcircle-icon" style="font-size:24px"><i class="fa-solid fa-box-open"></i></div>
-          <div class="hcircle-label">جميع المنتجات</div>
+        <div onclick="G('all-prods')" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <i class="fa-solid fa-box-open" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
+          <span style="font-size: 9px; font-weight: bold; color: var(--text);">المنتجات</span>
+        </div>
+        <div onclick="focusHomeTracker()" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <i class="fa-solid fa-route" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
+          <span style="font-size: 9px; font-weight: bold; color: var(--text);">التتبع الفوري</span>
+        </div>
+        <div onclick="G('driver-portal')" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <i class="fa-solid fa-motorcycle" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
+          <span style="font-size: 9px; font-weight: bold; color: var(--text);">السائقين</span>
         </div>
       </div>
-      <!-- PROMO BANNER FOR REGISTERING NEW MERCHANTS ACCORDING TO USER INTENT -->
-      <div style="background: linear-gradient(135deg, var(--g1) 0%, var(--g2) 100%); border: 1.5px solid var(--gold); border-radius: 14px; padding: 20px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 12px; margin-top: 24px; max-width: 320px; box-shadow: 0 4px 20px rgba(26,92,42,0.15); width: 100%;">
-        <div style="text-align: center;">
-          <h4 style="font-size: 15px; font-weight: 800; color: var(--gold2); margin-bottom: 6px; display: flex; align-items: center; justify-content: center; gap: 8px;">
-            🚀 افتح متجرك وضاعف مبيعاتك
-          </h4>
-          <p style="font-size: 11px; color: rgba(255,255,255,0.9); line-height: 1.5; margin: 0;">
-            ابدأ نشاطك التجاري اليوم! أطلق متجرك الخاص (مرخص أو عمل حر) مجاناً واعرض سلعك لآلاف الزبائن في ولايتك وضاعف مبيعاتك الآن.
-          </p>
-        </div>
-        <button onclick="openLink('register-step1.html')" style="background: var(--gold); color: #071a0b; border-radius: 10px; border: none; font-weight: 950; padding: 10px 18px; font-size: 12px; font-family: 'Cairo', sans-serif; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s; min-height: 40px; box-shadow: 0 4px 15px rgba(201, 168, 76, 0.25); width: 100%;">
-          <span>سجل متجرك وابدأ مجاناً</span> <span>←</span>
+      
+      <!-- Open Your Store Promo Card -->
+      <div style="background: #ffffff; border: 1.5px solid var(--g1); border-radius: 14px; padding: 12px 16px; display: flex; flex-direction: column; align-items: center; text-align: center; gap: 8px; max-width: 340px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(15,23,42,0.04);">
+        <h4 style="font-size: 14px; font-weight: 800; color: var(--g1); margin: 0; display: flex; align-items: center; gap: 6px;">
+          🚀 افتح متجرك وضاعف مبيعاتك مجاناً
+        </h4>
+        <p style="font-size: 10.5px; color: var(--gray); line-height: 1.4; margin: 0;">
+          ابدأ نشاطك التجاري اليوم! أطلق متجرك الخاص عبر 58 ولاية واعرض سلعك لآلاف الزبائن مجاناً.
+        </p>
+        <button onclick="openLink('register-step1.html')" style="background: var(--gold); color: var(--text); border-radius: 10px; border: none; font-weight: 800; padding: 8px 14px; font-size: 11px; font-family: 'Cairo', sans-serif; cursor: pointer; width: 100%; transition: all 0.2s; min-height: 36px; box-shadow: 0 2px 8px rgba(201,168,76,0.2);">
+          سجل متجرك الآن وابدأ ←
         </button>
       </div>
+
+      <!-- Live Order Tracker Section ("واجهة التتبع لـ 69 ولاية") -->
+      <div id="home-tracker-section" style="background: #ffffff; border: 1px solid var(--bd); border-radius: 16px; padding: 14px; max-width: 340px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span style="font-size: 18px;">📍</span>
+          <h3 style="font-size: 14px; font-weight: 800; color: var(--text); margin: 0;">نظام تتبع الشحنات (58 ولاية)</h3>
+        </div>
+        <p style="font-size: 10px; color: var(--gray); line-height: 1.4; margin: 0;">أدخل رقم الهاتف المستخدم في الطلب لتتبع خط سير بضاعتك لحظة بلحظة وبث السائقين.</p>
+        <div style="display: flex; gap: 6px; width: 100%;">
+          <input id="homePhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="flex: 1; text-align: center; font-weight: bold; border-radius: 10px; border: 1px solid var(--bd); background: #f8fafc; font-size: 12px; height: 38px; margin: 0; padding: 0 8px;" type="tel">
+          <button onclick="searchHomeOrders()" style="background: var(--g1); color: #fff; border: none; border-radius: 10px; padding: 0 14px; font-weight: bold; font-family: 'Cairo'; font-size: 11px; cursor: pointer; height: 38px;">بحث 🔍</button>
+        </div>
+        <div id="homeActivePhoneBadge" style="display: none; font-size: 10px; font-weight: bold; color: var(--gold); text-align: center;">
+          🟢 متابعة الرقم: <span id="homeActivePhoneVal"></span> | <span onclick="clearHomeTrackerSession()" style="color: var(--red); cursor: pointer; text-decoration: underline;">إلغاء</span>
+        </div>
+        <div id="home-tracking-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;"></div>
+      </div>
+
+      <!-- Live Notifications Section ("واجهة الإشعارات في الصفحة الرئيسية") -->
+      <div style="background: #ffffff; border: 1px solid var(--bd); border-radius: 16px; padding: 14px; max-width: 340px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 18px;">🔔</span>
+            <h3 style="font-size: 14px; font-weight: 800; color: var(--text); margin: 0;">آخر الإشعارات والتنبيهات</h3>
+          </div>
+          <span id="home-notif-badge" style="background: var(--red); color: white; border-radius: 10px; padding: 1px 6px; font-size: 9px; font-weight: bold; display: none;">0 جديد</span>
+        </div>
+        <div id="home-notif-list" style="display: flex; flex-direction: column; gap: 8px;">
+          <div style="text-align: center; color: var(--gray); font-size: 11px; padding: 10px 0;">لا توجد تنبيهات جديدة حالياً.</div>
+        </div>
+        <button onclick="G('notif')" style="background: none; border: none; color: var(--g1); font-size: 11px; font-weight: bold; cursor: pointer; padding: 4px 0; text-align: center; font-family: 'Cairo';">عرض سجل الإشعارات بالكامل ←</button>
+      </div>
+
     </div>
   </div>
-  <div class="bnav">
+  <div class="bnav" style="height: 56px;">
     <div class="bn on" onclick="G('home')"><div class="bni"><i class="fa-solid fa-house"></i></div><div class="bnl">الرئيسية</div></div>
     <div class="bn" onclick="G('myorders')"><div class="bni"><i class="fa-solid fa-bag-shopping"></i></div><div class="bnl">طلباتي</div></div>
     <div class="bn" onclick="G('wilayas')"><div class="bni"><i class="fa-solid fa-location-dot"></i></div><div class="bnl">الولايات</div></div>
@@ -2458,16 +2521,58 @@ window.driverUpdateStatus = async function(orderId, nextStatus) {
 };
 
 // Customer Tracking Operations
-window.clearCustomerSession = function() {
+window.focusHomeTracker = function() {
+  const section = document.getElementById('home-tracker-section');
+  if (section) {
+    section.scrollIntoView({ behavior: 'smooth' });
+    const input = document.getElementById('homePhoneInput');
+    if (input) {
+      input.focus();
+      input.style.borderColor = 'var(--g1)';
+      setTimeout(() => input.style.borderColor = 'var(--bd)', 1500);
+    }
+  }
+};
+
+window.searchHomeOrders = function() {
+  const phone = document.getElementById('homePhoneInput').value.trim();
+  if(!phone || phone.length < 8) {
+    alert('⚠️ يرجى كتابة رقم هاتف صحيح لعرض طلبات المشحونة');
+    return;
+  }
+  localStorage.setItem('zalo_customer_tracked_phone', phone);
+  const cInput = document.getElementById('cPhoneInput');
+  if(cInput) cInput.value = phone;
+  setupRealtimeTrackingListener(phone);
+};
+
+window.clearHomeTrackerSession = function() {
   localStorage.removeItem('zalo_customer_tracked_phone');
-  document.getElementById('cActivePhoneBadge').style.display = 'none';
-  document.getElementById('cPhoneInput').value = '';
-  document.getElementById('mo-empty').style.display = 'block';
-  document.getElementById('mo-list').innerHTML = '';
+  
+  const hBadge = document.getElementById('homeActivePhoneBadge');
+  if (hBadge) hBadge.style.display = 'none';
+  const hInput = document.getElementById('homePhoneInput');
+  if (hInput) hInput.value = '';
+  const hList = document.getElementById('home-tracking-list');
+  if (hList) hList.innerHTML = '';
+  
+  const cBadge = document.getElementById('cActivePhoneBadge');
+  if (cBadge) cBadge.style.display = 'none';
+  const cInput = document.getElementById('cPhoneInput');
+  if (cInput) cInput.value = '';
+  const moList = document.getElementById('mo-list');
+  if (moList) moList.innerHTML = '';
+  const moEmpty = document.getElementById('mo-empty');
+  if (moEmpty) moEmpty.style.display = 'block';
+
   if(window.customerUnsubscribe) {
     window.customerUnsubscribe();
     window.customerUnsubscribe = null;
   }
+};
+
+window.clearCustomerSession = function() {
+  window.clearHomeTrackerSession();
 };
 
 window.searchCustomerOrders = function() {
@@ -2477,17 +2582,41 @@ window.searchCustomerOrders = function() {
     return;
   }
   localStorage.setItem('zalo_customer_tracked_phone', phone);
+  const hInput = document.getElementById('homePhoneInput');
+  if(hInput) hInput.value = phone;
   setupRealtimeTrackingListener(phone);
 };
 
 window.setupRealtimeTrackingListener = function(phone) {
-  document.getElementById('cActivePhoneBadge').style.display = 'block';
-  document.getElementById('cActivePhoneVal').textContent = phone;
+  // Update My Orders screen elements if they exist
+  const cBadge = document.getElementById('cActivePhoneBadge');
+  const cVal = document.getElementById('cActivePhoneVal');
+  const cInput = document.getElementById('cPhoneInput');
+  if (cBadge) cBadge.style.display = 'block';
+  if (cVal) cVal.textContent = phone;
+  if (cInput) cInput.value = phone;
+
+  // Update Home Screen elements if they exist
+  const hBadge = document.getElementById('homeActivePhoneBadge');
+  const hVal = document.getElementById('homeActivePhoneVal');
+  const hInput = document.getElementById('homePhoneInput');
+  if (hBadge) hBadge.style.display = 'block';
+  if (hVal) hVal.textContent = phone;
+  if (hInput) hInput.value = phone;
   
   const listEl = document.getElementById('mo-list');
   const emptyEl = document.getElementById('mo-empty');
-  listEl.innerHTML = '<div style="text-align:center;padding:30px;color:#888;"><div class="spinner" style="margin: 0 auto 10px;"></div>جاري البحث والمزامنة المباشرة...</div>';
-  emptyEl.style.display = 'none';
+  if (listEl) {
+    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:#888;"><div class="spinner" style="margin: 0 auto 10px;"></div>جاري البحث والمزامنة المباشرة...</div>';
+  }
+  if (emptyEl) {
+    emptyEl.style.display = 'none';
+  }
+
+  const hListEl = document.getElementById('home-tracking-list');
+  if (hListEl) {
+    hListEl.innerHTML = '<div style="text-align:center;padding:12px;color:#888;font-size:11px;">جاري المزامنة المباشرة...</div>';
+  }
 
   const db = window._db;
   const q = window._ff.query(window._ff.collection(db, 'orders'));
@@ -2532,14 +2661,18 @@ window.setupRealtimeTrackingListener = function(phone) {
     });
     
     if(list.length === 0) {
-      emptyEl.style.display = 'block';
-      emptyEl.innerHTML = '<div class="ei">📦</div><p style="font-size:12px;color:#888;">لم يتم العثور على أي طلبيات مسجلة تحت الهاتف ' + phone + '</p>';
-      listEl.innerHTML = '';
+      if (emptyEl) {
+        emptyEl.style.display = 'block';
+        emptyEl.innerHTML = '<div class="ei">📦</div><p style="font-size:12px;color:#888;">لم يتم العثور على أي طلبيات مسجلة تحت الهاتف ' + phone + '</p>';
+      }
+      if (listEl) listEl.innerHTML = '';
+      if (hListEl) hListEl.innerHTML = '<div style="text-align:center;color:#888;font-size:11px;padding:10px 0;">لم يتم العثور على أي طلبيات مسجلة تحت هذا الرقم.</div>';
       return;
     }
     
-    emptyEl.style.display = 'none';
-    listEl.innerHTML = list.map(o => {
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    const renderedHTML = list.map(o => {
       const timelineHTML = renderTrackingTimeline(o);
       
       const drHTML = o.driverName ? `
@@ -2547,8 +2680,8 @@ window.setupRealtimeTrackingListener = function(phone) {
           <div style="font-size:11px; font-weight:700; color:var(--g1); margin-bottom:4px;">👤 سائق التوصيل المعيد والمطالب بالشحنة:</div>
           <div style="font-size:12px; font-weight:800; color:var(--text);">${o.driverName}</div>
           <div style="margin-top:4px; display:flex; gap:6px;">
-            <a href="tel:${o.driverPhone}" style="background:var(--g1); color:#fff; border-radius:6px; padding:3px 8px; font-size:10px; font-weight:bold; display:inline-block;">📞 اتصل بالسائق</a>
-            <a href="https://wa.me/213${o.driverPhone.replace(/^0/,'')}" target="_blank" style="background:#25d366; color:#fff; border-radius:6px; padding:3px 8px; font-size:10px; font-weight:bold; display:inline-block;">💬 تواصل واتساب</a>
+            <a href="tel:${o.driverPhone}" style="background:var(--g1); color:#fff; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:bold; display:inline-block; text-decoration:none;">📞 اتصل بالسائق</a>
+            <a href="https://wa.me/213${o.driverPhone.replace(/^0/,'')}" target="_blank" style="background:#25d366; color:#fff; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:bold; display:inline-block; text-decoration:none;">💬 تواصل واتساب</a>
           </div>
         </div>
       ` : `
@@ -2558,7 +2691,7 @@ window.setupRealtimeTrackingListener = function(phone) {
       `;
 
       return `
-        <div style="background:#fff; border:1.5px solid var(--bd); border-radius:16px; padding:14px; margin-bottom:16px; box-shadow:0 3px 10px rgba(0,0,0,0.02); text-align:right;">
+        <div style="background:#fff; border:1.5px solid var(--bd); border-radius:16px; padding:14px; margin-bottom:12px; box-shadow:0 3px 10px rgba(0,0,0,0.02); text-align:right;">
           <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
             <span style="font-size:11px; color:#999;">رقم المعاملة: <code>#${o.id.substring(0,8)}</code></span>
             <span style="font-size:12px; font-weight:800; color:var(--gold);">${(o.price || o.total || 0).toLocaleString()} دج</span>
@@ -2570,6 +2703,9 @@ window.setupRealtimeTrackingListener = function(phone) {
         </div>
       `;
     }).join('');
+
+    if (listEl) listEl.innerHTML = renderedHTML;
+    if (hListEl) hListEl.innerHTML = renderedHTML;
   }) : null;
 };
 
@@ -2771,36 +2907,66 @@ window.showElegantToast = function(title, body) {
 
 window.renderNotifications = function() {
   const list = getNotifications();
+  
+  // Render on main notifications page
   const listEl = document.getElementById('notif-dyn-list');
   const emptyEl = document.getElementById('notif-empty-state');
-  if(!listEl) return;
-
-  if (list.length === 0) {
-    listEl.innerHTML = '';
-    if (emptyEl) emptyEl.style.display = 'block';
-    return;
-  }
-  
-  if (emptyEl) emptyEl.style.display = 'none';
-  listEl.innerHTML = list.map(n => {
-    const timeStr = formatArabicTime(n.timestamp);
-    return `
-      <div class="nitem ${n.read ? '' : 'unread'}" style="position:relative; margin-bottom: 12px; padding: 14px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition:all 0.2s; gap:10px; display:flex;" id="ncell_${n.id}">
-        <span class="ni" style="font-size: 24px; flex-shrink:0;">${n.icon || '🔔'}</span>
-        <div style="flex:1; text-align: right;">
-          <div class="nt" style="font-size: 13px; font-weight: 800; color: var(--text);">${n.title}</div>
-          <div class="ns" style="font-size: 11.5px; color: var(--gray); margin-top: 3px; line-height: 1.4;">${n.text}</div>
-          <div style="margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
-            <span style="font-size: 10px; color: #aaa; font-weight: 600;">🕒 ${timeStr}</span>
-            <div style="display:flex; gap: 6px;">
-              ${!n.read ? `<button onclick="markNotificationRead('${n.id}')" style="background: rgba(26,92,42,0.1); color: var(--g1); border:none; padding:3px 10px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="تحديد كمقروء">✔ مقروء</button>` : ''}
-              <button onclick="deleteNotification('${n.id}')" style="background: rgba(220,53,69,0.08); color: #dc3545; border:none; padding:3px 8px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="حذف">🗑️</button>
+  if(listEl) {
+    if (list.length === 0) {
+      listEl.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = 'block';
+    } else {
+      if (emptyEl) emptyEl.style.display = 'none';
+      listEl.innerHTML = list.map(n => {
+        const timeStr = formatArabicTime(n.timestamp);
+        return `
+          <div class="nitem ${n.read ? '' : 'unread'}" style="position:relative; margin-bottom: 12px; padding: 14px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.03); transition:all 0.2s; gap:10px; display:flex;" id="ncell_${n.id}">
+            <span class="ni" style="font-size: 24px; flex-shrink:0;">${n.icon || '🔔'}</span>
+            <div style="flex:1; text-align: right;">
+              <div class="nt" style="font-size: 13px; font-weight: 800; color: var(--text);">${n.title}</div>
+              <div class="ns" style="font-size: 11.5px; color: var(--gray); margin-top: 3px; line-height: 1.4;">${n.text}</div>
+              <div style="margin-top: 8px; display: flex; align-items: center; justify-content: space-between;">
+                <span style="font-size: 10px; color: #aaa; font-weight: 600;">🕒 ${timeStr}</span>
+                <div style="display:flex; gap: 6px;">
+                  ${!n.read ? `<button onclick="markNotificationRead('${n.id}')" style="background: rgba(26,92,42,0.1); color: var(--g1); border:none; padding:3px 10px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="تحديد كمقروء">✔ مقروء</button>` : ''}
+                  <button onclick="deleteNotification('${n.id}')" style="background: rgba(220,53,69,0.08); color: #dc3545; border:none; padding:3px 8px; border-radius:6px; font-family:'Cairo'; font-size:10px; font-weight:bold; cursor:pointer;" title="حذف">🗑️</button>
+                </div>
+              </div>
             </div>
           </div>
+        `;
+      }).join('');
+    }
+  }
+
+  // Render on home screen live notifications container
+  const homeNotifEl = document.getElementById('home-notif-list');
+  const homeBadgeEl = document.getElementById('home-notif-badge');
+  if (homeNotifEl) {
+    const unreadCount = list.filter(n => !n.read).length;
+    if (homeBadgeEl) {
+      if (unreadCount > 0) {
+        homeBadgeEl.textContent = `${unreadCount} جديد`;
+        homeBadgeEl.style.display = 'inline-block';
+      } else {
+        homeBadgeEl.style.display = 'none';
+      }
+    }
+    const recent = list.slice(0, 3);
+    if (recent.length === 0) {
+      homeNotifEl.innerHTML = '<div style="text-align: center; color: var(--gray); font-size: 11px; padding: 10px 0;">لا توجد تنبيهات جديدة حالياً.</div>';
+    } else {
+      homeNotifEl.innerHTML = recent.map(n => `
+        <div class="nitem ${n.read ? '' : 'unread'}" style="position:relative; padding: 10px 8px; border-radius: 10px; border: 1px solid ${n.read ? 'var(--bd)' : 'rgba(26,92,42,0.15)'}; background: ${n.read ? '#ffffff' : 'rgba(26,92,42,0.03)'}; display: flex; gap: 8px; cursor: pointer;" onclick="G('notif'); markNotificationRead('${n.id}')">
+          <span style="font-size: 18px; flex-shrink: 0;">${n.icon || '🔔'}</span>
+          <div style="flex: 1; text-align: right;">
+            <div style="font-size: 11px; font-weight: 800; color: var(--text);">${n.title}</div>
+            <div style="font-size: 10px; color: var(--gray); margin-top: 2px; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">${n.text}</div>
+          </div>
         </div>
-      </div>
-    `;
-  }).join('');
+      `).join('');
+    }
+  }
 };
 
 window.markNotificationRead = function(id) {
