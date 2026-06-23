@@ -1,6 +1,6 @@
 // ZaLo Smart Marketplace - JavaScript Shared Engine (app.js)
 // Implements 100% Client-Side Firestore Database Replica using localStorage
-// Fully localized in Arabic with support for 58 Algerian Wilayas and custom Southern Municipalities
+// Fully localized in Arabic with support for 69 Algerian Wilayas and custom Southern Municipalities
 
 // --- Seed Databases ---
 const SEED_MUNICIPALITIES = [

@@ -536,11 +536,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 </head>
 <body>
 <div id="splash">
-  <img class="sp-img" src="assets/logo.svg" alt="ZaLo" onerror="this.src='https://placehold.co/180x180/1a5c2a/white?text=ZaLo'">
-  <div style="margin-top:14px;text-align:center">
-    <div style="color:var(--gold2);font-size:34px;font-weight:900;letter-spacing:2px">ZaLo</div>
-    <div style="color:rgba(255,255,255,.7);font-size:12px">marketplace smart • السوق الذكي الموحد</div>
-  </div>
+  <img class="sp-img" src="assets/logo.png" alt="ZaLo" style="width: 200px; height: 200px; object-fit: contain; margin: 0 auto; display: block;">
   <div class="sp-bar"><div class="sp-fill"></div></div>
 </div>
 
@@ -550,9 +546,8 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 <div class="sidemenu" id="sidemenu">
   <div class="sm-hd">
     <button class="sm-close" onclick="closeSide()">✕</button>
-    <img class="sm-logo" src="assets/logo.svg" alt="" onerror="this.src='https://placehold.co/100x100/1a5c2a/white?text=ZaLo'">
-    <div class="sm-title">ZaLo</div>
-    <div class="sm-sub">السوق الذكي الجزائري</div>
+    <img class="sm-logo" src="assets/logo.png" alt="" style="width: 120px; height: 120px; object-fit: contain; margin: 0 auto; display: block;">
+    <div class="sm-sub" style="text-align: center; margin-top: 4px; font-weight: bold; color: var(--gold);">السوق الذكي الجزائري الموحد</div>
   </div>
   <!-- DYNAMIC PROFILE CARD -->
   <div id="sm-profile-card" style="padding: 16px; background: #fdfdfd; border-bottom: 1px solid rgba(0,0,0,0.06); text-align: right;">
@@ -611,22 +606,19 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   <div class="topbar" style="height: 56px;">
     <div class="tb-bell" onclick="G('notif')">🔔<div class="tb-badge" id="nb">0</div></div>
     <div class="tb-center">
-      <img class="tb-logo-img" src="assets/logo.svg" alt="" onerror="this.src='https://placehold.co/40x40/1a5c2a/white?text=ZaLo'">
-      <div class="tb-title">ZaLo السوق الذكي</div>
+      <img class="tb-logo-img" src="assets/logo.png" alt="" style="height: 38px; width: 38px; object-fit: contain;">
+      <div class="tb-title">السوق الذكي الموحد</div>
     </div>
     <div class="tb-menu" onclick="openSide()"><span></span><span></span><span></span></div>
   </div>
   <div class="content">
     <div class="home-body" style="padding: 16px; gap: 12px;">
       <!-- Small Logo -->
-      <img src="assets/logo.svg" style="height: 48px; width: 48px; object-fit: contain; margin: 0 auto; display: block;" alt="ZaLo" onerror="this.src='https://placehold.co/48x48/1a5c2a/white?text=ZaLo'">
+      <img src="assets/logo.png" style="height: 120px; width: 120px; object-fit: contain; margin: 0 auto; display: block;" alt="ZaLo">
       
-      <!-- text-xl Heading -->
-      <h1 class="home-title" style="font-size: 20px; font-weight: 900; color: var(--g1); text-align: center; margin-bottom: 4px;">ZaLo السوق الذكي</h1>
-      
-      <!-- Button "تسوق في 58 ولاية" -->
+      <!-- Button "تسوق في 69 ولاية" -->
       <button class="btn-gm" onclick="G('wilayas')" style="width: 100%; max-width: 340px; margin: 0 auto; height: 48px; border-radius: 14px; background: var(--g1); font-weight: 800; font-size: 14px; border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(26,92,42,0.15);">
-        <i class="fa-solid fa-location-dot"></i> تسوق في 58 ولاية الآن
+        <i class="fa-solid fa-location-dot"></i> تسوق في 69 ولاية الآن
       </button>
       
       <!-- Network Icons Grid - styled beautifully (height 14 equivalent / h-14) -->
@@ -655,7 +647,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
           🚀 افتح متجرك وضاعف مبيعاتك مجاناً
         </h4>
         <p style="font-size: 10.5px; color: var(--gray); line-height: 1.4; margin: 0;">
-          ابدأ نشاطك التجاري اليوم! أطلق متجرك الخاص عبر 58 ولاية واعرض سلعك لآلاف الزبائن مجاناً.
+          ابدأ نشاطك التجاري اليوم! أطلق متجرك الخاص عبر 69 ولاية واعرض سلعك لآلاف الزبائن مجاناً.
         </p>
         <button onclick="openLink('register-step1.html')" style="background: var(--gold); color: var(--text); border-radius: 10px; border: none; font-weight: 800; padding: 8px 14px; font-size: 11px; font-family: 'Cairo', sans-serif; cursor: pointer; width: 100%; transition: all 0.2s; min-height: 36px; box-shadow: 0 2px 8px rgba(201,168,76,0.2);">
           سجل متجرك الآن وابدأ ←
@@ -666,7 +658,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
       <div id="home-tracker-section" style="background: #ffffff; border: 1px solid var(--bd); border-radius: 16px; padding: 14px; max-width: 340px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px;">
         <div style="display: flex; align-items: center; gap: 6px;">
           <span style="font-size: 18px;">📍</span>
-          <h3 style="font-size: 14px; font-weight: 800; color: var(--text); margin: 0;">نظام تتبع الشحنات (58 ولاية)</h3>
+          <h3 style="font-size: 14px; font-weight: 800; color: var(--text); margin: 0;">نظام تتبع الشحنات (69 ولاية)</h3>
         </div>
         <p style="font-size: 10px; color: var(--gray); line-height: 1.4; margin: 0;">أدخل رقم الهاتف المستخدم في الطلب لتتبع خط سير بضاعتك لحظة بلحظة وبث السائقين.</p>
         <div style="display: flex; gap: 6px; width: 100%;">
@@ -1157,7 +1149,10 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   </div>
   <div class="content">
     <div class="about-wrap">
-      <div style="text-align:center;margin-bottom:18px"><img src="assets/logo.svg" style="width:88px;object-fit:contain" onerror="this.src='https://placehold.co/88x88/1a5c2a/white?text=ZaLo'"><br><br><span style="font-size:19px;font-weight:900;color:var(--g1)">ZaLo - السوق الذكي الموحد</span></div>
+      <div style="text-align:center;margin-bottom:18px">
+        <img src="assets/logo.png" style="width:140px;height:140px;object-fit:contain;margin:0 auto;display:block;" alt="ZaLo">
+        <span style="font-size:19px;font-weight:900;color:var(--g1);display:block;margin-top:12px;">السوق الذكي الموحد</span>
+      </div>
       <div class="acard"><h3>🎯 رسالة وقيم المنصة</h3><p>منصة ZaLo هي المبادرة الذكية الوطنية لتجمع وتأطير جميع التجار والحرفيين من الـ69 ولاية في منصة بيع مباشرة وسهلة، متصلة مباشرة بأنظمة الدفع اليدوي وخدمة العملاء الآلية عبر قنوات ميسرة كالواتساب والبريد.</p></div>
       <div class="acard"><h3>📞 الهاتف والدعم الفني للإدارة</h3>
         <button class="btn-wa" onclick="openWA('0698694010','مرحباً بـ ZaLo')">💬 واتساب الدعم المباشر: 0698694010</button>
