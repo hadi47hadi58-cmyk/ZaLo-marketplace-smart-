@@ -1,5 +1,29 @@
 /* ZaLo Marketplace Smart Custom Stylesheet */
 
+:root {
+    --brand-green: oklch(0.35 0.08 145); /* #1a5c2a */
+    --brand-green-hover: oklch(0.42 0.09 145); /* #237a38 */
+    --brand-gold: oklch(0.72 0.13 75);  /* #d4af37 */
+}
+
+/* Base resets & horizontal scroll prevention */
+html, body {
+    max-width: 100% !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+}
+
+*, *:before, *:after {
+    box-sizing: border-box !important;
+}
+
+/* Responsive elements - fluid widths */
+img, video, iframe {
+    max-width: 100% !important;
+    height: auto;
+}
+
 /* Fluid RTL animations */
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(8px); }
@@ -27,4 +51,84 @@
 .smooth-scrolling {
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
+}
+
+/* --- Professional Mobile-First Styling & Brand Consistency --- */
+
+/* All buttons are full width and have standard 12px padding */
+button, 
+.btn, 
+.btn-p, 
+.btn-s, 
+.btn-wa, 
+.btn-gm, 
+.btn-g, 
+.btn-o, 
+.btn-r {
+    width: 100% !important;
+    padding: 12px !important;
+    font-family: 'Cairo', sans-serif !important;
+    font-weight: 700 !important;
+    box-sizing: border-box !important;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: none;
+}
+
+/* Default button styling with green branding colors */
+button:not(.btn-s):not(.btn-o):not(.btn-wa):not(.btn-r) {
+    background: var(--brand-green, #1a5c2a) !important;
+    color: #ffffff !important;
+}
+
+button:not(.btn-s):not(.btn-o):not(.btn-wa):not(.btn-r):hover {
+    background: var(--brand-green-hover, #237a38) !important;
+}
+
+button:active {
+    transform: scale(0.98);
+    opacity: 0.9;
+}
+
+/* Ensure border-radius: 8px on all interactive elements */
+button, 
+.btn, 
+.btn-p, 
+.btn-s, 
+.btn-wa, 
+.btn-gm, 
+.btn-g, 
+.btn-o, 
+.btn-r,
+input, 
+select, 
+textarea, 
+.card, 
+.acard, 
+.pcard, 
+.prod-card, 
+.tbl-wrap, 
+.nav-item,
+.detected-badge,
+.logo-inner {
+    border-radius: 8px !important;
+}
+
+/* Form inputs styling */
+input, select, textarea {
+    border: 1px solid var(--border, #cbd5e1);
+    padding: 10px;
+    font-family: 'Cairo', sans-serif;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, select:focus, textarea:focus {
+    outline: none;
+    border-color: var(--brand-green, #1a5c2a) !important;
+    box-shadow: 0 0 0 3px rgba(26, 92, 42, 0.15) !important;
 }
