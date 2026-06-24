@@ -785,8 +785,21 @@
     <div class="sec-head">
       <div class="sec-title">🛒 شحنات وطلبات الشراء المستلمة</div>
     </div>
+
+    <!-- Live Order Search/Tracking Box for Merchant (نظام تتبع الشحنات 69 ولاية) -->
+    <div style="background: #fff; border: 1.5px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 16px;">📍</span>
+        <strong style="font-size: 13.5px; color: var(--g1);">نظام تتبع الشحنات (69 ولاية)</strong>
+      </div>
+      <div style="display: flex; gap: 6px; width: 100%;">
+        <input id="merchantSearchInput" class="fi" placeholder="ابحث برقم الهاتف، اسم الزبون، أو رقم الطلب..." style="flex: 1; font-size: 12px; height: 38px; padding: 0 10px; border: 1px solid var(--border); border-radius: 8px; margin: 0; background: var(--bg); box-sizing: border-box;" oninput="merchantSearchOrders(this.value)">
+        <button class="btn btn-g" style="width: auto; padding: 0 14px; font-size: 12px; height: 38px; border-radius: 8px; margin: 0; font-weight: bold; font-family: 'Cairo';" onclick="merchantSearchOrders(document.getElementById('merchantSearchInput').value)">بحث 🔍</button>
+      </div>
+    </div>
+
     <div style="display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap">
-      <button class="btn btn-o" onclick="filterOrd('all',this)">جميع الواردات</button>
+      <button class="btn btn-o active" onclick="filterOrd('all',this)">جميع الواردات</button>
       <button class="btn btn-o" onclick="filterOrd('pending',this)">الجديدة</button>
       <button class="btn btn-o" onclick="filterOrd('confirmed',this)">المثبتة والمؤكدة</button>
       <button class="btn btn-o" onclick="filterOrd('delivered',this)">المسلمة</button>
@@ -1905,6 +1918,36 @@ function renderHomeOrders(ords) {
     </div>
   `).join('') : `<div class="empty">لا طلبيات مستوردة اليوم</div>`;
 }
+
+window.filterOrd = function(status, btn) {
+  if (btn) {
+    const parent = btn.parentElement;
+    parent.querySelectorAll('.btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  if (status === 'all') {
+    renderOrders(allOrders);
+  } else {
+    const filtered = allOrders.filter(o => o.status === status);
+    renderOrders(filtered);
+  }
+};
+
+window.merchantSearchOrders = function(queryVal) {
+  const q = queryVal.trim().toLowerCase();
+  if (!q) {
+    renderOrders(allOrders);
+    return;
+  }
+  const filtered = allOrders.filter(o => {
+    const id = o.id ? o.id.toLowerCase() : '';
+    const name = (o.customer || o.customerName || '').toLowerCase();
+    const phone = o.phone || '';
+    const wilaya = (o.wilaya || '').toLowerCase();
+    return id.includes(q) || name.includes(q) || phone.includes(q) || wilaya.includes(q);
+  });
+  renderOrders(filtered);
+};
 
 window.updateOrderStatus = async function(id, status) {
   try {

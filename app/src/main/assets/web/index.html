@@ -654,38 +654,6 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
         </button>
       </div>
 
-      <!-- Live Order Tracker Section ("واجهة التتبع لـ 69 ولاية") -->
-      <div id="home-tracker-section" style="background: #ffffff; border: 1px solid var(--bd); border-radius: 16px; padding: 14px; max-width: 340px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px;">
-        <div style="display: flex; align-items: center; gap: 6px;">
-          <span style="font-size: 18px;">📍</span>
-          <h3 style="font-size: 14px; font-weight: 800; color: var(--text); margin: 0;">نظام تتبع الشحنات (69 ولاية)</h3>
-        </div>
-        <p style="font-size: 10px; color: var(--gray); line-height: 1.4; margin: 0;">أدخل رقم الهاتف المستخدم في الطلب لتتبع خط سير بضاعتك لحظة بلحظة وبث السائقين.</p>
-        <div style="display: flex; gap: 6px; width: 100%;">
-          <input id="homePhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="flex: 1; text-align: center; font-weight: bold; border-radius: 10px; border: 1px solid var(--bd); background: #f8fafc; font-size: 12px; height: 38px; margin: 0; padding: 0 8px;" type="tel">
-          <button onclick="searchHomeOrders()" style="background: var(--g1); color: #fff; border: none; border-radius: 10px; padding: 0 14px; font-weight: bold; font-family: 'Cairo'; font-size: 11px; cursor: pointer; height: 38px;">بحث 🔍</button>
-        </div>
-        <div id="homeActivePhoneBadge" style="display: none; font-size: 10px; font-weight: bold; color: var(--gold); text-align: center;">
-          🟢 متابعة الرقم: <span id="homeActivePhoneVal"></span> | <span onclick="clearHomeTrackerSession()" style="color: var(--red); cursor: pointer; text-decoration: underline;">إلغاء</span>
-        </div>
-        <div id="home-tracking-list" style="display: flex; flex-direction: column; gap: 10px; margin-top: 4px;"></div>
-      </div>
-
-      <!-- Live Notifications Section ("واجهة الإشعارات في الصفحة الرئيسية") -->
-      <div style="background: #ffffff; border: 1px solid var(--bd); border-radius: 16px; padding: 14px; max-width: 340px; width: 100%; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 10px;">
-        <div style="display: flex; align-items: center; justify-content: space-between; width: 100%;">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 18px;">🔔</span>
-            <h3 style="font-size: 14px; font-weight: 800; color: var(--text); margin: 0;">آخر الإشعارات والتنبيهات</h3>
-          </div>
-          <span id="home-notif-badge" style="background: var(--red); color: white; border-radius: 10px; padding: 1px 6px; font-size: 9px; font-weight: bold; display: none;">0 جديد</span>
-        </div>
-        <div id="home-notif-list" style="display: flex; flex-direction: column; gap: 8px;">
-          <div style="text-align: center; color: var(--gray); font-size: 11px; padding: 10px 0;">لا توجد تنبيهات جديدة حالياً.</div>
-        </div>
-        <button onclick="G('notif')" style="background: none; border: none; color: var(--g1); font-size: 11px; font-weight: bold; cursor: pointer; padding: 4px 0; text-align: center; font-family: 'Cairo';">عرض سجل الإشعارات بالكامل ←</button>
-      </div>
-
     </div>
   </div>
   <div class="bnav" style="height: 56px;">
@@ -693,7 +661,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <div class="bn" onclick="G('myorders')"><div class="bni"><i class="fa-solid fa-bag-shopping"></i></div><div class="bnl">طلباتي</div></div>
     <div class="bn" onclick="G('wilayas')"><div class="bni"><i class="fa-solid fa-location-dot"></i></div><div class="bnl">الولايات</div></div>
     <div class="bn" onclick="G('search')"><div class="bni"><i class="fa-solid fa-magnifying-glass"></i></div><div class="bnl">بحث سريع</div></div>
-    <div class="bn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">بوابتي الكبرى</div></div>
+    <div class="bn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">بوابة كبرى</div></div>
   </div>
 </div>
 
@@ -902,16 +870,18 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <div style="width:34px"></div>
   </div>
   <div class="content">
-    <div id="mo-auth-container" style="padding: 20px 16px; text-align: center; background: #fff; margin-bottom: 12px; border-bottom: 1px solid var(--bd);">
-      <div style="font-size: 40px; margin-bottom: 8px;">📱</div>
-      <h3 style="font-size: 15px; font-weight: 800; color: var(--g1); margin-bottom: 6px;">تتبع طلبياتك بالرقم الفوري</h3>
-      <p style="font-size: 11px; color: var(--gray); line-height: 1.5; margin-bottom: 14px;">أدخل رقم هاتفك المستعمل أثناء الطلب لمراقبة مسار التوصيل وبث وموافاة السائقين فورياً.</p>
-      <div style="display: flex; gap: 8px; justify-content: center;">
-        <input id="cPhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="max-width: 250px; text-align: center; font-weight: bold; border-radius: 12px; background: #fdfdfd; font-size: 14px; margin:0;" type="tel">
-        <button onclick="searchCustomerOrders()" style="background: var(--g1); color: #fff; border: none; border-radius: 12px; padding: 0 16px; font-weight: bold; font-family: 'Cairo'; font-size: 13px; cursor: pointer; height: 42px;">🔍 بحث مالي</button>
+    <div id="mo-auth-container" style="background: #ffffff; border: 1.5px solid var(--g1); border-radius: 16px; padding: 18px; max-width: 380px; width: calc(100% - 24px); margin: 16px auto; box-shadow: 0 4px 15px rgba(26,92,42,0.06); display: flex; flex-direction: column; gap: 12px; text-align: center; box-sizing: border-box;">
+      <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <span style="font-size: 24px;">📍</span>
+        <h3 style="font-size: 15px; font-weight: 900; color: var(--g1); margin: 0;">نظام تتبع الشحنات (69 ولاية)</h3>
       </div>
-      <div id="cActivePhoneBadge" style="display: none; margin-top: 10px; font-size: 11px; font-weight: bold; color: var(--gold);">
-        🟢 الرقم المتابع حالياً: <span id="cActivePhoneVal"></span> | <span onclick="clearCustomerSession()" style="color: var(--red); cursor: pointer; text-decoration: underline;">تغيير الرقم</span>
+      <p style="font-size: 11px; color: var(--gray); line-height: 1.5; margin: 0 0 4px;">أدخل رقم الهاتف المستخدم في الطلب لتتبع خط سير بضاعتك لحظة بلحظة وبث السائقين.</p>
+      <div style="display: flex; gap: 8px; width: 100%; justify-content: center; align-items: center;">
+        <input id="cPhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="flex: 1; max-width: 220px; text-align: center; font-weight: bold; border-radius: 12px; border: 1px solid var(--bd); background: #f8fafc; font-size: 13px; height: 40px; margin: 0; padding: 0 10px;" type="tel">
+        <button onclick="searchCustomerOrders()" style="background: var(--g1); color: #fff; border: none; border-radius: 12px; padding: 0 16px; font-weight: 800; font-family: 'Cairo'; font-size: 12px; cursor: pointer; height: 40px; transition: all 0.2s;">بحث 🔍</button>
+      </div>
+      <div id="cActivePhoneBadge" style="display: none; font-size: 11px; font-weight: bold; color: var(--gold); text-align: center; margin-top: 2px;">
+        🟢 متابعة الرقم: <span id="cActivePhoneVal"></span> | <span onclick="clearCustomerSession()" style="color: var(--red); cursor: pointer; text-decoration: underline;">إلغاء المتابعة</span>
       </div>
     </div>
     
@@ -1187,10 +1157,15 @@ onAuthStateChanged(auth, async (u) => {
   window._user = u;
   const guestEl = document.getElementById('sm-profile-guest');
   const userEl = document.getElementById('sm-profile-user');
+  const profileCard = document.getElementById('sm-profile-card');
+  const unifiedLogin = document.getElementById('sm-unified-login-item');
+  
   if (guestEl && userEl) {
     if (u) {
       guestEl.style.display = 'none';
       userEl.style.display = 'block';
+      if (profileCard) profileCard.style.display = 'block';
+      if (unifiedLogin) unifiedLogin.style.display = 'none';
       
       const email = u.email || '';
       document.getElementById('sm-user-email').textContent = email;
@@ -1244,8 +1219,10 @@ onAuthStateChanged(auth, async (u) => {
         console.warn("User profile doc fetch error:", e);
       }
     } else {
-      guestEl.style.display = 'block';
+      guestEl.style.display = 'none';
       userEl.style.display = 'none';
+      if (profileCard) profileCard.style.display = 'none';
+      if (unifiedLogin) unifiedLogin.style.display = 'flex';
     }
   }
 });

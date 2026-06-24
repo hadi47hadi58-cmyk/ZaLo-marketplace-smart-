@@ -795,6 +795,19 @@
     <div class="section-header">
       <div class="section-title">🛒 تتبع وحفظ عمليات البيع بالولايات</div>
     </div>
+
+    <!-- Live Order Search/Tracking Box for Admin (نظام تتبع الشحنات 69 ولاية) -->
+    <div style="background: #fff; border: 1.5px solid var(--bd); border-radius: 12px; padding: 14px; margin-bottom: 14px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box; text-align: right;">
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="font-size: 16px;">📍</span>
+        <strong style="font-size: 13.5px; color: var(--g1); font-family: 'Cairo';">نظام تتبع الشحنات (69 ولاية)</strong>
+      </div>
+      <div style="display: flex; gap: 6px; width: 100%;">
+        <input id="adminSearchInput" class="fi" placeholder="ابحث برقم الهاتف، اسم الزبون، المتجر، أو رقم تتبع الشحنة..." style="flex: 1; font-size: 12px; height: 38px; padding: 0 10px; border: 1px solid var(--bd); border-radius: 8px; margin: 0; background: #fafafa; box-sizing: border-box;" oninput="adminSearchOrders(this.value)">
+        <button style="width: auto; padding: 0 14px; font-size: 12px; height: 38px; border-radius: 8px; margin: 0; font-weight: bold; font-family: 'Cairo'; background: var(--g1); color: #fff; border: none; cursor: pointer;" onclick="adminSearchOrders(document.getElementById('adminSearchInput').value)">بحث 🔍</button>
+      </div>
+    </div>
+
     <div class="table-wrap">
       <table>
         <thead><tr>
@@ -1833,6 +1846,23 @@ function renderOrdersTable(ords) {
     </tr>
   `).join('');
 }
+
+window.adminSearchOrders = function(queryVal) {
+  const q = queryVal.trim().toLowerCase();
+  if (!q) {
+    renderOrdersTable(window._allOrders || []);
+    return;
+  }
+  const filtered = (window._allOrders || []).filter(o => {
+    const id = o.id ? o.id.toLowerCase() : '';
+    const name = (o.customer || o.customerName || '').toLowerCase();
+    const phone = o.phone || '';
+    const wilaya = (o.wilaya || '').toLowerCase();
+    const store = (o.store || o.shopName || '').toLowerCase();
+    return id.includes(q) || name.includes(q) || phone.includes(q) || wilaya.includes(q) || store.includes(q);
+  });
+  renderOrdersTable(filtered);
+};
 
 function renderUsersTable(usrs) {
   const tbody = document.getElementById('usersTable');
