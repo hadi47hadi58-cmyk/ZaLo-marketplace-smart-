@@ -543,6 +543,25 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 <div id="toast" class="toast"></div>
 <div id="realtime-notification-container"></div>
 <div class="overlay" id="overlay" onclick="closeSide()"></div>
+
+<!-- Instant Tracking Modal -->
+<div id="instant-tracking-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+  <div class="modal-content" style="background:#ffffff; border:2.2px solid var(--gold); border-radius:24px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.15); position:relative; text-align:center; box-sizing: border-box;">
+    <button onclick="closeInstantTrackingModal()" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:22px; color:#999; cursor:pointer;">✕</button>
+    <div style="font-size:42px; margin-bottom:12px;">📍</div>
+    <h3 style="font-family:'Cairo'; font-weight:900; color:var(--g1); font-size:16px; margin:0 0 8px;">التتبع الفوري لمنتجاتك (69 ولاية)</h3>
+    <p style="font-family:'Cairo'; font-size:11.5px; color:var(--gray); line-height:1.5; margin:0 0 20px;">أدخل رقم هاتف الشراء، اسم المشتري، أو معرّف الشحنة لمتابعة حالة الشاحنة مباشرة وبث خط السير فورياً.</p>
+    
+    <div style="text-align:right; margin-bottom:18px;">
+      <label style="font-family:'Cairo'; font-weight:700; font-size:12px; color:var(--text); margin-bottom:6px; display:block;">📱 الهاتف، الاسم أو رقم الشحنة:</label>
+      <input class="fi" id="instantTrackingQuery" placeholder="مثال: 06XXXXXXXX أو محمد بلقاسم..." style="width:100%; height:46px; border-radius:12px; border:1.5px solid var(--bd); padding:0 12px; font-family:'Cairo'; font-size:13.5px; text-align:center; box-sizing:border-box;">
+    </div>
+    
+    <button onclick="submitInstantTrackingSearch()" class="btn-p" style="width:100%; height:46px; background:var(--g1); color:#fff; border:none; border-radius:12px; font-family:'Cairo'; font-size:14px; font-weight:800; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; box-shadow:0 4px 12px rgba(26,92,42,0.2);">
+      <span>بحث وتتبع الشحنة 🔍</span>
+    </button>
+  </div>
+</div>
 <div class="sidemenu" id="sidemenu">
   <div class="sm-hd">
     <button class="sm-close" onclick="closeSide()">✕</button>
@@ -864,10 +883,16 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 
 <!-- MY ORDERS -->
 <div id="s-myorders" class="screen">
-  <div class="topbar">
-    <button class="back-btn" onclick="back()">←</button>
-    <div class="tb-center"><div class="tb-title">حقيبة مشترياتي وتتبعها</div></div>
-    <div style="width:34px"></div>
+  <div class="topbar" style="display: flex; align-items: center; justify-content: center; position: relative; border-bottom: 2px solid var(--gold);">
+    <div style="position: absolute; right: 10px; display: none;">
+      <button class="back-btn" onclick="back()">←</button>
+    </div>
+    <div class="tb-center" style="display: flex; justify-content: center; align-items: center; width: 100%;">
+      <button onclick="back()" style="background: rgba(212, 175, 55, 0.05); border: 1.8px solid var(--gold); border-radius: 20px; padding: 6px 16px; font-family: 'Cairo', sans-serif; font-size: 13.5px; font-weight: 800; color: var(--gold); cursor: pointer; transition: all 0.2s; display: flex; align-items: center; gap: 6px; box-shadow: 0 2px 10px rgba(212, 175, 55, 0.2); outline: none;">
+        <span>←</span>
+        <span>نظام تتبع منتجاتك</span>
+      </button>
+    </div>
   </div>
   <div class="content">
     <div id="mo-auth-container" style="background: #ffffff; border: 1.5px solid var(--g1); border-radius: 16px; padding: 18px; max-width: 380px; width: calc(100% - 24px); margin: 16px auto; box-shadow: 0 4px 15px rgba(26,92,42,0.06); display: flex; flex-direction: column; gap: 12px; text-align: center; box-sizing: border-box;">
@@ -876,9 +901,9 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
         <h3 style="font-size: 15px; font-weight: 900; color: var(--g1); margin: 0;">نظام تتبع الشحنات (69 ولاية)</h3>
       </div>
       <p style="font-size: 11px; color: var(--gray); line-height: 1.5; margin: 0 0 4px;">أدخل رقم الهاتف المستخدم في الطلب لتتبع خط سير بضاعتك لحظة بلحظة وبث السائقين.</p>
-      <div style="display: flex; gap: 8px; width: 100%; justify-content: center; align-items: center;">
-        <input id="cPhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="flex: 1; max-width: 220px; text-align: center; font-weight: bold; border-radius: 12px; border: 1px solid var(--bd); background: #f8fafc; font-size: 13px; height: 40px; margin: 0; padding: 0 10px;" type="tel">
-        <button onclick="searchCustomerOrders()" style="background: var(--g1); color: #fff; border: none; border-radius: 12px; padding: 0 16px; font-weight: 800; font-family: 'Cairo'; font-size: 12px; cursor: pointer; height: 40px; transition: all 0.2s;">بحث 🔍</button>
+      <div style="display: flex; gap: 8px; width: 100%; justify-content: center; align-items: center; box-sizing: border-box;">
+        <input id="cPhoneInput" class="fi" placeholder="06XXXXXXXX أو 07XXXXXXXX" style="flex: 2.2; text-align: center; font-weight: bold; border-radius: 12px; border: 1.5px solid var(--bd); background: #f8fafc; font-size: 13.5px; height: 44px; margin: 0; padding: 0 12px; box-sizing: border-box;" type="tel">
+        <button onclick="searchCustomerOrders()" style="flex: 1; background: var(--g1); color: #fff; border: none; border-radius: 12px; font-weight: 800; font-family: 'Cairo'; font-size: 13px; cursor: pointer; height: 44px; transition: all 0.2s; margin: 0; display: flex; align-items: center; justify-content: center; gap: 4px; box-sizing: border-box; white-space: nowrap;">بحث 🔍</button>
       </div>
       <div id="cActivePhoneBadge" style="display: none; font-size: 11px; font-weight: bold; color: var(--gold); text-align: center; margin-top: 2px;">
         🟢 متابعة الرقم: <span id="cActivePhoneVal"></span> | <span onclick="clearCustomerSession()" style="color: var(--red); cursor: pointer; text-decoration: underline;">إلغاء المتابعة</span>
@@ -2494,23 +2519,42 @@ window.driverUpdateStatus = async function(orderId, nextStatus) {
 };
 
 // Customer Tracking Operations
-window.focusHomeTracker = function() {
-  const section = document.getElementById('home-tracker-section');
-  if (section) {
-    section.scrollIntoView({ behavior: 'smooth' });
-    const input = document.getElementById('homePhoneInput');
+window.openInstantTrackingModal = function() {
+  const modal = document.getElementById('instant-tracking-modal');
+  if (modal) {
+    modal.style.display = 'flex';
+    const input = document.getElementById('instantTrackingQuery');
     if (input) {
+      input.value = '';
       input.focus();
-      input.style.borderColor = 'var(--g1)';
-      setTimeout(() => input.style.borderColor = 'var(--bd)', 1500);
     }
   }
 };
 
+window.closeInstantTrackingModal = function() {
+  const modal = document.getElementById('instant-tracking-modal');
+  if (modal) modal.style.display = 'none';
+};
+
+window.submitInstantTrackingSearch = function() {
+  const query = document.getElementById('instantTrackingQuery').value.trim();
+  if (!query || query.length < 3) {
+    alert('⚠️ يرجى إدخال اسم البحث، أو رقم هاتف صحيح (3 خانات كحد أدنى)');
+    return;
+  }
+  closeInstantTrackingModal();
+  G('myorders'); // Navigate to tracking screen
+  setupRealtimeTrackingListener(query);
+};
+
+window.focusHomeTracker = function() {
+  openInstantTrackingModal();
+};
+
 window.searchHomeOrders = function() {
-  const phone = document.getElementById('homePhoneInput').value.trim();
-  if(!phone || phone.length < 8) {
-    alert('⚠️ يرجى كتابة رقم هاتف صحيح لعرض طلبات المشحونة');
+  const phone = document.getElementById('homePhoneInput')?.value?.trim() || '';
+  if(!phone || phone.length < 3) {
+    alert('⚠️ يرجى كتابة اسم أو هاتف تتبع صحيح');
     return;
   }
   localStorage.setItem('zalo_customer_tracked_phone', phone);
@@ -2560,22 +2604,24 @@ window.searchCustomerOrders = function() {
   setupRealtimeTrackingListener(phone);
 };
 
-window.setupRealtimeTrackingListener = function(phone) {
+window.setupRealtimeTrackingListener = function(query) {
+  const qLower = query.toLowerCase().trim();
+  
   // Update My Orders screen elements if they exist
   const cBadge = document.getElementById('cActivePhoneBadge');
   const cVal = document.getElementById('cActivePhoneVal');
   const cInput = document.getElementById('cPhoneInput');
   if (cBadge) cBadge.style.display = 'block';
-  if (cVal) cVal.textContent = phone;
-  if (cInput) cInput.value = phone;
+  if (cVal) cVal.textContent = query;
+  if (cInput) cInput.value = query;
 
   // Update Home Screen elements if they exist
   const hBadge = document.getElementById('homeActivePhoneBadge');
   const hVal = document.getElementById('homeActivePhoneVal');
   const hInput = document.getElementById('homePhoneInput');
   if (hBadge) hBadge.style.display = 'block';
-  if (hVal) hVal.textContent = phone;
-  if (hInput) hInput.value = phone;
+  if (hVal) hVal.textContent = query;
+  if (hInput) hInput.value = query;
   
   const listEl = document.getElementById('mo-list');
   const emptyEl = document.getElementById('mo-empty');
@@ -2601,7 +2647,18 @@ window.setupRealtimeTrackingListener = function(phone) {
     snap.forEach(docSnap => {
       const data = docSnap.data();
       const orderId = docSnap.id;
-      if(data.phone === phone || (data.phone && data.phone.endsWith(phone)) || (phone.endsWith(data.phone))) {
+      
+      const phone = data.phone || '';
+      const customerName = (data.customerName || data.customer || '').toLowerCase();
+      const product = (data.product || '').toLowerCase();
+      const idLower = orderId.toLowerCase();
+      
+      const isMatch = (phone && (phone.includes(qLower) || qLower.includes(phone))) || 
+                      customerName.includes(qLower) || 
+                      idLower.includes(qLower) || 
+                      product.includes(qLower);
+
+      if(isMatch) {
         list.push({ id: orderId, ...data });
         
         // Dynamic Notification trigger on order status change
@@ -2636,10 +2693,10 @@ window.setupRealtimeTrackingListener = function(phone) {
     if(list.length === 0) {
       if (emptyEl) {
         emptyEl.style.display = 'block';
-        emptyEl.innerHTML = '<div class="ei">📦</div><p style="font-size:12px;color:#888;">لم يتم العثور على أي طلبيات مسجلة تحت الهاتف ' + phone + '</p>';
+        emptyEl.innerHTML = '<div class="ei">📦</div><p style="font-size:12px;color:#888;">لم يتم العثور على أي طلبيات مسجلة تطابق "' + query + '"</p>';
       }
       if (listEl) listEl.innerHTML = '';
-      if (hListEl) hListEl.innerHTML = '<div style="text-align:center;color:#888;font-size:11px;padding:10px 0;">لم يتم العثور على أي طلبيات مسجلة تحت هذا الرقم.</div>';
+      if (hListEl) hListEl.innerHTML = '<div style="text-align:center;color:#888;font-size:11px;padding:10px 0;">لم يتم العثور على أي طلبيات مسجلة تطابق البحث.</div>';
       return;
     }
     
@@ -2650,7 +2707,7 @@ window.setupRealtimeTrackingListener = function(phone) {
       
       const drHTML = o.driverName ? `
         <div style="background:rgba(26,92,42,0.04); border:1px solid rgba(26,92,42,0.1); border-radius:10px; padding:10px; margin-top:10px; text-align:right;">
-          <div style="font-size:11px; font-weight:700; color:var(--g1); margin-bottom:4px;">👤 سائق التوصيل المعيد والمطالب بالشحنة:</div>
+          <div style="font-size:11px; font-weight:700; color:var(--g1); margin-bottom:4px;">👤 سائق التوصيل المكلف بالشحنة:</div>
           <div style="font-size:12px; font-weight:800; color:var(--text);">${o.driverName}</div>
           <div style="margin-top:4px; display:flex; gap:6px;">
             <a href="tel:${o.driverPhone}" style="background:var(--g1); color:#fff; border-radius:6px; padding:4px 10px; font-size:11px; font-weight:bold; display:inline-block; text-decoration:none;">📞 اتصل بالسائق</a>
@@ -2684,58 +2741,319 @@ window.setupRealtimeTrackingListener = function(phone) {
 
 window.renderTrackingTimeline = function(order) {
   const s = order.status || 'pending';
-  const steps = [
-    { key: 'pending', label: '⏳ بانتظار التأكيد' },
-    { key: 'confirmed', label: '✅ قبول العقد وحجز البضاعة' },
-    { key: 'left_store', label: '🏪 خرج من المتجر' },
-    { key: 'in_shipping', label: '🏢 مركز الفرز' },
-    { key: 'out_for_delivery', label: '🏍️ مع السائق (الطريق)' },
-    { key: 'delivered', label: '📦 تم التسليم والتحصيل' }
-  ];
+  const orderId = order.id || '';
+  
+  let progress = 15;
+  let truckX = 30;
+  let truckY = 40;
+  let routeProgressText = "يتم الآن تجهيز السلعة بمخازن الشريك";
+  let distanceText = "0";
 
-  if (s === 'returned') {
-    return `
-      <div style="background:rgba(220,53,69,0.05); color:#dc3545; border-radius:10px; padding:12px; font-size:12px; font-weight:700; text-align:center; margin:10px 0;">
-        ❌ تم إلغاء توصيل الشحنة أو رفض استلامها وإرجاع البضاعة
-      </div>
-    `;
+  let destWilaya = order.wilaya || "16 الجزائر";
+  let wilayaNum = parseInt(destWilaya) || 16;
+  let distance = Math.abs(wilayaNum - 16) * 12 + 45;
+  if (wilayaNum === 16) distance = 15;
+
+  if (s === 'pending' || s === 'confirmed' || s === 'accepted') {
+    progress = 15;
+    truckX = 30;
+    truckY = 40;
+    routeProgressText = "الطلب مقبول وجاهز لبدء رحلة الشحن والتوصيل";
+  } else if (s === 'left_store') {
+    progress = 45;
+    truckX = 90;
+    truckY = 28;
+    routeProgressText = "خرجت البضاعة وهي في طريقها إلى مركز الفرز الولائي";
+  } else if (s === 'in_shipping') {
+    progress = 70;
+    truckX = 150;
+    truckY = 27;
+    routeProgressText = `وصلت الشحنة لمركز التوزيع الإقليمي لولاية ${destWilaya}`;
+  } else if (s === 'out_for_delivery') {
+    progress = 88;
+    truckX = 210;
+    truckY = 32;
+    routeProgressText = "مع السائق الآن في مرحلة التسليم والموافاة المنزلية";
+  } else if (s === 'delivered') {
+    progress = 100;
+    truckX = 270;
+    truckY = 40;
+    routeProgressText = "تم تسليم السلعة كلياً للزبون والتحصيل المالي بنجاح";
+  } else if (s === 'returned') {
+    progress = 0;
+    truckX = 30;
+    truckY = 40;
+    routeProgressText = "تم إلغاء الشحنة أو إرجاعها نهائياً لمقر المتجر";
   }
 
-  let curIndex = steps.findIndex(x => x.key === s);
-  if(s === 'accepted') curIndex = 1;
-  if(curIndex === -1) curIndex = 0;
+  distanceText = distance.toString();
 
-  let html = `
-    <div style="margin: 14px 0 10px; text-align: right; direction: rtl;">
-      <div style="display: flex; justify-content: space-between; align-items: center; position: relative; margin-bottom: 8px;">
-        <div style="position: absolute; left: 10px; right: 10px; height: 3px; background: #e0e0e0; z-index: 1; top: 10px;"></div>
-        <div style="position: absolute; left: 10px; right: 10px; height: 3px; background: var(--g1); z-index: 2; top: 10px; width: ${ (curIndex / (steps.length - 1)) * 100 }%; transition: width 0.3s;"></div>
-  `;
-
-  steps.forEach((step, idx) => {
-    const isDone = idx <= curIndex;
-    const isCurrent = idx === curIndex;
-    const dotCol = isDone ? 'var(--g1)' : '#e0e0e0';
-    const borderCol = isCurrent ? 'var(--gold)' : 'transparent';
-    const borderVal = isCurrent ? '3px solid var(--gold)' : 'none';
-    const innerDot = isDone ? '✓' : '';
-    
-    html += `
-        <div style="z-index: 3; text-align: center; display: flex; flex-direction: column; align-items: center; width: 24px;">
-          <div style="width: 20px; height: 20px; border-radius: 50%; background: ${dotCol}; color:#fff; font-size:10px; font-weight:bold; display:flex; align-items:center; justify-content:center; border:${borderVal}; font-family:'Cairo';">${innerDot}</div>
-        </div>
-    `;
-  });
-
-  html += `
+  const mapHTML = `
+    <div style="background: linear-gradient(135deg, #111e14 0%, #060a07 100%); border: 1.5px solid var(--gold); border-radius: 20px; padding: 18px; margin: 16px 0; color: #fff; text-align: right; box-shadow: 0 4px 15px rgba(0,0,0,0.15); box-sizing: border-box; direction: rtl;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <span style="font-size:13px; font-weight:800; color:var(--gold); display:flex; align-items:center; gap:6px; font-family:'Cairo';">
+          📍 خريطة تتبع مسار الشحنة بالولايات
+        </span>
+        <span style="font-size:10px; background:rgba(212,175,55,0.15); color:var(--gold); padding:2px 8px; border-radius:10px; border:1px solid var(--gold); font-weight:bold; font-family:'Cairo';">
+          نشط الآن 🟢
+        </span>
       </div>
-      <div style="font-size: 11px; font-weight:bold; color: var(--g1); text-align:center; margin-top:5px; background:rgba(26,92,42,0.06); padding:4px; border-radius:6px;">
-        مرحلة الخط الشاحن الحالية: ${steps[curIndex].label}
+      
+      <div style="position:relative; width:100%; height:90px; background:#142218; border-radius:12px; border:1px solid rgba(212,175,55,0.2); overflow:hidden; display:flex; align-items:center; justify-content:center; box-sizing:border-box;">
+        <svg style="position:absolute; top:0; left:0; width:100%; height:100%; opacity:0.1;" width="100%" height="100%">
+          <defs>
+            <pattern id="grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+              <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#D4AF37" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid-pattern)" />
+        </svg>
+        
+        <svg style="position:absolute; width:90%; height:100%;" viewBox="0 0 300 80">
+          <path d="M 30 40 Q 150 15 270 40" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="4" stroke-dasharray="5,5" />
+          <path d="M 30 40 Q 150 15 270 40" fill="none" stroke="var(--gold)" stroke-width="4" stroke-dasharray="300" stroke-dashoffset="${300 - (300 * progress / 100)}" style="transition: stroke-dashoffset 1.5s ease-out;" />
+          
+          <circle cx="30" cy="40" r="7" fill="var(--g1)" stroke="#fff" stroke-width="1.5" />
+          <circle cx="30" cy="40" r="14" fill="none" stroke="var(--g1)" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="7;18;7" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+          </circle>
+          
+          <circle cx="150" cy="27" r="7" fill="${progress >= 50 ? 'var(--gold)' : '#555'}" stroke="#fff" stroke-width="1.5" />
+          ${progress >= 40 && progress < 80 ? `
+          <circle cx="150" cy="27" r="14" fill="none" stroke="var(--gold)" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="7;18;7" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+          </circle>` : ''}
+          
+          <circle cx="270" cy="40" r="7" fill="${progress >= 95 ? '#25d366' : '#555'}" stroke="#fff" stroke-width="1.5" />
+          ${progress >= 80 ? `
+          <circle cx="270" cy="40" r="14" fill="none" stroke="#25d366" stroke-width="1.5" opacity="0.5">
+            <animate attributeName="r" values="7;18;7" dur="2s" repeatCount="indefinite" />
+            <animate attributeName="opacity" values="0.8;0;0.8" dur="2s" repeatCount="indefinite" />
+          </circle>` : ''}
+          
+          <g transform="translate(${truckX}, ${truckY}) scale(0.85)">
+            <circle cx="0" cy="0" r="11" fill="var(--gold)" />
+            <text x="-6" y="4" font-size="11px" fill="#000">🚚</text>
+          </g>
+        </svg>
+        
+        <div style="position:absolute; bottom:8px; right:10px; font-size:9px; color:#aaa; font-weight:bold; font-family:'Cairo';">🏪 متجر الشحن</div>
+        <div style="position:absolute; top:8px; left:50%; transform:translateX(-50%); font-size:9px; color:#aaa; font-weight:bold; font-family:'Cairo';">🏢 مركز فرز الولايات</div>
+        <div style="position:absolute; bottom:8px; left:10px; font-size:9px; color:#aaa; font-weight:bold; font-family:'Cairo';">📍 ولاية التوصيل: ${destWilaya}</div>
+      </div>
+      
+      <div style="margin-top:10px; font-size:11.5px; line-height:1.6; border-top:1px solid rgba(255,255,255,0.1); padding-top:10px; font-family:'Cairo';">
+        <div style="display:flex; justify-content:space-between; margin-bottom:3px;">
+          <span style="color:#bbb;">خط السير الفعلي:</span>
+          <span style="font-weight:bold; color:var(--gold2);">${routeProgressText}</span>
+        </div>
+        <div style="display:flex; justify-content:space-between;">
+          <span style="color:#bbb;">المسافة التقريبية:</span>
+          <span style="font-weight:bold; color:#fff;">${distanceText} كم</span>
+        </div>
       </div>
     </div>
   `;
 
-  return html;
+  if (s === 'returned') {
+    return `
+      ${mapHTML}
+      <div style="background:rgba(220,53,69,0.05); color:#dc3545; border-radius:14px; padding:16px; font-size:12.5px; font-weight:700; text-align:center; margin:14px 0; border: 1.5px solid rgba(220,53,69,0.2); font-family:'Cairo';">
+        ❌ تم إلغاء توصيل الشحنة أو رفض استلامها وإرجاع البضاعة للمخزن الرئيسي.
+      </div>
+    `;
+  }
+
+  const isStep1Done = true;
+  const isStep2Done = ['left_store', 'in_shipping', 'out_for_delivery', 'delivered'].includes(s);
+  const isStep3Done = ['in_shipping', 'out_for_delivery', 'delivered'].includes(s);
+  const isStep4Done = ['out_for_delivery', 'delivered'].includes(s);
+  const isStep5Done = s === 'delivered';
+
+  let linePercent = "0%";
+  if (s === 'left_store') linePercent = "25%";
+  else if (s === 'in_shipping') linePercent = "50%";
+  else if (s === 'out_for_delivery') linePercent = "75%";
+  else if (s === 'delivered') linePercent = "100%";
+
+  const storePhone = order.storePhone || order.phone || '0698694010';
+  const driverPhone = order.driverPhone || '';
+
+  const node1 = `<div style="width:26px; height:26px; border-radius:50%; background:${isStep1Done ? 'var(--g1)' : '#e2e8f0'}; border:2px solid ${isStep1Done ? 'var(--gold)' : '#cbd5e1'}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold; z-index:3;">✓</div>`;
+  const node2 = `<div style="width:26px; height:26px; border-radius:50%; background:${isStep2Done ? 'var(--g1)' : '#e2e8f0'}; border:2px solid ${isStep2Done ? 'var(--gold)' : '#cbd5e1'}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold; z-index:3;">🏪</div>`;
+  const node3 = `<div style="width:26px; height:26px; border-radius:50%; background:${isStep3Done ? 'var(--g1)' : '#e2e8f0'}; border:2px solid ${isStep3Done ? 'var(--gold)' : '#cbd5e1'}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold; z-index:3;">🚚</div>`;
+  const node4 = `<div style="width:26px; height:26px; border-radius:50%; background:${isStep4Done ? 'var(--g1)' : '#e2e8f0'}; border:2px solid ${isStep4Done ? 'var(--gold)' : '#cbd5e1'}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold; z-index:3;">🏍️</div>`;
+  const node5 = `<div style="width:26px; height:26px; border-radius:50%; background:${isStep5Done ? 'var(--g1)' : '#e2e8f0'}; border:2px solid ${isStep5Done ? 'var(--gold)' : '#cbd5e1'}; display:flex; align-items:center; justify-content:center; color:#fff; font-size:11px; font-weight:bold; z-index:3;">🎁</div>`;
+
+  const badge1 = `
+    <div style="position:relative; width:44px; height:44px; border-radius:50%; background:${isStep1Done ? 'var(--g1)' : '#f1f5f9'}; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 6px rgba(0,0,0,0.06); border: 1.5px solid ${isStep1Done ? 'var(--gold)' : '#e2e8f0'};">
+      <span style="color:${isStep1Done ? '#fff' : '#94a3b8'};">📄</span>
+    </div>
+  `;
+  const badge2 = `
+    <div style="position:relative; width:44px; height:44px; border-radius:50%; background:${isStep2Done ? 'var(--g1)' : '#f1f5f9'}; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 6px rgba(0,0,0,0.06); border: 1.5px solid ${isStep2Done ? 'var(--gold)' : '#e2e8f0'};">
+      <span style="color:${isStep2Done ? '#fff' : '#94a3b8'};">🏪</span>
+      ${isStep2Done ? `
+      <div onclick="openWA('${storePhone}', 'مرحباً، أود الاستفسار عن طلبي #${orderId.substring(0,8)}')" style="position:absolute; bottom:-2px; right:-2px; width:16px; height:16px; border-radius:50%; background:#25d366; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; font-size:8px; color:#fff; cursor:pointer;">
+        <i class="fa-brands fa-whatsapp"></i>
+      </div>` : ''}
+    </div>
+  `;
+  const badge3 = `
+    <div style="position:relative; width:44px; height:44px; border-radius:50%; background:${isStep3Done ? 'var(--g1)' : '#f1f5f9'}; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 6px rgba(0,0,0,0.06); border: 1.5px solid ${isStep3Done ? 'var(--gold)' : '#e2e8f0'};">
+      <span style="color:${isStep3Done ? '#fff' : '#94a3b8'};">🚚</span>
+      ${isStep3Done ? `
+      <div onclick="openWA('0560000000', 'مرحباً ياليدين، أود الاستفسار عن شحنتي رقم YAL-${orderId.substring(0,8).toUpperCase()}')" style="position:absolute; bottom:-2px; right:-2px; width:16px; height:16px; border-radius:50%; background:#25d366; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; font-size:8px; color:#fff; cursor:pointer;">
+        <i class="fa-brands fa-whatsapp"></i>
+      </div>` : ''}
+    </div>
+  `;
+  const badge4 = `
+    <div style="position:relative; width:44px; height:44px; border-radius:50%; background:${isStep4Done ? 'var(--g1)' : '#f1f5f9'}; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 6px rgba(0,0,0,0.06); border: 1.5px solid ${isStep4Done ? 'var(--gold)' : '#e2e8f0'};">
+      <span style="color:${isStep4Done ? '#fff' : '#94a3b8'};">🏍️</span>
+      ${isStep4Done && driverPhone ? `
+      <div onclick="openWA('${driverPhone}', 'مرحباً، أنا صاحب الطلبية #${orderId.substring(0,8)}، أود التنسيق معك لاستلام السلعة')" style="position:absolute; bottom:-2px; right:-2px; width:16px; height:16px; border-radius:50%; background:#25d366; display:flex; align-items:center; justify-content:center; border:1.5px solid #fff; font-size:8px; color:#fff; cursor:pointer;">
+        <i class="fa-brands fa-whatsapp"></i>
+      </div>` : ''}
+    </div>
+  `;
+  const badge5 = `
+    <div style="position:relative; width:44px; height:44px; border-radius:50%; background:${isStep5Done ? 'var(--g1)' : '#f1f5f9'}; display:flex; align-items:center; justify-content:center; font-size:18px; box-shadow:0 3px 6px rgba(0,0,0,0.06); border: 1.5px solid ${isStep5Done ? 'var(--gold)' : '#e2e8f0'};">
+      <span style="color:${isStep5Done ? '#fff' : '#94a3b8'};">🎁</span>
+    </div>
+  `;
+
+  const buttonsStep2 = isStep2Done ? `
+    <div style="margin-top:6px; display:flex; gap:6px;">
+      <button onclick="openWA('${storePhone}', 'مرحباً، أود الاستفسار عن طلبي #${orderId.substring(0,8)} من متجركم الموقر')" style="background:#25d366; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:bold; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <i class="fa-brands fa-whatsapp"></i> واتساب المتجر
+      </button>
+    </div>
+  ` : '';
+
+  const buttonsStep3 = isStep3Done ? `
+    <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+      <button onclick="alert('📦 شحنتك مسجلة في مركز ياليدين الوطني تحت الرمز: YAL-${orderId.substring(0,8).toUpperCase()} - وهي في وضع الحركة والمتابعة الولائية حالياً.')" style="background:var(--g1); color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:bold; font-family:'Cairo'; cursor:pointer;">
+        📍 تتبع الشحنة
+      </button>
+      <button onclick="openWA('0560000000', 'مرحباً ياليدين، أود الاستفسار عن شحنتي رقم YAL-${orderId.substring(0,8).toUpperCase()}')" style="background:#25d366; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:bold; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <i class="fa-brands fa-whatsapp"></i> واتساب ياليدين
+      </button>
+    </div>
+  ` : '';
+
+  const buttonsStep4 = isStep4Done && driverPhone ? `
+    <div style="margin-top:6px; display:flex; gap:6px; flex-wrap:wrap;">
+      <a href="tel:${driverPhone}" style="background:var(--g1); color:#fff; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:bold; font-family:'Cairo'; text-decoration:none; display:inline-flex; align-items:center; gap:4px; border:none;">
+        📞 اتصال بالسائق
+      </a>
+      <button onclick="openWA('${driverPhone}', 'مرحباً، أنا صاحب الطلبية #${orderId.substring(0,8)}، أود التنسيق معك لاستلام السلعة')" style="background:#25d366; color:#fff; border:none; border-radius:8px; padding:6px 12px; font-size:11px; font-weight:bold; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; gap:4px;">
+        <i class="fa-brands fa-whatsapp"></i> واتساب السائق
+      </button>
+    </div>
+  ` : '';
+
+  const buttonsStep5 = `
+    <div style="margin-top:12px; display:flex; gap:8px; justify-content:center; border-top:1px dashed #e2e8f0; padding-top:12px;">
+      <button onclick="confirmOrderReceipt('${orderId}')" style="flex:1; background:#22c55e; color:#fff; border:none; border-radius:10px; height:36px; font-size:11.5px; font-weight:800; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 3px 8px rgba(34,197,94,0.2);">
+        ✓ تأكيد الاستلام
+      </button>
+      <button onclick="returnOrderRequest('${orderId}')" style="flex:1; background:#ef4444; color:#fff; border:none; border-radius:10px; height:36px; font-size:11.5px; font-weight:800; font-family:'Cairo'; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:4px; box-shadow:0 3px 8px rgba(239,68,68,0.2);">
+        ✕ ارجاع الطلب
+      </button>
+    </div>
+  `;
+
+  return `
+    ${mapHTML}
+    
+    <div style="background:#fff; border:1.5px solid var(--bd); border-radius:24px; padding:20px; margin-top:16px; box-shadow:0 4px 15px rgba(0,0,0,0.02); text-align:right; box-sizing:border-box;">
+      <h3 style="font-size:15px; font-weight:900; color:var(--g1); margin:0 0 20px; text-align:center; font-family:'Cairo';">📍 حالة الطلب النموذجي</h3>
+      
+      <div style="position:relative; direction:rtl; text-align:right;">
+        <div style="position:absolute; right:12px; top:13px; bottom:13px; width:2px; background:#e2e8f0; z-index:1;"></div>
+        <div style="position:absolute; right:12px; top:13px; height:${linePercent}; width:2px; background:var(--g1); z-index:2; transition:height 0.5s;"></div>
+        
+        <div style="display:flex; align-items:flex-start; margin-bottom:24px; position:relative; z-index:3;">
+          <div style="width:26px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${node1}</div>
+          <div style="flex:1; padding-right:12px; padding-left:12px; box-sizing:border-box;">
+            <h4 style="font-size:13px; font-weight:900; color:${isStep1Done ? 'var(--g1)' : '#777'}; margin:0 0 3px; font-family:'Cairo';">مقبول</h4>
+            <p style="font-size:11px; color:${isStep1Done ? 'var(--text)' : '#999'}; line-height:1.4; margin:0; font-family:'Cairo';">تم قبول الطلب من قبل المتجر وبدء التجهيز.</p>
+          </div>
+          <div style="width:44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${badge1}</div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; margin-bottom:24px; position:relative; z-index:3;">
+          <div style="width:26px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${node2}</div>
+          <div style="flex:1; padding-right:12px; padding-left:12px; box-sizing:border-box;">
+            <h4 style="font-size:13px; font-weight:900; color:${isStep2Done ? 'var(--g1)' : '#777'}; margin:0 0 3px; font-family:'Cairo';">في المتجر</h4>
+            <p style="font-size:11px; color:${isStep2Done ? 'var(--text)' : '#999'}; line-height:1.4; margin:0; font-family:'Cairo';">الطلب قيد التجهيز في المتجر لبريد السريع.</p>
+            ${buttonsStep2}
+          </div>
+          <div style="width:44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${badge2}</div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; margin-bottom:24px; position:relative; z-index:3;">
+          <div style="width:26px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${node3}</div>
+          <div style="flex:1; padding-right:12px; padding-left:12px; box-sizing:border-box;">
+            <h4 style="font-size:13px; font-weight:900; color:${isStep3Done ? 'var(--g1)' : '#777'}; margin:0 0 3px; font-family:'Cairo';">في الشحن</h4>
+            <p style="font-size:11px; color:${isStep3Done ? 'var(--text)' : '#999'}; line-height:1.4; margin:0; font-family:'Cairo';">الطلب في مكتب الشحن (ياليدين) للتوصيل السريع.</p>
+            ${buttonsStep3}
+          </div>
+          <div style="width:44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${badge3}</div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; margin-bottom:24px; position:relative; z-index:3;">
+          <div style="width:26px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${node4}</div>
+          <div style="flex:1; padding-right:12px; padding-left:12px; box-sizing:border-box;">
+            <h4 style="font-size:13px; font-weight:900; color:${isStep4Done ? 'var(--g1)' : '#777'}; margin:0 0 3px; font-family:'Cairo';">عند سائق توصيل</h4>
+            <p style="font-size:11px; color:${isStep4Done ? 'var(--text)' : '#999'}; line-height:1.4; margin:0; font-family:'Cairo';">الطلب مع السائق لتوصيله إليك قريباً.</p>
+            ${buttonsStep4}
+          </div>
+          <div style="width:44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${badge4}</div>
+        </div>
+
+        <div style="display:flex; align-items:flex-start; position:relative; z-index:3;">
+          <div style="width:26px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${node5}</div>
+          <div style="flex:1; padding-right:12px; padding-left:12px; box-sizing:border-box;">
+            <h4 style="font-size:13px; font-weight:900; color:${isStep5Done ? 'var(--g1)' : '#777'}; margin:0 0 3px; font-family:'Cairo';">استلام</h4>
+            <p style="font-size:11px; color:${isStep5Done ? 'var(--text)' : '#999'}; line-height:1.4; margin:0; font-family:'Cairo';">يرجى تأكيد الاستلام الفعلي أو تحديد خيار الإرجاع مع مندوب التوصيل.</p>
+            ${buttonsStep5}
+          </div>
+          <div style="width:44px; display:flex; justify-content:center; align-items:center; flex-shrink:0;">${badge5}</div>
+        </div>
+      </div>
+    </div>
+  `;
+};
+
+window.confirmOrderReceipt = async function(orderId) {
+  if(confirm('✅ هل تؤكد استلام الشحنة وتوقيع العقد واستلام البضاعة من السائق؟')) {
+    try {
+      const db = window._db;
+      await window._ff.updateDoc(window._ff.doc(db, 'orders', orderId), { status: 'delivered' });
+      toast('🎉 تم تأكيد استلام الشحنة بنجاح! شكراً لتعاملك مع ZaLo', 'success');
+    } catch(e) {
+      console.error(e);
+      alert('❌ فشل في تحديث حالة الطلبية');
+    }
+  }
+};
+
+window.returnOrderRequest = async function(orderId) {
+  const reason = prompt('❌ يرجى كتابة سبب إرجاع الطلب أو إلغائه (مثلاً: عدم مطابقة المواصفات، تأخر التوصيل...):');
+  if (reason !== null) {
+    try {
+      const db = window._db;
+      await window._ff.updateDoc(window._ff.doc(db, 'orders', orderId), { status: 'returned', returnReason: reason });
+      toast('📥 تم تقديم طلب إرجاع الشحنة وموافاة المتجر بالسبب', 'warning');
+    } catch(e) {
+      console.error(e);
+      alert('❌ فشل في تحديث حالة الطلبية');
+    }
+  }
 };
 
 // ====== DYNAMIC NOTIFICATIONS SYSTEM ======
