@@ -576,6 +576,7 @@
   }
   #passcode-screen button,
   #passcode-screen .pin-btn {
+    pointer-events: auto !important;
     width: 72px !important;
     height: 72px !important;
     border-radius: 50% !important;
@@ -657,9 +658,6 @@
 </style>
 
 <div id="passcode-screen" style="display:flex; position:fixed; top:0; left:0; right:0; bottom:0; background:radial-gradient(ellipse at center, #111e15, #070d0a); z-index:99999999; flex-direction:column; align-items:center; justify-content:center; color:#fff; font-family:'Cairo', sans-serif; transition: opacity 0.3s ease;">
-  <!-- Real input field under-the-hood connected to keyboard & listeners -->
-  <input type="tel" id="pin-hidden-input" maxlength="6" pattern="[0-9]*" inputmode="numeric" style="position: absolute; top: -1000px; left: -1000px; opacity: 0; pointer-events: none;" autocomplete="off" />
-
   <div style="text-align:center; margin-bottom:30px;">
     <div style="width:72px; height:72px; border-radius:50%; background:rgba(37,168,96,0.1); border:2px solid var(--gold); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; font-size:32px;">🔐</div>
     <div style="font-size:18px; font-weight:800; color:#fff;">دخول الإدارة العامة</div>
@@ -1589,6 +1587,7 @@ window.doLogin = async function() {
 };
 
 window.doLogout = async function() {
+  sessionStorage.removeItem('admin_security_unlocked');
   localStorage.removeItem('loggedInAdminEmail');
   localStorage.removeItem('loggedInAdminName');
   sessionStorage.removeItem('zalo_admin_role');
@@ -2668,10 +2667,6 @@ function initSecurityLock() {
     document.getElementById('passcode-screen').style.display = 'none';
   } else {
     document.getElementById('passcode-screen').style.display = 'flex';
-    setTimeout(() => {
-      const input = document.getElementById('pin-hidden-input');
-      if (input) input.focus();
-    }, 300);
   }
 }
 
@@ -2689,11 +2684,12 @@ function updatePinDots() {
 }
 
 window.pressPin = function(num) {
-  const input = document.getElementById('pin-hidden-input');
-  if (!input) return;
-  if (input.value.length >= 6) return;
-  input.value += num;
-  input.dispatchEvent(new Event('input'));
+  if (enteredPin.length >= 6) return;
+  enteredPin += num;
+  updatePinDots();
+  if (enteredPin.length === 6) {
+    setTimeout(verifyPin, 150);
+  }
 };
 
 async function verifyPin() {
@@ -2734,8 +2730,6 @@ async function verifyPin() {
       }
 
       enteredPin = "";
-      const input = document.getElementById('pin-hidden-input');
-      if (input) input.value = "";
       updatePinDots();
     }
   } catch(e) {
@@ -2745,50 +2739,28 @@ async function verifyPin() {
 }
 
 window.resetPin = function() {
-  const input = document.getElementById('pin-hidden-input');
-  if (input) {
-    input.value = "";
-    input.dispatchEvent(new Event('input'));
-  } else {
-    enteredPin = "";
-    updatePinDots();
-  }
+  enteredPin = "";
+  updatePinDots();
 };
 
 window.backspacePin = function() {
-  const input = document.getElementById('pin-hidden-input');
-  if (input) {
-    if (input.value.length > 0) {
-      input.value = input.value.slice(0, -1);
-      input.dispatchEvent(new Event('input'));
-    }
-  } else if (enteredPin.length > 0) {
+  if (enteredPin.length > 0) {
     enteredPin = enteredPin.slice(0, -1);
     updatePinDots();
   }
 };
 
-// Bind automatic click & input event synchronization
-document.addEventListener('DOMContentLoaded', () => {
-  const input = document.getElementById('pin-hidden-input');
+// Bind keyboard events for desktop users
+window.addEventListener('keydown', (e) => {
   const passcodeScreen = document.getElementById('passcode-screen');
-  
-  if (passcodeScreen && input) {
-    passcodeScreen.addEventListener('click', (e) => {
-      if (!e.target.closest('button')) {
-        input.focus();
-      }
-    });
-  }
-
-  if (input) {
-    input.addEventListener('input', () => {
-      enteredPin = input.value;
-      updatePinDots();
-      if (enteredPin.length === 6) {
-        setTimeout(verifyPin, 150);
-      }
-    });
+  if (passcodeScreen && passcodeScreen.style.display !== 'none') {
+    if (e.key >= '0' && e.key <= '9') {
+      pressPin(e.key);
+    } else if (e.key === 'Backspace') {
+      backspacePin();
+    } else if (e.key === 'Escape') {
+      resetPin();
+    }
   }
 });
 

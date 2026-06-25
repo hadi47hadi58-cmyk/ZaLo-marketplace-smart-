@@ -1350,13 +1350,27 @@ onAuthStateChanged(auth, async (u) => {
       userEl.style.display = 'none';
       if (profileCard) profileCard.style.display = 'block';
       if (unifiedLogin) unifiedLogin.style.display = 'flex';
+      
       // Securely clear any leftover UI info to protect user privacy
       const nameEl = document.getElementById('sm-user-name');
       const emailEl = document.getElementById('sm-user-email');
       const avatarEl = document.getElementById('sm-user-avatar');
-      if (nameEl) nameEl.textContent = 'تحميل...';
-      if (emailEl) emailEl.textContent = 'email@zalo.dz';
-      if (avatarEl) avatarEl.textContent = '?';
+      const badgeEl = document.getElementById('sm-user-badge');
+      const actionBtn = document.getElementById('sm-user-action-btn');
+      
+      if (nameEl) nameEl.textContent = 'زائر غير مسجل';
+      if (emailEl) emailEl.textContent = '';
+      if (avatarEl) avatarEl.textContent = '؟';
+      if (badgeEl) {
+        badgeEl.textContent = 'غير مسجل 🔐';
+        badgeEl.style.background = 'rgba(0,0,0,0.05)';
+        badgeEl.style.color = '#777';
+        badgeEl.style.display = 'inline-block';
+      }
+      if (actionBtn) {
+        actionBtn.style.display = 'none';
+        actionBtn.onclick = null;
+      }
     }
   }
 });
@@ -1372,6 +1386,25 @@ window.logoutCustomerAccount = async function() {
       
       // Clear customer session
       if (window.clearCustomerSession) window.clearCustomerSession();
+      
+      // Force instant UI clearance
+      const nameEl = document.getElementById('sm-user-name');
+      const emailEl = document.getElementById('sm-user-email');
+      const avatarEl = document.getElementById('sm-user-avatar');
+      const badgeEl = document.getElementById('sm-user-badge');
+      const actionBtn = document.getElementById('sm-user-action-btn');
+      
+      if (nameEl) nameEl.textContent = 'جاري الخروج...';
+      if (emailEl) emailEl.textContent = '';
+      if (avatarEl) avatarEl.textContent = '؟';
+      if (badgeEl) {
+        badgeEl.textContent = 'تم تسجيل الخروج';
+        badgeEl.style.display = 'none';
+      }
+      if (actionBtn) {
+        actionBtn.style.display = 'none';
+        actionBtn.onclick = null;
+      }
       
       toast('👋 تم تسجيل الخروج بنجاح!');
       setTimeout(() => { window.location.reload(); }, 600);
