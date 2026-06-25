@@ -10,6 +10,7 @@ import { AnalyticsModule } from './analytics/analytics.module';
 import { AuditService } from './audit/audit.service';
 import { MerchantModule } from './merchant/merchant.module';
 import { DeliveryModule } from './delivery/delivery.module';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { DeliveryModule } from './delivery/delivery.module';
     AnalyticsModule,
     MerchantModule,
     DeliveryModule,
+    SupabaseModule,
   ],
   providers: [AuditService],
   exports: [AuditService],
