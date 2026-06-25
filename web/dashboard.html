@@ -360,12 +360,12 @@
   }
   .finput {
     width:100%; padding: 10px 12px;
-    background: var(--bg3); border: 1px solid var(--border);
+    background: rgba(26, 92, 42, 0.05); border: 1.5px solid var(--gold);
     border-radius: 10px; color: var(--text);
     font-family: 'Cairo', sans-serif; font-size: 13px;
-    outline: none; transition: border-color 0.2s;
+    outline: none; transition: border-color 0.2s, background-color 0.2s;
   }
-  .finput:focus { border-color: var(--green); }
+  .finput:focus { border-color: var(--gold); background: rgba(26, 92, 42, 0.12); }
   .frow2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
   .img-upload-area {
@@ -569,11 +569,16 @@
   <div class="sidebar-head">
     <div class="shop-avatar" id="sideAvatar">🏪</div>
     <div class="shop-name" id="sideName">متجري الشريك</div>
-    <div style="display:flex; gap:6px; align-items:center; margin-top:6px; justify-content:center;">
-      <div class="shop-status" id="sideStatus">نشط</div>
-      <button id="storeToggleBtn" onclick="toggleStoreStatus()" style="background:#4caf50; color:#fff; border:none; padding:4px 8px; border-radius:6px; font-size:11px; font-family:'Cairo',sans-serif; cursor:pointer; flex: 1; transition:all 0.2s; min-height:24px; display:flex; align-items:center; justify-content:center; gap:3px;">
-         🟢 مفتوح
-      </button>
+    <div style="display:flex; gap:10px; align-items:center; margin-top:6px; justify-content:center; background:rgba(26,92,42,0.06); padding:6px 12px; border-radius:10px; border:1px solid var(--border);">
+      <div class="shop-status" id="sideStatus" style="font-size:11px; font-weight:700; margin:0;">نشط</div>
+      <div style="width:1.5px; height:14px; background:var(--border);"></div>
+      <!-- Toggle Switch Container -->
+      <div style="display:inline-flex; align-items:center; gap:6px; cursor:pointer; user-select:none;" onclick="toggleStoreStatus()">
+        <span id="storeToggleLabel" style="font-size:11px; font-weight:800; font-family:'Cairo',sans-serif; min-width:34px; text-align:right; transition:color 0.2s;">مفتوح</span>
+        <div id="storeToggleTrack" style="position:relative; width:42px; height:22px; background:#4caf50; border-radius:11px; transition:background-color 0.25s; flex-shrink:0;">
+          <div id="storeToggleThumb" style="position:absolute; top:2px; right:2px; width:18px; height:18px; background:#fff; border-radius:50%; transition:right 0.25s; box-shadow:0 1.5px 3px rgba(0,0,0,0.35);"></div>
+        </div>
+      </div>
     </div>
   </div>
   <nav class="sidebar-nav">
@@ -583,7 +588,7 @@
     </div>
     <div class="nav-sec">المنتجات</div>
     <div class="nav-item" onclick="goPage('products')">
-      <span class="ni"><i class="fa-solid fa-box-open"></i></span> معروضاتي
+      <span class="ni"><i class="fa-solid fa-box-open"></i></span> منتجات متجر
     </div>
     <div class="nav-item" onclick="goPage('add-product')">
       <span class="ni"><i class="fa-solid fa-plus"></i></span> إضافة سلعة
@@ -666,12 +671,12 @@
 
   <!-- PRODUCTS -->
   <div class="page page-fade" id="page-products">
-    <div class="sec-head">
-      <div class="sec-title">📦 إدارة وجرد سلعي</div>
-      <button class="btn btn-g" onclick="goPage('add-product')">➕ عرض سلعة جديدة</button>
+    <div class="sec-head" style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px;">
+      <div style="border: 2px solid var(--gold); background: rgba(26,92,42,0.12); color: var(--gold); padding: 8px 14px; border-radius: 9px; font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; font-family: 'Cairo', sans-serif;">📦 إدارة وجرد السلع</div>
+      <button class="btn" style="border: 2px solid var(--gold); background: rgba(26,92,42,0.12); color: var(--gold); padding: 8px 14px; border-radius: 9px; font-weight: 800; font-size: 13px; display: inline-flex; align-items: center; gap: 6px; font-family: 'Cairo', sans-serif; cursor:pointer;" onclick="goPage('add-product')">➕ عرض سلع جديدة</button>
     </div>
-    <div class="products-grid" id="productsGrid">
-      <div class="ldg" style="grid-column:1/-1"><div class="spin"></div></div>
+    <div id="productsGrid" style="display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box;">
+      <div class="ldg" style="width:100%; text-align:center;"><div class="spin"></div></div>
     </div>
   </div>
 
@@ -687,43 +692,40 @@
         <button id="tabAddLanding" class="btn" style="flex:1; justify-content:center; padding:10px; font-size:12px; font-weight:700; background:transparent; color:var(--text2); border-radius:8px; border:none;" onclick="switchAddProductTab('landing')">🚀 تصميم صفحة هبوط مبيعات</button>
       </div>
 
-      <div class="frow2">
-        <div class="frow">
-          <label class="flbl">اسم السلعة كما يراها الزبون *</label>
-          <input class="finput" id="pName" placeholder="مثال: حذاء جلدي محلي الصنع" />
-        </div>
-        <div class="frow">
-          <label class="flbl">فئة المنتج بالسوق *</label>
-          <select class="finput" id="pCategory">
-            <option value="">حدد الفئة المقترحة...</option>
-            <option>هواتف وإلكترونيات</option>
-            <option>أثاث ومنزل</option>
-            <option>ملابس وأزياء</option>
-            <option>أحذية وحقائب</option>
-            <option>مواد غذائية</option>
-            <option>ألعاب وهدايا</option>
-            <option>سيارات وقطع غيار</option>
-            <option>رياضية ولياقة</option>
-            <option>عقارات كراء وبيع</option>
-            <option>صحة ومكملات غذائية</option>
-            <option>خردوات ومواد بناء</option>
-            <option>أدوات ومعدات</option>
-            <option>تجميل وعناية</option>
-            <option>كتب وقرطاسية</option>
-            <option>خدمات ومهن حرة</option>
-            <option>أخرى</option>
-          </select>
-        </div>
+      <div class="frow">
+        <label class="flbl">اسم السلعة كما يراها الزبون *</label>
+        <input class="finput" id="pName" placeholder="مثال: حذاء جلدي محلي الصنع" />
       </div>
-      <div class="frow2">
-        <div class="frow">
-          <label class="flbl">السعر المستحق (دج) *</label>
-          <input class="finput" id="pPrice" type="number" placeholder="0" min="0" />
-        </div>
-        <div class="frow">
-          <label class="flbl">السعر قبل التخفيض (اختياري)</label>
-          <input class="finput" id="pOldPrice" type="number" placeholder="0" min="0" />
-        </div>
+      <div class="frow">
+        <label class="flbl">فئة المنتج بالسوق *</label>
+        <select class="finput" id="pCategory">
+          <option value="">حدد الفئة المقترحة...</option>
+          <option>هواتف وإلكترونيات</option>
+          <option>أثاث ومنزل</option>
+          <option>ملابس وأزياء</option>
+          <option>أحذية وحقائب</option>
+          <option>مواد غذائية</option>
+          <option>ألعاب وهدايا</option>
+          <option>سيارات وقطع غيار</option>
+          <option>رياضية ولياقة</option>
+          <option>عقارات كراء وبيع</option>
+          <option>صحة ومكملات غذائية</option>
+          <option>خردوات ومواد بناء</option>
+          <option>أدوات ومعدات</option>
+          <option>تجميل وعناية</option>
+          <option>كتب وقرطاسية</option>
+          <option>خدمات ومهن حرة</option>
+          <option>أخرى</option>
+        </select>
+      </div>
+
+      <div class="frow">
+        <label class="flbl">السعر المستحق (دج) *</label>
+        <input class="finput" id="pPrice" type="number" placeholder="0" min="0" />
+      </div>
+      <div class="frow">
+        <label class="flbl">السعر قبل التخفيض (اختياري)</label>
+        <input class="finput" id="pOldPrice" type="number" placeholder="0" min="0" />
       </div>
       <div class="frow">
         <label class="flbl">الكمية والمخزون المتوفر للتوصيل فوراً *</label>
@@ -735,7 +737,7 @@
       </div>
       <div class="frow">
         <label class="flbl">📷 صورة المنتج للبيع (جالبة للمشترين)</label>
-        <div id="pImgBox" style="position:relative; background:var(--bg3); border:2px dashed var(--border); border-radius:12px; padding:18px; text-align:center; cursor:pointer; min-height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.25s;">
+        <div id="pImgBox" style="position:relative; background:rgba(26,92,42,0.05); border:2px dashed var(--gold); border-radius:12px; padding:18px; text-align:center; cursor:pointer; min-height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; transition:all 0.25s;">
           <input type="file" id="pImgInput" accept="image/*" onchange="pickProductImage(this)" style="position:absolute; inset:0; opacity:0; cursor:pointer;" />
           <div id="pImgPlaceholder">
             <div style="font-size:26px; margin-bottom:6px">📸</div>
@@ -922,7 +924,7 @@
       </div>
       <div class="frow">
         <label class="flbl">📁 قسم وصنف المنتجات الرئيسي *</label>
-        <select class="finput" id="editCategory" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
+        <select class="finput" id="editCategory" style="color:#fff;">
           <option value="">اختر القسم...</option>
           <option value="هواتف وإلكترونيات">هواتف وإلكترونيات</option>
           <option value="أثاث ومنزل">أثاث ومنزل</option>
@@ -944,13 +946,13 @@
       </div>
       <div class="frow">
         <label class="flbl">📍 ولاية النشاط والفرز الجغرافي *</label>
-        <select class="finput" id="editWilaya" onchange="fillDashboardCommunes(this.value)" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
+        <select class="finput" id="editWilaya" onchange="fillDashboardCommunes(this.value)" style="color:#fff;">
           <option value="">اختر الولاية...</option>
         </select>
       </div>
       <div class="frow">
         <label class="flbl">🏙️ البلدية والمنطقة *</label>
-        <select class="finput" id="editCommune" style="color:#fff; background:var(--bg3); border:1px solid var(--border);">
+        <select class="finput" id="editCommune" style="color:#fff;">
           <option value="">اختر البلدية...</option>
         </select>
       </div>
@@ -1407,17 +1409,23 @@ window.toggleStoreStatus = async function() {
 };
 
 window.updateStoreToggleBtn = function() {
-  const btn = document.getElementById('storeToggleBtn');
+  const track = document.getElementById('storeToggleTrack');
+  const thumb = document.getElementById('storeToggleThumb');
+  const label = document.getElementById('storeToggleLabel');
   const statusBadge = document.getElementById('sideStatus');
   const isOpen = (shopData.storeOpen !== false);
   
-  if (btn) {
+  if (track && thumb && label) {
     if (isOpen) {
-      btn.innerHTML = '🟢 مفتوح';
-      btn.style.background = '#4caf50';
+      track.style.backgroundColor = '#4caf50';
+      thumb.style.right = '2px';
+      label.textContent = 'مفتوح';
+      label.style.color = '#4caf50';
     } else {
-      btn.innerHTML = '🔴 مغلق';
-      btn.style.background = '#f44336';
+      track.style.backgroundColor = '#f44336';
+      thumb.style.right = '22px';
+      label.textContent = 'مغلق';
+      label.style.color = '#f44336';
     }
   }
 
@@ -1577,30 +1585,38 @@ async function loadProducts() {
 function renderProducts() {
   const grid = document.getElementById('productsGrid');
   if(!allProducts.length) {
-    grid.innerHTML = `<div class="empty" style="grid-column:1/-1">
+    grid.innerHTML = `<div class="empty" style="width:100%">
       <div class="empty-i">📦</div>
       <div class="empty-t">قائمة معروضاتك فارغة حالياً</div>
       <button class="btn btn-g" style="margin-top:10px" onclick="goPage('add-product')">➕ اعرض أول سلعك فوراً</button>
     </div>`;
     return;
   }
-  grid.innerHTML = allProducts.map(p => {
-    const imgHTML = p.imageURL ? `<img src="${p.imageURL}" class="prod-img" style="width:100%;height:140px;object-fit:cover;border-radius:10px;margin-bottom:8px" alt="${p.name}" />` : `<div class="prod-img" style="width:100%;height:140px;background:var(--bg3);display:flex;align-items:center;justify-content:center;border-radius:10px;margin-bottom:8px;font-size:28px">📦</div>`;
+  grid.innerHTML = `<div style="display:flex; flex-direction:column; gap:10px; width:100%; box-sizing:border-box;">` + allProducts.map(p => {
+    const imgHTML = p.imageURL ? `<img src="${p.imageURL}" style="width:36px;height:36px;object-fit:cover;border-radius:6px;border:1.2px solid var(--gold);" alt="${p.name}" />` : `<div style="width:36px;height:36px;background:rgba(26,92,42,0.1);border:1.2px solid var(--gold);display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:16px">📦</div>`;
     return `
-      <div class="prod-card">
-        ${imgHTML}
-        <div class="prod-info">
-          <div class="prod-name" style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:4px">${p.name}</div>
-          <div class="prod-price" style="font-size:13px;color:var(--gold2);font-weight:800;margin-bottom:4px">${(p.price || 0).toLocaleString()} دج</div>
-          <div class="prod-stock" style="font-size:11px;color:var(--text2)">المخزون المتوفر: ${p.stock || 10}</div>
-          <div class="prod-actions" style="margin-top:8px; display:flex; gap:6px;">
-            <button class="ab" style="background:#4caf50;color:#fff;padding:6px 10px;border-radius:6px;flex:1;font-size:11px;border:none;cursor:pointer;" onclick="editProd('${p.id}')">✏️ تعديل</button>
-            <button class="ab ab-e" style="background:#ef5350;color:#fff;padding:6px 10px;border-radius:6px;flex:1;font-size:11px;border:none;cursor:pointer;" onclick="deleteProd('${p.id}')">❌ حذف</button>
-          </div>
+      <div class="prod-row-standardized" style="display:flex; flex-direction:row; align-items:center; justify-content:space-between; border:1.5px solid var(--gold); border-radius:12px; padding:10px 14px; background:rgba(26,92,42,0.06); gap:12px; direction:rtl; box-sizing:border-box; width:100%;">
+        <!-- Product Thumbnail and Name -->
+        <div style="display:flex; align-items:center; gap:10px; flex:1; min-width:0;">
+          ${imgHTML}
+          <div style="font-weight:700; font-size:13px; color:var(--text); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; min-width:0;">${p.name}</div>
+        </div>
+        <!-- Product Price -->
+        <div style="font-size:13px; color:var(--gold); font-weight:800; border:1.5px solid var(--gold); padding:4px 10px; border-radius:6px; background:rgba(26,92,42,0.12); white-space:nowrap; text-align:center;">
+          ${(p.price || 0).toLocaleString()} دج
+        </div>
+        <!-- Actions (Edit & Delete Buttons) -->
+        <div style="display:flex; align-items:center; gap:6px; flex-shrink:0;">
+          <button style="background:rgba(26,92,42,0.15); color:#fff; border:1.5px solid var(--gold); padding:6px 12px; border-radius:6px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px; font-family:'Cairo';" onclick="editProd('${p.id}')">
+            ✏️ <span style="display:inline;">تعديل</span>
+          </button>
+          <button style="background:rgba(229,57,53,0.12); color:#ffcdd2; border:1.5px solid var(--gold); padding:6px 12px; border-radius:6px; font-size:11.5px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:4px; font-family:'Cairo';" onclick="deleteProd('${p.id}')">
+            ❌ <span style="display:inline;">حذف</span>
+          </button>
         </div>
       </div>
     `;
-  }).join('');
+  }).join('') + `</div>`;
 }
 
 function renderHomeProducts(prods) {
@@ -2270,7 +2286,7 @@ window.goPage = function(page) {
   const el = document.getElementById('page-'+page);
   if(el) { el.classList.add('active'); el.classList.remove('page-fade'); void el.offsetWidth; el.classList.add('page-fade'); }
 
-  const titles = { home:'لوحتي الشاملة', products:'معروضاتي النشطة', 'add-product':'عرض سلعة جديدة لقائمة البيع', orders:'إدارات طلبيات الشحن', chat:'دعم ومراسلة الإدارة', analytics:'الأرباح والتحاليل الدقيقة', profile:'ملف محلي التجاري' };
+  const titles = { home:'لوحتي الشاملة', products:'منتجات متجر', 'add-product':'عرض سلعة جديدة لقائمة البيع', orders:'إدارات طلبيات الشحن', chat:'دعم ومراسلة الإدارة', analytics:'الأرباح والتحاليل الدقيقة', profile:'ملف محلي التجاري' };
   document.getElementById('topTitle').textContent = titles[page]||page;
 
   const idxMap = { home:0, products:1, 'add-product':2, orders:3, chat:4, analytics:5, profile:6 };
