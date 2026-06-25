@@ -271,6 +271,66 @@
       display: flex; align-items: center; gap: 6px; z-index: 15;
     }
     .back-btn:hover { color: #fff; }
+
+    @media (max-width: 600px) {
+      html, body {
+        padding: 8px 12px !important;
+        overflow: hidden !important; /* No-Scroll policy */
+        height: 100vh !important;
+        height: 100dvh !important;
+        justify-content: center !important;
+      }
+      .wrapper {
+        max-width: 100% !important;
+      }
+      .logo-area {
+        margin-bottom: 10px !important;
+        margin-top: 4px !important;
+      }
+      .logo-area img {
+        width: 80px !important;
+        height: 80px !important;
+      }
+      .brand-subtitle {
+        font-size: 11px !important;
+        margin-top: 4px !important;
+      }
+      .card {
+        padding: 14px 16px !important;
+        margin-bottom: 8px !important;
+        border-radius: 16px !important;
+      }
+      .form-group {
+        margin-bottom: 10px !important;
+      }
+      .form-label {
+        font-size: 11px !important;
+        margin-bottom: 4px !important;
+      }
+      .form-input {
+        padding: 10px 34px 10px 12px !important;
+        font-size: 13px !important;
+      }
+      .submit-btn {
+        padding: 10px !important;
+        font-size: 13px !important;
+      }
+      .separator {
+        margin: 10px 0 !important;
+        font-size: 11px !important;
+      }
+      .google-btn {
+        padding: 10px !important;
+        font-size: 13px !important;
+      }
+      .badge-container {
+        margin-bottom: 12px !important;
+      }
+      .detected-badge {
+        padding: 6px 12px !important;
+        font-size: 11px !important;
+      }
+    }
   </style>
 </head>
 <body>

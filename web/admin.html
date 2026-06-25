@@ -717,7 +717,10 @@
         </div>
       </div>
       <div class="chart-card">
-        <div class="chart-title">🔔 سجل العمليات والإجراءات الفورية واحصاء المتاجر الجدد</div>
+        <div class="chart-title" style="display: flex; justify-content: space-between; align-items: center;">
+          <span>🔔 سجل العمليات والإجراءات الفورية واحصاء المتاجر الجدد</span>
+          <button class="btn btn-red" onclick="adminClearNotifications()" style="padding: 4px 10px; font-size: 11px; border-radius: 6px; font-family:'Cairo';">🗑️ مسح الإشعارات العامة</button>
+        </div>
         <div id="recentActivity">
           <div class="loading"><div class="spinner"></div></div>
         </div>
@@ -2470,6 +2473,12 @@ function getSampleOrders() {
   return [
     {id:'ord1',customerName:'عبد الماليك بوزيدي',shopName:'ميكروسوفت بجاية للاستيراد',store:'ميكروسوفت بجاية للاستيراد',price:62000,paymentMethod:'الدفع عند الاستلام',createdAt:{seconds:Date.now()/1000-86400}}
   ];
+}
+function adminClearNotifications() {
+  if (confirm("هل أنت متأكد من مسح جميع إشعارات المستخدمين العامة في النظام نهائياً؟")) {
+    localStorage.setItem('zalo_notifications_list_v2', JSON.stringify([]));
+    alert("تم مسح جميع الإشعارات العامة بنجاح!");
+  }
 }
 </script>
 

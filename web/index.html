@@ -228,11 +228,11 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .tb-menu span{display:block;width:24px;height:3px;background:#fff;border-radius:2px}
 .ptbar{background:var(--g1);padding:10px 14px 14px;text-align:center;flex-shrink:0}
 .ptbar h2{color:#fff;font-size:16px;font-weight:800}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--g1);display:flex;height:56px;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
-.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px 2px;cursor:pointer;border-top:3px solid transparent;min-width:0;overflow:hidden}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--g1);display:flex;height:60px;z-index:200;padding-bottom:env(safe-area-inset-bottom);box-shadow:0 -2px 10px rgba(0,0,0,0.05)}
+.bn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2px 1px;cursor:pointer;border-top:3px solid transparent;min-width:0}
 .bn.on{border-top-color:var(--gold)}
 .bni{font-size:18px;color:rgba(255,255,255,.7)}
-.bnl{font-size:9px;color:rgba(255,255,255,.7);margin-top:1px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;text-align:center}
+.bnl{font-size:10.5px;color:rgba(255,255,255,.7);margin-top:2px;font-weight:700;white-space:nowrap;text-align:center}
 .bn.on .bni,.bn.on .bnl{color:#fff}
 .content{flex:1;overflow-y:auto;padding-bottom:70px}
 .home-body{display:flex;flex-direction:column;align-items:center;padding:20px 16px;background:var(--bg);min-height:calc(100dvh - 112px);gap:12px;}
@@ -683,7 +683,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 
     </div>
   </div>
-  <div class="bnav" style="height: 56px;">
+  <div class="bnav" style="height: 60px;">
     <div class="bn on" onclick="G('home')"><div class="bni"><i class="fa-solid fa-house"></i></div><div class="bnl">الرئيسية</div></div>
     <div class="bn" onclick="G('myorders')"><div class="bni"><i class="fa-solid fa-bag-shopping"></i></div><div class="bnl">طلباتي</div></div>
     <div class="bn" onclick="G('wilayas')"><div class="bni"><i class="fa-solid fa-location-dot"></i></div><div class="bnl">الولايات</div></div>
@@ -959,7 +959,6 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
           <div id="dwWilaya" style="font-size: 11px; color: var(--gold); font-weight: 700; margin-top: 3px;">الولاية: 31 وهران</div>
           <div id="dwPhone" style="font-size: 11px; opacity: 0.8; margin-top: 2px;">هاتف: 0698000000</div>
         </div>
-        <button onclick="logoutDriver()" style="background: rgba(229,57,53,0.2); color:#fff; border: 1px solid rgba(229,57,53,0.5); padding: 6px 12px; border-radius: 10px; font-family:'Cairo'; font-size:11px; font-weight:bold; cursor:pointer;">خروج ✕</button>
       </div>
 
       <!-- Quick Wilaya Shift Filter -->
@@ -977,6 +976,11 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 
       <!-- Tab Content Area -->
       <div id="driverOrdersContainer"></div>
+
+      <!-- Back button -->
+      <button class="btn-gm" onclick="back()" style="width: 100%; margin-top: 20px; background: var(--g1) !important; border: 2.5px solid var(--gold) !important; color: #fff; font-size: 14px; font-weight: 800; border-radius: 14px; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(26,92,42,0.15);">
+        <i class="fa-solid fa-arrow-right"></i> عودة
+      </button>
     </div>
   </div>
 </div>
@@ -997,15 +1001,56 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   color: #fff;
   border-color: var(--g1);
 }
+
+/* Header alignment & optimization rules */
+.topbar-standardized {
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  height: 56px !important;
+  box-sizing: border-box !important;
+}
+.topbar-standardized .tb-bell {
+  position: absolute !important;
+  left: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  z-index: 10 !important;
+}
+.topbar-standardized .tb-menu {
+  position: absolute !important;
+  right: 14px !important;
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  margin: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  width: 44px !important;
+  height: 44px !important;
+  z-index: 10 !important;
+}
+.topbar-standardized .header-back-button {
+  margin: 0 auto !important;
+  z-index: 5 !important;
+}
 </style>
 
 <!-- NOTIF -->
 <div id="s-notif" class="screen">
   <div class="topbar-standardized" style="position: relative;">
     <button class="header-back-button" onclick="back()">
-      مركز الإشعارات &larr;
+      الإشعارات &larr;
     </button>
-    <button onclick="clearAllNotifications()" style="border:none; background:transparent; color:#fff; font-size:18px; cursor:pointer; font-family:'Cairo'; font-weight:700; display:flex; align-items:center; gap:4px; padding:4px; position: absolute; left: 14px; top: 14px;" title="مسح الكل">🗑️ <span style="font-size:11px;">مسح</span></button>
+    <div class="tb-menu" onclick="openSide()" style="position: absolute; right: 14px; top: 4px;"><span></span><span></span><span></span></div>
   </div>
   <div class="content" style="padding: 14px 12px 100px;">
     <div id="notif-empty-state" style="display:none; text-align:center; padding:50px 20px; color:#c9a84c;">
