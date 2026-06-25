@@ -569,38 +569,14 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <img class="sm-logo" src="assets/logo.svg" alt="" style="width: 120px; height: 120px; object-fit: contain; margin: 0 auto; display: block;">
     <div class="sm-sub" style="text-align: center; margin-top: 4px; font-weight: bold; color: var(--gold);">السوق الذكي الجزائري الموحد</div>
   </div>
-  <!-- DYNAMIC PROFILE CARD -->
-  <div id="sm-profile-card" style="padding: 16px; background: #fdfdfd; border-bottom: 1px solid rgba(0,0,0,0.06); text-align: right;">
-    <!-- Guest State -->
-    <div id="sm-profile-guest" style="display:block;">
-      <button onclick="closeSide();openLink('login-customer.html')" style="background: var(--g1); color: #fff; border: none; border-radius: 8px; padding: 10px 12px; font-size: 12.5px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; width: 100%; box-shadow: 0 4px 10px rgba(26,92,42,0.15);">🔑 دخول الزبائن أو إنشاء حساب</button>
-    </div>
-    <!-- Logged in State -->
-    <div id="sm-profile-user" style="display:none;">
-      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
-        <div style="width: 36px; height: 36px; border-radius: 50%; background: var(--g1); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;" id="sm-user-avatar">?</div>
-        <div style="flex: 1; min-width: 0;">
-          <div style="font-size: 13px; font-weight: 800; color: #111; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="sm-user-name">تحميل...</div>
-          <div style="font-size: 10px; color: #777; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" id="sm-user-email">email@zalo.dz</div>
-        </div>
-      </div>
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-        <div id="sm-user-badge" style="display:inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; background: rgba(26,92,42,0.1); color: var(--g1);">زبون معتمد</div>
-      </div>
-      <div style="display: flex; gap: 6px; width: 100%;">
-        <button id="sm-user-action-btn" class="btn-p" style="display: none; flex:1; width:auto; border: none; border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin: 0; background: var(--g1); color: #fff;">📦 سلة مشترياتي</button>
-        <button onclick="logoutCustomerAccount()" style="background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; flex: 1;">خروج ✕</button>
-      </div>
-    </div>
-  </div>
-  <div class="sm-sec">القائمة</div>
+  <div class="sm-sec">القائمة الرئيسيّة</div>
   <div class="smi" onclick="closeSide();G('home')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-house"></i></span><div><div class="sn">الرئيسية</div></div></div>
   <div class="smi" onclick="closeSide();G('wilayas')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-location-dot"></i></span><div><div class="sn">الولايات</div></div></div>
   <div class="smi" onclick="closeSide();G('cats')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-folder-open"></i></span><div><div class="sn">جميع الأقسام</div></div></div>
   <div class="smi" onclick="closeSide();G('all-prods')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-box"></i></span><div><div class="sn">جميع المنتجات</div></div></div>
-  <div class="sm-sec" id="sm-driver-sec" style="display:none;">للتجار والسائقين</div>
-  <div class="smi" id="sm-unified-login-item" style="display:none;" onclick="closeSide();openLink('login.html')"><span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
-  <div class="smi" id="sm-driver-portal-item" style="display:none;" onclick="closeSide();G('driver-portal')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-motorcycle"></i></span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
+  <div class="sm-sec" id="sm-driver-sec">للتجار والسائقين</div>
+  <div class="smi" id="sm-unified-login-item" onclick="closeSide();openLink('login.html')"><span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
+  <div class="smi" id="sm-driver-portal-item" onclick="closeSide();G('driver-portal')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-motorcycle"></i></span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
   <div class="sm-sec">تواصل معنا وإدارة</div>
   <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si" style="color:#25d366"><i class="fa-brands fa-whatsapp"></i></span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
   <div class="smi" onclick="closeSide();openLink('https://zalo2.youcan.store/')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-globe"></i></span><div><div class="sn">موقع الإدارة</div><div class="sd">zalo2.youcan.store</div></div></div>
@@ -1281,96 +1257,29 @@ try {
 
 onAuthStateChanged(auth, async (u) => {
   window._user = u;
-  const guestEl = document.getElementById('sm-profile-guest');
-  const userEl = document.getElementById('sm-profile-user');
-  const profileCard = document.getElementById('sm-profile-card');
-  const unifiedLogin = document.getElementById('sm-unified-login-item');
   
-  if (guestEl && userEl) {
-    if (u) {
-      guestEl.style.display = 'none';
-      userEl.style.display = 'block';
-      if (profileCard) profileCard.style.display = 'block';
-      if (unifiedLogin) unifiedLogin.style.display = 'none';
-      
-      const email = u.email || '';
-      document.getElementById('sm-user-email').textContent = email;
-      document.getElementById('sm-user-name').textContent = email.split('@')[0];
-      document.getElementById('sm-user-avatar').textContent = email.charAt(0).toUpperCase();
-      
-      try {
-        const userDoc = await getDoc(doc(db, 'users', u.uid));
-        if (userDoc.exists()) {
-          const udata = userDoc.data();
-          const name = udata.name || email.split('@')[0];
-          document.getElementById('sm-user-name').textContent = name;
-          document.getElementById('sm-user-avatar').textContent = name.charAt(0).toUpperCase();
-          
-          if (udata.role === 'merchant') {
-            document.getElementById('sm-user-badge').textContent = 'متجر شريك 🏪';
-            document.getElementById('sm-user-badge').style.background = 'rgba(201,168,76,0.1)';
-            document.getElementById('sm-user-badge').style.color = 'var(--gold)';
-            document.getElementById('sm-user-action-btn').style.display = 'block';
-            document.getElementById('sm-user-action-btn').innerHTML = '🏪 لوحة المتجر';
-            document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'dashboard.html'; };
-          } else if (udata.role === 'admin') {
-            document.getElementById('sm-user-badge').textContent = 'مدير عام 👑';
-            document.getElementById('sm-user-badge').style.background = 'rgba(255,77,77,0.1)';
-            document.getElementById('sm-user-badge').style.color = 'var(--red)';
-            document.getElementById('sm-user-action-btn').style.display = 'block';
-            document.getElementById('sm-user-action-btn').innerHTML = '👑 لوحة المدير';
-            document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'admin.html'; };
-          } else {
-            // Customer role
-            document.getElementById('sm-user-badge').textContent = 'زبون معتمد 👤';
-            document.getElementById('sm-user-badge').style.background = 'rgba(26,92,42,0.1)';
-            document.getElementById('sm-user-badge').style.color = 'var(--g1)';
-            document.getElementById('sm-user-action-btn').style.display = 'none';
-            
-            // Auto-fill active phone based on customer's phone!
-            if (udata.phone) {
-              const cPhoneInput = document.getElementById('cPhoneInput');
-              if (cPhoneInput && !cPhoneInput.value) {
-                cPhoneInput.value = udata.phone;
-                localStorage.setItem('zalo_customer_tracked_phone', udata.phone);
-                setTimeout(() => {
-                  if (window.setupRealtimeTrackingListener) {
-                    window.setupRealtimeTrackingListener(udata.phone);
-                  }
-                }, 500);
+  if (u) {
+    try {
+      const userDoc = await getDoc(doc(db, 'users', u.uid));
+      if (userDoc.exists()) {
+        const udata = userDoc.data();
+        
+        // Auto-fill active phone based on customer's phone!
+        if (udata.phone) {
+          const cPhoneInput = document.getElementById('cPhoneInput');
+          if (cPhoneInput && !cPhoneInput.value) {
+            cPhoneInput.value = udata.phone;
+            localStorage.setItem('zalo_customer_tracked_phone', udata.phone);
+            setTimeout(() => {
+              if (window.setupRealtimeTrackingListener) {
+                window.setupRealtimeTrackingListener(udata.phone);
               }
-            }
+            }, 500);
           }
         }
-      } catch(e) {
-        console.warn("User profile doc fetch error:", e);
       }
-    } else {
-      guestEl.style.display = 'block';
-      userEl.style.display = 'none';
-      if (profileCard) profileCard.style.display = 'block';
-      if (unifiedLogin) unifiedLogin.style.display = 'flex';
-      
-      // Securely clear any leftover UI info to protect user privacy
-      const nameEl = document.getElementById('sm-user-name');
-      const emailEl = document.getElementById('sm-user-email');
-      const avatarEl = document.getElementById('sm-user-avatar');
-      const badgeEl = document.getElementById('sm-user-badge');
-      const actionBtn = document.getElementById('sm-user-action-btn');
-      
-      if (nameEl) nameEl.textContent = 'زائر غير مسجل';
-      if (emailEl) emailEl.textContent = '';
-      if (avatarEl) avatarEl.textContent = '؟';
-      if (badgeEl) {
-        badgeEl.textContent = 'غير مسجل 🔐';
-        badgeEl.style.background = 'rgba(0,0,0,0.05)';
-        badgeEl.style.color = '#777';
-        badgeEl.style.display = 'inline-block';
-      }
-      if (actionBtn) {
-        actionBtn.style.display = 'none';
-        actionBtn.onclick = null;
-      }
+    } catch(e) {
+      console.warn("User profile doc fetch error:", e);
     }
   }
 });
@@ -1386,25 +1295,6 @@ window.logoutCustomerAccount = async function() {
       
       // Clear customer session
       if (window.clearCustomerSession) window.clearCustomerSession();
-      
-      // Force instant UI clearance
-      const nameEl = document.getElementById('sm-user-name');
-      const emailEl = document.getElementById('sm-user-email');
-      const avatarEl = document.getElementById('sm-user-avatar');
-      const badgeEl = document.getElementById('sm-user-badge');
-      const actionBtn = document.getElementById('sm-user-action-btn');
-      
-      if (nameEl) nameEl.textContent = 'جاري الخروج...';
-      if (emailEl) emailEl.textContent = '';
-      if (avatarEl) avatarEl.textContent = '؟';
-      if (badgeEl) {
-        badgeEl.textContent = 'تم تسجيل الخروج';
-        badgeEl.style.display = 'none';
-      }
-      if (actionBtn) {
-        actionBtn.style.display = 'none';
-        actionBtn.onclick = null;
-      }
       
       toast('👋 تم تسجيل الخروج بنجاح!');
       setTimeout(() => { window.location.reload(); }, 600);
