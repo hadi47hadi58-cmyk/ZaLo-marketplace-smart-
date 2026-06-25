@@ -673,10 +673,11 @@
 </div>
 
 <!-- TOPBAR -->
-<div id="topbar">
+<div id="topbar" class="topbar-standardized" style="position: relative;">
   <div id="menuToggle" onclick="toggleSidebar()">☰</div>
-  <div class="topbar-title" id="pageTitle">بوابة الرقابة والتحكم للجزائر</div>
-  <button onclick="window.location.href='index.html'" class="btn btn-outline" style="padding: 6px 14px; font-size: 13px; font-weight: 600; background: rgba(255,255,255,0.04); color: var(--text); border-color: var(--border); display: inline-flex; align-items: center; gap: 6px; border-radius: 8px; margin-left: 10px; font-family: 'Cairo', sans-serif;">🏡 عودة للرئيسية</button>
+  <button class="header-back-button" onclick="adminBack()">
+    <span id="pageTitle">بوابة الرقابة والتحكم للجزائر</span> &larr;
+  </button>
   <div class="topbar-avatar" id="avatarBtn">👑</div>
 </div>
 
@@ -2105,6 +2106,15 @@ window.loadReports = function() {
       <div class="stat-label">إجمالي السلع النشطة</div>
     </div>
   `;
+};
+
+window.adminBack = function() {
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id !== 'page-dashboard') {
+    showPage('dashboard');
+  } else {
+    window.location.href = 'index.html';
+  }
 };
 
 window.showPage = function(page) {

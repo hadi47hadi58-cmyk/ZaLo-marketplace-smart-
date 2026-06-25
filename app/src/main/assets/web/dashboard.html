@@ -614,10 +614,11 @@
 </div>
 
 <!-- TOPBAR -->
-<div id="topbar">
+<div id="topbar" class="topbar-standardized" style="position: relative;">
   <div id="menuBtn" onclick="toggleSidebar()">☰</div>
-  <div class="topbar-title" id="topTitle">لوحتي الشاملة</div>
-  <div class="sub-badge" id="subBadge">🔵 معتمد وأساسي</div>
+  <button class="header-back-button" onclick="dashboardBack()">
+    <span id="topTitle">لوحتي الشاملة</span> &larr;
+  </button>
   <div class="topbar-notif" onclick="goPage('chat')">
     🔔<div class="notif-dot" id="notifDot"></div>
   </div>
@@ -2252,6 +2253,15 @@ window.loadAnalytics = function() {
       <span style="font-weight:700;color:var(--gold)">مثبت</span>
     </div>
   `).join('');
+};
+
+window.dashboardBack = function() {
+  const activePage = document.querySelector('.page.active');
+  if (activePage && activePage.id !== 'page-home') {
+    goPage('home');
+  } else {
+    window.location.href = 'index.html';
+  }
 };
 
 window.goPage = function(page) {
