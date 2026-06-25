@@ -631,6 +631,11 @@
 
 <!-- MAIN -->
 <div id="main">
+  <!-- Global Realtime Announcement Banner -->
+  <div id="global-announcement-banner" style="display:none; background:linear-gradient(135deg, #cc9a00 0%, #ffdf00 100%); color:#000; direction:rtl; text-align:right; padding:12px 16px; font-family:'Cairo'; font-size:12.5px; font-weight:800; border-bottom:2px solid var(--gold); align-items:center; justify-content:space-between; gap:10px; box-sizing:border-box; border-radius:12px; margin: 12px 12px 0;">
+    <span style="display:flex; align-items:center; gap:6px;">📢 <span id="announcement-banner-text">...</span></span>
+    <button onclick="this.parentElement.style.display='none'" style="background:transparent; border:none; color:#000; font-size:14px; font-weight:900; cursor:pointer; padding:2px;">✕</button>
+  </div>
 
   <!-- HOME -->
   <div class="page active page-fade" id="page-home">
@@ -1079,6 +1084,42 @@ let shopData = null;
 let shopId = null;
 let allProducts = [];
 let allOrders = [];
+
+window.listenToGlobalAnnouncements = function() {
+  const banner = document.getElementById('global-announcement-banner');
+  const textEl = document.getElementById('announcement-banner-text');
+  if (!banner || !textEl) return;
+  
+  try {
+    const q = query(
+      collection(db, 'global_announcements'),
+      orderBy('timestamp', 'desc'),
+      onSnapshot ? limit(1) : orderBy('timestamp', 'desc')
+    );
+    
+    onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        if (data.active !== false) {
+          textEl.textContent = data.text;
+          banner.style.display = 'flex';
+          return;
+        }
+      }
+      banner.style.display = 'none';
+    }, (err) => {
+      console.warn("Realtime announcements listener failed:", err);
+    });
+  } catch(e) {
+    console.warn("Announcements load failed:", e);
+  }
+};
+
+try {
+  window.listenToGlobalAnnouncements();
+} catch(err) {
+  console.error("Announcement load failed:", err);
+}
 
 onAuthStateChanged(auth, async (user) => {
   if (!user) { window.location.href = 'login-merchant.html'; return; }

@@ -687,42 +687,87 @@
   <!-- DASHBOARD PAGE -->
   <div class="page active" id="page-dashboard">
     <div class="stats-grid" id="statsGrid">
-      <div class="stat-card green">
+      <div class="stat-card green" onclick="showDetailsModal('merchants')" style="cursor: pointer; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.06); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.025)'" onmouseout="this.style.transform='scale(1)'">
         <div class="stat-icon">🏪</div>
         <div class="stat-value" id="statMerchants">-</div>
         <div class="stat-label">المتاجر النشطة وعينات مميزة</div>
       </div>
-      <div class="stat-card gold">
+      <div class="stat-card gold" onclick="showDetailsModal('requests')" style="cursor: pointer; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.06); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.025)'" onmouseout="this.style.transform='scale(1)'">
         <div class="stat-icon">📋</div>
         <div class="stat-value" id="statPending">-</div>
         <div class="stat-label">طلبات قيد المعالجة الأمنية</div>
       </div>
-      <div class="stat-card blue">
+      <div class="stat-card blue" onclick="showDetailsModal('products')" style="cursor: pointer; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.06); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.025)'" onmouseout="this.style.transform='scale(1)'">
         <div class="stat-icon">📦</div>
         <div class="stat-value" id="statProducts">-</div>
         <div class="stat-label">إجمالي السلع المعروضة</div>
       </div>
-      <div class="stat-card red">
+      <div class="stat-card red" onclick="showDetailsModal('users')" style="cursor: pointer; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.06); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.025)'" onmouseout="this.style.transform='scale(1)'">
         <div class="stat-icon">👥</div>
         <div class="stat-value" id="statUsers">-</div>
         <div class="stat-label">الزبائن الموثقين بالهواتف</div>
       </div>
+      <!-- Fifth card: Admins / Employees -->
+      <div class="stat-card purple" onclick="showDetailsModal('admins')" style="cursor: pointer; border: 1.5px solid var(--gold); background: rgba(103,58,183,0.06); transition: all 0.2s;" onmouseover="this.style.transform='scale(1.025)'" onmouseout="this.style.transform='scale(1)'">
+        <div class="stat-icon">👑</div>
+        <div class="stat-value" id="statAdmins">-</div>
+        <div class="stat-label">الموظفون والمشرفون الإداريون</div>
+      </div>
     </div>
 
+    <!-- Hidden Secure Audit Log Trigger Button -->
+    <button onclick="openAuditLogModal()" style="width:100%; padding:14px; background:rgba(26,92,42,0.12); color:var(--gold); border:1.8px solid var(--gold); border-radius:12px; font-family:'Cairo'; font-size:13.5px; font-weight:900; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; margin: 14px 0; transition:all 0.25s;" onmouseover="this.style.background='rgba(26,92,42,0.2)'" onmouseout="this.style.background='rgba(26,92,42,0.12)'">
+      🔐 📋 فتح سجل الرقابة والعمليات السري (خاص بالمدير)
+    </button>
+
     <div class="chart-grid">
-      <div class="chart-card">
-        <div class="chart-title">📊 توزيع المحلات بالولايات الأكثر تجارة</div>
-        <div class="bar-chart" id="wilayaChart">
-          <div class="loading"><div class="spinner"></div></div>
+      <!-- 69 Wilayas Detailed Table instead of bar charts -->
+      <div class="chart-card" style="display: flex; flex-direction: column; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.06); border-radius: 14px; padding: 16px;">
+        <div class="chart-title" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; border-bottom: 1.5px solid var(--gold); padding-bottom: 8px;">
+          <span style="font-weight: 800; font-family: 'Cairo'; font-size: 14px; color: var(--gold);">📊 جدول النشاط التجاري للولايات الـ69 بالتفصيل الممل</span>
+          <div style="position: relative; width: 100%; max-width: 220px;">
+            <input type="text" id="wilayaSearchInput" placeholder="🔍 ابحث بالاسم أو رمز الولاية..." oninput="filterWilayaTable(this.value)" style="width: 100%; padding: 8px 12px; border-radius: 8px; border: 1.5px solid var(--gold); background: rgba(0,0,0,0.3); color: #fff; font-family: 'Cairo'; font-size: 12px; outline: none; box-sizing: border-box;">
+          </div>
+        </div>
+        <div class="table-wrap" style="max-height: 280px; overflow-y: auto; margin-top: 10px; border: 1px solid rgba(201,168,76,0.2); border-radius: 8px;">
+          <table style="width: 100%; border-collapse: collapse; text-align: right; font-family: 'Cairo'; font-size: 11.5px;">
+            <thead>
+              <tr style="background: rgba(26,92,42,0.15); color: var(--gold); font-weight: 800; border-bottom: 2px solid var(--gold);">
+                <th style="padding: 10px; text-align: center;">الرمز</th>
+                <th style="padding: 10px;">اسم الولاية</th>
+                <th style="padding: 10px; text-align: center;">المتاجر</th>
+                <th style="padding: 10px; text-align: center;">المنتجات</th>
+                <th style="padding: 10px; text-align: center;">المبيعات</th>
+                <th style="padding: 10px; text-align: center;">حالة الربط والنشاط</th>
+              </tr>
+            </thead>
+            <tbody id="wilayaTableBody">
+              <!-- Rendered via renderWilayaDetailedTable() -->
+            </tbody>
+          </table>
         </div>
       </div>
-      <div class="chart-card">
-        <div class="chart-title" style="display: flex; justify-content: space-between; align-items: center;">
-          <span>🔔 سجل العمليات والإجراءات الفورية واحصاء المتاجر الجدد</span>
-          <button class="btn btn-red" onclick="adminClearNotifications()" style="padding: 4px 10px; font-size: 11px; border-radius: 6px; font-family:'Cairo';">🗑️ مسح الإشعارات العامة</button>
+
+      <!-- Private Admin Notifications and Broadcast Center -->
+      <div class="chart-card" style="display: flex; flex-direction: column; gap: 12px; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.06); border-radius: 14px; padding: 16px;">
+        <div class="chart-title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid var(--gold); padding-bottom: 8px; margin-bottom: 6px; font-weight: 800; font-family: 'Cairo'; font-size: 14px; color: var(--gold);">
+          <span>🔔 لوحة الإشعارات الخاصة بالمدير والتحكم الكامل</span>
+          <button class="btn btn-red" onclick="adminClearAllPrivateNotifications()" style="padding: 4px 10px; font-size: 11px; border-radius: 6px; font-family:'Cairo'; font-weight:bold; background:rgba(220,53,69,0.15); border:1px solid #ff4d4d; color:#ff4d4d;">🗑️ مسح كافة الإشعارات</button>
         </div>
-        <div id="recentActivity">
-          <div class="loading"><div class="spinner"></div></div>
+        
+        <!-- Broadcast Center -->
+        <div style="border: 1px dashed var(--gold); border-radius: 10px; padding: 12px; background: rgba(26,92,42,0.04);">
+          <div style="font-weight: 800; font-size: 12px; color: var(--gold); margin-bottom: 6px; display: flex; align-items: center; gap: 4px;">🚀 إطلاق شعار وإعلان عاجل لجميع الواجهات:</div>
+          <textarea id="adminBroadcastInput" rows="2" placeholder="اكتب هنا نص الإشعار العاجل الذي سيظهر فوراً لجميع الزبائن والتجار في واجهاتهم..." style="width: 100%; padding: 8px; border-radius: 8px; border: 1px solid var(--gold); background: rgba(0,0,0,0.3); color: #fff; font-family: 'Cairo'; font-size: 11.5px; outline: none; box-sizing: border-box; resize: none;"></textarea>
+          <button onclick="adminBroadcastMessage()" class="btn btn-g" style="width: 100%; margin-top: 8px; font-family: 'Cairo'; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 4px; padding: 8px; background: var(--gold); color: #000; border: none; border-radius: 8px; cursor: pointer;">
+            📢 إطلاق الشعار فوراً
+          </button>
+        </div>
+
+        <!-- Special Notifications Container (Stack Layout) -->
+        <div style="font-weight: 800; font-size: 12px; color: var(--gold); margin-top: 4px;">📋 قائمة إشعارات المدير الخاصة:</div>
+        <div id="privateAdminNotificationsContainer" style="display: flex; flex-direction: column; gap: 8px; max-height: 140px; overflow-y: auto; padding-right: 2px;">
+          <!-- Populated dynamically -->
         </div>
       </div>
     </div>
@@ -1224,6 +1269,44 @@
   </div>
 </div>
 
+<!-- MODAL: Interactive Cards Details -->
+<div class="modal-overlay" id="detailsModal" style="z-index: 10000;">
+  <div class="modal" style="max-width: 650px; width: 92%; max-height: 80vh; display: flex; flex-direction: column; padding: 20px; border: 2.2px solid var(--gold); border-radius: 20px; background: #0c150e; color: #fff;">
+    <div class="modal-title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 12px; margin-bottom: 14px;">
+      <h3 id="detailsModalTitle" style="font-family: 'Cairo'; font-weight: 900; font-size: 15px; color: var(--gold); margin: 0; display: flex; align-items: center; gap: 8px;">📋 تفاصيل القائمة</h3>
+      <button class="modal-close" onclick="closeModal('detailsModal')" style="background: rgba(255,255,255,0.08); border: 1px solid var(--gold); color: var(--gold); font-size: 14px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+    </div>
+    
+    <!-- Smart Search Bar inside the detailed list -->
+    <div style="margin-bottom: 12px; width: 100%;">
+      <input type="text" id="detailsSearchInput" placeholder="🔍 بحث ذكي في القائمة..." oninput="filterDetailsModalList(this.value)" style="width: 100%; padding: 10px 14px; border-radius: 10px; border: 1.5px solid var(--gold); background: rgba(26,92,42,0.08); color: #fff; font-family: 'Cairo'; font-size: 13px; outline: none; box-sizing: border-box;">
+    </div>
+    
+    <!-- Scrollable container for Stack Layout items with Golden Borders -->
+    <div id="detailsModalContent" style="flex: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 10px; box-sizing: border-box;">
+      <!-- Populated dynamically via JS -->
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Audit Log -->
+<div class="modal-overlay" id="auditLogModal" style="z-index: 10005;">
+  <div class="modal" style="max-width: 650px; width: 92%; max-height: 80vh; display: flex; flex-direction: column; padding: 20px; border: 2.2px solid var(--gold); border-radius: 20px; background: #080f0a; color: #fff;">
+    <div class="modal-title" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--gold); padding-bottom: 12px; margin-bottom: 14px;">
+      <h3 style="font-family: 'Cairo'; font-weight: 900; font-size: 15px; color: var(--gold); margin: 0; display: flex; align-items: center; gap: 8px;">🔐 سجل الرقابة والعمليات السري للمنصة</h3>
+      <button class="modal-close" onclick="closeModal('auditLogModal')" style="background: rgba(255,255,255,0.08); border: 1px solid var(--gold); color: var(--gold); font-size: 14px; width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</button>
+    </div>
+    
+    <div style="font-size: 11px; color: #ccc; margin-bottom: 12px; line-height: 1.5; text-align: right; direction: rtl;">
+      سجل العمليات الآمن يسجل حركات الترخيص، الإيقاف، إقالة المساعدين، تعديل الصلاحيات وبث الإشعارات لضمان الشفافية والمسؤولية الكاملة.
+    </div>
+
+    <div id="auditLogContent" style="flex: 1; overflow-y: auto; padding: 4px; display: flex; flex-direction: column; gap: 8px; box-sizing: border-box;">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast">✅ تم حفظ الإجراء بالنجاح التام والموثوق</div>
 
@@ -1466,10 +1549,11 @@ window.loadDashboard = async function() {
       console.warn("Firestore fetch admins failed:", err);
     }
     window._allAdmins = admins;
+    document.getElementById('statAdmins').textContent = admins.length;
 
-    renderWilayaChart(window._allMerchants);
+    renderWilayaDetailedTable(window._allMerchants);
     renderRecentRequests(window._allRequests.slice(-4));
-    renderActivityLog(window._allRequests, window._allMerchants);
+    initPrivateAdminNotifications(window._allRequests, window._allMerchants);
     
     // Render tables if the divs exist
     if (document.getElementById('adminsTable')) {
@@ -1494,16 +1578,21 @@ function loadMockDashboard() {
   window._allProducts = getSampleProducts();
   window._allUsers = getSampleUsers();
   window._allOrders = getSampleOrders();
+  window._allAdmins = window._allAdmins || [
+    {id: 'adm1', name: 'الحسين بلقاسم', email: 'hussein@zalo.dz', role: 'admin', pin: '9999'},
+    {id: 'adm2', name: 'أمين الدفلى', email: 'amine@zalo.dz', role: 'helper', pin: '5555'}
+  ];
 
   document.getElementById('statMerchants').textContent = window._allMerchants.length;
   document.getElementById('statPending').textContent = window._allRequests.filter(r=>r.status==='pending').length;
   document.getElementById('pendingBadge').textContent = window._allRequests.filter(r=>r.status==='pending').length;
   document.getElementById('statProducts').textContent = window._allProducts.length;
   document.getElementById('statUsers').textContent = window._allUsers.length;
+  document.getElementById('statAdmins').textContent = window._allAdmins.length;
 
-  renderWilayaChart(window._allMerchants);
+  renderWilayaDetailedTable(window._allMerchants);
   renderRecentRequests(window._allRequests);
-  renderActivityLog(window._allRequests, window._allMerchants);
+  initPrivateAdminNotifications(window._allRequests, window._allMerchants);
 }
 
 function renderWilayaChart(merchants) {
@@ -2713,6 +2802,538 @@ window.printAdminReport = function() {
   `;
   printWindow.document.write(content);
   printWindow.document.close();
+};
+
+  printWindow.document.write(content);
+  printWindow.document.close();
+};
+
+/* ==========================================
+   NEW ADVANCED ADMIN SYSTEMS & CORE ACTIONS
+   ========================================== */
+
+window.renderWilayaDetailedTable = function(merchants) {
+  const tbody = document.getElementById('wilayaTableBody');
+  if (!tbody) return;
+
+  const defaults = [
+    "01 أدرار", "02 الشلف", "03 الأغواط", "04 أم البواقي", "05 باتنة",
+    "06 بجاية", "07 بسكرة", "08 بشار", "09 البليدة", "10 البويرة",
+    "11 تمنراست", "12 تبسة", "13 تلمسان", "14 تيارت", "15 تيزي وزو",
+    "16 الجزائر", "17 الجلفة", "18 جيجل", "19 سطيف", "20 سعيدة",
+    "21 سكيكدة", "22 سيدي بلعباس", "23 عنابة", "24 قالمة", "25 قسنطينة",
+    "26 المدية", "27 مستغانم", "28 المسيلة", "29 معسكر", "30 ورقلة",
+    "31 وهران", "32 البيض", "33 إليزي", "34 برج بوعريريج", "35 بومرداس",
+    "36 الطارف", "37 تندوف", "38 تيسمسيلت", "39 الوادي", "40 خنشلة",
+    "41 سوق أهراس", "42 تيبازة", "43 ميلة", "44 عين الدفلى", "45 النعامة",
+    "46 عين تموشنت", "47 غرداية", "48 غليزان", "49 تميمون", "50 برج باجي مختار",
+    "51 أولاد جلال", "52 بني عباس", "53 عين صالح", "54 عين قزام", "55 تقرت",
+    "56 جانت", "57 المغير", "58 المنيعة", "59 أفلو", "60 عين البيضاء", "61 عين مليلة",
+    "62 سدراتة", "63 العلمة", "64 بوسعادة", "65 بريكة", "66 قصر الشلالة", "67 مسعد",
+    "68 فرندة", "69 الأبيض سيدي الشيخ"
+  ];
+
+  const products = window._allProducts || [];
+  const orders = window._allOrders || [];
+
+  const html = defaults.map(w => {
+    const code = w.substring(0, 2);
+    const name = w.substring(3);
+    const wMerchants = merchants.filter(m => m.wilaya && m.wilaya.includes(name));
+    const activeMerchantsCount = wMerchants.length;
+    
+    const mIds = wMerchants.map(m => m.id);
+    const wProductsCount = products.filter(p => mIds.includes(p.merchantId)).length;
+    const wOrdersCount = orders.filter(o => mIds.includes(o.merchantId || o.shopId)).length;
+
+    const statusDot = activeMerchantsCount > 0 
+      ? `<span style="display:inline-flex; align-items:center; gap:5px; color:#4caf50; font-weight:bold;"><span style="width:7px; height:7px; border-radius:50%; background:#4caf50; box-shadow:0 0 6px #4caf50;"></span> نشط (${activeMerchantsCount} متجر)</span>`
+      : `<span style="display:inline-flex; align-items:center; gap:5px; color:#777;"><span style="width:7px; height:7px; border-radius:50%; background:#777;"></span> خامل</span>`;
+
+    return `
+      <tr class="wilaya-tr-row" data-search="${w.toLowerCase()}" style="border-bottom:1px solid rgba(201,168,76,0.12); transition:background 0.2s;" onmouseover="this.style.background='rgba(26,92,42,0.06)'" onmouseout="this.style.background='transparent'">
+        <td style="padding: 8px; text-align: center; font-weight: bold; color: var(--gold);">${code}</td>
+        <td style="padding: 8px; font-weight: 700; color: #fff;">${name}</td>
+        <td style="padding: 8px; text-align: center; font-weight: 700; color: var(--gold);">${activeMerchantsCount}</td>
+        <td style="padding: 8px; text-align: center;">${wProductsCount}</td>
+        <td style="padding: 8px; text-align: center;">${wOrdersCount}</td>
+        <td style="padding: 8px; text-align: center;">${statusDot}</td>
+      </tr>
+    `;
+  }).join('');
+
+  tbody.innerHTML = html;
+};
+
+window.filterWilayaTable = function(query) {
+  const rows = document.querySelectorAll('.wilaya-tr-row');
+  if (!rows) return;
+  const q = query.trim().toLowerCase();
+  rows.forEach(r => {
+    const searchVal = r.getAttribute('data-search') || '';
+    if (searchVal.includes(q)) {
+      r.style.display = '';
+    } else {
+      r.style.display = 'none';
+    }
+  });
+};
+
+window.showDetailsModal = function(type) {
+  const modal = document.getElementById('detailsModal');
+  const titleEl = document.getElementById('detailsModalTitle');
+  const contentEl = document.getElementById('detailsModalContent');
+  const searchInput = document.getElementById('detailsSearchInput');
+  
+  if (!modal || !titleEl || !contentEl) return;
+  
+  searchInput.value = '';
+  modal.classList.add('open');
+  modal.style.display = 'flex';
+  
+  let html = '';
+  if (type === 'merchants') {
+    titleEl.innerHTML = `🏪 المتاجر النشطة وعينات مميزة (${window._allMerchants.length})`;
+    if (!window._allMerchants.length) {
+      html = `<div style="text-align:center; padding:30px; color:var(--gold); font-weight:bold;">لا توجد متاجر نشطة حالياً.</div>`;
+    } else {
+      html = window._allMerchants.map(m => {
+        const isStoreOpen = m.storeOpen !== false;
+        const connectionDot = isStoreOpen
+          ? `<span style="background:#4caf50; box-shadow:0 0 8px #4caf50; width:10px; height:10px; border-radius:50%; display:inline-block;" title="مفتوح"></span>`
+          : `<span style="background:#f44336; box-shadow:0 0 8px #f44336; width:10px; height:10px; border-radius:50%; display:inline-block;" title="مغلق"></span>`;
+        
+        return `
+          <div class="details-item-card" data-search="${(m.storeName || '').toLowerCase()} ${(m.ownerName || '').toLowerCase()} ${(m.phone || '').toLowerCase()} ${(m.wilaya || '').toLowerCase()}" style="border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px; background: rgba(26,92,42,0.12); display: flex; flex-direction: column; gap: 6px; direction: rtl; text-align: right;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <span style="font-weight: 800; font-size: 14px; color: var(--gold); display: flex; align-items: center; gap: 6px;">
+                ${connectionDot} ${m.storeName || 'متجر غير مسمى'}
+              </span>
+              <span style="font-size: 11px; background: rgba(26,92,42,0.15); color: var(--gold); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--gold);">${m.category || 'تصنيف عام'}</span>
+            </div>
+            <div style="font-size: 12px; color: #eee; margin-top: 4px;">
+              <div>👤 المالك: <strong>${m.ownerName || 'بدون اسم'}</strong></div>
+              <div>📱 الهاتف: <a href="tel:${m.phone}" style="color:#25d366; text-decoration:none;">${m.phone || 'غير مسجل'}</a></div>
+              <div>📍 الموقع: <strong>${m.wilaya || ''} - ${m.commune || ''}</strong></div>
+              <div>🏢 السجل التجاري: <strong>${m.rcNumber || 'غير متوفر'}</strong></div>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 8px;">
+              <button onclick="adminToggleBlockMerchant('${m.id}')" style="background: rgba(220,53,69,0.15); color: #ff8a80; border: 1.2px solid #ff8a80; padding: 6px 12px; border-radius: 6px; font-family:'Cairo'; font-size: 11.5px; font-weight:700; cursor:pointer; flex: 1;">
+                🚫 حظر وتعليق النشاط
+              </button>
+              <button onclick="adminOpenWhatsAppDirect('${m.phone || m.whatsapp}', 'أهلاً متجر ${m.storeName}')" style="background: rgba(37,211,102,0.15); color: #a7f3d0; border: 1.2px solid #25d366; padding: 6px 12px; border-radius: 6px; font-family:'Cairo'; font-size: 11.5px; font-weight:700; cursor:pointer; flex: 1;">
+                💬 مراسلة واتساب
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+  } else if (type === 'requests') {
+    const pending = window._allRequests.filter(r => r.status === 'pending');
+    titleEl.innerHTML = `📋 طلبات قيد المعالجة الأمنية (${pending.length})`;
+    if (!pending.length) {
+      html = `<div style="text-align:center; padding:30px; color:var(--gold); font-weight:bold;">لا توجد طلبات معلقة بالتصفية الأمنية حالياً.</div>`;
+    } else {
+      html = pending.map(r => `
+        <div class="details-item-card" data-search="${(r.storeName || '').toLowerCase()} ${(r.ownerName || '').toLowerCase()} ${(r.phone || '').toLowerCase()} ${(r.wilaya || '').toLowerCase()}" style="border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px; background: rgba(26,92,42,0.12); display: flex; flex-direction: column; gap: 6px; direction: rtl; text-align: right;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; font-size: 14px; color: var(--gold);">🏪 ${r.storeName || 'طلب جديد'}</span>
+            <span style="font-size: 11px; background: rgba(201,168,76,0.15); color: var(--gold); padding: 2px 8px; border-radius: 6px; border: 1px solid var(--gold);">معلق للتصريح</span>
+          </div>
+          <div style="font-size: 12px; color: #eee; margin-top: 4px;">
+            <div>👤 المالك المقترح: <strong>${r.ownerName || ''}</strong></div>
+            <div>📱 هاتف التواصل: <strong>${r.phone || ''}</strong></div>
+            <div>📍 الموقع المقترح: <strong>${r.wilaya || ''} - ${r.commune || ''}</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button onclick="closeModal('detailsModal'); viewRequest('${r.id}')" style="background: var(--gold); color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-family:'Cairo'; font-size: 11.5px; font-weight:800; cursor:pointer; flex: 1;">
+              🔍 فتح المستندات والترخيص
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else if (type === 'products') {
+    titleEl.innerHTML = `📦 إجمالي السلع المعروضة (${window._allProducts.length})`;
+    if (!window._allProducts.length) {
+      html = `<div style="text-align:center; padding:30px; color:var(--gold); font-weight:bold;">لا توجد منتجات معروضة للبيع حالياً.</div>`;
+    } else {
+      html = window._allProducts.map(p => {
+        const pImg = p.imageURL ? `<img src="${p.imageURL}" style="width:40px; height:40px; border-radius:6px; object-fit:cover; border:1px solid var(--gold);" />` : `<div style="width:40px; height:40px; border-radius:6px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; font-size:18px; border:1px solid var(--gold);">📦</div>`;
+        return `
+          <div class="details-item-card" data-search="${(p.name || '').toLowerCase()} ${(p.category || '').toLowerCase()} ${(p.merchantName || '').toLowerCase()}" style="border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px; background: rgba(26,92,42,0.12); display: flex; align-items: center; gap: 12px; direction: rtl; text-align: right;">
+            ${pImg}
+            <div style="flex: 1; min-width: 0;">
+              <div style="font-weight: 800; font-size: 13px; color: var(--gold); overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${p.name || 'منتج غير مسمى'}</div>
+              <div style="font-size: 11px; color: #ccc; margin-top: 2px;">الفئة: ${p.category || 'عام'} • السعر: <strong style="color:var(--gold);">${(p.price || 0).toLocaleString()} دج</strong></div>
+            </div>
+            <button onclick="adminDeleteProductDirect('${p.id}', '${p.name}')" style="background: rgba(220,53,69,0.15); color: #ff8a80; border: 1.2px solid #ff8a80; padding: 4px 10px; border-radius: 6px; font-family:'Cairo'; font-size: 11px; font-weight:700; cursor:pointer;">
+              🗑️ حذف
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+  } else if (type === 'users') {
+    titleEl.innerHTML = `👥 الزبائن الموثقين بالهواتف (${window._allUsers.length})`;
+    if (!window._allUsers.length) {
+      html = `<div style="text-align:center; padding:30px; color:var(--gold); font-weight:bold;">لا يوجد زبائن موثقين مسجلين حالياً.</div>`;
+    } else {
+      html = window._allUsers.map(u => `
+        <div class="details-item-card" data-search="${(u.name || '').toLowerCase()} ${(u.email || '').toLowerCase()} ${(u.phone || '').toLowerCase()}" style="border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px; background: rgba(26,92,42,0.12); display: flex; flex-direction: column; gap: 6px; direction: rtl; text-align: right;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; font-size: 14px; color: var(--gold);">👤 ${u.name || 'زبون مجهول'}</span>
+            <span style="font-size: 11px; background: rgba(26,92,42,0.15); color: var(--gold); padding: 2px 8px; border-radius: 6px;">${u.role || 'customer'}</span>
+          </div>
+          <div style="font-size: 12px; color: #eee; margin-top: 4px;">
+            <div>📧 البريد الإلكتروني: <strong>${u.email || 'لا يوجد'}</strong></div>
+            <div>📱 هاتف الزبون: <strong>${u.phone || 'غير مسجل'}</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button onclick="adminBlockCustomer('${u.id}')" style="background: rgba(220,53,69,0.15); color: #ff8a80; border: 1.2px solid #ff8a80; padding: 6px 12px; border-radius: 6px; font-family:'Cairo'; font-size: 11.5px; font-weight:700; cursor:pointer; flex: 1;">
+              🚫 حظر الحساب
+            </button>
+            <button onclick="adminPromoteToHelper('${u.id}', '${u.name}', '${u.email}')" style="background: rgba(201,168,76,0.15); color: var(--gold); border: 1.2px solid var(--gold); padding: 6px 12px; border-radius: 6px; font-family:'Cairo'; font-size: 11.5px; font-weight:700; cursor:pointer; flex: 1;">
+              👑 ترقية لمشرف/مساعد
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  } else if (type === 'admins') {
+    titleEl.innerHTML = `👑 الموظفون والمشرفون الإداريون (${window._allAdmins.length})`;
+    if (!window._allAdmins.length) {
+      html = `<div style="text-align:center; padding:30px; color:var(--gold); font-weight:bold;">لا توجد حسابات مشرفين مسجلة حالياً.</div>`;
+    } else {
+      html = window._allAdmins.map(a => `
+        <div class="details-item-card" data-search="${(a.name || '').toLowerCase()} ${(a.email || '').toLowerCase()}" style="border: 1.5px solid var(--gold); border-radius: 12px; padding: 12px; background: rgba(26,92,42,0.12); display: flex; flex-direction: column; gap: 6px; direction: rtl; text-align: right;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 800; font-size: 14px; color: var(--gold);">👑 ${a.name || 'مشرف'}</span>
+            <span style="font-size: 11px; background: rgba(255,77,77,0.15); color: #ff4d4d; padding: 2px 8px; border-radius: 6px; border:1px solid #ff4d4d;">${a.role || 'admin'}</span>
+          </div>
+          <div style="font-size: 12px; color: #eee; margin-top: 4px;">
+            <div>📧 البريد الإلكتروني: <strong>${a.email || ''}</strong></div>
+            <div>🔑 رمز الدخول المخصص (PIN): <strong>${a.pin || 'غير محدد'}</strong></div>
+          </div>
+          <div style="display: flex; gap: 8px; margin-top: 8px;">
+            <button onclick="adminDeleteHelper('${a.id}')" style="background: rgba(220,53,69,0.15); color: #ff8a80; border: 1.2px solid #ff8a80; padding: 6px 12px; border-radius: 6px; font-family:'Cairo'; font-size: 11.5px; font-weight:700; cursor:pointer; flex: 1;">
+              ❌ إقالة وإلغاء الصلاحية
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+  }
+  
+  contentEl.innerHTML = html;
+};
+
+window.filterDetailsModalList = function(query) {
+  const items = document.querySelectorAll('.details-item-card');
+  if (!items) return;
+  const q = query.trim().toLowerCase();
+  items.forEach(item => {
+    const s = item.getAttribute('data-search') || '';
+    if (s.includes(q)) {
+      item.style.display = 'flex';
+    } else {
+      item.style.display = 'none';
+    }
+  });
+};
+
+window.adminOpenWhatsAppDirect = function(phone, msg) {
+  if (!phone) {
+    alert("لا يتوفر رقم هاتف لهذا المتجر!");
+    return;
+  }
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  window.open(`https://wa.me/${cleanPhone}?text=${encodeURIComponent(msg)}`, '_blank');
+};
+
+window.initPrivateAdminNotifications = function(reqs, merts) {
+  let list = [];
+  try {
+    const saved = localStorage.getItem('admin_private_notifications_list');
+    if (saved) {
+      list = JSON.parse(saved);
+    }
+  } catch(e) {
+    console.error(e);
+  }
+
+  if (!list.length) {
+    reqs.forEach(r => {
+      list.push({
+        id: 'priv_' + Math.random().toString(36).substring(2, 9),
+        text: `طلب معلق باسم: ${r.storeName} من مالكه: ${r.ownerName}`,
+        time: `📍 ${r.wilaya || ''}`,
+        class: 'gold',
+        timestamp: Date.now()
+      });
+    });
+    merts.forEach(m => {
+      list.push({
+        id: 'priv_' + Math.random().toString(36).substring(2, 9),
+        text: `تم التصريح لمتجر: ${m.storeName} بممارسة التجارة`,
+        time: `📍 ${m.wilaya || ''}`,
+        class: 'green',
+        timestamp: Date.now()
+      });
+    });
+    localStorage.setItem('admin_private_notifications_list', JSON.stringify(list));
+  }
+
+  window._allPrivateNotifications = list;
+  window.renderPrivateAdminNotifications();
+};
+
+window.renderPrivateAdminNotifications = function() {
+  const container = document.getElementById('privateAdminNotificationsContainer');
+  if (!container) return;
+  
+  const list = window._allPrivateNotifications || [];
+  if (!list.length) {
+    container.innerHTML = `<div style="text-align:center; padding:15px; color:#aaa; font-size:11px;">لا توجد أي إشعارات إدارية خاصة حالياً.</div>`;
+    return;
+  }
+  
+  container.innerHTML = list.map(item => `
+    <div class="private-notif-row" style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.03); border:1px solid rgba(201,168,76,0.15); border-radius:8px; padding:6px 10px; gap:8px; direction:rtl; text-align:right;">
+      <div style="display:flex; align-items:center; gap:8px; flex:1; min-width:0;">
+        <span style="width:7px; height:7px; border-radius:50%; background:${item.class === 'gold' ? 'var(--gold)' : '#4caf50'}; box-shadow:0 0 6px ${item.class === 'gold' ? 'var(--gold)' : '#4caf50'}; flex-shrink:0;"></span>
+        <div style="min-width:0; flex:1;">
+          <div style="font-size:11px; font-weight:700; color:#fff; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${item.text}</div>
+          <div style="font-size:10px; color:#aaa;">${item.time}</div>
+        </div>
+      </div>
+      <button onclick="adminDeletePrivateNotification('${item.id}')" style="background:transparent; border:none; color:#ff4d4d; cursor:pointer; font-size:12px; padding:4px;" title="حذف">🗑️</button>
+    </div>
+  `).join('');
+};
+
+window.adminDeletePrivateNotification = function(id) {
+  window._allPrivateNotifications = (window._allPrivateNotifications || []).filter(x => x.id !== id);
+  localStorage.setItem('admin_private_notifications_list', JSON.stringify(window._allPrivateNotifications));
+  window.renderPrivateAdminNotifications();
+  showToast('✅ تم حذف الإشعار بنجاح!');
+};
+
+window.adminClearAllPrivateNotifications = function() {
+  if (!confirm('هل أنت متأكد من مسح كافة الإشعارات الخاصة بالمدير؟')) return;
+  window._allPrivateNotifications = [];
+  localStorage.setItem('admin_private_notifications_list', JSON.stringify([]));
+  window.renderPrivateAdminNotifications();
+  showToast('✅ تم مسح جميع الإشعارات بنجاح!');
+};
+
+window.adminBroadcastMessage = async function() {
+  const input = document.getElementById('adminBroadcastInput');
+  if (!input || !input.value.trim()) {
+    alert("يرجى كتابة نص الإشعار أولاً!");
+    return;
+  }
+  const text = input.value.trim();
+  if (!confirm('هل توافق على إطلاق هذا الشعار وبثه فوراً لجميع واجهات الزبائن والتجار؟')) return;
+  
+  try {
+    const fu = window._firestoreUtils;
+    const db = window._db;
+    
+    await fu.addDoc(fu.collection(db, 'global_announcements'), {
+      text: text,
+      timestamp: Date.now(),
+      active: true,
+      sender: localStorage.getItem('loggedInAdminName') || 'المدير العام'
+    });
+    
+    await window.adminAddAuditLog('إطلاق إعلان', `تم نشر إعلان عاجل: "${text}"`);
+    
+    input.value = '';
+    alert('🚀 تم إطلاق الإشعار بنجاح وبثه لجميع المستخدمين!');
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث خطأ أثناء بث الإعلان.');
+  }
+};
+
+window.adminAddAuditLog = async function(action, details) {
+  try {
+    const db = window._db;
+    const fu = window._firestoreUtils;
+    if (!db || !fu) return;
+    
+    const log = {
+      action: action,
+      details: details,
+      timestamp: Date.now(),
+      adminName: localStorage.getItem('loggedInAdminName') || 'المدير العام',
+      adminEmail: localStorage.getItem('loggedInAdminEmail') || 'admin@zalo.dz'
+    };
+    
+    await fu.addDoc(fu.collection(db, 'audit_logs'), log);
+  } catch(e) {
+    console.warn("Failed to save audit log to Firestore, logging locally:", e);
+    let localLogs = [];
+    try {
+      const saved = localStorage.getItem('local_audit_logs');
+      if (saved) localLogs = JSON.parse(saved);
+    } catch(err) {}
+    localLogs.unshift({
+      action: action,
+      details: details,
+      timestamp: Date.now(),
+      adminName: localStorage.getItem('loggedInAdminName') || 'المدير العام',
+      adminEmail: localStorage.getItem('loggedInAdminEmail') || 'admin@zalo.dz'
+    });
+    localStorage.setItem('local_audit_logs', JSON.stringify(localLogs));
+  }
+};
+
+window.openAuditLogModal = async function() {
+  const modal = document.getElementById('auditLogModal');
+  const container = document.getElementById('auditLogContent');
+  if (!modal || !container) return;
+  
+  modal.classList.add('open');
+  modal.style.display = 'flex';
+  
+  container.innerHTML = `<div class="loading" style="text-align:center; padding:20px;"><div class="spinner"></div>جاري تحميل سجل الأمان...</div>`;
+  
+  try {
+    const db = window._db;
+    const fu = window._firestoreUtils;
+    
+    const snap = await fu.getDocs(fu.collection(db, 'audit_logs'));
+    let logs = snap.docs.map(d => d.data());
+    logs.sort((a,b) => b.timestamp - a.timestamp);
+    
+    let localLogs = [];
+    try {
+      const saved = localStorage.getItem('local_audit_logs');
+      if (saved) localLogs = JSON.parse(saved);
+    } catch(err) {}
+    
+    const allLogs = [...localLogs, ...logs].sort((a,b) => b.timestamp - a.timestamp);
+    
+    if (!allLogs.length) {
+      container.innerHTML = `<div style="text-align:center; padding:30px; color:#aaa; font-size:12px;">سجل العمليات فارغ تماماً حالياً.</div>`;
+      return;
+    }
+    
+    container.innerHTML = allLogs.map(l => {
+      const d = new Date(l.timestamp);
+      const timeStr = `${d.getFullYear()}/${d.getMonth()+1}/${d.getDate()} - ${d.getHours()}:${String(d.getMinutes()).padStart(2,'0')}`;
+      return `
+        <div style="border: 1.5px solid var(--gold); border-radius: 10px; padding: 10px; background: rgba(26,92,42,0.12); direction: rtl; text-align: right; box-sizing: border-box;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-weight: 800; color: var(--gold); font-size: 12px; background: rgba(201,168,76,0.15); border: 1px solid var(--gold); padding: 1px 6px; border-radius: 4px;">${l.action}</span>
+            <span style="font-size: 10.5px; color: #aaa;">${timeStr}</span>
+          </div>
+          <div style="font-size: 11.5px; color: #fff; line-height: 1.4;">${l.details}</div>
+          <div style="font-size: 10px; color: #aaa; margin-top: 4px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 4px;">بواسطة: <strong>${l.adminName}</strong> (${l.adminEmail})</div>
+        </div>
+      `;
+    }).join('');
+  } catch(e) {
+    console.error(e);
+    container.innerHTML = `<div style="text-align:center; padding:20px; color:#ff8a80;">فشل في تحميل السجل من الخادم. يرجى مراجعة الاتصال.</div>`;
+  }
+};
+
+window.adminToggleBlockMerchant = async function(id) {
+  if (!confirm('هل تود بالتأكيد تعليق وحظر نشاط هذا المتجر مؤقتاً؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'shops', id));
+    await fu.updateDoc(fu.doc(window._db, 'merchant_requests', id), { status: 'suspended' });
+    alert('✅ تم حظر المتجر وتعليق رخصته بنجاح!');
+    
+    await window.adminAddAuditLog('تعليق متجر', `تم حظر وتعليق نشاط المتجر ذي المعرف ${id}`);
+    
+    closeModal('detailsModal');
+    loadDashboard();
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث خطأ أثناء الحظر.');
+  }
+};
+
+window.adminDeleteProductDirect = async function(id, name) {
+  if (!confirm(`هل تود بالتأكيد حذف السلعة "${name}" نهائياً من جميع معروضات المنصة؟`)) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'products', id));
+    alert('✅ تم حذف السلعة بنجاح!');
+    
+    await window.adminAddAuditLog('حذف سلعة', `تم حذف السلعة "${name}" ذات المعرف ${id}`);
+    
+    closeModal('detailsModal');
+    loadDashboard();
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث خطأ أثناء الحذف.');
+  }
+};
+
+window.adminBlockCustomer = async function(id) {
+  if (!confirm('هل تود بالتأكيد حظر هذا الحساب للزبون؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.updateDoc(fu.doc(window._db, 'users', id), { blocked: true });
+    alert('✅ تم حظر حساب الزبون بنجاح!');
+    
+    await window.adminAddAuditLog('حظر زبون', `تم حظر حساب الزبون ذي المعرف ${id}`);
+    
+    closeModal('detailsModal');
+    loadDashboard();
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث خطأ أثناء الحظر.');
+  }
+};
+
+window.adminPromoteToHelper = async function(id, name, email) {
+  const pin = prompt(`أدخل رمز الدخول المخصص (PIN) المكون من 4 أرقام للمشرف الجديد "${name}":`, "1234");
+  if (!pin) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.setDoc(fu.doc(window._db, 'admins', id), {
+      name: name || 'مشرف جديد',
+      email: email || '',
+      pin: pin,
+      role: 'helper'
+    });
+    await fu.updateDoc(fu.doc(window._db, 'users', id), { role: 'admin' });
+    alert('✅ تمت ترقية الحساب بنجاح ليكون مشرفاً مساعداً!');
+    
+    await window.adminAddAuditLog('ترقية مشرف', `تمت ترقية ${name} كعضو في إدارة المنصة بنجاح`);
+    
+    closeModal('detailsModal');
+    loadDashboard();
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث خطأ أثناء الترقية.');
+  }
+};
+
+window.adminDeleteHelper = async function(id) {
+  if (!confirm('هل تود بالتأكيد إقالة هذا المشرف وإلغاء صلاحياته الإدارية؟')) return;
+  try {
+    const fu = window._firestoreUtils;
+    await fu.deleteDoc(fu.doc(window._db, 'admins', id));
+    await fu.updateDoc(fu.doc(window._db, 'users', id), { role: 'customer' });
+    alert('✅ تم إلغاء الصلاحيات الإدارية بنجاح!');
+    
+    await window.adminAddAuditLog('إقالة مشرف', `تمت إقالة المشرف وإلغاء صلاحياته الإدارية لـ ${id}`);
+    
+    closeModal('detailsModal');
+    loadDashboard();
+  } catch(e) {
+    console.error(e);
+    alert('⚠️ حدث خطأ أثناء إلغاء الصلاحيات.');
+  }
 };
 
 initSecurityLock();

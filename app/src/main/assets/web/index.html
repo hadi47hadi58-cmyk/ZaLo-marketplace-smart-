@@ -631,6 +631,12 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <div class="tb-menu" onclick="openSide()" style="position: absolute; right: 14px; top: 4px;"><span></span><span></span><span></span></div>
   </div>
   <div class="content">
+    <!-- Global Realtime Announcement Banner -->
+    <div id="global-announcement-banner" style="display:none; background:linear-gradient(135deg, #cc9a00 0%, #ffdf00 100%); color:#000; direction:rtl; text-align:right; padding:10px 14px; font-family:'Cairo'; font-size:12px; font-weight:800; border-bottom:2px solid var(--gold); align-items:center; justify-content:space-between; gap:10px; box-sizing:border-box; border-radius:12px; margin: 0 auto 12px; width: 100%; max-width: 340px;">
+      <span style="display:flex; align-items:center; gap:6px;">📢 <span id="announcement-banner-text">...</span></span>
+      <button onclick="this.parentElement.style.display='none'" style="background:transparent; border:none; color:#000; font-size:14px; font-weight:900; cursor:pointer; padding:2px;">✕</button>
+    </div>
+    
     <div class="home-body" style="padding: 16px; gap: 12px;">
       <!-- Small Logo -->
       <img src="assets/logo.svg" style="height: 120px; width: 120px; object-fit: contain; margin: 0 auto; display: block;" alt="ZaLo">
@@ -1238,6 +1244,42 @@ const st=getStorage(fa);
 window._db=db;window._auth=auth;window._st=st;
 window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc,setDoc,createUserWithEmailAndPassword,onSnapshot,updateDoc};
 
+window.listenToGlobalAnnouncements = function() {
+  const banner = document.getElementById('global-announcement-banner');
+  const textEl = document.getElementById('announcement-banner-text');
+  if (!banner || !textEl) return;
+  
+  try {
+    const q = query(
+      collection(db, 'global_announcements'),
+      orderBy('timestamp', 'desc'),
+      limit(1)
+    );
+    
+    onSnapshot(q, (snapshot) => {
+      if (!snapshot.empty) {
+        const data = snapshot.docs[0].data();
+        if (data.active !== false) {
+          textEl.textContent = data.text;
+          banner.style.display = 'flex';
+          return;
+        }
+      }
+      banner.style.display = 'none';
+    }, (err) => {
+      console.warn("Realtime announcements listener failed:", err);
+    });
+  } catch(e) {
+    console.warn("Announcements load failed:", e);
+  }
+};
+
+try {
+  window.listenToGlobalAnnouncements();
+} catch(err) {
+  console.error("Announcement init failed:", err);
+}
+
 onAuthStateChanged(auth, async (u) => {
   window._user = u;
   const guestEl = document.getElementById('sm-profile-guest');
@@ -1305,10 +1347,17 @@ onAuthStateChanged(auth, async (u) => {
         console.warn("User profile doc fetch error:", e);
       }
     } else {
-      guestEl.style.display = 'none';
+      guestEl.style.display = 'block';
       userEl.style.display = 'none';
-      if (profileCard) profileCard.style.display = 'none';
+      if (profileCard) profileCard.style.display = 'block';
       if (unifiedLogin) unifiedLogin.style.display = 'flex';
+      // Securely clear any leftover UI info to protect user privacy
+      const nameEl = document.getElementById('sm-user-name');
+      const emailEl = document.getElementById('sm-user-email');
+      const avatarEl = document.getElementById('sm-user-avatar');
+      if (nameEl) nameEl.textContent = 'تحميل...';
+      if (emailEl) emailEl.textContent = 'email@zalo.dz';
+      if (avatarEl) avatarEl.textContent = '?';
     }
   }
 });
