@@ -335,8 +335,8 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   color: #000;
 }
 .slist{padding:10px 14px 80px}
-.scard{background:#fff;border-radius:14px;margin-bottom:10px;border:1.5px solid var(--bd);display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;transition:all .2s;box-shadow:0 1px 4px rgba(0,0,0,.05)}
-.scard:active{border-color:var(--g2);background:#f9fdf9}
+.scard{background:#fff;border-radius:14px;margin-bottom:10px;border:1.5px solid var(--gold);display:flex;align-items:center;gap:12px;padding:12px;cursor:pointer;transition:all .2s;box-shadow:0 3px 10px rgba(26,92,42,0.04)}
+.scard:active{border-color:var(--gold2);background:#fffdf6}
 .slogo{width:58px;height:58px;border-radius:12px;background:#f0f8f0;border:2px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;overflow:hidden}
 .slogo img{width:100%;height:100%;object-fit:cover}
 .sname{font-size:14px;font-weight:800}
@@ -403,7 +403,8 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 .sidemenu{position:fixed;top:0;right:-282px;width:280px;height:100vh;background:#fff;z-index:100001;transition:right .3s;overflow-y:auto;display:flex;flex-direction:column;border-left:1px solid rgba(0,0,0,0.08)}
 .sidemenu.open{right:0}
 .sm-hd{background:linear-gradient(135deg,var(--g1),var(--g2));padding:28px 14px 18px;position:relative}
-.sm-close{position:absolute;top:10px;left:10px;background:rgba(255,255,255,.2);border:none;color:#fff;width:28px;height:28px;border-radius:50%;font-size:14px;cursor:pointer}
+.sm-close{position:absolute;top:12px;left:12px;background:var(--g1);border:1.8px solid var(--gold);color:var(--gold);width:30px;height:30px;border-radius:50%;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 3px 8px rgba(0,0,0,0.15);transition:all 0.25s;z-index:100}
+.sm-close:hover{transform:scale(1.08)}
 .sm-logo{width:50px;height:50px;border-radius:50%;border:4px solid var(--gold);object-fit:contain;margin-bottom:6px}
 .sm-title{color:var(--gold2);font-size:18px;font-weight:900}
 .sm-sub{color:rgba(255,255,255,.7);font-size:11px;margin-top:1px}
@@ -547,7 +548,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 <!-- Instant Tracking Modal -->
 <div id="instant-tracking-modal" class="modal-overlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:99999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
   <div class="modal-content" style="background:#ffffff; border:2.2px solid var(--gold); border-radius:24px; padding:24px; width:90%; max-width:400px; box-shadow:0 10px 30px rgba(0,0,0,0.15); position:relative; text-align:center; box-sizing: border-box;">
-    <button onclick="closeInstantTrackingModal()" style="position:absolute; top:12px; right:12px; background:none; border:none; font-size:22px; color:#999; cursor:pointer;">✕</button>
+    <div onclick="closeInstantTrackingModal()" style="position:absolute; top:12px; left:12px; background:var(--g1); border:1.8px solid var(--gold); color:var(--gold); width:30px; height:30px; border-radius:50%; font-size:12px; font-weight:900; display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.15); transition:all 0.25s; z-index:100;" onmouseover="this.style.transform='scale(1.08)';" onmouseout="this.style.transform='scale(1)';">✕</div>
     <div style="font-size:42px; margin-bottom:12px;">📍</div>
     <h3 style="font-family:'Cairo'; font-weight:900; color:var(--g1); font-size:16px; margin:0 0 8px;">التتبع الفوري لمنتجاتك (69 ولاية)</h3>
     <p style="font-family:'Cairo'; font-size:11.5px; color:var(--gray); line-height:1.5; margin:0 0 20px;">أدخل رقم هاتف الشراء، اسم المشتري، أو معرّف الشحنة لمتابعة حالة الشاحنة مباشرة وبث خط السير فورياً.</p>
@@ -564,7 +565,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 </div>
 <div class="sidemenu" id="sidemenu">
   <div class="sm-hd">
-    <button class="sm-close" onclick="closeSide()">✕</button>
+    <div class="sm-close" onclick="closeSide()">✕</div>
     <img class="sm-logo" src="assets/logo.svg" alt="" style="width: 120px; height: 120px; object-fit: contain; margin: 0 auto; display: block;">
     <div class="sm-sub" style="text-align: center; margin-top: 4px; font-weight: bold; color: var(--gold);">السوق الذكي الجزائري الموحد</div>
   </div>
@@ -588,8 +589,8 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
         <div id="sm-user-badge" style="display:inline-block; padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: bold; background: rgba(26,92,42,0.1); color: var(--g1);">زبون معتمد</div>
       </div>
       <div style="display: flex; gap: 6px; width: 100%;">
-        <button id="sm-user-action-btn" class="btn-p" style="flex:1; width:auto; border: none; border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin: 0; background: var(--g1); color: #fff;">📦 سلة مشترياتي</button>
-        <button onclick="logoutCustomerAccount()" style="background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; flex-shrink:0;">خروج ✕</button>
+        <button id="sm-user-action-btn" class="btn-p" style="display: none; flex:1; width:auto; border: none; border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; margin: 0; background: var(--g1); color: #fff;">📦 سلة مشترياتي</button>
+        <button onclick="logoutCustomerAccount()" style="background: rgba(220,53,69,0.1); color: #dc3545; border: 1px solid rgba(220,53,69,0.2); border-radius: 8px; padding: 6px; font-size: 11px; font-family: 'Cairo'; font-weight: bold; cursor: pointer; flex: 1;">خروج ✕</button>
       </div>
     </div>
   </div>
@@ -640,22 +641,30 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
       </button>
       
       <!-- Network Icons Grid - styled beautifully (height 14 equivalent / h-14) -->
-      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; max-width: 340px; margin: 0 auto;">
-        <div onclick="G('cats')" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-          <i class="fa-solid fa-grip" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
-          <span style="font-size: 9px; font-weight: bold; color: var(--text);">الأقسام</span>
+      <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; width: 100%; max-width: 340px; margin: 0 auto; padding: 4px 0;">
+        <div onclick="G('cats')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <div style="background: rgba(26, 92, 42, 0.08); border: 1.5px solid rgba(26, 92, 42, 0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.25s; box-shadow: 0 2px 8px rgba(26,92,42,0.05);" onmouseover="this.style.transform='scale(1.08)'; this.style.background='rgba(26, 92, 42, 0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(26, 92, 42, 0.08)'">
+            <i class="fa-solid fa-grip" style="font-size: 15px; color: var(--g1);"></i>
+          </div>
+          <span style="font-size: 9.5px; font-weight: bold; color: var(--text); margin-top: 5px; text-align: center; white-space: nowrap;">الأقسام</span>
         </div>
-        <div onclick="G('all-prods')" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-          <i class="fa-solid fa-box-open" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
-          <span style="font-size: 9px; font-weight: bold; color: var(--text);">المنتجات</span>
+        <div onclick="G('all-prods')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <div style="background: rgba(26, 92, 42, 0.08); border: 1.5px solid rgba(26, 92, 42, 0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.25s; box-shadow: 0 2px 8px rgba(26,92,42,0.05);" onmouseover="this.style.transform='scale(1.08)'; this.style.background='rgba(26, 92, 42, 0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(26, 92, 42, 0.08)'">
+            <i class="fa-solid fa-box-open" style="font-size: 15px; color: var(--g1);"></i>
+          </div>
+          <span style="font-size: 9.5px; font-weight: bold; color: var(--text); margin-top: 5px; text-align: center; white-space: nowrap;">المنتجات</span>
         </div>
-        <div onclick="focusHomeTracker()" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-          <i class="fa-solid fa-route" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
-          <span style="font-size: 9px; font-weight: bold; color: var(--text);">التتبع الفوري</span>
+        <div onclick="focusHomeTracker()" style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <div style="background: rgba(26, 92, 42, 0.08); border: 1.5px solid rgba(26, 92, 42, 0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.25s; box-shadow: 0 2px 8px rgba(26,92,42,0.05);" onmouseover="this.style.transform='scale(1.08)'; this.style.background='rgba(26, 92, 42, 0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(26, 92, 42, 0.08)'">
+            <i class="fa-solid fa-route" style="font-size: 15px; color: var(--g1);"></i>
+          </div>
+          <span style="font-size: 9.5px; font-weight: bold; color: var(--text); margin-top: 5px; text-align: center; white-space: nowrap;">التتبع الفوري</span>
         </div>
-        <div onclick="G('driver-portal')" style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
-          <i class="fa-solid fa-motorcycle" style="font-size: 16px; color: var(--g1); margin-bottom: 2px;"></i>
-          <span style="font-size: 9px; font-weight: bold; color: var(--text);">السائقين</span>
+        <div onclick="G('driver-portal')" style="display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s;">
+          <div style="background: rgba(26, 92, 42, 0.08); border: 1.5px solid rgba(26, 92, 42, 0.2); width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.25s; box-shadow: 0 2px 8px rgba(26,92,42,0.05);" onmouseover="this.style.transform='scale(1.08)'; this.style.background='rgba(26, 92, 42, 0.15)'" onmouseout="this.style.transform='scale(1)'; this.style.background='rgba(26, 92, 42, 0.08)'">
+            <i class="fa-solid fa-motorcycle" style="font-size: 15px; color: var(--g1);"></i>
+          </div>
+          <span style="font-size: 9.5px; font-weight: bold; color: var(--text); margin-top: 5px; text-align: center; white-space: nowrap;">السائقين</span>
         </div>
       </div>
       
@@ -678,8 +687,8 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <div class="bn on" onclick="G('home')"><div class="bni"><i class="fa-solid fa-house"></i></div><div class="bnl">الرئيسية</div></div>
     <div class="bn" onclick="G('myorders')"><div class="bni"><i class="fa-solid fa-bag-shopping"></i></div><div class="bnl">طلباتي</div></div>
     <div class="bn" onclick="G('wilayas')"><div class="bni"><i class="fa-solid fa-location-dot"></i></div><div class="bnl">الولايات</div></div>
-    <div class="bn" onclick="G('search')"><div class="bni"><i class="fa-solid fa-magnifying-glass"></i></div><div class="bnl">بحث سريع</div></div>
-    <div class="bn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">بوابة كبرى</div></div>
+    <div class="bn" onclick="G('search')"><div class="bni"><i class="fa-solid fa-magnifying-glass"></i></div><div class="bnl">البحث</div></div>
+    <div class="bn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">الدخول</div></div>
   </div>
 </div>
 
@@ -767,19 +776,21 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   </div>
   <div class="content" style="padding-top:0;">
     <!-- STORE DYNAMIC PROFILE HEADER -->
-    <div id="store-profile-header" style="position:relative; background:linear-gradient(135deg, #0d1a12 0%, #050a07 100%); padding:38px 16px 24px; text-align:center; display:flex; flex-direction:column; align-items:center; justify-content:center; border-bottom:2.5px solid var(--gold); box-shadow:0 4px 15px rgba(0,0,0,0.25); margin-bottom:12px; overflow:hidden;">
+    <div id="store-profile-header" style="position:relative; background:linear-gradient(135deg, rgba(13, 26, 18, 0.45) 0%, rgba(5, 10, 7, 0.7) 100%); padding:42px 16px 24px; display:flex; flex-direction:row; align-items:center; justify-content:flex-start; gap:16px; border-bottom:2.5px solid var(--gold); box-shadow:0 4px 15px rgba(0,0,0,0.25); margin-bottom:12px; overflow:hidden; text-align:right; direction:rtl;">
       <!-- Storefront Tent Awning (M مظلة المحل) -->
-      <div style="position:absolute; top:0; left:0; right:0; height:18px; background:repeating-linear-gradient(90deg, var(--gold) 0px, var(--gold) 20px, #15271b 20px, #15271b 40px); border-bottom:2.5px solid var(--gold2); box-shadow:0 2px 5px rgba(0,0,0,0.25);"></div>
-      <!-- Logo Wrap -->
-      <div style="position:relative; z-index:2; width:84px; height:84px; border-radius:50%; background:#142218; border:2.5px solid var(--gold); padding:4px; box-shadow:0 6px 14px rgba(0,0,0,0.3); display:flex; align-items:center; justify-content:center; overflow:hidden; margin-bottom:10px;">
+      <div style="position:absolute; top:0; left:0; right:0; height:18px; background:repeating-linear-gradient(90deg, var(--gold) 0px, var(--gold) 20px, #15271b 20px, #15271b 40px); border-bottom:2.5px solid var(--gold2); box-shadow:0 2px 5px rgba(0,0,0,0.25); z-index:3;"></div>
+      <!-- Logo Wrap (Right aligned in RTL) -->
+      <div style="position:relative; z-index:2; width:74px; height:74px; border-radius:50%; background:#142218; border:2.5px solid var(--gold); padding:4px; box-shadow:0 6px 14px rgba(0,0,0,0.35); display:flex; align-items:center; justify-content:center; overflow:hidden; flex-shrink:0;">
         <img id="store-profile-logo" src="" style="width:100%; height:100%; object-fit:cover; border-radius:50%; display:none;">
         <div id="store-profile-logo-placeholder" style="width:100%; height:100%; display:block;"></div>
       </div>
-      <!-- Store Name -->
-      <h2 id="store-profile-name" style="color:#fff; font-size:18px; font-weight:800; margin:0 0 6px; font-family:'Cairo', sans-serif; text-shadow:0 1px 4px rgba(0,0,0,0.5);">—</h2>
-      <!-- Location Badge -->
-      <div style="background:rgba(201,168,76,0.15); border:1.2px solid rgba(201,168,76,0.35); border-radius:20px; padding:3px 14px; color:var(--gold); font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; direction:rtl;">
-        📍 <span id="store-profile-wilcom">شريك شبكة ZaLo</span>
+      <!-- Store Name & Info (Left aligned in RTL) -->
+      <div style="display:flex; flex-direction:column; align-items:flex-start; justify-content:center; text-align:right; z-index:2;">
+        <h2 id="store-profile-name" style="color:#fff; font-size:18px; font-weight:800; margin:0 0 6px; font-family:'Cairo', sans-serif; text-shadow:0 2px 6px rgba(0,0,0,0.85);">—</h2>
+        <!-- Location Badge -->
+        <div style="background:rgba(201,168,76,0.22); border:1.2px solid rgba(201,168,76,0.45); border-radius:20px; padding:3px 12px; color:var(--gold); font-size:11px; font-weight:700; display:inline-flex; align-items:center; gap:5px; direction:rtl;">
+          📍 <span id="store-profile-wilcom">شريك شبكة ZaLo</span>
+        </div>
       </div>
     </div>
 
@@ -1208,12 +1219,14 @@ onAuthStateChanged(auth, async (u) => {
             document.getElementById('sm-user-badge').textContent = 'متجر شريك 🏪';
             document.getElementById('sm-user-badge').style.background = 'rgba(201,168,76,0.1)';
             document.getElementById('sm-user-badge').style.color = 'var(--gold)';
+            document.getElementById('sm-user-action-btn').style.display = 'block';
             document.getElementById('sm-user-action-btn').innerHTML = '🏪 لوحة المتجر';
             document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'dashboard.html'; };
           } else if (udata.role === 'admin') {
             document.getElementById('sm-user-badge').textContent = 'مدير عام 👑';
             document.getElementById('sm-user-badge').style.background = 'rgba(255,77,77,0.1)';
             document.getElementById('sm-user-badge').style.color = 'var(--red)';
+            document.getElementById('sm-user-action-btn').style.display = 'block';
             document.getElementById('sm-user-action-btn').innerHTML = '👑 لوحة المدير';
             document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); window.location.href = 'admin.html'; };
           } else {
@@ -1221,8 +1234,7 @@ onAuthStateChanged(auth, async (u) => {
             document.getElementById('sm-user-badge').textContent = 'زبون معتمد 👤';
             document.getElementById('sm-user-badge').style.background = 'rgba(26,92,42,0.1)';
             document.getElementById('sm-user-badge').style.color = 'var(--g1)';
-            document.getElementById('sm-user-action-btn').innerHTML = '📦 سلة مشترياتي';
-            document.getElementById('sm-user-action-btn').onclick = () => { closeSide(); G('myorders'); };
+            document.getElementById('sm-user-action-btn').style.display = 'none';
             
             // Auto-fill active phone based on customer's phone!
             if (udata.phone) {
@@ -1774,11 +1786,11 @@ function openStore(id,name,wa,logo){
         // Set background banner storefront image
         if (headerEl) {
           if (s.frontURL && s.frontURL.trim().length > 0) {
-            headerEl.style.backgroundImage = `linear-gradient(135deg, rgba(13, 26, 18, 0.85) 0%, rgba(5, 10, 7, 0.95) 100%), url(${s.frontURL})`;
+            headerEl.style.backgroundImage = `linear-gradient(135deg, rgba(13, 26, 18, 0.45) 0%, rgba(5, 10, 7, 0.7) 100%), url(${s.frontURL})`;
             headerEl.style.backgroundSize = 'cover';
             headerEl.style.backgroundPosition = 'center';
           } else if (s.frontFile && s.frontFile.trim().length > 0) {
-            headerEl.style.backgroundImage = `linear-gradient(135deg, rgba(13, 26, 18, 0.85) 0%, rgba(5, 10, 7, 0.95) 100%), url(${s.frontFile})`;
+            headerEl.style.backgroundImage = `linear-gradient(135deg, rgba(13, 26, 18, 0.45) 0%, rgba(5, 10, 7, 0.7) 100%), url(${s.frontFile})`;
             headerEl.style.backgroundSize = 'cover';
             headerEl.style.backgroundPosition = 'center';
           }
