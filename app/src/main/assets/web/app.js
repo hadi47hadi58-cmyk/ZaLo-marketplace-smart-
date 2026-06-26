@@ -705,28 +705,32 @@ function renderAdminStores() {
 
     stores.forEach(s => {
         let stateText = s.status || "نشط";
-        let stateBadge = stateText === "APPROVED" || stateText === "نشط" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30" : "bg-amber-500/10 text-amber-400 border-amber-500/30";
+        let stateBadge = stateText === "APPROVED" || stateText === "نشط" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30" : "bg-amber-500/10 text-amber-400 border border-amber-500/30";
         let row = document.createElement("tr");
-        row.className = "border-t border-slate-700/50 text-white font-semibold";
+        row.className = "border-t border-slate-800 hover:bg-slate-800/25 text-white font-semibold transition-colors duration-150";
         row.innerHTML = `
-            <td class="p-3 text-right">
-                <div class="flex items-center gap-2">
-                    <img src="${s.image}" class="w-10 h-10 object-cover rounded-lg shrink-0">
+            <td class="p-4 text-right">
+                <div class="flex items-center gap-3">
+                    <img src="${s.image}" class="w-12 h-12 object-cover rounded-xl shrink-0 border border-white/10 shadow-md">
                     <div>
-                        <p class="font-bold">${s.storeName}</p>
-                        <p class="text-[10px] text-slate-400 font-normal line-clamp-1">${s.description}</p>
+                        <p class="font-bold text-white text-sm">${s.storeName}</p>
+                        <p class="text-[11px] text-slate-400 font-normal line-clamp-1 mt-0.5">${s.description || 'لا يوجد وصف حالي'}</p>
                     </div>
                 </div>
             </td>
-            <td class="p-3 text-right">${s.ownerName}</td>
-            <td class="p-3 text-right">${s.phone}</td>
-            <td class="p-3 text-right">
-                <span class="text-xs px-2.5 py-1 rounded-full border ${stateBadge} font-bold">${stateText}</span>
+            <td class="p-4 text-right text-slate-300 text-xs">${s.ownerName}</td>
+            <td class="p-4 text-right text-slate-300 text-xs dir-ltr">${s.phone}</td>
+            <td class="p-4 text-right">
+                <span class="text-[11px] px-3 py-1 rounded-full ${stateBadge} font-bold inline-block shadow-sm">${stateText === 'APPROVED' ? 'موافق عليه ✅' : 'قيد المراجعة ⏳'}</span>
             </td>
-            <td class="p-3 text-center">
+            <td class="p-4 text-center">
                 <div class="flex gap-2 justify-center">
-                    <button class="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold font-bold" onclick="approveStoreAdmin('${s.storeId}')">قبول</button>
-                    <button class="bg-red-500 hover:bg-red-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold font-bold" onclick="rejectStoreAdmin('${s.storeId}')">تعليق</button>
+                    <button class="bg-emerald-600 hover:bg-emerald-500 text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shadow-sm hover:shadow-emerald-600/25" onclick="approveStoreAdmin('${s.storeId}')">
+                        <i class="fa-solid fa-check text-[10px]"></i> قبول
+                    </button>
+                    <button class="bg-rose-600/20 text-rose-400 border border-rose-500/30 hover:bg-rose-600 hover:text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shadow-sm" onclick="rejectStoreAdmin('${s.storeId}')">
+                        <i class="fa-solid fa-ban text-[10px]"></i> تعليق
+                    </button>
                 </div>
             </td>
         `;
@@ -768,25 +772,31 @@ function renderManagerUsers() {
     let users = DB.get("users", SEED_USERS);
 
     users.forEach(u => {
-        let statusBadge = u.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" : "bg-red-500/10 text-red-500 border-red-500/20";
+        let statusBadge = u.status === "ACTIVE" ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20" : "bg-rose-500/10 text-rose-400 border border-rose-500/20";
         let row = document.createElement("tr");
-        row.className = "border-t border-slate-700/50 text-white font-semibold";
+        row.className = "border-t border-slate-800 hover:bg-slate-800/25 text-white font-semibold transition-colors duration-150";
         row.innerHTML = `
-            <td class="p-3 text-right">
-                <p class="font-bold">${u.name}</p>
-                <p class="text-[10px] text-slate-400 font-normal">${u.email}</p>
+            <td class="p-4 text-right">
+                <div class="space-y-0.5">
+                    <p class="font-bold text-white text-sm">${u.name}</p>
+                    <p class="text-[11px] text-slate-400 font-normal">${u.email}</p>
+                </div>
             </td>
-            <td class="p-3 text-right">${u.phone}</td>
-            <td class="p-3 text-right">
-                <span class="text-xs bg-slate-700 text-slate-300 px-3 py-1 rounded-full border border-slate-600 font-bold">${getRoleArabic(u.role)}</span>
+            <td class="p-4 text-right text-slate-300 text-xs dir-ltr">${u.phone}</td>
+            <td class="p-4 text-right">
+                <span class="text-xs bg-slate-800 text-slate-300 px-3 py-1 rounded-full border border-slate-700 font-bold shadow-sm">${getRoleArabic(u.role)}</span>
             </td>
-            <td class="p-3 text-right">
-                <span class="text-xs px-2.5 py-1 rounded-full border ${statusBadge} font-bold">${u.status || 'ACTIVE'}</span>
+            <td class="p-4 text-right">
+                <span class="text-[11px] px-3 py-1 rounded-full border ${statusBadge} font-bold inline-block shadow-sm">${u.status === 'SUSPENDED' ? 'معطل ❌' : 'نشط 🟢'}</span>
             </td>
-            <td class="p-3 text-center">
+            <td class="p-4 text-center">
                 <div class="flex gap-2 justify-center">
-                    <button class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-[10px] px-2.5 py-1 rounded-xl font-bold font-bold" onclick="changeUserRole('${u.uid}')">ترقية</button>
-                    <button class="bg-red-500 hover:bg-red-600 text-white text-[10px] px-2.5 py-1 rounded-xl font-bold font-bold" onclick="banUser('${u.uid}')">تعطيل</button>
+                    <button class="bg-amber-500 hover:bg-amber-400 text-slate-950 text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shadow-sm" onclick="changeUserRole('${u.uid}')">
+                        <i class="fa-solid fa-user-pen text-[10px]"></i> ترقية
+                    </button>
+                    <button class="bg-rose-600/20 text-rose-400 border border-rose-500/30 hover:bg-rose-600 hover:text-white text-xs px-3 py-1.5 rounded-xl font-bold flex items-center gap-1 transition shadow-sm" onclick="banUser('${u.uid}')">
+                        <i class="fa-solid fa-user-slash text-[10px]"></i> ${u.status === 'SUSPENDED' ? 'تفعيل' : 'تعطيل'}
+                    </button>
                 </div>
             </td>
         `;
