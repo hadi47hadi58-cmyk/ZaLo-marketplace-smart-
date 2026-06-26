@@ -3,6 +3,29 @@
 -- مخطط قاعدة بيانات سوق الجزائر الذكي - هيكلة إنتاجية متكاملة بـ 58 ولاية
 -- =====================================================================
 
+-- Safe clean up of existing tables and types (to allow clean re-runs)
+DROP TABLE IF EXISTS audit_logs CASCADE;
+DROP TABLE IF EXISTS notifications CASCADE;
+DROP TABLE IF EXISTS subscriptions CASCADE;
+DROP TABLE IF EXISTS complaints CASCADE;
+DROP TABLE IF EXISTS reviews CASCADE;
+DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS orders CASCADE;
+DROP TABLE IF EXISTS products CASCADE;
+DROP TABLE IF EXISTS stores CASCADE;
+DROP TABLE IF EXISTS merchant_documents CASCADE;
+DROP TABLE IF EXISTS users CASCADE;
+
+DROP TYPE IF EXISTS ticket_status CASCADE;
+DROP TYPE IF EXISTS sub_status CASCADE;
+DROP TYPE IF EXISTS sub_plan CASCADE;
+DROP TYPE IF EXISTS payment_status CASCADE;
+DROP TYPE IF EXISTS payment_method CASCADE;
+DROP TYPE IF EXISTS order_status CASCADE;
+DROP TYPE IF EXISTS store_status CASCADE;
+DROP TYPE IF EXISTS user_status CASCADE;
+DROP TYPE IF EXISTS user_role CASCADE;
+
 -- 1. ENUMS AND CUSTOM TYPES (أنواع مخصصة للمنصة)
 CREATE TYPE user_role AS ENUM ('CUSTOMER', 'MERCHANT', 'ADMIN');
 CREATE TYPE user_status AS ENUM ('ACTIVE', 'SUSPENDED', 'PENDING_VERIFICATION');

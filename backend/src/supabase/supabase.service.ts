@@ -6,9 +6,9 @@ export class SupabaseService implements OnModuleInit {
   private readonly logger = new Logger(SupabaseService.name);
   private supabaseClient: SupabaseClient;
 
-  // Supabase Credentials (loaded from environment or using the provided credentials as fallback)
-  private readonly supabaseUrl = process.env.SUPABASE_URL || 'https://xwwzadxsqmmxerbolovz.supabase.co';
-  private readonly supabaseKey = process.env.SUPABASE_KEY || 'sb_publishable_qJ68bIG-VZXemJ5LOGhY3w_1I7718w1';
+  // Supabase Credentials (loaded from environment)
+  private readonly supabaseUrl = process.env.SUPABASE_URL;
+  private readonly supabaseKey = process.env.SUPABASE_KEY;
 
   onModuleInit() {
     this.logger.log('Initializing Supabase client...');
