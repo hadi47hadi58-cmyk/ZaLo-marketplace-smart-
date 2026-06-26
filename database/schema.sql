@@ -10,6 +10,8 @@ DROP TABLE IF EXISTS subscriptions CASCADE;
 DROP TABLE IF EXISTS complaints CASCADE;
 DROP TABLE IF EXISTS reviews CASCADE;
 DROP TABLE IF EXISTS order_items CASCADE;
+DROP TABLE IF EXISTS payment_proofs CASCADE;
+DROP TABLE IF EXISTS order_lifecycle CASCADE;
 DROP TABLE IF EXISTS orders CASCADE;
 DROP TABLE IF EXISTS products CASCADE;
 DROP TABLE IF EXISTS stores CASCADE;
@@ -126,6 +128,27 @@ CREATE TABLE order_items (
     product_name VARCHAR(150) NOT NULL,
     price NUMERIC(12,2) NOT NULL,
     quantity INT NOT NULL CHECK (quantity > 0)
+);
+
+-- 6b. PAYMENT PROOFS (إثباتات الدفع بالمنصة)
+CREATE TABLE payment_proofs (
+    id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+    customer_id INT REFERENCES users(id) ON DELETE SET NULL,
+    receipt_image_url VARCHAR(255) NOT NULL, -- رابط إثبات الدفع المرفوع (بريديموب / CCP)
+    amount NUMERIC(12,2),
+    status VARCHAR(50) DEFAULT 'PENDING', -- PENDING, APPROVED, REJECTED
+    submitted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 6c. ORDER LIFECYCLE TRACKING (سجل تتبع الشحنات وحركة البضاعة)
+CREATE TABLE order_lifecycle (
+    id SERIAL PRIMARY KEY,
+    order_id INT REFERENCES orders(id) ON DELETE CASCADE,
+    status order_status NOT NULL,
+    notes TEXT,
+    updated_by VARCHAR(100),
+    changed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- 7. REVIEWS & RATINGS (التقييمات ومراجعات الجودة للسلع)
