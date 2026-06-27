@@ -98,6 +98,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             MyApplicationTheme {
                 PureWebContainerScreen(
+                    activity = this,
                     onOpenFileChooser = { callback, params ->
                         filePathCallback?.onReceiveValue(null)
                         filePathCallback = callback
@@ -146,10 +147,10 @@ class MainActivity : ComponentActivity() {
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
 fun PureWebContainerScreen(
+    activity: MainActivity,
     onOpenFileChooser: (ValueCallback<Array<Uri>>?, WebChromeClient.FileChooserParams?) -> Unit
 ) {
     var webView: WebView? by remember { mutableStateOf(null) }
-    val activity = LocalContext.current as MainActivity
 
     // Handle back button clicks to navigate backward in the WebView instead of exiting the app
     BackHandler(enabled = webView?.canGoBack() == true) {

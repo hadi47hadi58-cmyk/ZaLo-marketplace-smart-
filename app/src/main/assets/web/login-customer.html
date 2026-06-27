@@ -235,6 +235,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { supabase } from './js/supabase-config.js';
 
   const cfg = {
     apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
@@ -287,11 +288,16 @@
   });
 
   document.getElementById('googleBtn').addEventListener('click', async () => {
-    const provider = new GoogleAuthProvider();
     errorEl.style.display = 'none';
     try {
-      await signInWithPopup(auth, provider);
-      window.location.href = 'index.html';
+      const redirectUrl = "https://hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/web/register-step1.html";
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl
+        }
+      });
+      if (error) throw error;
     } catch (error) {
       console.error(error);
       showError("فشل تسجيل الدخول باستخدام حساب Google.");
