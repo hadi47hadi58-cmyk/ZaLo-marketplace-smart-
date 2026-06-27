@@ -695,6 +695,29 @@
   </form>
 </div>
 
+<!-- Global Ultimate Fallback Timer to prevent infinite loading under any circumstances -->
+<script>
+  setTimeout(() => {
+    const loader = document.getElementById('loadingOverlay');
+    if (loader && loader.style.display !== 'none' && (!window.supabase || !window.supabase.auth)) {
+      console.warn("Loader is still active after 8-second timeout. Triggering fallback recovery.");
+      const statusBar = document.getElementById('statusBar');
+      const statusText = document.getElementById('statusMessage');
+      const statusIcon = document.getElementById('statusIcon');
+      if (statusBar && statusText) {
+        statusBar.className = 'status-box error';
+        statusText.textContent = "تأخرت عملية التحقق. يرجى التأكد من اتصال الإنترنت وإعادة المحاولة.";
+        if (statusIcon) statusIcon.className = 'fa-solid fa-circle-exclamation';
+        statusBar.style.display = 'flex';
+      }
+      loader.style.display = 'none';
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 4000);
+    }
+  }, 8000);
+</script>
+
 <!-- Supabase Module Integration -->
 <script type="module">
   import { supabase } from './js/supabase-config.js';
@@ -776,6 +799,14 @@
   ];
 
   let currentUser = null;
+
+  // Helper for promise timeout to ensure robust session checking
+  const withTimeout = (promise, ms, errorMsg) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms))
+    ]);
+  };
 
   // Initialize Searchable Dropdown elements
   function initSearchableSelect() {
@@ -881,20 +912,23 @@
   async function checkUserSession() {
     showLoading(true);
     try {
-      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      console.log("Checking active session...");
+      
+      // Attempt to get the session with a 6-second timeout to prevent infinite spinner hang
+      const { data, error: sessionError } = await withTimeout(
+        supabase.auth.getSession(),
+        6000,
+        "انتهت مهلة الاتصال بالخادم. يرجى التحقق من الإنترنت وإعادة المحاولة."
+      );
       
       if (sessionError) {
-        console.error("Session fetch failed:", sessionError);
-        showStatus("خطأ في الاتصال بالخادم الرئيسي للمصادقة.", "error");
-        return;
+        throw sessionError;
       }
       
+      const session = data ? data.session : null;
+      
       if (!session || !session.user) {
-        showStatus("يرجى تسجيل الدخول أولاً لتعديل ملفك الشخصي. جاري تحويلك...", "error");
-        setTimeout(() => {
-          window.location.href = 'login.html';
-        }, 3000);
-        return;
+        throw new Error("جلسة غير صالحة أو منتهية الصلاحية. يرجى إعادة تسجيل الدخول.");
       }
       
       currentUser = session.user;
@@ -914,20 +948,36 @@
       }
 
       // Pre-populate data from Supabase DB to guarantee seamless experience
-      const { data: profile, error: dbError } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('id', currentUser.id)
-        .maybeSingle();
+      try {
+        const { data: profile, error: dbError } = await withTimeout(
+          supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+          5000,
+          "تعذر جلب بيانات ملف التعريف في الوقت المحدد."
+        );
 
-      if (profile) {
-        if (profile.phone) document.getElementById('phone').value = profile.phone;
-        if (profile.commune) document.getElementById('commune').value = profile.commune;
-        if (profile.wilaya) {
-          selectWilaya(profile.wilaya);
+        if (dbError) {
+          console.warn("Non-blocking DB fetch issue:", dbError);
         }
-      } else {
-        // Fallback to local SessionStorage for transient step flows
+
+        if (profile) {
+          if (profile.phone) document.getElementById('phone').value = profile.phone;
+          if (profile.commune) document.getElementById('commune').value = profile.commune;
+          if (profile.wilaya) {
+            selectWilaya(profile.wilaya);
+          }
+        } else {
+          // Fallback to local SessionStorage for transient step flows
+          const storedPhone = sessionStorage.getItem('reg_phone');
+          const storedWilaya = sessionStorage.getItem('reg_wilaya');
+          const storedCommune = sessionStorage.getItem('reg_commune');
+          
+          if (storedPhone) document.getElementById('phone').value = storedPhone;
+          if (storedCommune) document.getElementById('commune').value = storedCommune;
+          if (storedWilaya) selectWilaya(storedWilaya);
+        }
+      } catch (dbErr) {
+        console.warn("Skipped DB load due to timeout/error, using local fallback:", dbErr);
+        // Local fallback anyway
         const storedPhone = sessionStorage.getItem('reg_phone');
         const storedWilaya = sessionStorage.getItem('reg_wilaya');
         const storedCommune = sessionStorage.getItem('reg_commune');
@@ -938,11 +988,21 @@
       }
       
     } catch (err) {
-      console.error("Authentication init issue:", err);
-      showStatus("عذراً، حدث خطأ غير متوقع أثناء إعداد الملف الشخصي.", "error");
-    } finally {
+      console.error("Session verification failure:", err);
+      showStatus(err.message || "خطأ في الاتصال، يرجى إعادة تسجيل الدخول.", "error");
+      
+      // Stop spinner immediately on failure
       showLoading(false);
+      
+      // Automatic redirect to login page after 3 seconds
+      setTimeout(() => {
+        window.location.href = 'login.html';
+      }, 3000);
+      return;
     }
+    
+    // Stop spinner on successful verification
+    showLoading(false);
   }
 
   // Handle Form Submission with Upsert
