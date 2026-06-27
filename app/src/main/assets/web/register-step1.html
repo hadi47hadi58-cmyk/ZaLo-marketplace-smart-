@@ -2,300 +2,1026 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل جديد - الخطوة 1</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZaLo Smart - إكمال التسجيل (الخطوة 1)</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #1a5c2a;
+      --primary-dark: #0f3a19;
+      --primary-light: #2d7a3a;
+      --primary-accent: #eef7f0;
+      --pure-white: #ffffff;
+      --soft-white: #fcfdfe;
+      --gray-light: #f1f5f1;
+      --gray-border: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --text-white: #ffffff;
+      --success: #10b981;
+      --success-bg: #ecfdf5;
+      --success-border: #a7f3d0;
+      --error: #ef4444;
+      --error-bg: #fef2f2;
+      --error-border: #fca5a5;
+      --shadow-sm: 0 4px 12px rgba(26,92,42,0.03);
+      --shadow-md: 0 10px 30px rgba(26,92,42,0.06);
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
     html, body {
       font-family: 'Cairo', sans-serif;
-      background: linear-gradient(135deg, #f5f5f5, #e8f0ea);
+      background: var(--soft-white);
+      color: var(--text-main);
+      min-height: 100vh;
+      min-height: 100dvh;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      min-height: 100vh;
-      padding: 20px;
+      padding: 16px;
       overflow-x: hidden;
-      width: 100%;
-      max-width: 100%;
     }
+
+    /* Page decorative element */
+    body::before {
+      content: '';
+      position: fixed;
+      top: -10%;
+      left: -10%;
+      width: 40%;
+      height: 40%;
+      background: radial-gradient(circle, rgba(26,92,42,0.04) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    body::after {
+      content: '';
+      position: fixed;
+      bottom: -10%;
+      right: -10%;
+      width: 40%;
+      height: 40%;
+      background: radial-gradient(circle, rgba(37,168,96,0.03) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
     .container {
       width: 100%;
-      max-width: 450px;
-      background: white;
-      border-radius: 16px;
-      padding: 32px 24px;
-      box-shadow: 0 10px 40px rgba(26,92,42,0.15);
+      max-width: 460px;
+      background: var(--pure-white);
+      border-radius: 20px;
+      padding: 36px 28px;
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--primary-accent);
+      position: relative;
+      z-index: 10;
+      transition: all 0.3s ease;
     }
+
     .header {
       text-align: center;
       margin-bottom: 24px;
     }
-    .logo-large { font-size: 50px; margin-bottom: 12px; }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 72px;
+      height: 72px;
+      background: var(--primary-accent);
+      border-radius: 50%;
+      margin-bottom: 16px;
+      border: 1.5px solid var(--primary-light);
+    }
+
+    .logo-container i {
+      font-size: 32px;
+      color: var(--primary);
+    }
+
     .title {
       font-size: 24px;
-      font-weight: 900;
-      color: #1a5c2a;
-      margin-bottom: 4px;
+      font-weight: 800;
+      color: var(--primary-dark);
+      margin-bottom: 6px;
     }
+
     .subtitle {
-      font-size: 12px;
-      color: #666;
+      font-size: 13px;
+      color: var(--text-muted);
+      font-weight: 600;
     }
+
+    /* Progress Steps indicator */
     .progress-bar {
       display: flex;
-      gap: 8px;
-      margin-bottom: 20px;
+      align-items: center;
       justify-content: center;
+      gap: 12px;
+      margin-bottom: 28px;
     }
+
     .progress-step {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
-      background: #e0e0e0;
-      color: white;
+      background: var(--gray-light);
+      border: 1.5px solid var(--gray-border);
+      color: var(--text-muted);
       display: flex;
       align-items: center;
       justify-content: center;
       font-weight: 700;
-      font-size: 12px;
-      transition: all 0.2s;
+      font-size: 13px;
+      transition: all 0.3s ease;
+      position: relative;
     }
+
     .progress-step.active {
-      background: #1a5c2a;
+      background: var(--primary);
+      border-color: var(--primary);
+      color: var(--pure-white);
+      box-shadow: 0 4px 10px rgba(26,92,42,0.2);
     }
+
+    .progress-step.completed {
+      background: var(--primary-light);
+      border-color: var(--primary-light);
+      color: var(--pure-white);
+    }
+
+    .progress-line {
+      flex: 1;
+      height: 2px;
+      background: var(--gray-border);
+      max-width: 40px;
+    }
+
+    .progress-line.active {
+      background: var(--primary-light);
+    }
+
+    /* Welcome Banner for Email Confirmation redirects */
+    .welcome-banner {
+      display: none;
+      background: var(--success-bg);
+      border: 1px solid var(--success-border);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 24px;
+      animation: slideInDown 0.4s ease-out;
+    }
+
+    @keyframes slideInDown {
+      from { transform: translateY(-12px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    .welcome-banner-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+      color: var(--primary);
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .welcome-banner-header i {
+      font-size: 18px;
+      color: var(--success);
+    }
+
+    .welcome-banner-body {
+      font-size: 12px;
+      color: var(--text-main);
+      line-height: 1.6;
+    }
+
+    .welcome-banner-email {
+      font-weight: 700;
+      color: var(--primary-light);
+      word-break: break-all;
+    }
+
+    /* Form Design */
     .form-group {
-      margin-bottom: 16px;
+      margin-bottom: 20px;
+      position: relative;
     }
+
     label {
       display: block;
       font-size: 13px;
       font-weight: 700;
-      color: #1a1a1a;
+      color: var(--text-main);
       margin-bottom: 8px;
     }
-    input, select {
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-wrapper i.field-icon {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 16px;
+      transition: color 0.2s;
+    }
+
+    input[type="tel"], input[type="text"] {
       width: 100%;
-      padding: 12px;
-      border: 2px solid #e0e0e0;
-      border-radius: 8px;
+      padding: 12px 42px 12px 16px;
+      border: 1.5px solid var(--gray-border);
+      background: var(--pure-white);
+      border-radius: 10px;
       font-family: 'Cairo', sans-serif;
       font-size: 14px;
-      transition: all 0.2s;
+      font-weight: 600;
+      color: var(--text-main);
+      transition: all 0.2s ease;
       outline: none;
       min-height: 48px;
     }
-    input:focus, select:focus {
-      border-color: #1a5c2a;
-      box-shadow: 0 0 0 3px rgba(26,92,42,0.1);
+
+    input:focus {
+      border-color: var(--primary);
+      background: var(--pure-white);
+      box-shadow: 0 0 0 3px rgba(26,92,42,0.08);
     }
-    .type-selector {
+
+    input:focus + i.field-icon {
+      color: var(--primary);
+    }
+
+    /* Searchable Select Dropdown */
+    .searchable-select-container {
+      position: relative;
+    }
+
+    .select-trigger {
       display: flex;
-      gap: 10px;
-      margin-bottom: 16px;
-    }
-    .type-btn {
-      flex: 1;
-      padding: 10px;
-      border: 2px solid #e0e0e0;
-      background: white;
-      border-radius: 8px;
-      font-family: 'Cairo', sans-serif;
-      font-weight: 700;
-      font-size: 11px;
-      cursor: pointer;
-      transition: all 0.2s;
-      min-height: 44px;
-    }
-    .type-btn.selected {
-      border-color: #1a5c2a;
-      background: rgba(26,92,42,0.1);
-      color: #1a5c2a;
-    }
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 20px;
-    }
-    .btn {
-      flex: 1;
-      padding: 12px;
-      border: none;
-      border-radius: 8px;
-      font-family: 'Cairo', sans-serif;
-      font-weight: 700;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      padding: 12px 42px 12px 16px;
+      border: 1.5px solid var(--gray-border);
+      background: var(--pure-white);
+      border-radius: 10px;
       font-size: 14px;
+      font-weight: 600;
+      color: var(--text-main);
       cursor: pointer;
-      transition: all 0.2s;
+      transition: all 0.2s ease;
       min-height: 48px;
+      user-select: none;
+    }
+
+    .select-trigger:focus-within, .searchable-select-container.active .select-trigger {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,92,42,0.08);
+    }
+
+    .select-trigger span {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .select-trigger i.chevron {
+      color: var(--text-muted);
+      font-size: 14px;
+      transition: transform 0.2s ease;
+    }
+
+    .searchable-select-container.active .select-trigger i.chevron {
+      transform: rotate(180deg);
+      color: var(--primary);
+    }
+
+    .select-dropdown {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      width: 100%;
+      background: var(--pure-white);
+      border-radius: 10px;
+      border: 1.5px solid var(--gray-border);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+      z-index: 100;
+      max-height: 250px;
+      overflow: hidden;
+      flex-direction: column;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .searchable-select-container.active .select-dropdown {
+      display: flex;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .search-box {
+      padding: 8px;
+      border-bottom: 1px solid var(--gray-border);
+      position: relative;
+    }
+
+    .search-box i {
+      position: absolute;
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 8px 34px 8px 12px;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+      font-family: 'Cairo', sans-serif;
+      font-size: 13px;
+      outline: none;
+      min-height: 36px;
+    }
+
+    .select-options {
+      list-style: none;
+      overflow-y: auto;
+      max-height: 190px;
+      padding: 4px 0;
+    }
+
+    .select-option {
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all 0.15s ease;
+      text-align: right;
+    }
+
+    .select-option:hover {
+      background: var(--primary-accent);
+      color: var(--primary-dark);
+    }
+
+    .select-option.selected {
+      background: var(--primary);
+      color: var(--pure-white);
+    }
+
+    /* Custom Scrollbar for Dropdown options */
+    .select-options::-webkit-scrollbar {
+      width: 6px;
+    }
+    .select-options::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .select-options::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    .select-options::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+
+    /* Status Notifications Bar */
+    .status-box {
+      display: none;
+      padding: 12px 16px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      align-items: flex-start;
+      gap: 10px;
+      animation: fadeIn 0.2s ease;
+    }
+
+    .status-box.success {
+      display: flex;
+      background: var(--success-bg);
+      color: #065f46;
+      border: 1px solid var(--success-border);
+    }
+
+    .status-box.error {
+      display: flex;
+      background: var(--error-bg);
+      color: #991b1b;
+      border: 1px solid var(--error-border);
+    }
+
+    .status-box i {
+      font-size: 16px;
+      margin-top: 2px;
+    }
+
+    /* Button and actions styling */
+    .buttons-container {
+      margin-top: 24px;
+    }
+
+    .btn {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Cairo', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      cursor: pointer;
+      transition: all 0.2s ease;
       display: inline-flex;
       align-items: center;
       justify-content: center;
+      gap: 8px;
+      min-height: 48px;
     }
+
     .btn-next {
-      background: linear-gradient(135deg, #1a5c2a, #2d7a3a);
-      color: white;
+      background: var(--primary);
+      color: var(--pure-white);
+      box-shadow: 0 4px 14px rgba(26,92,42,0.15);
     }
+
+    .btn-next:hover {
+      background: var(--primary-dark);
+      box-shadow: 0 6px 20px rgba(26,92,42,0.25);
+    }
+
+    .btn-next:active {
+      transform: translateY(1px);
+    }
+
     .btn-next:disabled {
-      opacity: 0.5;
+      opacity: 0.7;
       cursor: not-allowed;
     }
-    .btn-back {
-      background: #e0e0e0;
-      color: #1a1a1a;
-    }
-    .login-link {
+
+    .btn-back-link {
+      display: block;
       text-align: center;
-      margin-top: 16px;
-      font-size: 12px;
-      color: #666;
-    }
-    .login-link a {
-      color: #1a5c2a;
+      margin-top: 18px;
+      font-size: 13px;
+      color: var(--text-muted);
       text-decoration: none;
       font-weight: 700;
+      transition: color 0.15s;
     }
-    @media (max-width: 600px) {
-      html, body {
-        padding: 8px 12px !important;
-        overflow: hidden !important; /* No-Scroll policy */
-        height: 100vh !important;
-        height: 100dvh !important;
-        justify-content: center !important;
+
+    .btn-back-link:hover {
+      color: var(--primary);
+    }
+
+    /* Loading Overlay on initialization */
+    .loading-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.85);
+      border-radius: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      backdrop-filter: blur(2px);
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 4px solid var(--primary-accent);
+      border-top: 4px solid var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 12px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .loading-text {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Mobile Responsive optimizations */
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+        background: var(--pure-white); /* Edge-to-edge pure white feel on mobile */
       }
+
       .container {
-        padding: 16px 14px !important;
-        border-radius: 12px !important;
+        border-radius: 0;
+        border: none;
+        box-shadow: none;
+        padding: 16px 4px;
+        max-width: 100%;
       }
-      .header {
-        margin-bottom: 12px !important;
+
+      body::before, body::after {
+        display: none;
       }
-      .logo-large {
-        font-size: 32px !important;
-        margin-bottom: 4px !important;
-      }
+
       .title {
-        font-size: 18px !important;
+        font-size: 21px;
       }
-      .subtitle {
-        font-size: 11px !important;
-      }
+
       .progress-bar {
-        margin-bottom: 12px !important;
+        margin-bottom: 24px;
       }
+
       .progress-step {
-        width: 24px !important;
-        height: 24px !important;
-        font-size: 11px !important;
+        width: 28px;
+        height: 28px;
+        font-size: 12px;
       }
-      .form-group {
-        margin-bottom: 10px !important;
-      }
-      label {
-        font-size: 11px !important;
-        margin-bottom: 4px !important;
-      }
-      input, select {
-        padding: 10px !important;
-        font-size: 13px !important;
-        min-height: 40px !important;
-      }
-      .type-selector {
-        gap: 6px !important;
-      }
-      .type-btn {
-        padding: 8px !important;
-        font-size: 11px !important;
-        min-height: 36px !important;
-      }
-      .buttons {
-        margin-top: 12px !important;
-      }
-      .btn {
-        padding: 10px !important;
-        font-size: 13px !important;
-        min-height: 40px !important;
-      }
-      .login-link {
-        margin-top: 10px !important;
-        font-size: 11px !important;
+
+      input[type="tel"], input[type="text"], .select-trigger {
+        min-height: 46px;
+        font-size: 13px;
       }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
+<div class="container" id="formContainer">
+  <!-- Loading animation state -->
+  <div class="loading-overlay" id="loadingOverlay">
+    <div class="spinner"></div>
+    <div class="loading-text">جاري التحقق من الهوية...</div>
+  </div>
+
   <div class="header">
-    <div class="logo-large">🏛️</div>
-    <div class="title">تسجيل جديد</div>
-    <div class="subtitle">أنشئ حسابك في ZaLo</div>
+    <div class="logo-container">
+      <i class="fa-solid fa-user-gear"></i>
+    </div>
+    <div class="title" id="pageTitle">إكمال بيانات الملف</div>
+    <div class="subtitle" id="pageSubtitle">تفعيل الملف الشخصي الذكي للعملاء والشركاء</div>
   </div>
 
+  <!-- Progress Bar Steps -->
   <div class="progress-bar">
-    <div class="progress-step active">1</div>
-    <div class="progress-step">2</div>
-    <div class="progress-step">3</div>
+    <div class="progress-step active" title="البيانات الأساسية">1</div>
+    <div class="progress-line active"></div>
+    <div class="progress-step" title="إكمال الإعدادات">2</div>
+    <div class="progress-line"></div>
+    <div class="progress-step" title="تفعيل الحساب">3</div>
   </div>
 
-  <form onsubmit="goToStep2(event)" id="step1Form">
+  <!-- Email Activation Welcome Banner -->
+  <div class="welcome-banner" id="welcomeBanner">
+    <div class="welcome-banner-header">
+      <i class="fa-solid fa-circle-check"></i>
+      <span>مرحباً بك في ZaLo Smart! 🎉</span>
+    </div>
+    <div class="welcome-banner-body">
+      لقد تم تفعيل حسابك بنجاح من خلال رابط البريد الإلكتروني:
+      <div class="welcome-banner-email" id="bannerEmail">loading@zalo.dz</div>
+      يرجى ملء البيانات التالية أدناه لإكمال ملفك وتفعيل الحساب.
+    </div>
+  </div>
+
+  <!-- Notification Bar -->
+  <div class="status-box" id="statusBar">
+    <i class="fa-solid fa-circle-exclamation" id="statusIcon"></i>
+    <span id="statusMessage">هنا تظهر الإشعارات</span>
+  </div>
+
+  <!-- Main Registration Form -->
+  <form id="step1Form" onsubmit="handleNextStep(event)">
+    
+    <!-- Phone Field -->
     <div class="form-group">
-      <label>نوع الحساب</label>
-      <div class="type-selector">
-        <button type="button" class="type-btn selected" onclick="selectType('customer')">👤 عميل</button>
-        <button type="button" class="type-btn" onclick="selectType('merchant')">🏪 تاجر</button>
+      <label for="phone">رقم الهاتف الجوال</label>
+      <div class="input-wrapper">
+        <input 
+          type="tel" 
+          id="phone" 
+          placeholder="06XXXXXXXX أو 07XXXXXXXX"
+          required
+          autocomplete="tel"
+        >
+        <i class="fa-solid fa-phone field-icon"></i>
       </div>
-      <input type="hidden" id="userType" value="customer" required>
     </div>
 
+    <!-- Searchable 69 Wilayas Select Field -->
     <div class="form-group">
-      <label for="fullName">الاسم الكامل</label>
-      <input 
-        type="text" 
-        id="fullName" 
-        placeholder="أحمد محمد علي"
-        required
-      >
+      <label for="wilaya">الولاية الجغرافية</label>
+      <div class="searchable-select-container" id="wilayaSelectContainer">
+        <div class="select-trigger" onclick="toggleWilayaDropdown(event)">
+          <span id="selectedWilayaText">اختر الولاية...</span>
+          <i class="fa-solid fa-chevron-down chevron"></i>
+        </div>
+        
+        <div class="select-dropdown" id="wilayaDropdown">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input 
+              type="text" 
+              id="wilayaSearchInput" 
+              placeholder="ابحث عن اسم أو رقم الولاية..." 
+              oninput="filterWilayas()" 
+              onclick="event.stopPropagation()"
+            >
+          </div>
+          <ul class="select-options" id="wilayaOptionsList">
+            <!-- Populated via Javascript -->
+          </ul>
+        </div>
+        
+        <!-- Native representation for Form compatibility -->
+        <input type="hidden" id="wilaya" required>
+      </div>
     </div>
 
-    <div class="buttons">
-      <button type="button" class="btn btn-back" onclick="goToLogin()">← الدخول</button>
-      <button type="submit" class="btn btn-next" id="nextBtn">التالي →</button>
+    <!-- Commune Field -->
+    <div class="form-group">
+      <label for="commune">البلدية</label>
+      <div class="input-wrapper">
+        <input 
+          type="text" 
+          id="commune" 
+          placeholder="مثال: حاسي الفحل أو عين تموشنت" 
+          required
+          autocomplete="address-level2"
+        >
+        <i class="fa-solid fa-location-dot field-icon"></i>
+      </div>
+    </div>
+
+    <!-- Submit button area -->
+    <div class="buttons-container">
+      <button type="submit" class="btn btn-next" id="nextBtn">
+        <span>التالي</span>
+        <i class="fa-solid fa-arrow-left"></i>
+      </button>
+      
+      <a href="login.html" class="btn-back-link" id="backToLoginLink">
+        <i class="fa-solid fa-lock"></i> العودة لبوابة الدخول الموحدة
+      </a>
     </div>
   </form>
-
-  <div class="login-link">
-    تملك حساب؟ <a href="login.html">ادخل الآن</a>
-  </div>
 </div>
 
-<script>
-  function selectType(type) {
-    document.getElementById('userType').value = type;
-    document.querySelectorAll('.type-btn').forEach(btn => btn.classList.remove('selected'));
-    // Since we handle both admin and merchant or customer, admin cannot self sign-up here (restricted)
-    event.currentTarget.classList.add('selected');
+<!-- Supabase Module Integration -->
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
+
+  // Make sure to expose Supabase globally for custom flows or backward compatibility
+  window.supabase = supabase;
+
+  // The 69 Algerian Wilayas (58 official + 11 newly appointed delegated ones)
+  const WILAYAS_LIST = [
+    "01 - أدرار",
+    "02 - الشلف",
+    "03 - الأغواط",
+    "04 - أم البواقي",
+    "05 - باتنة",
+    "06 - بجاية",
+    "07 - بسكرة",
+    "08 - بشار",
+    "09 - البليدة",
+    "10 - البويرة",
+    "11 - تمنراست",
+    "12 - تبسة",
+    "13 - تلمسان",
+    "14 - تيارت",
+    "15 - تيزي وزو",
+    "16 - الجزائر",
+    "17 - الجلفة",
+    "18 - جيجل",
+    "19 - سطيف",
+    "20 - سعيدة",
+    "21 - سكيكدة",
+    "22 - سيدي بلعباس",
+    "23 - عنابة",
+    "24 - قالمة",
+    "25 - قسنطينة",
+    "26 - المدية",
+    "27 - مستغانم",
+    "28 - المسيلة",
+    "29 - معسكر",
+    "30 - ورقلة",
+    "31 - وهران",
+    "32 - البيض",
+    "33 - إليزي",
+    "34 - برج بوعريريج",
+    "35 - بومرداس",
+    "36 - الطارف",
+    "37 - تندوف",
+    "38 - تيسمسيلت",
+    "39 - الوادي",
+    "40 - خنشلة",
+    "41 - سوق أهراس",
+    "42 - تيبازة",
+    "43 - ميلة",
+    "44 - عين الدفلى",
+    "45 - النعامة",
+    "46 - عين تموشنت",
+    "47 - غرداية",
+    "48 - غليزان",
+    "49 - تيميمون",
+    "50 - برج باجي مختار",
+    "51 - أولاد جلال",
+    "52 - بني عباس",
+    "53 - عين صالح",
+    "54 - عين قزام",
+    "55 - تقرت",
+    "56 - جانت",
+    "57 - المغير",
+    "58 - المنيعة",
+    "59 - بريكة",
+    "60 - بوسعادة",
+    "61 - مسعد",
+    "62 - قصر الشلالة",
+    "63 - العلمة",
+    "64 - فرجيوة",
+    "65 - شلغوم العيد",
+    "66 - عين البيضاء",
+    "67 - عين وسارة",
+    "68 - الأبيض سيدي الشيخ",
+    "69 - أفلو"
+  ];
+
+  let currentUser = null;
+
+  // Initialize Searchable Dropdown elements
+  function initSearchableSelect() {
+    const optionsList = document.getElementById('wilayaOptionsList');
+    optionsList.innerHTML = '';
+    
+    WILAYAS_LIST.forEach(wilaya => {
+      const li = document.createElement('li');
+      li.className = 'select-option';
+      li.textContent = wilaya;
+      li.setAttribute('data-value', wilaya);
+      li.onclick = () => selectWilaya(wilaya);
+      optionsList.appendChild(li);
+    });
   }
 
-  function goToStep2(e) {
-    e.preventDefault();
-    const userType = document.getElementById('userType').value;
-    const fullName = document.getElementById('fullName').value;
+  // Handle dropdown selection
+  function selectWilaya(value) {
+    document.getElementById('selectedWilayaText').textContent = value;
+    document.getElementById('wilaya').value = value;
+    
+    // Highlight selected element in dropdown list
+    const options = document.querySelectorAll('.select-option');
+    options.forEach(opt => {
+      if (opt.getAttribute('data-value') === value) {
+        opt.classList.add('selected');
+      } else {
+        opt.classList.remove('selected');
+      }
+    });
 
-    if (!userType || !fullName) {
-      alert('يرجى ملء جميع الحقول');
+    closeAllDropdowns();
+  }
+
+  // Live filter Search box logic
+  window.filterWilayas = function() {
+    const query = document.getElementById('wilayaSearchInput').value.trim().toLowerCase();
+    const options = document.querySelectorAll('.select-option');
+    options.forEach(opt => {
+      const text = opt.textContent.toLowerCase();
+      if (text.includes(query)) {
+        opt.style.display = 'block';
+      } else {
+        opt.style.display = 'none';
+      }
+    });
+  };
+
+  // Toggle Dropdown menu visibility
+  window.toggleWilayaDropdown = function(event) {
+    event.stopPropagation();
+    const container = document.getElementById('wilayaSelectContainer');
+    const isActive = container.classList.contains('active');
+    
+    closeAllDropdowns();
+    
+    if (!isActive) {
+      container.classList.add('active');
+      const searchInput = document.getElementById('wilayaSearchInput');
+      searchInput.value = '';
+      window.filterWilayas();
+      
+      // Auto-focus search input
+      setTimeout(() => {
+        searchInput.focus();
+      }, 100);
+    }
+  };
+
+  function closeAllDropdowns() {
+    document.getElementById('wilayaSelectContainer').classList.remove('active');
+  }
+
+  // Global click listener to close dropdown when clicking outside
+  document.addEventListener('click', () => {
+    closeAllDropdowns();
+  });
+
+  // Display status notifications
+  function showStatus(message, type) {
+    const statusBar = document.getElementById('statusBar');
+    const statusText = document.getElementById('statusMessage');
+    const statusIcon = document.getElementById('statusIcon');
+    
+    statusBar.className = 'status-box ' + type;
+    statusText.textContent = message;
+    
+    if (type === 'success') {
+      statusIcon.className = 'fa-solid fa-circle-check';
+    } else {
+      statusIcon.className = 'fa-solid fa-circle-exclamation';
+    }
+    
+    statusBar.style.display = 'flex';
+  }
+
+  // Toggle loading overlay status
+  function showLoading(show) {
+    document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+  }
+
+  // Initialize and check authenticated user sessions
+  async function checkUserSession() {
+    showLoading(true);
+    try {
+      const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        console.error("Session fetch failed:", sessionError);
+        showStatus("خطأ في الاتصال بالخادم الرئيسي للمصادقة.", "error");
+        return;
+      }
+      
+      if (!session || !session.user) {
+        showStatus("يرجى تسجيل الدخول أولاً لتعديل ملفك الشخصي. جاري تحويلك...", "error");
+        setTimeout(() => {
+          window.location.href = 'login.html';
+        }, 3000);
+        return;
+      }
+      
+      currentUser = session.user;
+      
+      // Smart detection for Email activation redirect triggers
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const queryParams = new URLSearchParams(window.location.search);
+      const isFromEmail = hashParams.has('access_token') || 
+                          queryParams.has('confirmed') || 
+                          hashParams.get('type') === 'signup' || 
+                          queryParams.get('type') === 'signup' ||
+                          currentUser.email_confirmed_at;
+                          
+      if (isFromEmail) {
+        document.getElementById('welcomeBanner').style.display = 'block';
+        document.getElementById('bannerEmail').textContent = currentUser.email;
+      }
+
+      // Pre-populate data from Supabase DB to guarantee seamless experience
+      const { data: profile, error: dbError } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', currentUser.id)
+        .maybeSingle();
+
+      if (profile) {
+        if (profile.phone) document.getElementById('phone').value = profile.phone;
+        if (profile.commune) document.getElementById('commune').value = profile.commune;
+        if (profile.wilaya) {
+          selectWilaya(profile.wilaya);
+        }
+      } else {
+        // Fallback to local SessionStorage for transient step flows
+        const storedPhone = sessionStorage.getItem('reg_phone');
+        const storedWilaya = sessionStorage.getItem('reg_wilaya');
+        const storedCommune = sessionStorage.getItem('reg_commune');
+        
+        if (storedPhone) document.getElementById('phone').value = storedPhone;
+        if (storedCommune) document.getElementById('commune').value = storedCommune;
+        if (storedWilaya) selectWilaya(storedWilaya);
+      }
+      
+    } catch (err) {
+      console.error("Authentication init issue:", err);
+      showStatus("عذراً، حدث خطأ غير متوقع أثناء إعداد الملف الشخصي.", "error");
+    } finally {
+      showLoading(false);
+    }
+  }
+
+  // Handle Form Submission with Upsert
+  window.handleNextStep = async function(event) {
+    event.preventDefault();
+    
+    if (!currentUser) {
+      showStatus("جلسة المصادقة منتهية، يرجى تسجيل الدخول أولاً.", "error");
+      return;
+    }
+    
+    const phone = document.getElementById('phone').value.trim();
+    const wilaya = document.getElementById('wilaya').value;
+    const commune = document.getElementById('commune').value.trim();
+    
+    if (!phone || !wilaya || !commune) {
+      showStatus("يرجى ملء جميع الحقول الإلزامية واختيار الولاية.", "error");
+      return;
+    }
+    
+    // Exact Algerian phone standard check
+    const cleanPhone = phone.replace(/[\s\-()]/g, '');
+    if (!/^(05|06|07|02|03|04|09|\+213)[0-9]{8,11}$/.test(cleanPhone)) {
+      showStatus("يرجى إدخال رقم هاتف جزائري صالح (مثال: 0698694010).", "error");
       return;
     }
 
-    sessionStorage.setItem('reg_userType', userType);
-    sessionStorage.setItem('reg_fullName', fullName);
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.disabled = true;
+    nextBtn.querySelector('span').textContent = 'جاري الحفظ والتحقق...';
+    
+    try {
+      const profileData = {
+        id: currentUser.id,
+        phone: cleanPhone,
+        wilaya: wilaya,
+        commune: commune,
+        updated_at: new Date().toISOString()
+      };
+      
+      // Auto include verified email address
+      if (currentUser.email) {
+        profileData.email = currentUser.email;
+      }
+      
+      // Database update using upsert adhering to RLS policies
+      const { error: upsertError } = await supabase
+        .from('profiles')
+        .upsert(profileData);
+        
+      if (upsertError) {
+        throw upsertError;
+      }
+      
+      // Sync with local session cache
+      sessionStorage.setItem('reg_phone', cleanPhone);
+      sessionStorage.setItem('reg_wilaya', wilaya);
+      sessionStorage.setItem('reg_commune', commune);
+      
+      showStatus("تم حفظ وحفظ بيانات الخطوة الأولى بنجاح! جاري تحويلك...", "success");
+      
+      // Redirect to step 2 after a tiny delay for visual confirmation
+      setTimeout(() => {
+        window.location.href = 'register-step2.html';
+      }, 1500);
+      
+    } catch (err) {
+      console.error("Supabase Profile Sync failed:", err);
+      showStatus("فشل تحديث البيانات الشخصية: " + (err.message || "خطأ داخلي في الخادم"), "error");
+      nextBtn.disabled = false;
+      nextBtn.querySelector('span').textContent = 'التالي';
+    }
+  };
 
-    window.location.href = 'register-step2.html';
-  }
-
-  function goToLogin() {
-    window.location.href = 'login.html';
-  }
+  // Run on load
+  document.addEventListener('DOMContentLoaded', () => {
+    initSearchableSelect();
+    checkUserSession();
+  });
 </script>
 
 </body>
