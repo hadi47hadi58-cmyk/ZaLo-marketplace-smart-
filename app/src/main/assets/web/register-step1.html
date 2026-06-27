@@ -572,6 +572,31 @@
       }
     }
   </style>
+  <script>
+    // Robust Early Toggling Logic to guarantee instant Wilaya dropdown functionality
+    window.toggleWilayaDropdown = function(event) {
+      if (event) event.stopPropagation();
+      const container = document.getElementById('wilayaSelectContainer');
+      if (!container) return;
+      
+      const isActive = container.classList.contains('active');
+      if (isActive) {
+        container.classList.remove('active');
+      } else {
+        container.classList.add('active');
+        const searchInput = document.getElementById('wilayaSearchInput');
+        if (searchInput) {
+          searchInput.value = '';
+          if (typeof window.filterWilayas === 'function') {
+            window.filterWilayas();
+          }
+          setTimeout(() => {
+            searchInput.focus();
+          }, 80);
+        }
+      }
+    };
+  </script>
 </head>
 <body>
 
@@ -718,13 +743,8 @@
   }, 8000);
 </script>
 
-<!-- Supabase Module Integration -->
-<script type="module">
-  import { supabase } from './js/supabase-config.js';
-
-  // Make sure to expose Supabase globally for custom flows or backward compatibility
-  window.supabase = supabase;
-
+<!-- UI & Dropdown Logic (Loads synchronously so dropdown works instantly) -->
+<script>
   // The 69 Algerian Wilayas (58 official + 11 newly appointed delegated ones)
   const WILAYAS_LIST = [
     "01 - أدرار",
@@ -798,19 +818,10 @@
     "69 - أفلو"
   ];
 
-  let currentUser = null;
-
-  // Helper for promise timeout to ensure robust session checking
-  const withTimeout = (promise, ms, errorMsg) => {
-    return Promise.race([
-      promise,
-      new Promise((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms))
-    ]);
-  };
-
   // Initialize Searchable Dropdown elements
   function initSearchableSelect() {
     const optionsList = document.getElementById('wilayaOptionsList');
+    if (!optionsList) return;
     optionsList.innerHTML = '';
     
     WILAYAS_LIST.forEach(wilaya => {
@@ -825,8 +836,10 @@
 
   // Handle dropdown selection
   function selectWilaya(value) {
-    document.getElementById('selectedWilayaText').textContent = value;
-    document.getElementById('wilaya').value = value;
+    const textEl = document.getElementById('selectedWilayaText');
+    const inputEl = document.getElementById('wilaya');
+    if (textEl) textEl.textContent = value;
+    if (inputEl) inputEl.value = value;
     
     // Highlight selected element in dropdown list
     const options = document.querySelectorAll('.select-option');
@@ -857,32 +870,37 @@
 
   // Toggle Dropdown menu visibility
   window.toggleWilayaDropdown = function(event) {
-    event.stopPropagation();
+    if (event) event.stopPropagation();
     const container = document.getElementById('wilayaSelectContainer');
+    if (!container) return;
+    
     const isActive = container.classList.contains('active');
-    
-    closeAllDropdowns();
-    
-    if (!isActive) {
+    if (isActive) {
+      container.classList.remove('active');
+    } else {
       container.classList.add('active');
       const searchInput = document.getElementById('wilayaSearchInput');
-      searchInput.value = '';
-      window.filterWilayas();
-      
-      // Auto-focus search input
-      setTimeout(() => {
-        searchInput.focus();
-      }, 100);
+      if (searchInput) {
+        searchInput.value = '';
+        window.filterWilayas();
+        setTimeout(() => {
+          searchInput.focus();
+        }, 100);
+      }
     }
   };
 
   function closeAllDropdowns() {
-    document.getElementById('wilayaSelectContainer').classList.remove('active');
+    const container = document.getElementById('wilayaSelectContainer');
+    if (container) container.classList.remove('active');
   }
 
-  // Global click listener to close dropdown when clicking outside
-  document.addEventListener('click', () => {
-    closeAllDropdowns();
+  // Global click listener to close dropdown when clicking outside (using contains check)
+  document.addEventListener('click', (event) => {
+    const container = document.getElementById('wilayaSelectContainer');
+    if (container && !container.contains(event.target)) {
+      container.classList.remove('active');
+    }
   });
 
   // Display status notifications
@@ -891,13 +909,17 @@
     const statusText = document.getElementById('statusMessage');
     const statusIcon = document.getElementById('statusIcon');
     
+    if (!statusBar || !statusText) return;
+    
     statusBar.className = 'status-box ' + type;
     statusText.textContent = message;
     
-    if (type === 'success') {
-      statusIcon.className = 'fa-solid fa-circle-check';
-    } else {
-      statusIcon.className = 'fa-solid fa-circle-exclamation';
+    if (statusIcon) {
+      if (type === 'success') {
+        statusIcon.className = 'fa-solid fa-circle-check';
+      } else {
+        statusIcon.className = 'fa-solid fa-circle-exclamation';
+      }
     }
     
     statusBar.style.display = 'flex';
@@ -905,12 +927,45 @@
 
   // Toggle loading overlay status
   function showLoading(show) {
-    document.getElementById('loadingOverlay').style.display = show ? 'flex' : 'none';
+    const loader = document.getElementById('loadingOverlay');
+    if (loader) loader.style.display = show ? 'flex' : 'none';
   }
+
+  // Expose functions globally
+  window.selectWilaya = selectWilaya;
+  window.showStatus = showStatus;
+  window.showLoading = showLoading;
+
+  // Run immediately or on DOM load to guarantee instant interactivity
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      initSearchableSelect();
+    });
+  } else {
+    initSearchableSelect();
+  }
+</script>
+
+<!-- Supabase Module Integration -->
+<script type="module">
+  import { supabase } from './js/supabase-config.js';
+
+  // Make sure to expose Supabase globally for custom flows or backward compatibility
+  window.supabase = supabase;
+
+  let currentUser = null;
+
+  // Helper for promise timeout to ensure robust session checking
+  const withTimeout = (promise, ms, errorMsg) => {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error(errorMsg)), ms))
+    ]);
+  };
 
   // Initialize and check authenticated user sessions
   async function checkUserSession() {
-    showLoading(true);
+    window.showLoading(true);
     try {
       console.log("Checking active session...");
       
@@ -963,7 +1018,7 @@
           if (profile.phone) document.getElementById('phone').value = profile.phone;
           if (profile.commune) document.getElementById('commune').value = profile.commune;
           if (profile.wilaya) {
-            selectWilaya(profile.wilaya);
+            window.selectWilaya(profile.wilaya);
           }
         } else {
           // Fallback to local SessionStorage for transient step flows
@@ -973,7 +1028,7 @@
           
           if (storedPhone) document.getElementById('phone').value = storedPhone;
           if (storedCommune) document.getElementById('commune').value = storedCommune;
-          if (storedWilaya) selectWilaya(storedWilaya);
+          if (storedWilaya) window.selectWilaya(storedWilaya);
         }
       } catch (dbErr) {
         console.warn("Skipped DB load due to timeout/error, using local fallback:", dbErr);
@@ -984,15 +1039,15 @@
         
         if (storedPhone) document.getElementById('phone').value = storedPhone;
         if (storedCommune) document.getElementById('commune').value = storedCommune;
-        if (storedWilaya) selectWilaya(storedWilaya);
+        if (storedWilaya) window.selectWilaya(storedWilaya);
       }
       
     } catch (err) {
       console.error("Session verification failure:", err);
-      showStatus(err.message || "خطأ في الاتصال، يرجى إعادة تسجيل الدخول.", "error");
+      window.showStatus(err.message || "خطأ في الاتصال، يرجى إعادة تسجيل الدخول.", "error");
       
       // Stop spinner immediately on failure
-      showLoading(false);
+      window.showLoading(false);
       
       // Automatic redirect to login page after 3 seconds
       setTimeout(() => {
@@ -1002,7 +1057,7 @@
     }
     
     // Stop spinner on successful verification
-    showLoading(false);
+    window.showLoading(false);
   }
 
   // Handle Form Submission with Upsert
@@ -1010,7 +1065,7 @@
     event.preventDefault();
     
     if (!currentUser) {
-      showStatus("جلسة المصادقة منتهية، يرجى تسجيل الدخول أولاً.", "error");
+      window.showStatus("جلسة المصادقة منتهية، يرجى تسجيل الدخول أولاً.", "error");
       return;
     }
     
@@ -1019,14 +1074,14 @@
     const commune = document.getElementById('commune').value.trim();
     
     if (!phone || !wilaya || !commune) {
-      showStatus("يرجى ملء جميع الحقول الإلزامية واختيار الولاية.", "error");
+      window.showStatus("يرجى ملء جميع الحقول الإلزامية واختيار الولاية.", "error");
       return;
     }
     
     // Exact Algerian phone standard check
     const cleanPhone = phone.replace(/[\s\-()]/g, '');
     if (!/^(05|06|07|02|03|04|09|\+213)[0-9]{8,11}$/.test(cleanPhone)) {
-      showStatus("يرجى إدخال رقم هاتف جزائري صالح (مثال: 0698694010).", "error");
+      window.showStatus("يرجى إدخال رقم هاتف جزائري صالح (مثال: 0698694010).", "error");
       return;
     }
 
@@ -1062,7 +1117,7 @@
       sessionStorage.setItem('reg_wilaya', wilaya);
       sessionStorage.setItem('reg_commune', commune);
       
-      showStatus("تم حفظ وحفظ بيانات الخطوة الأولى بنجاح! جاري تحويلك...", "success");
+      window.showStatus("تم حفظ وحفظ بيانات الخطوة الأولى بنجاح! جاري تحويلك...", "success");
       
       // Redirect to step 2 after a tiny delay for visual confirmation
       setTimeout(() => {
@@ -1071,17 +1126,20 @@
       
     } catch (err) {
       console.error("Supabase Profile Sync failed:", err);
-      showStatus("فشل تحديث البيانات الشخصية: " + (err.message || "خطأ داخلي في الخادم"), "error");
+      window.showStatus("فشل تحديث البيانات الشخصية: " + (err.message || "خطأ داخلي في الخادم"), "error");
       nextBtn.disabled = false;
       nextBtn.querySelector('span').textContent = 'التالي';
     }
   };
 
   // Run on load
-  document.addEventListener('DOMContentLoaded', () => {
-    initSearchableSelect();
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      checkUserSession();
+    });
+  } else {
     checkUserSession();
-  });
+  }
 </script>
 
 </body>
