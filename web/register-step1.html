@@ -963,43 +963,83 @@
     ]);
   };
 
+  // Helper delay function
+  const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
   // Initialize and check authenticated user sessions
   async function checkUserSession() {
-    window.showLoading(true);
+    // Smart detection for Email activation/recovery/signup redirect triggers
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const queryParams = new URLSearchParams(window.location.search);
+    const isActivationFlow = hashParams.has('access_token') || 
+                             queryParams.has('access_token') || 
+                             hashParams.get('type') === 'recovery' || 
+                             queryParams.get('type') === 'recovery' ||
+                             hashParams.get('type') === 'signup' || 
+                             queryParams.get('type') === 'signup' ||
+                             window.location.hash.includes('access_token') ||
+                             window.location.search.includes('access_token') ||
+                             queryParams.has('confirmed');
+
+    if (isActivationFlow) {
+      window.showLoading(true);
+      window.showStatus("جاري تفعيل إعدادات حسابك الآمن... يرجى الانتظار لحظات.", "success");
+    } else {
+      window.showLoading(true);
+    }
+
     try {
-      console.log("Checking active session...");
+      console.log("Checking active session... isActivationFlow:", isActivationFlow);
       
-      // Attempt to get the session with a 6-second timeout to prevent infinite spinner hang
-      const { data, error: sessionError } = await withTimeout(
-        supabase.auth.getSession(),
-        6000,
-        "انتهت مهلة الاتصال بالخادم. يرجى التحقق من الإنترنت وإعادة المحاولة."
-      );
+      // 1. Wait for 2.5 seconds to allow Supabase to fully parse and process hash parameters
+      await delay(2500);
       
-      if (sessionError) {
-        throw sessionError;
+      let session = null;
+      let retries = 2; // Retry mechanism
+      
+      while (retries > 0 && !session) {
+        console.log(`Attempting to retrieve active session... (Attempts left: ${retries})`);
+        try {
+          const { data, error: sessionError } = await withTimeout(
+            supabase.auth.getSession(),
+            6000,
+            "انتهت مهلة الاتصال بالخادم."
+          );
+          
+          if (sessionError) {
+            console.warn("Session retrieval attempt failed:", sessionError);
+          } else if (data && data.session) {
+            session = data.session;
+            break;
+          }
+        } catch (retryErr) {
+          console.warn("Session check retry error:", retryErr);
+        }
+        
+        if (!session) {
+          retries--;
+          if (retries > 0) {
+            console.log("Session not found yet. Retrying session check in 2 seconds...");
+            if (isActivationFlow) {
+              window.showStatus("جاري إعادة المحاولة وتأكيد الاتصال الآمن مع الخادم...", "success");
+            }
+            await delay(2000);
+          }
+        }
       }
       
-      const session = data ? data.session : null;
-      
       if (!session || !session.user) {
-        throw new Error("جلسة غير صالحة أو منتهية الصلاحية. يرجى إعادة تسجيل الدخول.");
+        throw new Error("يرجى تسجيل الدخول مجدداً لتفعيل بياناتك.");
       }
       
       currentUser = session.user;
       
-      // Smart detection for Email activation redirect triggers
-      const hashParams = new URLSearchParams(window.location.hash.substring(1));
-      const queryParams = new URLSearchParams(window.location.search);
-      const isFromEmail = hashParams.has('access_token') || 
-                          queryParams.has('confirmed') || 
-                          hashParams.get('type') === 'signup' || 
-                          queryParams.get('type') === 'signup' ||
-                          currentUser.email_confirmed_at;
-                          
+      const isFromEmail = isActivationFlow || currentUser.email_confirmed_at;
       if (isFromEmail) {
-        document.getElementById('welcomeBanner').style.display = 'block';
-        document.getElementById('bannerEmail').textContent = currentUser.email;
+        const welcomeBanner = document.getElementById('welcomeBanner');
+        if (welcomeBanner) welcomeBanner.style.display = 'block';
+        const bannerEmail = document.getElementById('bannerEmail');
+        if (bannerEmail) bannerEmail.textContent = currentUser.email;
       }
 
       // Pre-populate data from Supabase DB to guarantee seamless experience
@@ -1044,20 +1084,60 @@
       
     } catch (err) {
       console.error("Session verification failure:", err);
-      window.showStatus(err.message || "خطأ في الاتصال، يرجى إعادة تسجيل الدخول.", "error");
+      window.showStatus(err.message || "يرجى تسجيل الدخول مجدداً لتفعيل بياناتك.", "error");
       
       // Stop spinner immediately on failure
       window.showLoading(false);
       
-      // Automatic redirect to login page after 3 seconds
+      // Activation exception check: if in activation/recovery, prevent automatic redirect
+      if (isActivationFlow) {
+        console.warn("Activation flow detected. Bypassing automatic redirect to allow user manual intervention or session retry.");
+        window.showStatus("انتهت صلاحية الجلسة أو تعذر تأكيد التفعيل الآلي. يرجى تسجيل الدخول لتنشيط حسابك.", "error");
+        return;
+      }
+      
+      // Automatic redirect to login page after 4 seconds (instead of immediate/3s redirect)
       setTimeout(() => {
         window.location.href = 'login.html';
-      }, 3000);
+      }, 4000);
       return;
     }
     
     // Stop spinner on successful verification
     window.showLoading(false);
+  }
+
+  // Hook into onAuthStateChanged to dynamically capture session as soon as parsed by Supabase
+  try {
+    supabase.auth.onAuthStateChanged(async (event, session) => {
+      console.log("Auth state change captured in step 1:", event, session ? "Session active" : "No session");
+      if (session && session.user && !currentUser) {
+        currentUser = session.user;
+        const welcomeBanner = document.getElementById('welcomeBanner');
+        if (welcomeBanner) welcomeBanner.style.display = 'block';
+        const bannerEmail = document.getElementById('bannerEmail');
+        if (bannerEmail) bannerEmail.textContent = currentUser.email;
+        
+        try {
+          const { data: profile } = await supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle();
+          if (profile) {
+            if (profile.phone && !document.getElementById('phone').value) {
+              document.getElementById('phone').value = profile.phone;
+            }
+            if (profile.commune && !document.getElementById('commune').value) {
+              document.getElementById('commune').value = profile.commune;
+            }
+            if (profile.wilaya) {
+              window.selectWilaya(profile.wilaya);
+            }
+          }
+        } catch (e) {
+          console.warn("Could not query profile on auth state change:", e);
+        }
+      }
+    });
+  } catch (err) {
+    console.error("Failed to register onAuthStateChanged listener:", err);
   }
 
   // Handle Form Submission with Upsert
