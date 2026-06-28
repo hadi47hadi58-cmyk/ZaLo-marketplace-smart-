@@ -5,7 +5,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // Supabase Credentials (will fallback to public credentials or placeholders)
 const SUPABASE_URL = "https://xwwzadxsqmmxerbolovz.supabase.co"; // Replace with your actual project URL
-const SUPABASE_ANON_KEY = "sb_publishable_qJ60bIG-VZXemJ5L0GhY3w_1I7718wl"; // Replace with your actual anon key
+const SUPABASE_ANON_KEY = "Sb_publishable_qJ60bIG-VZXemJ5L0GhY3w_1I7718wl"; // Replace with your actual anon key
 
 // Initialize Supabase Client
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
