@@ -171,6 +171,40 @@ fun PureWebContainerScreen(
                             // Keep navigation internal to the WebView
                             return false
                         }
+
+                        override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
+                            super.onPageStarted(view, url, favicon)
+                            if (url != null) {
+                                val targetDomains = arrayOf(
+                                    "hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/web/",
+                                    "hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/",
+                                    "hadi47hadi58-cmyk.github.io/"
+                                )
+                                for (domain in targetDomains) {
+                                    if (url.contains(domain)) {
+                                        // Intercept and redirect to the corresponding local file!
+                                        val filename = when {
+                                            url.contains("register-step1.html") -> "register-step1.html"
+                                            url.contains("login-customer.html") -> "login-customer.html"
+                                            url.contains("login.html") -> "login.html"
+                                            else -> "splash.html"
+                                        }
+                                        
+                                        // Retain any hash parameters (like #access_token=...) or query parameters
+                                        val extraParams = when {
+                                            url.contains("#") -> "#" + url.substringAfter("#")
+                                            url.contains("?") -> "?" + url.substringAfter("?")
+                                            else -> ""
+                                        }
+                                        
+                                        val localUrl = "file:///android_asset/web/$filename$extraParams"
+                                        view?.stopLoading()
+                                        view?.loadUrl(localUrl)
+                                        return
+                                    }
+                                }
+                            }
+                        }
                     }
                     webChromeClient = object : WebChromeClient() {
                         override fun onShowFileChooser(

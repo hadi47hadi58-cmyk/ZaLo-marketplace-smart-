@@ -287,8 +287,22 @@
     }
   });
 
+  // Handle Google Sign-in action
   document.getElementById('googleBtn').addEventListener('click', async () => {
     errorEl.style.display = 'none';
+    if (window.AndroidInterface && typeof window.AndroidInterface.requestGoogleSignIn === 'function') {
+      try {
+        window.AndroidInterface.requestGoogleSignIn();
+      } catch (err) {
+        console.error("Native Google sign-in failure, calling Web OAuth fallback:", err);
+        fallbackToWebOAuth();
+      }
+    } else {
+      fallbackToWebOAuth();
+    }
+  });
+
+  async function fallbackToWebOAuth() {
     try {
       const redirectUrl = "https://hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/web/register-step1.html";
       const { data, error } = await supabase.auth.signInWithOAuth({
@@ -302,7 +316,44 @@
       console.error(error);
       showError("فشل تسجيل الدخول باستخدام حساب Google.");
     }
-  });
+  }
+
+  // Define global callbacks for Android native integration
+  window.onGoogleIdTokenReceived = async function(idToken) {
+    errorEl.style.display = 'none';
+    try {
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.style.opacity = '0.5';
+      }
+      
+      const { data, error } = await supabase.auth.signInWithIdToken({
+        provider: 'google',
+        token: idToken
+      });
+      
+      if (error) throw error;
+      
+      // Success! Redirect to registration step or main homepage
+      window.location.href = "register-step1.html";
+    } catch (error) {
+      console.error("Supabase ID Token Auth failed:", error);
+      showError("حدث خطأ أثناء الاتصال بـ Supabase باستخدام حساب جوجل: " + (error.message || error));
+      const submitBtn = document.getElementById('submitBtn');
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.style.opacity = '1';
+      }
+    }
+  };
+
+  window.onGoogleIdTokenFailed = function(reason) {
+    console.warn("Google native sign-in failed/cancelled:", reason);
+    if (reason !== 'cancelled') {
+      showError("فشل تسجيل الدخول باستخدام حساب جوجل: " + reason);
+    }
+  };
 </script>
 
 </body>
