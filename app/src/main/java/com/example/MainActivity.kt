@@ -174,33 +174,44 @@ fun PureWebContainerScreen(
 
                         override fun onPageStarted(view: WebView?, url: String?, favicon: android.graphics.Bitmap?) {
                             super.onPageStarted(view, url, favicon)
+                            // Let the page start loading so we can capture the full URL with hash fragment in onPageFinished
+                        }
+
+                        override fun onPageFinished(view: WebView?, url: String?) {
+                            super.onPageFinished(view, url)
                             if (url != null) {
                                 val targetDomains = arrayOf(
                                     "hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/web/",
                                     "hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/",
                                     "hadi47hadi58-cmyk.github.io/"
                                 )
+                                var matchesDomain = false
                                 for (domain in targetDomains) {
                                     if (url.contains(domain)) {
-                                        // Intercept and redirect to the corresponding local file!
-                                        val filename = when {
-                                            url.contains("register-step1.html") -> "register-step1.html"
-                                            url.contains("login-customer.html") -> "login-customer.html"
-                                            url.contains("login.html") -> "login.html"
-                                            else -> "splash.html"
+                                        matchesDomain = true
+                                        break
+                                    }
+                                }
+                                if (matchesDomain) {
+                                    // Query the full URL from JS to preserve hash fragment
+                                    view?.evaluateJavascript("window.location.href") { fullUrl ->
+                                        val cleanUrl = fullUrl?.removePrefix("\"")?.removeSuffix("\"")
+                                        if (cleanUrl != null && cleanUrl.isNotEmpty() && cleanUrl != "null") {
+                                            val filename = when {
+                                                cleanUrl.contains("register-step1.html") -> "register-step1.html"
+                                                cleanUrl.contains("login-customer.html") -> "login-customer.html"
+                                                cleanUrl.contains("login.html") -> "login.html"
+                                                else -> "register-step1.html" // Default callback target
+                                            }
+                                            val extraParams = when {
+                                                cleanUrl.contains("#") -> "#" + cleanUrl.substringAfter("#")
+                                                cleanUrl.contains("?") -> "?" + cleanUrl.substringAfter("?")
+                                                else -> ""
+                                            }
+                                            val localUrl = "file:///android_asset/web/$filename$extraParams"
+                                            view?.stopLoading()
+                                            view?.loadUrl(localUrl)
                                         }
-                                        
-                                        // Retain any hash parameters (like #access_token=...) or query parameters
-                                        val extraParams = when {
-                                            url.contains("#") -> "#" + url.substringAfter("#")
-                                            url.contains("?") -> "?" + url.substringAfter("?")
-                                            else -> ""
-                                        }
-                                        
-                                        val localUrl = "file:///android_asset/web/$filename$extraParams"
-                                        view?.stopLoading()
-                                        view?.loadUrl(localUrl)
-                                        return
                                     }
                                 }
                             }
