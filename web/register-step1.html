@@ -955,6 +955,14 @@
 
   let currentUser = null;
 
+  const AD_LIST = [
+    'zinzinochop@gmail.com',
+    'admin@zalo.dz',
+    'admin@zalo.com',
+    'manager@zalo.dz',
+    'manager@zalo.com'
+  ];
+
   // Helper for promise timeout to ensure robust session checking
   const withTimeout = (promise, ms, errorMsg) => {
     return Promise.race([
@@ -1074,6 +1082,14 @@
       }
       
       currentUser = session.user;
+
+      const email = currentUser.email ? currentUser.email.toLowerCase().trim() : "";
+      if (AD_LIST.includes(email)) {
+        console.log("Admin user detected. Redirecting to admin.html...");
+        sessionStorage.setItem('admin_logged_in_session', 'true');
+        window.location.href = "admin.html";
+        return;
+      }
       
       const isFromEmail = isActivationFlow || currentUser.email_confirmed_at;
       if (isFromEmail) {
@@ -1154,6 +1170,15 @@
       console.log("Auth state change captured in step 1:", event, session ? "Session active" : "No session");
       if (session && session.user && !currentUser) {
         currentUser = session.user;
+
+        const email = currentUser.email ? currentUser.email.toLowerCase().trim() : "";
+        if (AD_LIST.includes(email)) {
+          console.log("Admin user detected in auth change. Redirecting to admin.html...");
+          sessionStorage.setItem('admin_logged_in_session', 'true');
+          window.location.href = "admin.html";
+          return;
+        }
+        
         const welcomeBanner = document.getElementById('welcomeBanner');
         if (welcomeBanner) welcomeBanner.style.display = 'block';
         const bannerEmail = document.getElementById('bannerEmail');

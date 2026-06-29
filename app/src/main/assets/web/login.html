@@ -393,7 +393,7 @@
 <!-- Firebase Modular SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { supabase } from './js/supabase-config.js';
 
@@ -623,6 +623,20 @@
       });
       
       if (error) throw error;
+
+      // Check if this email is an administrator
+      const email = (data.user && data.user.email) ? data.user.email.toLowerCase().trim() : "";
+      if (AD_LIST.includes(email)) {
+        sessionStorage.setItem('admin_logged_in_session', 'true');
+        try {
+          const credential = GoogleAuthProvider.credential(idToken);
+          await signInWithCredential(auth, credential);
+        } catch (fbErr) {
+          console.warn("Failed to synchronize with Firebase auth:", fbErr);
+        }
+        window.location.href = "admin.html";
+        return;
+      }
       
       // Success! Redirect to registration step or main homepage
       window.location.href = "register-step1.html";
