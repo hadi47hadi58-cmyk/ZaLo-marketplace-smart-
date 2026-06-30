@@ -1254,6 +1254,48 @@ async function handleOAuthCallback() {
 }
 await handleOAuthCallback();
 
+// 1b. Smart verification delay helper: wait up to 500ms for Supabase session to settle
+async function getSettleSessionWithTimeout(maxWaitMs = 500) {
+  const startTime = Date.now();
+  
+  // Try immediate retrieve
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (session) {
+      console.log("ZaLo Smart: Session found immediately in storage.");
+      return session;
+    }
+  } catch (e) {
+    console.warn("Immediate session check failed:", e);
+  }
+
+  // Poll up to maxWaitMs for session to resolve (useful during async OAuth processing)
+  return new Promise((resolve) => {
+    const interval = setInterval(async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          clearInterval(interval);
+          console.log(`ZaLo Smart: Session resolved successfully after ${Date.now() - startTime}ms.`);
+          resolve(session);
+          return;
+        }
+      } catch (e) {
+        console.warn("Polling session check failed:", e);
+      }
+
+      if (Date.now() - startTime >= maxWaitMs) {
+        clearInterval(interval);
+        console.log(`ZaLo Smart: Session resolution timed out after ${maxWaitMs}ms.`);
+        resolve(null);
+      }
+    }, 50);
+  });
+}
+
+// Perform initial 500ms smart checking
+const initialSession = await getSettleSessionWithTimeout(500);
+
 // 2. Auto-seed Algerian Marketplace Data if empty to ensure the platform is never blank
 const SEED_SHOPS = [
   {
