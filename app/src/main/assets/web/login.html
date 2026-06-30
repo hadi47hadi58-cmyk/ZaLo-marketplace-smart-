@@ -383,8 +383,9 @@
       </button>
     </form>
 
-    <div style="text-align: center; margin-top: 20px; font-size: 13px;">
+    <div style="text-align: center; margin-top: 20px; font-size: 13px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
       <a href="register-step1.html" style="color: var(--gold2); text-decoration: none; font-weight: 800;">تقديم طلب شريك تجاري جديد <i class="fa-solid fa-arrow-left"></i></a>
+      <button id="clearSessionBtn" type="button" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #888; border-radius: 8px; font-size: 11px; padding: 6px 12px; cursor: pointer; font-family: 'Cairo', sans-serif;">🧹 تنظيف وإعادة تعيين جلسة الاتصال (Clean Auth Session)</button>
     </div>
   </div>
 
@@ -393,6 +394,30 @@
 <!-- Supabase Integration -->
 <script type="module">
   import { supabase } from './js/supabase-config.js';
+
+  // Session Cleanup action
+  const clearBtn = document.getElementById('clearSessionBtn');
+  if (clearBtn) {
+    clearBtn.addEventListener('click', async () => {
+      try {
+        localStorage.clear();
+        sessionStorage.clear();
+        for (let key in localStorage) {
+          if (key.startsWith('sb-')) {
+            localStorage.removeItem(key);
+          }
+        }
+        await supabase.auth.signOut();
+        alert("تم تنظيف جلسة العمل وذاكرة التخزين المؤقت بنجاح. يرجى المحاولة مجدداً.");
+        window.location.reload();
+      } catch (err) {
+        console.error("Session cleanup failed:", err);
+        localStorage.clear();
+        sessionStorage.clear();
+        window.location.reload();
+      }
+    });
+  }
 
   const form = document.getElementById('unifiedLoginForm');
   const emailInput = document.getElementById('loginEmail');
