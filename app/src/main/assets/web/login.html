@@ -384,7 +384,7 @@
     </form>
 
     <div style="text-align: center; margin-top: 20px; font-size: 13px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
-      <a href="register-step1.html" style="color: var(--gold2); text-decoration: none; font-weight: 800;">تقديم طلب شريك تجاري جديد <i class="fa-solid fa-arrow-left"></i></a>
+      <a href="#" id="toggleModeBtn" style="color: var(--gold2); text-decoration: none; font-weight: 800;">ليس لديك حساب؟ سجل حساباً جديداً الآن ←</a>
       <button id="clearSessionBtn" type="button" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #888; border-radius: 8px; font-size: 11px; padding: 6px 12px; cursor: pointer; font-family: 'Cairo', sans-serif;">🧹 تنظيف وإعادة تعيين جلسة الاتصال (Clean Auth Session)</button>
     </div>
   </div>
@@ -508,6 +508,25 @@
     }, 400);
   });
 
+  let isSignUpMode = false;
+  const toggleModeBtn = document.getElementById('toggleModeBtn');
+  if (toggleModeBtn) {
+    toggleModeBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      isSignUpMode = !isSignUpMode;
+      const btnSpan = submitBtn.querySelector('span') || submitBtn;
+      if (isSignUpMode) {
+        btnSpan.textContent = 'إنشاء حساب جديد وتأكيد الدخول';
+        toggleModeBtn.textContent = 'لديك حساب بالفعل؟ سجل دخولك الآن ←';
+        if (badgeText) badgeText.textContent = '✨ إنشاء حساب زبون جديد';
+      } else {
+        btnSpan.textContent = 'تأكيد وتسجيل الدخول الموحد';
+        toggleModeBtn.textContent = 'ليس لديك حساب؟ سجل حساباً جديداً الآن ←';
+        performDetection(emailInput.value);
+      }
+    });
+  }
+
   // Form submission and routing
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -519,11 +538,33 @@
     submitBtn.style.opacity = '0.7';
 
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: pass
-      });
-      if (error) throw error;
+      let data, error;
+      if (isSignUpMode) {
+        const signupRes = await supabase.auth.signUp({
+          email: email,
+          password: pass
+        });
+        data = signupRes.data;
+        error = signupRes.error;
+        if (error) throw error;
+        
+        // Auto create profile for newly registered customer
+        await supabase.from('profiles').upsert({
+          id: data.user.id,
+          email: data.user.email,
+          role: 'customer',
+          status: 'active'
+        });
+      } else {
+        const signinRes = await supabase.auth.signInWithPassword({
+          email: email,
+          password: pass
+        });
+        data = signinRes.data;
+        error = signinRes.error;
+        if (error) throw error;
+      }
+      
       const user = data.user;
 
       // Ensure local state stores correct details
@@ -570,11 +611,13 @@
       }
 
       // Route 4: Normal customer
-      window.location.href = 'index.html';
+      window.location.href = 'customer-home.html';
 
     } catch (error) {
       console.error(error);
-      let arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى التحقق وإعادة المحاولة.";
+      let arabicError = isSignUpMode 
+        ? "فشل إنشاء الحساب الجديد. قد يكون البريد الإلكتروني مسجلاً بالفعل أو كلمة المرور قصيرة جداً (6 أحرف على الأقل)."
+        : "البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى التحقق وإعادة المحاولة.";
       showError(arabicError);
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
