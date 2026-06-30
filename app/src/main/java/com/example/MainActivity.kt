@@ -201,7 +201,8 @@ fun PureWebContainerScreen(
                                                 cleanUrl.contains("register-step1.html") -> "register-step1.html"
                                                 cleanUrl.contains("login-customer.html") -> "login-customer.html"
                                                 cleanUrl.contains("login.html") -> "login.html"
-                                                else -> "register-step1.html" // Default callback target
+                                                cleanUrl.contains("index.html") -> "index.html"
+                                                else -> "index.html" // Default callback target
                                             }
                                             val extraParams = when {
                                                 cleanUrl.contains("#") -> "#" + cleanUrl.substringAfter("#")

@@ -27,37 +27,93 @@ export class GoogleAuthProvider {
 }
 
 // 2. Auth State and Actions
+let lastStateValue = undefined;
+
 export function onAuthStateChanged(auth, callback) {
-    // Trigger callback initially with current user if exists
-    supabase.auth.getSession().then(({ data: { session } }) => {
-        if (session) {
-            const user = {
-                uid: session.user.id,
-                id: session.user.id,
-                email: session.user.email,
-                ...session.user
-            };
-            callback(user);
-        } else {
-            callback(null);
+    let isSetted = false;
+    let timeoutId = null;
+
+    const triggerCallback = (user) => {
+        const stateId = user ? user.id : null;
+        if (stateId === lastStateValue) {
+            console.log("onAuthStateChanged: Suppressing duplicate state trigger:", stateId);
+            return;
+        }
+        lastStateValue = stateId;
+        callback(user);
+    };
+
+    const hasHashToken = window.location.hash.includes("access_token=") || window.location.search.includes("access_token=");
+    const maxWaitMs = hasHashToken ? 1000 : 500;
+
+    console.log(`onAuthStateChanged: Initiating patient session check (Wait up to ${maxWaitMs}ms)...`);
+
+    const checkSession = async () => {
+        try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                if (timeoutId) clearTimeout(timeoutId);
+                isSetted = true;
+                const user = {
+                    uid: session.user.id,
+                    id: session.user.id,
+                    email: session.user.email,
+                    ...session.user
+                };
+                triggerCallback(user);
+                return true;
+            }
+        } catch (e) {
+            console.warn("Patient session check error:", e);
+        }
+        return false;
+    };
+
+    checkSession().then(found => {
+        if (!found) {
+            const startTime = Date.now();
+            const interval = setInterval(async () => {
+                const foundNow = await checkSession();
+                if (foundNow || (Date.now() - startTime >= maxWaitMs)) {
+                    clearInterval(interval);
+                    if (!foundNow && !isSetted) {
+                        isSetted = true;
+                        triggerCallback(null);
+                    }
+                }
+            }, 50);
         }
     });
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+        console.log("onAuthStateChanged: Supabase Auth event received:", event);
         if (session) {
+            isSetted = true;
+            if (timeoutId) clearTimeout(timeoutId);
             const user = {
                 uid: session.user.id,
                 id: session.user.id,
                 email: session.user.email,
                 ...session.user
             };
-            callback(user);
+            triggerCallback(user);
         } else {
-            callback(null);
+            if (isSetted) {
+                triggerCallback(null);
+            }
         }
     });
 
+    timeoutId = setTimeout(() => {
+        if (!isSetted) {
+            console.log("onAuthStateChanged: Settle timeout reached, fallback to null.");
+            isSetted = true;
+            triggerCallback(null);
+        }
+    }, maxWaitMs);
+
     return () => {
+        if (timeoutId) clearTimeout(timeoutId);
         subscription.unsubscribe();
     };
 }
