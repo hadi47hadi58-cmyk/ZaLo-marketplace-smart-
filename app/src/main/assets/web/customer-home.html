@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>بوابة الزبون - ZaLo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+:root {
+  --g1: oklch(0.35 0.08 145);
+  --g2: oklch(0.42 0.09 145);
+  --gold: oklch(0.72 0.13 75);
+  --gold2: oklch(0.80 0.10 75);
+  --bg: #070a08;
+  --card-bg: #0f1811;
+  --text: #f8fafc;
+  --gray: #94a3b8;
+  --red: #ef4444;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body {
+  font-family: 'Cairo', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 24px 16px;
+}
+.container {
+  width: 100%;
+  max-width: 500px;
+  background: var(--card-bg);
+  border: 1.5px solid rgba(197, 160, 89, 0.2);
+  border-radius: 20px;
+  padding: 32px 24px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: fadeIn 0.4s ease-out;
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  padding-bottom: 20px;
+}
+.avatar {
+  width: 70px;
+  height: 70px;
+  background: rgba(26, 92, 42, 0.2);
+  border: 2px solid var(--gold);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 32px;
+}
+.btn-primary {
+  background: var(--g1);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+  box-shadow: 0 4px 12px rgba(26,92,42,0.3);
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--g2);
+  transform: translateY(-1px);
+}
+.btn-primary:disabled {
+  background: #1e291f;
+  color: var(--gray);
+  border: 1px solid rgba(255,255,255,0.05);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.btn-secondary {
+  background: rgba(255,255,255,0.05);
+  color: var(--text);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 12px;
+  padding: 12px;
+  font-family: 'Cairo', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  background: rgba(255,255,255,0.1);
+}
+.toast {
+  position: fixed;
+  bottom: 24px;
+  left: 16px;
+  right: 16px;
+  background: #1e291f;
+  color: #fff;
+  padding: 14px 20px;
+  border-radius: 12px;
+  border-right: 4px solid var(--gold);
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  display: none;
+  text-align: right;
+  z-index: 1000;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+  
+  <div class="header">
+    <div class="avatar">
+      <i class="fa-solid fa-circle-user"></i>
+    </div>
+    <h2 style="font-size: 20px; font-weight: 900; color: var(--gold);" id="customer-email">جاري التحميل...</h2>
+    <span style="font-size: 11px; color: var(--gray);">رقم الحساب الموحد: #<span id="customer-id-tag">...</span></span>
+  </div>
+
+  <div style="display: flex; flex-direction: column; gap: 12px;">
+    <h3 style="font-size: 14px; font-weight: 800; color: #fff;">لوحة التحكم والخيارات:</h3>
+    
+    <button class="btn-primary" onclick="window.location.href='index.html'">
+      <i class="fa-solid fa-store"></i> تصفح السوق الذكي الجزائري
+    </button>
+    
+    <button class="btn-primary" onclick="window.location.href='index.html#myorders'">
+      <i class="fa-solid fa-box"></i> تتبع شحناتي وطلباتي المباشرة
+    </button>
+  </div>
+
+  <div style="background: rgba(197, 160, 89, 0.05); border: 1px dashed rgba(197, 160, 89, 0.2); border-radius: 14px; padding: 16px; display: flex; flex-direction: column; gap: 12px;">
+    <h4 style="font-size: 14px; font-weight: 800; color: var(--gold); display: flex; align-items: center; gap: 8px;">
+      💼 الشراكة والبيع على منصة ZaLo
+    </h4>
+    <p style="font-size: 11px; color: var(--gray); line-height: 1.5; margin: 0;">
+      هل تملك متجراً أو منتجات وتريد بيعها لآلاف الزبائن في 69 ولاية جزائرية؟ قدم طلب شريك تجاري الآن للانضمام لكوكبة التجار المعتمدين وتفعيل لوحة الإدارة!
+    </p>
+    
+    <button id="apply-merchant-btn" class="btn-primary" style="background: var(--gold); color: #070a08;" onclick="applyForMerchant()">
+      <i class="fa-solid fa-briefcase"></i> تقديم طلب انضمام كتاجر
+    </button>
+    
+    <div id="application-status-container" style="display: none; font-size: 12px; font-weight: bold; text-align: center; padding: 8px; border-radius: 8px; background: rgba(255,255,255,0.03);"></div>
+  </div>
+
+  <button class="btn-secondary" style="color: var(--red); border-color: rgba(239, 68, 68, 0.2);" onclick="handleLogout()">
+    <i class="fa-solid fa-right-from-bracket"></i> تسجيل الخروج الآمن
+  </button>
+
+</div>
+
+<div id="toast" class="toast"></div>
+
+<script type="module">
+import { onAuthStateChanged } from "./js/supabase-db-compat.js";
+import { supabase } from "./js/supabase-config.js";
+
+const auth = { currentUser: null };
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.display = 'block';
+  setTimeout(() => { t.style.display = 'none'; }, 4000);
+}
+
+// Update UI based on Application status
+function updateApplicationUI(status) {
+  const btn = document.getElementById('apply-merchant-btn');
+  const container = document.getElementById('application-status-container');
+  
+  if (status === 'pending') {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> قيد المراجعة حالياً...`;
+    container.style.display = 'block';
+    container.style.color = 'var(--gold)';
+    container.textContent = '⏳ تم إيداع طلب الشراكة بنجاح وهو قيد الدراسة من قبل الإدارة العليا.';
+  } else if (status === 'active') {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> شريك نشط`;
+    container.style.display = 'block';
+    container.style.color = '#4ade80';
+    container.textContent = '✅ حسابك شريك معتمد ونشط بالمنصة! يمكنك الدخول كتاجر.';
+  } else {
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-briefcase"></i> تقديم طلب انضمام كتاجر`;
+    container.style.display = 'none';
+  }
+}
+
+// Apply for merchant role
+window.applyForMerchant = async function() {
+  const btn = document.getElementById('apply-merchant-btn');
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري تقديم الطلب...`;
+  
+  try {
+    const { data: { session } } = await supabase.auth.getSession();
+    if (!session || !session.user) {
+      showToast("⚠️ لم يتم العثور على جلسة مستخدم نشطة!");
+      return;
+    }
+    
+    // Update the profile status to pending
+    const { error } = await supabase
+      .from('profiles')
+      .update({ status: 'pending' })
+      .eq('id', session.user.id);
+      
+    if (error) throw error;
+    
+    showToast("🎉 تم إرسال طلبك للمراجعة بنجاح!");
+    updateApplicationUI('pending');
+  } catch (e) {
+    console.error(e);
+    showToast("⚠️ فشل إرسال الطلب: " + (e.message || e));
+    btn.disabled = false;
+    btn.innerHTML = `<i class="fa-solid fa-briefcase"></i> تقديم طلب انضمام كتاجر`;
+  }
+};
+
+// Logout handler
+window.handleLogout = async function() {
+  try {
+    await supabase.auth.signOut();
+    window.location.href = 'index.html';
+  } catch (e) {
+    console.error(e);
+    window.location.href = 'index.html';
+  }
+};
+
+// Page Guard
+onAuthStateChanged(auth, async (user) => {
+  if (!user) {
+    console.log("PageGuard: No active session. Redirecting to gateway...");
+    window.location.href = 'index.html';
+    return;
+  }
+  
+  try {
+    const { data: profile, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', user.id)
+      .maybeSingle();
+      
+    if (profile && profile.role && profile.role !== 'customer') {
+      console.log("PageGuard: Access restricted for non-customer:", profile.role);
+      if (profile.role === 'admin') window.location.href = 'admin.html';
+      else if (profile.role === 'merchant') window.location.href = 'dashboard.html';
+      else window.location.href = 'index.html';
+      return;
+    }
+    
+    // Display customer info
+    document.getElementById('customer-email').textContent = user.email || 'مستخدم ZaLo';
+    document.getElementById('customer-id-tag').textContent = user.id.slice(0, 8);
+    
+    if (profile) {
+      updateApplicationUI(profile.status);
+    } else {
+      // Auto-insert profile for consistency if missing
+      await supabase.from('profiles').upsert({
+        id: user.id,
+        email: user.email,
+        role: 'customer',
+        status: 'active'
+      });
+      updateApplicationUI('active');
+    }
+  } catch (e) {
+    console.warn("Error running page guard checks:", e);
+  }
+});
+</script>
+
+</body>
+</html>
