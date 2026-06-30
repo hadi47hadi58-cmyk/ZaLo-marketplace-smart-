@@ -1426,31 +1426,30 @@
 
 <!-- Firebase script -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc, getDoc }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import {
+  initializeApp,
+  getFirestore,
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  collection,
+  getDocs,
+  doc,
+  updateDoc,
+  query,
+  where,
+  addDoc,
+  setDoc,
+  deleteDoc,
+  getDoc
+} from "./js/supabase-db-compat.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSy" + "DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-  authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-  projectId: "zalo-marketplace-smart-final",
-  storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-  messagingSenderId: "393402903971",
-  appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-// App Check with reCAPTCHA Enterprise is skipped in local WebView sandbox.
-console.log('App Check skipped in local WebView sandbox.');
+const app = initializeApp();
+const auth = getAuth();
+const db = getFirestore();
 
 window._db = db;
 window._auth = auth;
-window._firebaseConfig = firebaseConfig;
 window._firestoreUtils = { collection, getDocs, doc, updateDoc, query, where, addDoc, setDoc, deleteDoc, getDoc };
 
 window.getAdminRoleLabel = function(role) {
@@ -2158,19 +2157,16 @@ window.saveNewAdmin = async function() {
     const db = window._db;
     const admId = email; 
 
-    // Create in Firebase Auth using secondary app instance so current super-admin gets no displacement
+    // Create in Supabase Auth using secondary app instance so current super-admin gets no displacement
     try {
-      const { initializeApp: initApp } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
-      const { getAuth: gAuth, createUserWithEmailAndPassword: createUser, signOut: sOut } = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js");
-      if (window._firebaseConfig) {
-        const tempApp = initApp(window._firebaseConfig, "TempAdminAuthApp_" + Date.now());
-        const tempAuth = gAuth(tempApp);
-        await createUser(tempAuth, email, pass);
-        await sOut(tempAuth);
-        console.log("Background sub-admin Auth registration succeeded");
-      }
+      const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
+      const tempClient = createClient("https://xwwzadxsqmmxerbolovz.supabase.co", "Sb_publishable_qJ60bIG-VZXemJ5L0GhY3w_1I7718wl", {
+        auth: { persistSession: false }
+      });
+      await tempClient.auth.signUp({ email, password: pass });
+      console.log("Background sub-admin Supabase registration succeeded");
     } catch(authErr) {
-      console.warn("Background sub-admin Auth registration skipped/already exists:", authErr.message);
+      console.warn("Background sub-admin Supabase registration skipped/already exists:", authErr.message);
     }
 
     await fu.setDoc(fu.doc(db, 'admins', admId), {

@@ -221,24 +221,9 @@
 
 </div>
 
-<!-- Firebase Modular SDK -->
+<!-- Supabase Integration -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-  const cfg = {
-    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-    projectId: "zalo-marketplace-smart-final",
-    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-    messagingSenderId: "393402903971",
-    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-  };
-
-  const app = initializeApp(cfg);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  import { supabase } from './js/supabase-config.js';
 
   const form = document.getElementById('merchantLoginForm');
   const errorEl = document.getElementById('errorMessage');
@@ -252,8 +237,8 @@
   async function verifyMerchantAndRedirect(user) {
     try {
       // Check if a shop doc exists
-      const shopSnap = await getDoc(doc(db, 'shops', user.uid));
-      if (shopSnap.exists()) {
+      const { data: shopSnap } = await supabase.from('shops').select('*').eq('id', user.id).maybeSingle();
+      if (shopSnap) {
         window.location.href = 'dashboard.html';
         return;
       }
@@ -261,18 +246,21 @@
       // If not, self-heal via merchant_requests
       const uEmail = user.email ? user.email.trim().toLowerCase() : '';
       if (uEmail) {
-        let qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail)));
-        if (qSnap.empty) {
+        let { data: requests } = await supabase.from('merchant_requests').select('*').eq('email', uEmail);
+        if (!requests || requests.length === 0) {
           const capitalizedEmail = uEmail.charAt(0).toUpperCase() + uEmail.slice(1);
-          qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', capitalizedEmail)));
+          const { data: req2 } = await supabase.from('merchant_requests').select('*').eq('email', capitalizedEmail);
+          requests = req2;
         }
-        if (qSnap.empty) {
-          qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', uEmail.toUpperCase())));
+        if (!requests || requests.length === 0) {
+          const { data: req3 } = await supabase.from('merchant_requests').select('*').eq('email', uEmail.toUpperCase());
+          requests = req3;
         }
 
-        if (!qSnap.empty) {
-          const reqData = qSnap.docs[0].data();
+        if (requests && requests.length > 0) {
+          const reqData = requests[0];
           const shopData = {
+            id: user.id,
             storeName: reqData.storeName || "متجري الشريك المعتمد",
             ownerName: reqData.ownerName || "تاجر شريك",
             email: user.email,
@@ -291,9 +279,9 @@
             telegramURL: reqData.telegramURL || "",
             status: 'active',
             subscription: 'basic',
-            createdAt: serverTimestamp()
+            createdAt: new Date().toISOString()
           };
-          await setDoc(doc(db, 'shops', user.uid), shopData);
+          await supabase.from('shops').upsert(shopData);
           window.location.href = 'dashboard.html';
           return;
         }
@@ -322,18 +310,15 @@
     submitBtn.style.opacity = '0.7';
 
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, pass);
-      await verifyMerchantAndRedirect(cred.user);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: pass
+      });
+      if (error) throw error;
+      await verifyMerchantAndRedirect(data.user);
     } catch (error) {
       console.error(error);
-      let arabicError = "الكلمة أو البريد غير صحيح، يرجى إعادة المحاولة.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-      } else if (error.code === 'auth/invalid-email') {
-        arabicError = "صيغة البريد الإلكتروني غير صالحة.";
-      } else if (error.code === 'auth/network-request-failed') {
-        arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
-      }
+      let arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى التحقق وإعادة المحاولة.";
       showError(arabicError);
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
@@ -349,8 +334,12 @@
     submitBtn.style.opacity = '0.7';
 
     try {
-      const cred = await signInWithEmailAndPassword(auth, 'merchant@zalo.com', '12345678');
-      await verifyMerchantAndRedirect(cred.user);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: 'merchant@zalo.com',
+        password: '12345678'
+      });
+      if (error) throw error;
+      await verifyMerchantAndRedirect(data.user);
     } catch (error) {
       console.error(error);
       showError("فشل الدخول السريع بالحساب التجريبي، يرجى إدخال البيانات يدوياً.");

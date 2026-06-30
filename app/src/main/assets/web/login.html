@@ -390,25 +390,9 @@
 
 </div>
 
-<!-- Firebase Modular SDK -->
+<!-- Supabase Integration -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-  import { getFirestore, doc, getDoc, getDocs, collection, query, where, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
   import { supabase } from './js/supabase-config.js';
-
-  const cfg = {
-    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-    projectId: "zalo-marketplace-smart-final",
-    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-    messagingSenderId: "393402903971",
-    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-  };
-
-  const app = initializeApp(cfg);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
 
   const form = document.getElementById('unifiedLoginForm');
   const emailInput = document.getElementById('loginEmail');
@@ -471,23 +455,21 @@
       return;
     }
 
-    // 3. Smart check Firestore for matching shops or merchant_requests
+    // 3. Smart check Supabase for matching shops or merchant_requests
     try {
-      const q1 = query(collection(db, 'shops'), where('email', '==', email));
-      const snap1 = await getDocs(q1);
-      if (!snap1.empty) {
+      const { data: shops } = await supabase.from('shops').select('email').eq('email', email);
+      if (shops && shops.length > 0) {
         updateBadge('merchant');
         return;
       }
 
-      const q2 = query(collection(db, 'merchant_requests'), where('email', '==', email));
-      const snap2 = await getDocs(q2);
-      if (!snap2.empty) {
+      const { data: requests } = await supabase.from('merchant_requests').select('email').eq('email', email);
+      if (requests && requests.length > 0) {
         updateBadge('merchant');
         return;
       }
     } catch (err) {
-      console.warn("Firestore lookup silenced:", err);
+      console.warn("Supabase lookup silenced:", err);
     }
 
     updateBadge('customer');
@@ -512,8 +494,12 @@
     submitBtn.style.opacity = '0.7';
 
     try {
-      const cred = await signInWithEmailAndPassword(auth, email, pass);
-      const user = cred.user;
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: pass
+      });
+      if (error) throw error;
+      const user = data.user;
 
       // Ensure local state stores correct details
       localStorage.setItem('user_email', email);
@@ -526,17 +512,18 @@
       }
 
       // Route 2: Active Store / Product manager
-      const shopSnap = await getDoc(doc(db, 'shops', user.uid));
-      if (shopSnap.exists()) {
+      const { data: shopSnap } = await supabase.from('shops').select('*').eq('id', user.id).maybeSingle();
+      if (shopSnap) {
         window.location.href = 'dashboard.html';
         return;
       }
 
       // Route 3: Pending approved Merchant requests
-      const qSnap = await getDocs(query(collection(db, 'merchant_requests'), where('email', '==', email)));
-      if (!qSnap.empty) {
-        const reqData = qSnap.docs[0].data();
+      const { data: requests } = await supabase.from('merchant_requests').select('*').eq('email', email);
+      if (requests && requests.length > 0) {
+        const reqData = requests[0];
         const shopData = {
+          id: user.id,
           storeName: reqData.storeName || "متجري الشريك المعتمد",
           ownerName: reqData.ownerName || "تاجر شريك",
           email: user.email,
@@ -550,9 +537,9 @@
           description: reqData.description || "",
           status: 'active',
           subscription: 'basic',
-          createdAt: serverTimestamp()
+          createdAt: new Date().toISOString()
         };
-        await setDoc(doc(db, 'shops', user.uid), shopData);
+        await supabase.from('shops').upsert(shopData);
         window.location.href = 'dashboard.html';
         return;
       }
@@ -563,13 +550,6 @@
     } catch (error) {
       console.error(error);
       let arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى التحقق وإعادة المحاولة.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        arabicError = "التحقق غير صالح: حساب المرور أو البريد غير صحيح.";
-      } else if (error.code === 'auth/invalid-email') {
-        arabicError = "صيغة البريد الإلكتروني المدخلة غير معترف بها.";
-      } else if (error.code === 'auth/network-request-failed') {
-        arabicError = "بوابة الاتصال مقطوعة، تأكد من الاتصال بالشبكة.";
-      }
       showError(arabicError);
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
@@ -628,12 +608,6 @@
       const email = (data.user && data.user.email) ? data.user.email.toLowerCase().trim() : "";
       if (AD_LIST.includes(email)) {
         sessionStorage.setItem('admin_logged_in_session', 'true');
-        try {
-          const credential = GoogleAuthProvider.credential(idToken);
-          await signInWithCredential(auth, credential);
-        } catch (fbErr) {
-          console.warn("Failed to synchronize with Firebase auth:", fbErr);
-        }
         window.location.href = "admin.html";
         return;
       }

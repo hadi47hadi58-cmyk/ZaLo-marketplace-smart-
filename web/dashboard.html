@@ -987,25 +987,29 @@
 
 <!-- Firebase scripts with fix -->
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
 import {
-  getFirestore, collection, query, where, getDocs, doc,
-  getDoc, addDoc, updateDoc, orderBy, serverTimestamp, setDoc, onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  initializeApp,
+  getFirestore,
+  getAuth,
+  onAuthStateChanged,
+  signOut,
+  collection,
+  query,
+  where,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  orderBy,
+  serverTimestamp,
+  setDoc,
+  onSnapshot
+} from "./js/supabase-db-compat.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSy" + "DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-  authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-  projectId: "zalo-marketplace-smart-final",
-  storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-  messagingSenderId: "393402903971",
-  appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-};
-
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+const app = initializeApp();
+const auth = getAuth();
+const db = getFirestore();
 
 // WILAYAS global dictionary
 const WILAYAS = [

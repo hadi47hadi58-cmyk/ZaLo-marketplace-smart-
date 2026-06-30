@@ -154,23 +154,9 @@
 
     </main>
 
-    <!-- Firebase Auth & Firestore module for full isolation -->
+    <!-- Supabase Integration for Reviews -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, getDocs, query, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-
-        // Firebase Config of active ZaLo project
-        const firebaseConfig = {
-          apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-          authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-          projectId: "zalo-marketplace-smart-final",
-          storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-          messagingSenderId: "393402903971",
-          appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
+        import { supabase } from './js/supabase-config.js';
 
         let selectedRating = 0;
         let currentProductId = new URLSearchParams(window.location.search).get("productId") || "default_prod";
@@ -194,22 +180,20 @@
             const listContainer = document.getElementById("reviews-list");
             if (!listContainer) return;
             try {
-                const q = query(collection(db, "reviews"), where("productId", "==", currentProductId));
-                const snap = await getDocs(q);
+                const { data: reviews, error } = await supabase
+                    .from('reviews')
+                    .select('*')
+                    .eq('productId', currentProductId)
+                    .order('createdAt', { ascending: false });
                 
-                if (snap.empty) {
+                if (error) throw error;
+                
+                if (!reviews || reviews.length === 0) {
                     listContainer.innerHTML = '<p class="text-slate-500 text-xs text-center py-4">📦 لا توجد تقييمات منشورة لهذه السلعة بعد. كن أول من يضيف تقييمه!</p>';
                     return;
                 }
 
                 let html = "";
-                const reviews = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }))
-                                         .sort((a, b) => {
-                                             const timeA = a.createdAt ? (a.createdAt.toMillis ? a.createdAt.toMillis() : a.createdAt) : 0;
-                                             const timeB = b.createdAt ? (b.createdAt.toMillis ? b.createdAt.toMillis() : b.createdAt) : 0;
-                                             return timeB - timeA;
-                                         });
-
                 reviews.forEach(r => {
                     let starsHtml = "";
                     for (let i = 1; i <= 5; i++) {
@@ -260,13 +244,15 @@
             submitBtn.textContent = "⏳ جاري الحفظ والتأمين...";
 
             try {
-                await addDoc(collection(db, "reviews"), {
+                const { error } = await supabase.from('reviews').insert({
                     productId: currentProductId,
                     rating: selectedRating,
                     comment: reviewComment,
                     userName: reviewUser,
-                    createdAt: serverTimestamp()
+                    createdAt: new Date().toISOString()
                 });
+
+                if (error) throw error;
 
                 alert("✅ تم حفظ تقييمك ورأيك بنجاح بالمنصة الشاملة!");
                 

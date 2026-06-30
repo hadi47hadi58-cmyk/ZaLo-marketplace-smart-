@@ -1207,17 +1207,51 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
 </div><!-- /app -->
 
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import{getFirestore,collection,addDoc,getDocs,query,where,serverTimestamp,doc,getDoc,setDoc,onSnapshot,limit,orderBy,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import{getAuth,signInWithEmailAndPassword,onAuthStateChanged,createUserWithEmailAndPassword}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import{getStorage,ref,uploadBytes,getDownloadURL}from"https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-const cfg={apiKey:"AIzaSy"+"DTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",authDomain:"zalo-marketplace-smart-final.firebaseapp.com",projectId:"zalo-marketplace-smart-final",storageBucket:"zalo-marketplace-smart-final.firebasestorage.app",messagingSenderId:"393402903971",appId:"1:393402903971:web:7c521e8cb7b823d306be16"};
-const fa=initializeApp(cfg);
-const db=getFirestore(fa);
-const auth=getAuth(fa);
-const st=getStorage(fa);
-window._db=db;window._auth=auth;window._st=st;
-window._ff={collection,addDoc,getDocs,query,where,serverTimestamp,ref,uploadBytes,getDownloadURL,doc,getDoc,setDoc,createUserWithEmailAndPassword,onSnapshot,updateDoc};
+import {
+  initializeApp,
+  getFirestore,
+  getAuth,
+  onAuthStateChanged,
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp,
+  doc,
+  getDoc,
+  setDoc,
+  onSnapshot,
+  limit,
+  orderBy,
+  updateDoc
+} from "./js/supabase-db-compat.js";
+
+const fa = initializeApp();
+const db = getFirestore();
+const auth = getAuth();
+const st = {}; // Dummy storage
+
+window._db = db;
+window._auth = auth;
+window._st = st;
+window._ff = {
+  collection,
+  addDoc,
+  getDocs,
+  query,
+  where,
+  serverTimestamp,
+  ref: () => null,
+  uploadBytes: () => null,
+  getDownloadURL: () => null,
+  doc,
+  getDoc,
+  setDoc,
+  createUserWithEmailAndPassword: () => null,
+  onSnapshot,
+  updateDoc
+};
 
 window.listenToGlobalAnnouncements = function() {
   const banner = document.getElementById('global-announcement-banner');

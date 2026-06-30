@@ -221,22 +221,9 @@
 
 </div>
 
-<!-- Firebase Modular SDK -->
+<!-- Supabase Integration -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-
-  const cfg = {
-    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-    projectId: "zalo-marketplace-smart-final",
-    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-    messagingSenderId: "393402903971",
-    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-  };
-
-  const app = initializeApp(cfg);
-  const auth = getAuth(app);
+  import { supabase } from './js/supabase-config.js';
 
   const form = document.getElementById('adminLoginForm');
   const errorEl = document.getElementById('errorMessage');
@@ -271,16 +258,15 @@
 
     try {
       sessionStorage.setItem('admin_logged_in_session', 'true');
-      await signInWithEmailAndPassword(auth, email, pass);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: pass
+      });
+      if (error) throw error;
       window.location.href = 'admin.html';
     } catch (error) {
       console.error(error);
       let arabicError = "فشل في تسجيل الدخول، يرجى التحقق من صحة البيانات المرسلة.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-      } else if (error.code === 'auth/network-request-failed') {
-        arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
-      }
       showError(arabicError);
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
@@ -297,7 +283,11 @@
 
     try {
       sessionStorage.setItem('admin_logged_in_session', 'true');
-      await signInWithEmailAndPassword(auth, 'zinzinochop@gmail.com', '12345678');
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: 'zinzinochop@gmail.com',
+        password: '12345678'
+      });
+      if (error) throw error;
       window.location.href = 'admin.html';
     } catch (error) {
       console.error(error);

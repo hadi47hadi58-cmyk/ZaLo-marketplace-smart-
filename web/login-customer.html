@@ -231,23 +231,9 @@
 
 </div>
 
-<!-- Firebase Modular SDK -->
+<!-- Supabase Integration -->
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, signInWithCredential } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { supabase } from './js/supabase-config.js';
-
-  const cfg = {
-    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-    projectId: "zalo-marketplace-smart-final",
-    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-    messagingSenderId: "393402903971",
-    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-  };
-
-  const app = initializeApp(cfg);
-  const auth = getAuth(app);
 
   const form = document.getElementById('customerLoginForm');
   const errorEl = document.getElementById('errorMessage');
@@ -268,19 +254,16 @@
     submitBtn.style.opacity = '0.7';
 
     try {
-      await signInWithEmailAndPassword(auth, email, pass);
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: pass
+      });
+      if (error) throw error;
       // Success! Redirect to hompage
       window.location.href = 'index.html';
     } catch (error) {
       console.error(error);
-      let arabicError = "أو كلمة المرور خطأ، يرجى إعادة المحاولة الكلمة أو البريد غير صحيح.";
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة.";
-      } else if (error.code === 'auth/invalid-email') {
-        arabicError = "صيغة البريد الإلكتروني غير صالحة.";
-      } else if (error.code === 'auth/network-request-failed') {
-        arabicError = "حدث خطأ في الشبكة، يرجى فحص الاتصال بالإنترنت.";
-      }
+      let arabicError = "البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى التحقق وإعادة المحاولة.";
       showError(arabicError);
       submitBtn.disabled = false;
       submitBtn.style.opacity = '1';
@@ -347,12 +330,6 @@
       const email = (data.user && data.user.email) ? data.user.email.toLowerCase().trim() : "";
       if (AD_LIST.includes(email)) {
         sessionStorage.setItem('admin_logged_in_session', 'true');
-        try {
-          const credential = GoogleAuthProvider.credential(idToken);
-          await signInWithCredential(auth, credential);
-        } catch (fbErr) {
-          console.warn("Failed to synchronize with Firebase auth:", fbErr);
-        }
         window.location.href = "admin.html";
         return;
       }

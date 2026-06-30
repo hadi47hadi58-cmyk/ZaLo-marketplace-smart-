@@ -463,23 +463,9 @@
   </form>
 </div>
 
+<!-- Supabase Integration -->
 <script type="module">
-  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-  import { getAuth, createUserWithEmailAndPassword, signOut } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
-  import { getFirestore, doc, setDoc, collection, addDoc } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyDTTM8qt9MBpy9MzLnyd17_shNulkQb9Hw",
-    authDomain: "zalo-marketplace-smart-final.firebaseapp.com",
-    projectId: "zalo-marketplace-smart-final",
-    storageBucket: "zalo-marketplace-smart-final.firebasestorage.app",
-    messagingSenderId: "393402903971",
-    appId: "1:393402903971:web:7c521e8cb7b823d306be16"
-  };
-
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+  import { supabase } from './js/supabase-config.js';
 
   const userType = sessionStorage.getItem('reg_userType') || 'customer';
   const fullName = sessionStorage.getItem('reg_fullName') || '';
@@ -600,13 +586,17 @@
     errorMsg.classList.remove('show');
 
     try {
-      // Create user in Firebase Auth
-      const cred = await createUserWithEmailAndPassword(auth, email, password);
-      const uid = cred.user.uid;
+      // Create user in Supabase Auth
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: email,
+        password: password
+      });
+      if (signUpError) throw signUpError;
+      const uid = data.user.id;
 
-      // Save user data in Firestore
-      await setDoc(doc(db, 'users', uid), {
-        uid: uid,
+      // Save user data in Supabase Profiles table
+      const { error: profileError } = await supabase.from('profiles').upsert({
+        id: uid,
         name: fullName,
         email: email,
         phone: phone,
@@ -614,16 +604,18 @@
         commune: commune,
         role: userType,
         status: 'active',
-        createdAt: new Date(),
-        updatedAt: new Date()
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
       });
+      if (profileError) throw profileError;
 
       // If merchant, create shop request and shop document
       if (userType === 'merchant') {
         const rnum = 'REG-' + Date.now().toString().slice(-6);
 
         // Save shop profile
-        await setDoc(doc(db, 'shops', uid), {
+        const { error: shopError } = await supabase.from('shops').upsert({
+          id: uid,
           storeName: storeName,
           ownerName: fullName,
           email: email,
@@ -641,12 +633,13 @@
           frontURL: frontFile || '',
           status: 'active',
           subscription: 'basic',
-          createdAt: new Date()
+          createdAt: new Date().toISOString()
         });
+        if (shopError) throw shopError;
 
         // Save request logs for control panel
-        await setDoc(doc(db, 'merchant_requests', uid), {
-          uid: uid,
+        const { error: requestError } = await supabase.from('merchant_requests').upsert({
+          id: uid,
           regNumber: rnum,
           storeName: storeName,
           ownerName: fullName,
@@ -664,8 +657,9 @@
           idFront: idFront,
           idBack: idBack, // Storing Honorary declaration under idBack safely
           status: 'approved',
-          createdAt: new Date()
+          createdAt: new Date().toISOString()
         });
+        if (requestError) throw requestError;
       }
 
       // Save session and redirect
@@ -687,14 +681,7 @@
 
     } catch (err) {
       console.error(err);
-      const errors = {
-        'auth/email-already-in-use': 'هذا البريد مسجل مسبقاً',
-        'auth/invalid-email': 'صيغة البريد غير صحيحة',
-        'auth/weak-password': 'كلمة المرور ضعيفة جداً',
-        'auth/network-request-failed': 'تحقق من اتصالك بالإنترنت'
-      };
-      
-      errorMsg.textContent = errors[err.code] || 'حدث خطأ: ' + err.message;
+      errorMsg.textContent = 'حدث خطأ أثناء إنشاء الحساب: ' + (err.message || err);
       errorMsg.classList.add('show');
     } finally {
       submitBtn.disabled = false;
