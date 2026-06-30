@@ -669,7 +669,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
     <div class="bn" onclick="G('myorders')"><div class="bni"><i class="fa-solid fa-bag-shopping"></i></div><div class="bnl">طلباتي</div></div>
     <div class="bn" onclick="G('wilayas')"><div class="bni"><i class="fa-solid fa-location-dot"></i></div><div class="bnl">الولايات</div></div>
     <div class="bn" onclick="G('search')"><div class="bni"><i class="fa-solid fa-magnifying-glass"></i></div><div class="bnl">البحث</div></div>
-    <div class="bn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">الدخول</div></div>
+    <div class="bn" id="bottom-nav-login-btn" onclick="openLink('login.html')"><div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">الدخول</div></div>
   </div>
 </div>
 
@@ -1226,6 +1226,225 @@ import {
   orderBy,
   updateDoc
 } from "./js/supabase-db-compat.js";
+import { supabase } from "./js/supabase-config.js";
+
+// 1. Instantly parse and handle Google OAuth redirect tokens from the URL hash
+async function handleOAuthCallback() {
+  const hashParams = new URLSearchParams(window.location.hash.substring(1));
+  const access_token = hashParams.get('access_token');
+  const refresh_token = hashParams.get('refresh_token');
+  
+  if (access_token) {
+    console.log("ZaLo Smart: OAuth access_token detected in URL hash. Attempting to set session...");
+    try {
+      const { data, error } = await supabase.auth.setSession({
+        access_token,
+        refresh_token: refresh_token || ""
+      });
+      if (error) throw error;
+      console.log("ZaLo Smart: OAuth session successfully initialized.");
+      
+      // Clean URL hash to prevent loops and clean user path
+      history.replaceState(null, "", window.location.pathname + window.location.search);
+      toast("✨ تم تسجيل دخولك بنجاح عبر حساب Google!");
+    } catch (err) {
+      console.error("ZaLo Smart: Error parsing session from URL hash:", err.message);
+    }
+  }
+}
+await handleOAuthCallback();
+
+// 2. Auto-seed Algerian Marketplace Data if empty to ensure the platform is never blank
+const SEED_SHOPS = [
+  {
+    id: "shop_seed_1",
+    storeName: "مجوهرات ومجوهرات القصبة العريقة",
+    ownerName: "الحاج سعيد البهجة",
+    email: "said@zalo.com",
+    phone: "0698694010",
+    whatsapp: "0698694010",
+    wilaya: "الجزائر",
+    commune: "الجزائر الوسطى",
+    address: "باب الواد - الجزائر الوسطى",
+    category: "مجوهرات وهدايا",
+    workHours: "09:00 - 19:00",
+    description: "أرقى الحلي والمجوهرات التقليدية المصنوعة يدوياً بجودة عالية وضمان حقيقي.",
+    rcNumber: "RC-778899",
+    storeType: "registered",
+    logoURL: "https://images.unsplash.com/photo-1515562141207-7a88fb7ce338?auto=format&fit=crop&q=80&w=200",
+    status: "active",
+    subscription: "premium",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "shop_seed_2",
+    storeName: "ملابس وبدلات الفخامة والجمال",
+    ownerName: "عبد الوهاب القسنطيني",
+    email: "wahab@zalo.com",
+    phone: "0770112233",
+    whatsapp: "0770112233",
+    wilaya: "قسنطينة",
+    commune: "قسنطينة",
+    address: "وسط المدينة - قسنطينة",
+    category: "ملابس وأزياء",
+    workHours: "08:30 - 20:30",
+    description: "أحدث صيحات الموضة للرجال والنساء وبدلات الزفاف التقليدية القسنطينية الأصيلة.",
+    rcNumber: "RC-445566",
+    storeType: "registered",
+    logoURL: "https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&q=80&w=200",
+    status: "active",
+    subscription: "premium",
+    createdAt: new Date().toISOString()
+  },
+  {
+    id: "shop_seed_3",
+    storeName: "أواني ومنزل المطبخ الجزائري",
+    ownerName: "أمينة الوهرانية",
+    email: "amina@zalo.com",
+    phone: "0550998877",
+    whatsapp: "0550998877",
+    wilaya: "وهران",
+    commune: "وهران",
+    address: "حي الحمري - وهران",
+    category: "أواني ومنزلية",
+    workHours: "09:00 - 21:00",
+    description: "كل ما تحتاجه المرأة الجزائرية لمطبخها من أواني راقية، ديكورات منزلية عصرية.",
+    rcNumber: "RC-112233",
+    storeType: "registered",
+    logoURL: "https://images.unsplash.com/photo-1556911220-e15b29be8c8f?auto=format&fit=crop&q=80&w=200",
+    status: "active",
+    subscription: "basic",
+    createdAt: new Date().toISOString()
+  }
+];
+
+const SEED_PRODUCTS = [
+  {
+    id: "prod_seed_1",
+    storeId: "shop_seed_1",
+    name: "سوار ذهبي عيار 18 قيراط تصميم تركي",
+    price: 85000,
+    image: "https://images.unsplash.com/photo-1599643478518-a784e5dc4c8f?auto=format&fit=crop&q=80&w=400",
+    emoji: "👑",
+    category: "مجوهرات وهدايا",
+    status: "active",
+    deleted: false
+  },
+  {
+    id: "prod_seed_2",
+    storeId: "shop_seed_1",
+    name: "خاتم فضي عيار 925 مرصع بالياقوت الأزرق",
+    price: 12500,
+    image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?auto=format&fit=crop&q=80&w=400",
+    emoji: "💍",
+    category: "مجوهرات وهدايا",
+    status: "active",
+    deleted: false
+  },
+  {
+    id: "prod_seed_3",
+    storeId: "shop_seed_2",
+    name: "طقم بدلة كلاسيكية رجالي تركي فخم 3 قطع",
+    price: 34000,
+    image: "https://images.unsplash.com/photo-1594938298603-c8148c4dae35?auto=format&fit=crop&q=80&w=400",
+    emoji: "👔",
+    category: "ملابس وأزياء",
+    status: "active",
+    deleted: false
+  },
+  {
+    id: "prod_seed_4",
+    storeId: "shop_seed_2",
+    name: "فستان قفطان قطيفة قسنطيني مطرز بالخيط الذهبي",
+    price: 48000,
+    image: "https://images.unsplash.com/photo-1566174053879-31528523f8ae?auto=format&fit=crop&q=80&w=400",
+    emoji: "👗",
+    category: "ملابس وأزياء",
+    status: "active",
+    deleted: false
+  },
+  {
+    id: "prod_seed_5",
+    storeId: "shop_seed_3",
+    name: "طقم حلل جرانيت فاخر مقاوم للالتصاق 10 قطع",
+    price: 19500,
+    image: "https://images.unsplash.com/photo-1584269600464-37b1b58a9fe7?auto=format&fit=crop&q=80&w=400",
+    emoji: "🍳",
+    category: "أواني ومنزلية",
+    status: "active",
+    deleted: false
+  }
+];
+
+async function ensureDatabaseSeeded() {
+  try {
+    const { data: existingShops, error: checkError } = await supabase.from('shops').select('id').limit(1);
+    if (checkError) throw checkError;
+    
+    if (!existingShops || existingShops.length === 0) {
+      console.log("ZaLo Smart: Database is empty. Seeding initial marketplace data...");
+      const { error: shopSeedErr } = await supabase.from('shops').upsert(SEED_SHOPS);
+      if (shopSeedErr) {
+        console.error("Shop seeding issue:", shopSeedErr.message);
+      } else {
+        const { error: prodSeedErr } = await supabase.from('products').upsert(SEED_PRODUCTS);
+        if (prodSeedErr) {
+          console.error("Product seeding issue:", prodSeedErr.message);
+        } else {
+          console.log("ZaLo Smart: Seeding completed successfully.");
+        }
+      }
+    }
+  } catch(e) {
+    console.warn("ZaLo Smart: Database seeding check failed/skipped:", e.message);
+  }
+}
+await ensureDatabaseSeeded();
+
+const AD_LIST = [
+  'zinzinochop@gmail.com',
+  'admin@zalo.dz',
+  'admin@zalo.com',
+  'manager@zalo.dz',
+  'manager@zalo.com'
+];
+
+// Profile Modal for Logged in Customers
+window.showCustomerProfileModal = function(user) {
+  const oldModal = document.getElementById('customer-profile-modal');
+  if (oldModal) oldModal.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'customer-profile-modal';
+  modal.style = `
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+    z-index: 100090; display: flex; align-items: center; justify-content: center;
+    font-family: 'Cairo', sans-serif;
+  `;
+  
+  modal.innerHTML = `
+    <div style="background: #ffffff; border: 2px solid var(--gold); border-radius: 24px; padding: 24px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.25); position: relative;">
+      <div onclick="document.getElementById('customer-profile-modal').remove()" style="position: absolute; top: 12px; left: 12px; background: var(--g1); border: 1.5px solid var(--gold); color: var(--gold); width: 30px; height: 30px; border-radius: 50%; font-size: 12px; font-weight: 900; display: flex; align-items: center; justify-content: center; cursor: pointer;">✕</div>
+      <div style="font-size: 48px; margin-bottom: 12px;">👤</div>
+      <h3 style="font-weight: 900; color: var(--g1); font-size: 18px; margin-bottom: 4px;">مرحباً بك شريكنا العزيز</h3>
+      <p style="font-size: 13px; color: var(--gray); margin-bottom: 20px;">حساب الزبون / المتابع النشط لـ ZaLo</p>
+      
+      <div style="background: #f8fafc; border: 1px solid var(--bd); border-radius: 12px; padding: 12px; margin-bottom: 20px; text-align: right;">
+        <div style="font-size: 11px; color: var(--gray); margin-bottom: 2px;">البريد الإلكتروني:</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--text); margin-bottom: 8px; word-break: break-all;">${user.email}</div>
+        <div style="font-size: 11px; color: var(--gray); margin-bottom: 2px;">رقم التعريف الفريد (UID):</div>
+        <div style="font-size: 11px; font-family: monospace; color: var(--text); word-break: break-all;">${user.id}</div>
+      </div>
+      
+      <button onclick="document.getElementById('customer-profile-modal').remove(); window.logoutCustomerAccount();" style="width: 100%; height: 46px; background: #ef4444; color: #fff; border: none; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 12px rgba(239,68,68,0.2);">
+        <span>تسجيل الخروج 👋</span>
+      </button>
+    </div>
+  `;
+  
+  document.body.appendChild(modal);
+};
 
 const fa = initializeApp();
 const db = getFirestore();
@@ -1292,7 +1511,81 @@ try {
 onAuthStateChanged(auth, async (u) => {
   window._user = u;
   
+  // Dynamic UI update elements
+  const loginSidebarItem = document.getElementById('sm-unified-login-item');
+  const bottomLoginBtn = document.getElementById('bottom-nav-login-btn');
+  
   if (u) {
+    const userEmail = u.email || "مستخدم مجهول";
+    
+    // 1. Update Sidebar login item
+    if (loginSidebarItem) {
+      loginSidebarItem.innerHTML = `
+        <span class="si" style="color:var(--gold)"><i class="fa-solid fa-user-circle"></i></span>
+        <div>
+          <div class="sn" style="font-weight: 800; color: var(--g1); font-size: 13px;">حسابك نشط: ${userEmail}</div>
+          <div class="sd" style="color: var(--gold); font-weight: bold; font-size: 11px;">اضغط للانتقال إلى لوحة التحكم ⚙️</div>
+        </div>
+      `;
+      loginSidebarItem.onclick = () => {
+        closeSide();
+        // Redirect to dashboard based on role
+        if (AD_LIST.includes(userEmail.toLowerCase().trim())) {
+          window.location.href = 'admin.html';
+        } else {
+          supabase.from('shops').select('*').eq('id', u.uid).maybeSingle().then(({ data }) => {
+            if (data) {
+              window.location.href = 'dashboard.html';
+            } else {
+              window.showCustomerProfileModal(u);
+            }
+          });
+        }
+      };
+    }
+    
+    // 2. Add Logout item to sidebar if not exists
+    if (!document.getElementById('sm-logout-item')) {
+      const logoutItem = document.createElement('div');
+      logoutItem.className = 'smi';
+      logoutItem.id = 'sm-logout-item';
+      logoutItem.onclick = () => {
+        closeSide();
+        window.logoutCustomerAccount();
+      };
+      logoutItem.innerHTML = `
+        <span class="si" style="color:var(--red)"><i class="fa-solid fa-right-from-bracket"></i></span>
+        <div>
+          <div class="sn" style="color:var(--red); font-weight:800; font-size: 13px;">تسجيل الخروج 👋</div>
+        </div>
+      `;
+      // Insert right after the login item
+      if (loginSidebarItem && loginSidebarItem.parentNode) {
+        loginSidebarItem.parentNode.insertBefore(logoutItem, loginSidebarItem.nextSibling);
+      }
+    }
+    
+    // 3. Update Bottom Nav item
+    if (bottomLoginBtn) {
+      bottomLoginBtn.innerHTML = `
+        <div class="bni"><i class="fa-solid fa-user-shield" style="color:var(--gold)"></i></div>
+        <div class="bnl" style="color:var(--gold); font-weight:bold;">حسابي</div>
+      `;
+      bottomLoginBtn.onclick = () => {
+        if (AD_LIST.includes(userEmail.toLowerCase().trim())) {
+          window.location.href = 'admin.html';
+        } else {
+          supabase.from('shops').select('*').eq('id', u.uid).maybeSingle().then(({ data }) => {
+            if (data) {
+              window.location.href = 'dashboard.html';
+            } else {
+              window.showCustomerProfileModal(u);
+            }
+          });
+        }
+      };
+    }
+    
     try {
       const userDoc = await getDoc(doc(db, 'users', u.uid));
       if (userDoc.exists()) {
@@ -1314,6 +1607,19 @@ onAuthStateChanged(auth, async (u) => {
       }
     } catch(e) {
       console.warn("User profile doc fetch error:", e);
+    }
+  } else {
+    // Revert to signed-out state
+    if (loginSidebarItem) {
+      loginSidebarItem.innerHTML = `<span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div>`;
+      loginSidebarItem.onclick = () => { closeSide(); openLink('login.html'); };
+    }
+    const logoutItem = document.getElementById('sm-logout-item');
+    if (logoutItem) logoutItem.remove();
+    
+    if (bottomLoginBtn) {
+      bottomLoginBtn.innerHTML = `<div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">الدخول</div>`;
+      bottomLoginBtn.onclick = () => openLink('login.html');
     }
   }
 });
