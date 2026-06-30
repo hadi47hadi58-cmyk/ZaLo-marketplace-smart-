@@ -44,7 +44,7 @@ export function onAuthStateChanged(auth, callback) {
     };
 
     const hasHashToken = window.location.hash.includes("access_token=") || window.location.search.includes("access_token=");
-    const maxWaitMs = hasHashToken ? 1000 : 500;
+    const maxWaitMs = hasHashToken ? 2000 : 3500;
 
     console.log(`onAuthStateChanged: Initiating patient session check (Wait up to ${maxWaitMs}ms)...`);
 
