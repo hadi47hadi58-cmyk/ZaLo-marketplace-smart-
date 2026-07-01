@@ -1,22 +1,23 @@
-// ZaLo Smart Marketplace - Supabase Firestore/Auth Compatibility Layer
+// ZaLo Smart Marketplace - Supabase & NestJS Unified Compatibility Layer
 // This file acts as a drop-in replacement for the Firebase modular SDK,
-// routing all operations completely and exclusively through Supabase.
+// routing all operations completely and cleanly through Supabase AND our NestJS + PostgreSQL Backend.
 
 import { supabase } from './supabase-config.js';
+import { telemetry } from './telemetry-logger.js';
 
-export { supabase };
+export { supabase, telemetry };
 
 // 1. Core / Initializers
 export function initializeApp() {
-    return { name: "ZaLo-Supabase-Compat" };
+    return { name: "ZaLo-Unified-Compat" };
 }
 
 export function getAuth() {
-    return { name: "ZaLo-Supabase-Auth-Compat" };
+    return { name: "ZaLo-Unified-Auth-Compat" };
 }
 
 export function getFirestore() {
-    return { name: "ZaLo-Supabase-Db-Compat" };
+    return { name: "ZaLo-Unified-Db-Compat" };
 }
 
 export const serverTimestamp = () => new Date().toISOString();
@@ -24,6 +25,36 @@ export const serverTimestamp = () => new Date().toISOString();
 // Dummy Auth Provider for import compatibility
 export class GoogleAuthProvider {
     static credential(token) { return { token }; }
+}
+
+// NestJS Configuration
+const NESTJS_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000/api'
+  : 'https://zalo-smart-backend-service-api.run.app/api';
+
+console.log(`[ZaLo Compat Engine] Bridge initialized. NestJS API Endpoint: ${NESTJS_BASE_URL}`);
+
+// Helper to make fetch calls to NestJS
+async function callNestApi(endpoint, method = 'GET', body = null, token = null) {
+    try {
+        const headers = { 'Content-Type': 'application/json' };
+        if (token) {
+            headers['Authorization'] = `Bearer ${token}`;
+        }
+        const options = { method, headers };
+        if (body) {
+            options.body = JSON.stringify(body);
+        }
+        const response = await fetch(`${NESTJS_BASE_URL}/${endpoint}`, options);
+        if (response.ok) {
+            return await response.json();
+        }
+        console.warn(`[ZaLo Compat Engine] NestJS responded with code ${response.status} for ${endpoint}`);
+        return null;
+    } catch (e) {
+        console.warn(`[ZaLo Compat Engine] NestJS endpoint ${endpoint} unreachable:`, e.message);
+        return null;
+    }
 }
 
 // 2. Auth State and Actions
@@ -119,10 +150,22 @@ export function onAuthStateChanged(auth, callback) {
 }
 
 export async function signOut() {
+    localStorage.removeItem('nestjs_token');
+    localStorage.removeItem('nestjs_user');
     return await supabase.auth.signOut();
 }
 
 export async function signInWithEmailAndPassword(auth, email, password) {
+    // 1. First attempt login with NestJS backend (PostgreSQL database integration)
+    console.log("[ZaLo Compat Engine] Registering login session with NestJS backend...");
+    const nestResult = await callNestApi('auth/login', 'POST', { email, password });
+    if (nestResult && nestResult.access_token) {
+        localStorage.setItem('nestjs_token', nestResult.access_token);
+        localStorage.setItem('nestjs_user', JSON.stringify(nestResult.user));
+        console.log("[ZaLo Compat Engine] NestJS Auth successful.");
+    }
+
+    // 2. Perform regular Supabase auth flow
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
     return {
@@ -136,6 +179,18 @@ export async function signInWithEmailAndPassword(auth, email, password) {
 }
 
 export async function createUserWithEmailAndPassword(auth, email, password) {
+    // 1. Register with NestJS backend as well for unified database mapping
+    console.log("[ZaLo Compat Engine] Registering account on NestJS backend...");
+    await callNestApi('auth/register', 'POST', {
+        name: email.split('@')[0],
+        email,
+        password,
+        role: 'CUSTOMER',
+        wilaya: 'الجزائر',
+        commune: 'المرسى'
+    });
+
+    // 2. Create in Supabase
     const { data, error } = await supabase.auth.signUp({ email, password });
     if (error) throw error;
     return {
@@ -188,7 +243,6 @@ export const query = (colRef, ...conditions) => {
 };
 
 export const where = (field, op, val) => {
-    // Map standard firestore uids/ids to unified "id" column if relevant
     let mappedField = field;
     if (field === 'uid') mappedField = 'id';
     return { type: 'where', field: mappedField, op, val };
@@ -199,7 +253,22 @@ export const orderBy = (field, direction = 'asc') => ({ type: 'orderBy', field, 
 
 // 4. Data Operations (getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc)
 export async function getDoc(docRef) {
-    // First try querying where 'id' is docRef.id, otherwise fallback
+    // If querying specific profile, first try getting profile from NestJS
+    if (docRef.table === 'profiles') {
+        const token = localStorage.getItem('nestjs_token');
+        if (token) {
+            const nestProfile = await callNestApi('users/profile', 'GET', null, token);
+            if (nestProfile && nestProfile.data) {
+                return {
+                    exists: true,
+                    exists() { return true; },
+                    id: docRef.id,
+                    data: () => nestProfile.data
+                };
+            }
+        }
+    }
+
     const { data, error } = await supabase
         .from(docRef.table)
         .select('*')
@@ -220,6 +289,73 @@ export async function getDoc(docRef) {
 
 export async function getDocs(queryObj) {
     const table = queryObj.table || queryObj;
+
+    // 1. Try unified NestJS API routing for products catalog
+    if (table === 'products') {
+        console.log("[ZaLo Compat Engine] Fetching products via NestJS REST API...");
+        const nestProducts = await callNestApi('products');
+        if (nestProducts && nestProducts.data) {
+            const docs = nestProducts.data.map(prod => ({
+                id: prod.id,
+                exists: true,
+                exists() { return true; },
+                data: () => ({
+                    id: prod.id,
+                    title: prod.name,
+                    price: prod.price,
+                    category: prod.category,
+                    desc: prod.description,
+                    stock: prod.stock,
+                    url: prod.imageUrl || "https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=600&q=80",
+                    isApproved: true,
+                    storeID: "101",
+                    storeName: "متجر النور للإلكترونيات"
+                })
+            }));
+            return {
+                empty: docs.length === 0,
+                docs: docs,
+                forEach(cb) { docs.forEach(cb); }
+            };
+        }
+    }
+
+    // 2. Try NestJS routing for orders list
+    if (table === 'orders') {
+        console.log("[ZaLo Compat Engine] Fetching orders via NestJS REST API...");
+        const token = localStorage.getItem('nestjs_token');
+        if (token) {
+            const nestOrders = await callNestApi('orders', 'GET', null, token);
+            if (nestOrders) {
+                const list = Array.isArray(nestOrders) ? nestOrders : (nestOrders.data || []);
+                const docs = list.map(ord => ({
+                    id: ord.id,
+                    exists: true,
+                    exists() { return true; },
+                    data: () => ({
+                        id: ord.id,
+                        customerName: ord.customerName || "زبون متجر زالو",
+                        total: ord.totalAmount,
+                        paymentMethod: ord.paymentMethod,
+                        paymentStatus: ord.paymentStatus,
+                        status: ord.status === 'SHIPPING' ? 'في الطريق' : ord.status === 'DELIVERED' ? 'تم التسليم' : 'قيد المراجعة',
+                        address: ord.address,
+                        wilaya: ord.wilaya,
+                        commune: ord.commune,
+                        trackingNumber: ord.trackingNumber || "DZ-ZALO-MOCK",
+                        timestamp: ord.timestamp || Date.now()
+                    })
+                }));
+                return {
+                    empty: docs.length === 0,
+                    docs: docs,
+                    forEach(cb) { docs.forEach(cb); }
+                };
+            }
+        }
+    }
+
+    // Standard Supabase Fallback
     let q = supabase.from(table).select('*');
     
     if (queryObj.filters && queryObj.filters.length > 0) {
@@ -269,6 +405,32 @@ export async function getDocs(queryObj) {
 }
 
 export async function addDoc(colRef, data) {
+    // Intercept checkout to create order in NestJS + PostgreSQL
+    if (colRef.table === 'orders') {
+        const token = localStorage.getItem('nestjs_token');
+        if (token) {
+            console.log("[ZaLo Compat Engine] Routing Order creation to NestJS API...");
+            const orderPayload = {
+                items: [
+                    {
+                        productId: parseInt(data.productID) || 1001,
+                        productName: data.productName || "سلعة زالو الرائعة",
+                        price: parseFloat(data.price) || data.total,
+                        quantity: parseInt(data.qty) || 1
+                    }
+                ],
+                address: data.address || "غير محدد",
+                wilaya: data.wilaya || "الجزائر",
+                commune: data.commune || "المرسى",
+                paymentMethod: data.paymentMethod === 'BaridiMob' ? 'BARIDIMOB' : data.paymentMethod === 'CCP' ? 'CCP' : 'COD'
+            };
+            const result = await callNestApi('orders', 'POST', orderPayload, token);
+            if (result) {
+                console.log("[ZaLo Compat Engine] Order created on NestJS successfully:", result.id);
+            }
+        }
+    }
+
     const cleanData = { ...data };
     const { data: inserted, error } = await supabase
         .from(colRef.table)
@@ -288,7 +450,6 @@ export async function addDoc(colRef, data) {
 }
 
 export async function setDoc(docRef, data, options) {
-    // If the data does not have the 'id' field, inject docRef.id
     const payload = { id: docRef.id, ...data };
     const { error } = await supabase
         .from(docRef.table)
@@ -349,7 +510,6 @@ export function onSnapshot(queryOrDoc, callback, errCallback) {
         }
     };
 
-    // Immediate initial fetch
     trigger();
 
     // Clean and performant interval polling every 4 seconds for immediate updates

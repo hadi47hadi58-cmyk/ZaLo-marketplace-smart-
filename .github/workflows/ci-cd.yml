@@ -1,0 +1,66 @@
+name: ZaLo Smart Marketplace CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "main", "master", "develop" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  # 1. Backend Integration & Verification Job
+  backend-ci:
+    name: NestJS Backend CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js Environment
+        uses: actions/setup-node@v4
+        with:
+          node-size: '18'
+          cache: 'npm'
+          cache-dependency-path: backend/package-lock.json
+
+      - name: Install Dependencies
+        working-directory: ./backend
+        run: npm ci
+
+      - name: Run Code Linter
+        working-directory: ./backend
+        run: npm run lint --if-present
+
+      - name: Compile & Build NestJS App
+        working-directory: ./backend
+        run: npm run build
+
+  # 2. Android Mobile Companion Build & Verification Job
+  android-ci:
+    name: Android App CI
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'gradle'
+
+      - name: Create Dummy Secrets Environment File
+        run: |
+          echo "SUPABASE_URL=https://dummy-project.supabase.co" > .env
+          echo "SUPABASE_KEY=dummy-key-value" >> .env
+          cp .env .env.example
+
+      - name: Grant Execute Permission for Gradle
+        run: chmod +x gradlew
+        continue-on-error: true
+
+      - name: Build Debug APK
+        run: gradle assembleDebug
+
+      - name: Run Android Unit & Robolectric Tests
+        run: gradle testDebugUnitTest
