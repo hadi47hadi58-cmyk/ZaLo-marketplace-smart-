@@ -4,50 +4,101 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { SetMetadata } from '@nestjs/common';
 import { AuditService } from '../audit/audit.service';
-import { IsNotEmpty, IsNumber, IsString, IsArray, IsEnum, Min } from 'class-validator';
+import { IsNotEmpty, IsNumber, IsString, IsArray, IsEnum, Min, ValidateNested, IsInt, IsPositive, IsOptional, MaxLength } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class OrderItemDto {
-  @ApiProperty({ description: 'رقم السلعة المعنية', example: 1001 })
-  @IsNumber()
+  @ApiProperty({ 
+    description: 'المعرف الفريد للمنتج المراد شراؤه بقاعدة البيانات', 
+    example: 1001,
+    type: Number 
+  })
+  @IsNotEmpty({ message: 'يجب تقديم معرف المنتج الفريد' })
+  @IsInt({ message: 'معرف المنتج يجب أن يكون رقماً صحيحاً' })
+  @IsPositive({ message: 'معرف المنتج يجب أن يكون رقماً موجباً' })
   productId: number;
 
-  @ApiProperty({ description: 'اسم السلعة', example: 'ساعات أنكر اللاسلكية Soundcore X' })
-  @IsString()
+  @ApiProperty({ 
+    description: 'الاسم الكامل للسلعة للتوثيق والفوترة', 
+    example: 'ساعات أنكر اللاسلكية Soundcore X' 
+  })
+  @IsNotEmpty({ message: 'يجب إدخال اسم السلعة' })
+  @IsString({ message: 'اسم السلعة يجب أن يكون نصاً صالحاً' })
+  @MaxLength(100, { message: 'اسم السلعة طويل جداً، الحد الأقصى 100 حرف' })
   productName: string;
 
-  @ApiProperty({ description: 'السعر الأحادي', example: 7900 })
-  @IsNumber()
+  @ApiProperty({ 
+    description: 'سعر القطعة الواحدة بالدينار الجزائري (DZD)', 
+    example: 7900,
+    minimum: 0
+  })
+  @IsNotEmpty({ message: 'يجب تحديد سعر القطعة' })
+  @IsNumber({}, { message: 'سعر القطعة يجب أن يكون قيمة عددية' })
+  @Min(0, { message: 'لا يمكن أن يكون السعر سالباً' })
   price: number;
 
-  @ApiProperty({ description: 'الكمية المطلوبة', example: 1 })
-  @IsNumber()
-  @Min(1)
+  @ApiProperty({ 
+    description: 'الكمية المطلوبة من هذه السلعة بطلب الشراء', 
+    example: 1,
+    minimum: 1
+  })
+  @IsNotEmpty({ message: 'يجب تحديد الكمية المطلوبة' })
+  @IsInt({ message: 'الكمية المطلوبة يجب أن تكون عدداً صحيحاً' })
+  @Min(1, { message: 'الحد الأدنى للكمية المطلوبة هو قطعة واحدة (1)' })
   quantity: number;
 }
 
 export class CreateOrderDto {
-  @ApiProperty({ description: 'السلع المضافة للسلة', type: [OrderItemDto] })
-  @IsArray()
+  @ApiProperty({ 
+    description: 'قائمة السلع والمنتجات المضافة لسلة التسوق للعميل', 
+    type: [OrderItemDto] 
+  })
+  @IsArray({ message: 'يجب تقديم المنتجات في شكل مصفوفة صالحة' })
+  @ValidateNested({ each: true })
+  @Type(() => OrderItemDto)
   items: OrderItemDto[];
 
-  @ApiProperty({ description: 'عنوان التوصيل بالتفصيل', example: 'حي المستقبل، مبنى 12، الطابق 2' })
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ 
+    description: 'عنوان التوصيل بالتفصيل الممل (مثل: حي المستقبل، مبنى 12، الطابق 2)', 
+    example: 'حي المستقبل، مبنى 12، الطابق 2' 
+  })
+  @IsNotEmpty({ message: 'عنوان التوصيل مطلوب لجدولة شركة الشحن' })
+  @IsString({ message: 'عنوان التوصيل يجب أن يكون نصاً صالحاً' })
+  @MaxLength(250, { message: 'العنوان طويل جداً، يرجى التلخيص بحد أقصى 250 حرف' })
   address: string;
 
-  @ApiProperty({ description: 'الولاية المستلمة', example: 'الجزائر' })
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ 
+    description: 'ولاية التسليم بالجزائر', 
+    example: 'الجزائر' 
+  })
+  @IsNotEmpty({ message: 'يجب تحديد ولاية التوصيل لتعيين سعر الشحن المناسب' })
+  @IsString({ message: 'الولاية يجب أن تكون نصاً صحيحاً' })
   wilaya: string;
 
-  @ApiProperty({ description: 'البلدية أو المقاطعة الفيدرالية', example: 'المرسى' })
-  @IsNotEmpty()
-  @IsString()
+  @ApiProperty({ 
+    description: 'البلدية أو المقاطعة الفرعية التابعة للولاية المختارة', 
+    example: 'المرسى' 
+  })
+  @IsNotEmpty({ message: 'يجب إدخال اسم البلدية بدقة' })
+  @IsString({ message: 'البلدية يجب أن تكون نصاً صالحاً' })
   commune: string;
 
-  @ApiProperty({ description: 'طرق الدفع بالمنصة', enum: ['COD', 'BARIDIMOB', 'CCP'], example: 'COD' })
-  @IsEnum(['COD', 'BARIDIMOB', 'CCP'])
+  @ApiProperty({ 
+    description: 'طريقة الدفع المعتمدة لهذا الطلب', 
+    enum: ['COD', 'BARIDIMOB', 'CCP'], 
+    example: 'COD' 
+  })
+  @IsEnum(['COD', 'BARIDIMOB', 'CCP'], { message: 'طريقة الدفع يجب أن تكون إما COD (الدفع عند الاستلام)، BARIDIMOB (بريدي موب)، أو CCP (الحساب البريدي الجاري)' })
   paymentMethod: 'COD' | 'BARIDIMOB' | 'CCP';
+
+  @ApiProperty({ 
+    description: 'رقم هاتف المستلم للتواصل والتنسيق أثناء تسليم الطلب', 
+    example: '0770123456', 
+    required: false 
+  })
+  @IsOptional()
+  @IsString({ message: 'رقم الهاتف يجب أن يكون نصاً صالحاً' })
+  phone?: string;
 }
 
 @ApiTags('إدارة الطلبات والدفع وتتبع التوصيل - Orders & Payments & Shipping')

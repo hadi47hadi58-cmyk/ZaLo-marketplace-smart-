@@ -404,7 +404,167 @@ export async function getDocs(queryObj) {
     };
 }
 
+// --- Offline Queue & Sync Engine ---
+const OFFLINE_QUEUE_KEY = 'zalo_offline_queue';
+const ID_MAPPINGS_KEY = 'zalo_offline_id_mappings';
+
+/**
+ * دالة مساعدة لحفظ عملية تعديل في طابور العمليات غير المتصلة (Offline Queue)
+ */
+function queueOfflineMutation(type, table, data, id = null) {
+    const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+    const tempId = id || `temp_${Date.now()}_${Math.random().toString(36).substr(2, 5)}`;
+    
+    const mutation = {
+        tempId,
+        type, // 'INSERT', 'UPDATE', 'DELETE', 'UPSERT'
+        table,
+        data,
+        timestamp: Date.now()
+    };
+    
+    queue.push(mutation);
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+    
+    telemetry.logWarning(`[Offline Engine] تم حفظ العملية محلياً لعدم توفر شبكة. النوع: ${type} الجدول: ${table}`, mutation);
+    return tempId;
+}
+
+/**
+ * محرك المزامنة التلقائية وقمع التعارضات عند استعادة الاتصال بالإنترنت
+ */
+export async function syncOfflineQueue() {
+    if (!navigator.onLine) return;
+    
+    const queue = JSON.parse(localStorage.getItem(OFFLINE_QUEUE_KEY) || '[]');
+    if (queue.length === 0) return;
+    
+    console.log(`%c[Offline Sync] تم اكتشاف ${queue.length} عملية معلقة محلياً. بدء المزامنة مع خادم PostgreSQL...`, 'color: #00FF00; font-weight: bold;');
+    telemetry.logInfo(`[Offline Sync] بدء مزامنة ${queue.length} عملية معلقة.`);
+
+    const idMappings = JSON.parse(localStorage.getItem(ID_MAPPINGS_KEY) || '{}');
+    const remainingQueue = [];
+
+    for (const mutation of queue) {
+        try {
+            let { type, table, data, tempId, timestamp } = mutation;
+            
+            // 1. حل تعارض المعرفات والعلاقات (Id & Relational Integrity Conflict Resolution)
+            // إذا كانت البيانات تحتوي على معرفات مؤقتة تم حلها سابقاً من السيرفر، نقوم باستبدالها
+            const dataStr = JSON.stringify(data);
+            let updatedDataStr = dataStr;
+            for (const [tempKey, serverRealId] of Object.entries(idMappings)) {
+                if (updatedDataStr.includes(tempKey)) {
+                    updatedDataStr = updatedDataStr.split(tempKey).join(serverRealId);
+                }
+            }
+            data = JSON.parse(updatedDataStr);
+
+            // 2. فحص صراع التعديل المتأخر (Last-Write-Wins Conflict Resolution)
+            // نقوم بجلب حالة السجل الحالية من السيرفر للتأكد من أننا لا نمسح تعديلاً أحدث منه
+            if ((type === 'UPDATE' || type === 'UPSERT') && !tempId.startsWith('temp_')) {
+                const { data: currentServerRecord } = await supabase
+                    .from(table)
+                    .select('updated_at, timestamp')
+                    .eq('id', tempId)
+                    .maybeSingle();
+
+                if (currentServerRecord) {
+                    const serverTime = new Date(currentServerRecord.updated_at || currentServerRecord.timestamp).getTime();
+                    if (serverTime > timestamp) {
+                        console.warn(`[Offline Sync] تم قمع التعديل على السجل ${tempId} في الجدول ${table} لوجود نسخة أحدث على السيرفر.`);
+                        telemetry.logWarning(`[Offline Sync] تم قمع التعديل (Last-Write-Wins) على السجل ${tempId} لتفادي الكتابة فوق بيانات أحدث.`);
+                        continue; // تخطي هذه المزامنة بسلام لأن السيرفر يمتلك بيانات أحدث
+                    }
+                }
+            }
+
+            // 3. تنفيذ العملية الفعلية على قاعدة بيانات السيرفر
+            if (type === 'INSERT') {
+                // إزالة المعرف المؤقت لتوليد UUID حقيقي من PostgreSQL
+                const cleanInsertData = { ...data };
+                delete cleanInsertData.id;
+                delete cleanInsertData.tempId;
+
+                const { data: insertedRecord, error } = await supabase
+                    .from(table)
+                    .insert(cleanInsertData)
+                    .select()
+                    .single();
+
+                if (error) throw error;
+                
+                // تسجيل وتحديث خريطة المعرفات للحفاظ على العلاقات بين الجداول
+                if (insertedRecord && insertedRecord.id) {
+                    idMappings[tempId] = insertedRecord.id;
+                    localStorage.setItem(ID_MAPPINGS_KEY, JSON.stringify(idMappings));
+                    console.log(`[Offline Sync] تم إدخال السجل بنجاح ومواءمة المعرف ${tempId} -> ${insertedRecord.id}`);
+                }
+            } 
+            else if (type === 'UPDATE') {
+                const realId = idMappings[tempId] || tempId;
+                const { error } = await supabase
+                    .from(table)
+                    .update(data)
+                    .eq('id', realId);
+
+                if (error) throw error;
+            } 
+            else if (type === 'UPSERT') {
+                const realId = idMappings[tempId] || tempId;
+                const upsertPayload = { id: realId, ...data };
+                const { error } = await supabase
+                    .from(table)
+                    .upsert(upsertPayload);
+
+                if (error) throw error;
+            } 
+            else if (type === 'DELETE') {
+                const realId = idMappings[tempId] || tempId;
+                const { error } = await supabase
+                    .from(table)
+                    .delete()
+                    .eq('id', realId);
+
+                if (error) throw error;
+            }
+
+        } catch (err) {
+            console.error(`[Offline Sync] فشلت مزامنة العملية في الجدول ${mutation.table}:`, err.message);
+            telemetry.logError(`[Offline Sync] خطأ في مزامنة السجل في الجدول ${mutation.table}`, err);
+            // في حال حدوث خطأ شبكة عابر، نحتفظ بالعملية لإعادة المحاولة لاحقاً
+            remainingQueue.push(mutation);
+        }
+    }
+
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(remainingQueue));
+    if (remainingQueue.length === 0) {
+        console.log("%c[Offline Sync] تم الانتهاء من مزامنة جميع البيانات المعلقة بنجاح!", "color: #00FF00; font-weight: bold;");
+        telemetry.logInfo("[Offline Sync] تم إكمال جميع المزامنات وتفريغ الطابور.");
+    } else {
+        telemetry.logWarning(`[Offline Sync] تبقى ${remainingQueue.length} عمليات لم تُزامن بعد بسبب أخطاء.`);
+    }
+}
+
+// الاستماع لعودة الإنترنت للمزامنة الفورية تلقائياً
+window.addEventListener('online', () => {
+    console.log("[Network] تم استعادة الاتصال بالإنترنت! جاري إطلاق محرك المزامنة...");
+    syncOfflineQueue();
+});
+
+// محاولة المزامنة الدورية كل 15 ثانية في الخلفية لضمان سلامة البيانات
+setInterval(syncOfflineQueue, 15000);
+
+
 export async function addDoc(colRef, data) {
+    if (!navigator.onLine) {
+        const tempId = queueOfflineMutation('INSERT', colRef.table, data);
+        return {
+            id: tempId,
+            data: () => ({ id: tempId, ...data })
+        };
+    }
+
     // Intercept checkout to create order in NestJS + PostgreSQL
     if (colRef.table === 'orders') {
         const token = localStorage.getItem('nestjs_token');
@@ -450,6 +610,11 @@ export async function addDoc(colRef, data) {
 }
 
 export async function setDoc(docRef, data, options) {
+    if (!navigator.onLine) {
+        queueOfflineMutation('UPSERT', docRef.table, data, docRef.id);
+        return;
+    }
+
     const payload = { id: docRef.id, ...data };
     const { error } = await supabase
         .from(docRef.table)
@@ -462,6 +627,11 @@ export async function setDoc(docRef, data, options) {
 }
 
 export async function updateDoc(docRef, data) {
+    if (!navigator.onLine) {
+        queueOfflineMutation('UPDATE', docRef.table, data, docRef.id);
+        return;
+    }
+
     const { error } = await supabase
         .from(docRef.table)
         .update(data)
@@ -474,6 +644,11 @@ export async function updateDoc(docRef, data) {
 }
 
 export async function deleteDoc(docRef) {
+    if (!navigator.onLine) {
+        queueOfflineMutation('DELETE', docRef.table, null, docRef.id);
+        return;
+    }
+
     const { error } = await supabase
         .from(docRef.table)
         .delete()

@@ -2,6 +2,8 @@
 // جسر الاتصال البرمجي الموحد بين الواجهة الأمامية والخلفية لـ NestJS وقاعدة بيانات PostgreSQL
 // يدعم التبديل التلقائي والحفظ الاحتياطي في الـ LocalStorage لضمان تشغيل أوفلاين متين وسلس.
 
+import { telemetry } from './telemetry-logger.js';
+
 const NESTJS_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
   ? 'http://localhost:3000/api'
   : 'https://zalo-smart-backend-service-api.run.app/api'; // رابط الإنتاج الافتراضي في السحابة
@@ -9,27 +11,74 @@ const NESTJS_BASE_URL = window.location.hostname === 'localhost' || window.locat
 console.log(`[ZaLo Bridge] تم إعداد جسر الاتصال بـ NestJS على المسار: ${NESTJS_BASE_URL}`);
 
 /**
+ * دالة مساعدة لتأخير التنفيذ لعدد معين من الميلي ثانية
+ */
+const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+/**
+ * دالة ذكية لإعادة المحاولة المأخوذة بـ Exponential Backoff مع إضافة Jitter عشوائي
+ * لتفادي الضغط المتزامن والتحميل المفرط على الواجهة الخلفية (Preventing Thundering Herd Problem)
+ */
+async function nestFetchWithRetry(endpoint, options = {}, retries = 3, baseDelayMs = 1000) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      // تسجيل بدء إرسال الطلب لتيليمتري الأداء
+      if (typeof telemetry !== 'undefined' && telemetry.trackApiRequest) {
+        telemetry.trackApiRequest();
+      }
+
+      const response = await fetch(`${NESTJS_BASE_URL}/${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        },
+      });
+
+      const result = await response.json();
+      if (!response.ok) {
+        // تسجيل الفشل بالخادم لتيليمتري الأداء
+        if (typeof telemetry !== 'undefined' && telemetry.trackApiError) {
+          telemetry.trackApiError();
+        }
+        // إذا كان خطأ العميل (مثل 400 Bad Request أو 401 Unauthorized أو 403 Forbidden)، لا نعيد المحاولة لأنه خطأ منطقي وليس عطل شبكي مؤقت
+        if (response.status >= 400 && response.status < 500) {
+          throw new Error(result.message || `خطأ في الطلب: ${response.status}`);
+        }
+        throw new Error(result.message || `خطأ في استجابة الخادم: ${response.status}`);
+      }
+      return result;
+    } catch (err) {
+      if (typeof telemetry !== 'undefined' && telemetry.trackApiError) {
+        telemetry.trackApiError();
+      }
+
+      if (attempt === retries) {
+        console.error(`[ZaLo Bridge] تجاوز الحد الأقصى لإعادة المحاولات (${retries}) لـ ${endpoint}. الخطأ النهائي:`, err.message);
+        throw err;
+      }
+      
+      // حساب وقت الانتظار: baseDelayMs * 2^attempt + Jitter عشوائي (بين 0 و 300ms)
+      const exponentialDelay = baseDelayMs * Math.pow(2, attempt);
+      const jitter = Math.floor(Math.random() * 300);
+      const totalDelay = exponentialDelay + jitter;
+      
+      console.warn(
+        `[ZaLo Bridge] فشل الاتصال بالخادم عند المحاولة ${attempt + 1}/${retries + 1} لـ (${endpoint}). ` +
+        `جاري إعادة المحاولة خلال ${totalDelay}ms... الخطأ: ${err.message}`
+      );
+      
+      await delay(totalDelay);
+    }
+  }
+}
+
+/**
  * دالة مساعدة لتنفيذ الطلبات مع معالجة الأخطاء والرجوع التلقائي للبيانات المحلية
  */
 async function nestFetch(endpoint, options = {}) {
-  try {
-    const response = await fetch(`${NESTJS_BASE_URL}/${endpoint}`, {
-      ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {}),
-      },
-    });
-
-    const result = await response.json();
-    if (!response.ok) {
-      throw new Error(result.message || `خطأ في استجابة الخادم: ${response.status}`);
-    }
-    return result;
-  } catch (err) {
-    console.warn(`[ZaLo Bridge] فشل الاتصال بالواجهة الخلفية لـ NestJS (${endpoint}). التفاصيل:`, err.message);
-    throw err;
-  }
+  // نقوم باستدعاء الدالة المحدثة مع آلية المحاولة الذكية افتراضياً
+  return await nestFetchWithRetry(endpoint, options, 3, 800);
 }
 
 /**
