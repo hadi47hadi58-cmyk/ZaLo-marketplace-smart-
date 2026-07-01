@@ -547,14 +547,6 @@
         data = signupRes.data;
         error = signupRes.error;
         if (error) throw error;
-        
-        // Auto create profile for newly registered customer
-        await supabase.from('profiles').upsert({
-          id: data.user.id,
-          email: data.user.email,
-          role: 'customer',
-          status: 'active'
-        });
       } else {
         const signinRes = await supabase.auth.signInWithPassword({
           email: email,

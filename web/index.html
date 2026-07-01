@@ -1318,46 +1318,61 @@ async function handleOAuthCallback() {
 }
 await handleOAuthCallback();
 
-// 1b. Smart verification delay helper: wait up to 500ms for Supabase session to settle
-async function getSettleSessionWithTimeout(maxWaitMs = 500) {
+// 1b. Patient session initialization helper (initAuthHub)
+async function initAuthHub(maxWaitMs = 3500) {
   const startTime = Date.now();
+  console.log(`initAuthHub: Initiating patient session check (max wait ${maxWaitMs}ms)...`);
   
   // Try immediate retrieve
   try {
-    const { data: { session } } = await supabase.auth.getSession();
+    const { data: { session }, error } = await supabase.auth.getSession();
+    if (error) {
+      if (error.status === 401 || error.message.includes("401") || error.message.toLowerCase().includes("unauthorized")) {
+        console.log("initAuthHub: Received 401 Unauthorized, treating as loading/waiting state...");
+      } else {
+        console.warn("initAuthHub: Initial session retrieval returned error:", error);
+      }
+    }
     if (session) {
-      console.log("ZaLo Smart: Session found immediately in storage.");
+      console.log("initAuthHub: Session found immediately.");
       return session;
     }
   } catch (e) {
-    console.warn("Immediate session check failed:", e);
+    console.warn("initAuthHub: Immediate session check threw exception:", e);
   }
 
   // Poll up to maxWaitMs for session to resolve (useful during async OAuth processing)
   return new Promise((resolve) => {
     const interval = setInterval(async () => {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session }, error } = await supabase.auth.getSession();
+        if (error) {
+          if (error.status === 401 || error.message.includes("401") || error.message.toLowerCase().includes("unauthorized")) {
+            console.log("initAuthHub (polling): Received 401 Unauthorized, treating as loading/waiting state...");
+          } else {
+            console.warn("initAuthHub (polling): Session fetch returned error:", error);
+          }
+        }
         if (session) {
           clearInterval(interval);
-          console.log(`ZaLo Smart: Session resolved successfully after ${Date.now() - startTime}ms.`);
+          console.log(`initAuthHub: Session resolved successfully after ${Date.now() - startTime}ms.`);
           resolve(session);
           return;
         }
       } catch (e) {
-        console.warn("Polling session check failed:", e);
+        console.warn("initAuthHub: Polling session check threw exception:", e);
       }
 
       if (Date.now() - startTime >= maxWaitMs) {
         clearInterval(interval);
-        console.log(`ZaLo Smart: Session resolution timed out after ${maxWaitMs}ms.`);
+        console.log(`initAuthHub: Session resolution timed out after ${maxWaitMs}ms.`);
         resolve(null);
       }
-    }, 50);
+    }, 100);
   });
 }
 
-// Smart Auth Redirection Gate
+// Smart Auth Redirection Gate - Patient Retry Version without Client-side profile Insertion
 async function runSmartRoleRedirection(session) {
   if (!session || !session.user) return;
   
@@ -1374,35 +1389,32 @@ async function runSmartRoleRedirection(session) {
   }
   
   try {
-    // 2. Query the profiles table in Supabase
-    let { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-      
-    if (error) {
-      console.warn("SmartGate: Error fetching profile, falling back:", error);
-    }
+    // 2. Query the profiles table in Supabase with retry logic
+    let profile = null;
+    let fetchAttempts = 0;
+    const maxFetchAttempts = 7; // up to 3500ms total wait (7 * 500ms)
     
-    // 3. If no profile exists, create one with role='customer' and status='active'
-    if (!profile) {
-      console.log("SmartGate: Profile not found, auto-creating default customer profile...");
-      const { data: newProfile, error: insertError } = await supabase
+    while (fetchAttempts < maxFetchAttempts) {
+      console.log(`SmartGate: Fetching profile for ${user.id} (Attempt ${fetchAttempts + 1}/${maxFetchAttempts})...`);
+      
+      const { data, error } = await supabase
         .from('profiles')
-        .upsert({
-          id: user.id,
-          email: user.email,
-          role: 'customer',
-          status: 'active'
-        })
-        .select()
+        .select('*')
+        .eq('id', user.id)
         .maybeSingle();
         
-      if (insertError) {
-        console.error("SmartGate: Failed to insert new profile:", insertError);
-      } else {
-        profile = newProfile;
+      if (error) {
+        // Deal with 401 Unauthorized or transient network as loading, not kicking the user
+        console.warn(`SmartGate: Attempt ${fetchAttempts + 1} returned error:`, error.message);
+      } else if (data) {
+        profile = data;
+        break; // Successfully fetched the profile!
+      }
+      
+      fetchAttempts++;
+      if (fetchAttempts < maxFetchAttempts) {
+        console.log("SmartGate: Profile row not generated yet or fetch failed. Retrying in 500ms...");
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
     }
     
@@ -1485,14 +1497,6 @@ document.addEventListener('DOMContentLoaded', () => {
           data = signupRes.data;
           error = signupRes.error;
           if (error) throw error;
-          
-          // Auto create profile for newly registered customer
-          await supabase.from('profiles').upsert({
-            id: data.user.id,
-            email: data.user.email,
-            role: 'customer',
-            status: 'active'
-          });
           
           toast("✨ تم إنشاء حسابك الموحد بنجاح!", "ok");
         } else {
@@ -1602,8 +1606,8 @@ document.addEventListener('DOMContentLoaded', () => {
   };
 });
 
-// Perform initial 500ms smart checking
-const initialSession = await getSettleSessionWithTimeout(500);
+// Perform patient 3500ms session checking via initAuthHub
+const initialSession = await initAuthHub(3500);
 if (initialSession) {
   await runSmartRoleRedirection(initialSession);
 }
