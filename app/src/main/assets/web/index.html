@@ -1372,74 +1372,109 @@ async function initAuthHub(maxWaitMs = 3500) {
   });
 }
 
-// Smart Auth Redirection Gate - Patient Retry Version without Client-side profile Insertion
-async function runSmartRoleRedirection(session) {
-  if (!session || !session.user) return;
+// دالة ذكية للتحقق من دور المستخدم وتوجيهه إلى الصفحة المناسبة بعد تسجيل الدخول.
+// تقوم بالانتظار لفترة قصيرة حتى يستقر الـ Trigger الخاص بقاعدة البيانات
+// في إنشاء الملف الشخصي (Profile) لتفادي أي أخطاء أو حلقات توجيه مفرغة.
+async function checkRoleAndRedirect() {
+  console.log("checkRoleAndRedirect: بدء فحص الجلسة والدور للتوجيه...");
+  
+  // 1. الانتظار للحصول على الجلسة الحالية (Session) بانتظار بسيط (مثلاً 2000ms كحد أقصى)
+  let session = null;
+  try {
+    const { data: { session: currentSession } } = await supabase.auth.getSession();
+    session = currentSession;
+  } catch (err) {
+    console.warn("checkRoleAndRedirect: فشل جلب الجلسة المباشرة:", err);
+  }
+  
+  // إذا لم تتوفر الجلسة فوراً، ننتظرها عبر دالة initAuthHub بحد أقصى 2000ms
+  if (!session) {
+    console.log("checkRoleAndRedirect: لم يتم العثور على جلسة فورية، جاري الانتظار عبر initAuthHub...");
+    session = await initAuthHub(2000);
+  }
+  
+  if (!session || !session.user) {
+    console.warn("checkRoleAndRedirect: لا توجد جلسة نشطة للمستخدم، لن يتم التوجيه.");
+    return;
+  }
   
   const user = session.user;
   const email = user.email ? user.email.toLowerCase().trim() : "";
-  console.log("SmartGate: Authenticated user detected:", email);
+  console.log(`checkRoleAndRedirect: تم العثور على المستخدم ${email}، جاري جلب الصلاحية...`);
   
-  // 1. Check fallback for hardcoded Admin List
+  // التحقق أولاً من قائمة المسؤولين الثابتة كبديل فوري في حال تطابق البريد الإلكتروني
   if (AD_LIST.includes(email)) {
-    console.log("SmartGate: Admin detected via AD_LIST. Redirecting to admin.html");
+    console.log("checkRoleAndRedirect: تم التعرف على البريد كمسؤول (Admin) من القائمة الثابتة.");
     sessionStorage.setItem('admin_logged_in_session', 'true');
     window.location.href = 'admin.html';
     return;
   }
   
+  let role = null;
+  
   try {
-    // 2. Query the profiles table in Supabase with retry logic
-    let profile = null;
-    let fetchAttempts = 0;
-    const maxFetchAttempts = 7; // up to 3500ms total wait (7 * 500ms)
-    
-    while (fetchAttempts < maxFetchAttempts) {
-      console.log(`SmartGate: Fetching profile for ${user.id} (Attempt ${fetchAttempts + 1}/${maxFetchAttempts})...`);
+    // المحاولة الأولى لجلب الملف الشخصي من جدول profiles
+    console.log("checkRoleAndRedirect: المحاولة الأولى لجلب الملف الشخصي...");
+    const { data: firstTryProfile, error: firstTryError } = await supabase
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
       
-      const { data, error } = await supabase
+    if (firstTryError) {
+      console.warn("checkRoleAndRedirect: خطأ في المحاولة الأولى لجلب الملف الشخصي:", firstTryError.message);
+    }
+    
+    if (firstTryProfile && firstTryProfile.role) {
+      role = firstTryProfile.role;
+      console.log(`checkRoleAndRedirect: تم جلب الدور بنجاح من المحاولة الأولى: ${role}`);
+    } else {
+      // إذا لم يُعثر على الملف الشخصي أو الدور بعد (بسبب تأخر الـ Trigger الخاص بـ Security Definer)
+      // ننتظر 1000ms ونعيد المحاولة مرة واحدة فقط كما هو مطلوب بدقة
+      console.log("checkRoleAndRedirect: لم يتم العثور على الدور فوراً (قد يتأخر الـ Trigger). جاري الانتظار 1000ms قبل إعادة المحاولة...");
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      console.log("checkRoleAndRedirect: المحاولة الثانية والأخيرة لجلب الملف الشخصي...");
+      const { data: secondTryProfile, error: secondTryError } = await supabase
         .from('profiles')
-        .select('*')
+        .select('role')
         .eq('id', user.id)
         .maybeSingle();
         
-      if (error) {
-        // Deal with 401 Unauthorized or transient network as loading, not kicking the user
-        console.warn(`SmartGate: Attempt ${fetchAttempts + 1} returned error:`, error.message);
-      } else if (data) {
-        profile = data;
-        break; // Successfully fetched the profile!
+      if (secondTryError) {
+        console.warn("checkRoleAndRedirect: خطأ في المحاولة الثانية لجلب الملف الشخصي:", secondTryError.message);
       }
       
-      fetchAttempts++;
-      if (fetchAttempts < maxFetchAttempts) {
-        console.log("SmartGate: Profile row not generated yet or fetch failed. Retrying in 500ms...");
-        await new Promise(resolve => setTimeout(resolve, 500));
-      }
-    }
-    
-    const role = (profile && profile.role) ? profile.role : 'customer';
-    console.log("SmartGate: Resolved user role:", role);
-    
-    if (role === 'admin') {
-      sessionStorage.setItem('admin_logged_in_session', 'true');
-      window.location.href = 'admin.html';
-    } else if (role === 'merchant') {
-      window.location.href = 'dashboard.html';
-    } else {
-      // Normal customer: do NOT redirect on index.html page load, let them browse!
-      const loginScreen = document.getElementById('s-login');
-      if (loginScreen && loginScreen.classList.contains('active')) {
-        window.location.href = 'customer-home.html';
+      if (secondTryProfile && secondTryProfile.role) {
+        role = secondTryProfile.role;
+        console.log(`checkRoleAndRedirect: تم جلب الدور بنجاح في المحاولة الثانية: ${role}`);
+      } else {
+        console.warn("checkRoleAndRedirect: لم يتم العثور على ملف شخصي بعد المحاولتين. تعيين الدور الافتراضي: customer");
+        role = 'customer';
       }
     }
   } catch (err) {
-    console.error("SmartGate: Redirection processing failed:", err);
+    console.error("checkRoleAndRedirect: خطأ أثناء معالجة جلب الدور:", err);
+    role = 'customer'; // القيمة الافتراضية الآمنة في حال حدوث استثناء غير متوقع
+  }
+  
+  // التوجيه النهائي الآمن بناءً على الدور المؤكد فقط لمنع أي حلقات تكرار
+  console.log(`checkRoleAndRedirect: التوجيه النهائي للمستخدم ذو الدور: ${role}`);
+  if (role === 'admin') {
+    sessionStorage.setItem('admin_logged_in_session', 'true');
+    window.location.href = 'admin.html';
+  } else if (role === 'merchant') {
+    window.location.href = 'dashboard.html';
+  } else if (role === 'customer') {
+    window.location.href = 'customer-home.html';
   }
 }
 
-// Expose redirection function to other scopes if needed
-window.runSmartRoleRedirection = runSmartRoleRedirection;
+// تصدير وتوفير الدوال للنطاقات الأخرى لضمان التوافقية
+window.checkRoleAndRedirect = checkRoleAndRedirect;
+window.runSmartRoleRedirection = async function(session) {
+  await checkRoleAndRedirect();
+};
 
 // Attach listeners for unified-login screen once DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
@@ -1511,7 +1546,7 @@ document.addEventListener('DOMContentLoaded', () => {
           toast("✨ تم تسجيل دخولك الموحد بنجاح!", "ok");
         }
         
-        runSmartRoleRedirection(data.session || { user: data.user });
+        await checkRoleAndRedirect();
       } catch (err) {
         console.error("Unified Login error:", err);
         const errMsg = isSignUpMode 
@@ -1594,7 +1629,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error) throw error;
       
       toast("✨ تم تسجيل دخولك بنجاح عبر حساب Google الموحد!", "ok");
-      runSmartRoleRedirection(data.session || { user: data.user });
+      await checkRoleAndRedirect();
     } catch (err) {
       console.error("Native ID Token validation failed:", err);
       showError("فشلت عملية التحقق من حساب Google الموحد.");
@@ -1609,7 +1644,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // Perform patient 3500ms session checking via initAuthHub
 const initialSession = await initAuthHub(3500);
 if (initialSession) {
-  await runSmartRoleRedirection(initialSession);
+  await checkRoleAndRedirect();
 }
 
 
