@@ -28,9 +28,9 @@ jobs:
 
       - name: Mask Sensitive Deployment Variables
         run: |
-          # تطبيق تقنيات التشفير المتقدمة للـ Runner لمنع طباعة المعطيات الحساسة في السجلات العامة
-          echo "::add-mask::${{ secrets.NESTJS_JWT_SECRET }}"
-          echo "::add-mask::${{ secrets.DATABASE_PROD_URL }}"
+          # تطبيق تقنيات التشفير المتقدمة للـ Runner لمنع طباعة المعطيات الحساسة في السجلات العامة مع تفادي خرق السلاسل الفارغة
+          if [ ! -z "${{ secrets.NESTJS_JWT_SECRET }}" ]; then echo "::add-mask::${{ secrets.NESTJS_JWT_SECRET }}"; fi
+          if [ ! -z "${{ secrets.DATABASE_PROD_URL }}" ]; then echo "::add-mask::${{ secrets.DATABASE_PROD_URL }}"; fi
           echo "NESTJS_JWT_SECRET=***" >> $GITHUB_ENV
 
       - name: Run Code Linter
@@ -58,17 +58,21 @@ jobs:
 
       - name: Create Dynamic & Secure Environment Config
         run: |
-          # جلب المتغيرات من مستودع GitHub Secrets وتشفيرها لضمان الأمان الفائق للـ APK المنتج
-          echo "::add-mask::${{ secrets.SUPABASE_URL }}"
-          echo "::add-mask::${{ secrets.SUPABASE_KEY }}"
+          # جلب المتغيرات من مستودع GitHub Secrets وتشفيرها لضمان الأمان الفائق للـ APK المنتج مع تجنب التنبيهات الفارغة
+          if [ ! -z "${{ secrets.SUPABASE_URL }}" ]; then echo "::add-mask::${{ secrets.SUPABASE_URL }}"; fi
+          if [ ! -z "${{ secrets.SUPABASE_KEY }}" ]; then echo "::add-mask::${{ secrets.SUPABASE_KEY }}"; fi
+          if [ ! -z "${{ secrets.GEMINI_API_KEY }}" ]; then echo "::add-mask::${{ secrets.GEMINI_API_KEY }}"; fi
           
-          # توليد ملف الإعدادات المدمج
+          # توليد ملف الإعدادات المدمج للـ APK والـ Unit Tests
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://dummy-project.supabase.co' }}" > .env
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY || 'dummy-key-value' }}" >> .env
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY || 'dummy-gemini-key' }}" >> .env
           cp .env .env.example
 
       - name: Grant Execute Permission for Gradle
-        run: chmod +x gradlew
+        run: |
+          chmod +x gradlew
+          ls -la gradlew
         continue-on-error: true
 
       - name: Build Debug APK
@@ -76,6 +80,8 @@ jobs:
 
       - name: Run Android Unit & Robolectric Tests
         id: run-tests
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           ./gradlew testDebugUnitTest || gradle testDebugUnitTest
           echo "test_status=success" >> $GITHUB_ENV
