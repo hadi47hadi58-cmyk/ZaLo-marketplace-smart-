@@ -3,9 +3,13 @@
 
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
 
-// Supabase Credentials (will fallback to public credentials or placeholders)
-const SUPABASE_URL = "https://xwwzadxsqmmxerbolovz.supabase.co"; // Replace with your actual project URL
-const SUPABASE_ANON_KEY = "Sb_publishable_qJ60bIG-VZXemJ5L0GhY3w_1I7718wl"; // Replace with your actual anon key
+// Supabase Credentials (loaded dynamically from window context, process.env, or falling back to build placeholders)
+const SUPABASE_URL = window.SUPABASE_URL || (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || "SUPABASE_URL_PLACEHOLDER";
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || (typeof process !== 'undefined' && process.env?.SUPABASE_KEY) || "SUPABASE_KEY_PLACEHOLDER";
+
+// Expose public config variables on window for use by other scripts (like sub-client registration)
+window.SUPABASE_URL = SUPABASE_URL;
+window.SUPABASE_ANON_KEY = SUPABASE_ANON_KEY;
 
 // Initialize Supabase Client
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {

@@ -2160,7 +2160,9 @@ window.saveNewAdmin = async function() {
     // Create in Supabase Auth using secondary app instance so current super-admin gets no displacement
     try {
       const { createClient } = await import('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm');
-      const tempClient = createClient("https://xwwzadxsqmmxerbolovz.supabase.co", "Sb_publishable_qJ60bIG-VZXemJ5L0GhY3w_1I7718wl", {
+      const sUrl = window.SUPABASE_URL || "SUPABASE_URL_PLACEHOLDER";
+      const sKey = window.SUPABASE_ANON_KEY || "SUPABASE_KEY_PLACEHOLDER";
+      const tempClient = createClient(sUrl, sKey, {
         auth: { persistSession: false }
       });
       await tempClient.auth.signUp({ email, password: pass });

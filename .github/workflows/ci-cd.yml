@@ -77,12 +77,20 @@ jobs:
         continue-on-error: true
 
       - name: Build Debug APK
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://dummy-project.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || 'dummy-key-value' }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-gemini-key' }}
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY || 'dummy-maps-key' }}
         run: ./gradlew assembleDebug || gradle assembleDebug
 
       - name: Run Android Unit & Robolectric Tests
         id: run-tests
         env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL || 'https://dummy-project.supabase.co' }}
+          SUPABASE_KEY: ${{ secrets.SUPABASE_KEY || 'dummy-key-value' }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-gemini-key' }}
+          MAPS_API_KEY: ${{ secrets.MAPS_API_KEY || 'dummy-maps-key' }}
         run: |
           ./gradlew testDebugUnitTest || gradle testDebugUnitTest
           echo "test_status=success" >> $GITHUB_ENV

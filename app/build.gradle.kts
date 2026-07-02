@@ -122,11 +122,59 @@ dependencies {
   "ksp"(libs.moshi.kotlin.codegen)
 }
 
+// Capture final files outside of closure to prevent serialization issues with the Gradle Configuration Cache
+val rootDirFile = rootDir
+val projectDirFile = projectDir
+val localConfigFile = file("${projectDirFile}/src/main/assets/web/js/supabase-config.js")
+val localAdminFile = file("${projectDirFile}/src/main/assets/web/admin.html")
+val localEnvFile = file("${rootDirFile}/.env")
+
 // Automatically copy master web assets from root ./web directory to app/src/main/assets/web on every build
 val copyWebAssets by tasks.registering(Copy::class) {
-    from(file("${rootDir}/web"))
-    into(file("${projectDir}/src/main/assets/web"))
+    notCompatibleWithConfigurationCache("Custom task uses dynamic script execution to inject secrets.")
+    from(file("${rootDirFile}/web"))
+    into(file("${projectDirFile}/src/main/assets/web"))
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
+
+    doLast {
+        var supabaseUrl = System.getenv("SUPABASE_URL") ?: ""
+        var supabaseKey = System.getenv("SUPABASE_KEY") ?: ""
+
+        // Try reading from local .env file if system environment variables are empty
+        if (supabaseUrl.isEmpty() || supabaseKey.isEmpty()) {
+            if (localEnvFile.exists()) {
+                localEnvFile.readLines().forEach { line ->
+                    val parts = line.split("=", limit = 2)
+                    if (parts.size == 2) {
+                        val key = parts[0].trim()
+                        val value = parts[1].trim().removeSurrounding("\"").removeSurrounding("'")
+                        if (key == "SUPABASE_URL" && supabaseUrl.isEmpty()) {
+                            supabaseUrl = value
+                        } else if (key == "SUPABASE_KEY" && supabaseKey.isEmpty()) {
+                            supabaseKey = value
+                        }
+                    }
+                }
+            }
+        }
+
+        // Inject the actual credentials into the web asset copy for the Android build
+        if (localConfigFile.exists() && supabaseUrl.isNotEmpty() && supabaseKey.isNotEmpty()) {
+            var content = localConfigFile.readText()
+            content = content.replace("SUPABASE_URL_PLACEHOLDER", supabaseUrl)
+            content = content.replace("SUPABASE_KEY_PLACEHOLDER", supabaseKey)
+            localConfigFile.writeText(content)
+            println("🔒 [Security Audit] Successfully injected Supabase URL and Key into web assets.")
+        }
+
+        if (localAdminFile.exists() && supabaseUrl.isNotEmpty() && supabaseKey.isNotEmpty()) {
+            var content = localAdminFile.readText()
+            content = content.replace("SUPABASE_URL_PLACEHOLDER", supabaseUrl)
+            content = content.replace("SUPABASE_KEY_PLACEHOLDER", supabaseKey)
+            localAdminFile.writeText(content)
+            println("🔒 [Security Audit] Successfully injected Supabase URL and Key into admin.html.")
+        }
+    }
 }
 
 tasks.matching { it.name.startsWith("preBuild") }.configureEach {
