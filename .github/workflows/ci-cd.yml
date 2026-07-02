@@ -87,6 +87,12 @@ jobs:
           MAPS_API_KEY: ${{ secrets.MAPS_API_KEY || 'dummy-maps-key' }}
         run: ./gradlew assembleDebug || gradle assembleDebug
 
+      - name: Debug Secret Availability
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          if [ -z "$GEMINI_API_KEY" ]; then echo "GEMINI_API_KEY is missing!"; else echo "GEMINI_API_KEY is detected."; fi
+
       - name: Run Android Unit & Robolectric Tests
         id: run-tests
         env:
