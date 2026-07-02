@@ -24,7 +24,9 @@ jobs:
 
       - name: Install Dependencies
         working-directory: ./backend
-        run: npm install
+        run: |
+          # Using 'npm install' instead of 'npm ci' to prevent lockfile sync errors (EUSAGE)
+          npm install
 
       - name: Run Code Linter
         working-directory: ./backend
