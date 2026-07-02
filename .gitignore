@@ -18,3 +18,14 @@ local.properties
 .env*
 serviceAccountKey.json
 debug.keystore
+
+# Node and build outputs
+node_modules/
+dist/
+backend/node_modules/
+backend/dist/
+web/node_modules/
+web/dist/
+.env.local
+.env.*.local
+
