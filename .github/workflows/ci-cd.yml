@@ -18,20 +18,13 @@ jobs:
       - name: Setup Node.js Environment
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache: 'npm'
           cache-dependency-path: backend/package-lock.json
 
       - name: Install Dependencies
         working-directory: ./backend
         run: npm ci
-
-      - name: Mask Sensitive Deployment Variables
-        run: |
-          # تطبيق تقنيات التشفير المتقدمة للـ Runner لمنع طباعة المعطيات الحساسة في السجلات العامة مع تفادي خرق السلاسل الفارغة
-          if [ ! -z "${{ secrets.NESTJS_JWT_SECRET }}" ]; then echo "::add-mask::${{ secrets.NESTJS_JWT_SECRET }}"; fi
-          if [ ! -z "${{ secrets.DATABASE_PROD_URL }}" ]; then echo "::add-mask::${{ secrets.DATABASE_PROD_URL }}"; fi
-          echo "NESTJS_JWT_SECRET=***" >> $GITHUB_ENV
 
       - name: Run Code Linter
         working-directory: ./backend
@@ -56,14 +49,18 @@ jobs:
           java-version: '17'
           cache: 'gradle'
 
+      - name: Generate Local Debug Keystore
+        run: |
+          if [ ! -f debug.keystore ]; then
+            keytool -genkey -v -keystore debug.keystore -storepass android -alias androiddebugkey -keypass android -keyalg RSA -keysize 2048 -validity 10000 -dname "CN=Android Debug,O=Android,C=US"
+            echo "Successfully generated local debug.keystore for CI build"
+          else
+            echo "debug.keystore already exists"
+          fi
+
       - name: Create Dynamic & Secure Environment Config
         run: |
-          # جلب المتغيرات من مستودع GitHub Secrets وتشفيرها لضمان الأمان الفائق للـ APK المنتج مع تجنب التنبيهات الفارغة
-          if [ ! -z "${{ secrets.SUPABASE_URL }}" ]; then echo "::add-mask::${{ secrets.SUPABASE_URL }}"; fi
-          if [ ! -z "${{ secrets.SUPABASE_KEY }}" ]; then echo "::add-mask::${{ secrets.SUPABASE_KEY }}"; fi
-          if [ ! -z "${{ secrets.GEMINI_API_KEY }}" ]; then echo "::add-mask::${{ secrets.GEMINI_API_KEY }}"; fi
-          
-          # توليد ملف الإعدادات المدمج للـ APK والـ Unit Tests
+          # توليد ملف الإعدادات المدمج للـ APK والـ Unit Tests دون طباعة المعطيات الحساسة أو التحذيرات الفارغة
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://dummy-project.supabase.co' }}" > .env
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY || 'dummy-key-value' }}" >> .env
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY || 'dummy-gemini-key' }}" >> .env
@@ -71,8 +68,12 @@ jobs:
 
       - name: Grant Execute Permission for Gradle
         run: |
-          chmod +x gradlew
-          ls -la gradlew
+          if [ -f gradlew ]; then
+            chmod +x gradlew
+            ls -la gradlew
+          else
+            echo "gradlew wrapper not found, using system gradle."
+          fi
         continue-on-error: true
 
       - name: Build Debug APK
@@ -81,7 +82,7 @@ jobs:
       - name: Run Android Unit & Robolectric Tests
         id: run-tests
         env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY || 'dummy-gemini-key' }}
         run: |
           ./gradlew testDebugUnitTest || gradle testDebugUnitTest
           echo "test_status=success" >> $GITHUB_ENV
