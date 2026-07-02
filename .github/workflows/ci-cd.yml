@@ -64,6 +64,7 @@ jobs:
           echo "SUPABASE_URL=${{ secrets.SUPABASE_URL || 'https://dummy-project.supabase.co' }}" > .env
           echo "SUPABASE_KEY=${{ secrets.SUPABASE_KEY || 'dummy-key-value' }}" >> .env
           echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY || 'dummy-gemini-key' }}" >> .env
+          echo "MAPS_API_KEY=${{ secrets.MAPS_API_KEY || 'dummy-maps-key' }}" >> .env
           cp .env .env.example
 
       - name: Grant Execute Permission for Gradle
