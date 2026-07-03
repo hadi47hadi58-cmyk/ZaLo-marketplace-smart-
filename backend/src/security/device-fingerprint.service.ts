@@ -22,7 +22,7 @@ export class DeviceFingerprintService {
   /**
    * Registers a login or access event for a specific user and device fingerprint.
    */
-  async registerDevice(userId: number, fingerprint: string, deviceName: string, ipAddress: string): Promise<boolean> {
+  async registerDevice(userId: number, fingerprint: string, deviceName: string, ipAddress: string, userAgent?: string): Promise<boolean> {
     try {
       const supabase = this.supabaseService.getClient();
 
@@ -41,7 +41,7 @@ export class DeviceFingerprintService {
         await supabase.from('user_devices').insert({
           user_id: userId,
           device_fingerprint: fingerprint,
-          device_name: deviceName || this.parseDeviceName(userAgent),
+          device_name: deviceName || this.parseDeviceName(userAgent || ''),
           last_ip: ipAddress,
           last_login: now,
           is_trusted: true, // Default to true on first successful login, can be updated later

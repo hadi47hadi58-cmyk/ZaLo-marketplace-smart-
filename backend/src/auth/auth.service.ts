@@ -50,6 +50,7 @@ export class AuthService {
       `تم تسجيل حساب مستخدم جديد بنجاح بدور: ${newUser.role} في ولاية: ${newUser.wilaya}`
     );
 
+    const payload = { email: newUser.email, sub: newUser.id, role: newUser.role, name: newUser.name };
     const token = this.jwtService.sign(payload);
     return {
       message: 'تم تسجيل الحساب بنجاح، أهلاً بك في فضاء ZaLo الذكي ✨',
@@ -89,6 +90,7 @@ export class AuthService {
       `تسجيل دخول حساب مستقر من رتبة: ${user.role} تحت عنوان: ${user.wilaya}`
     );
 
+    const payload = { email: user.email, sub: user.id, role: user.role, name: user.name };
     const token = this.jwtService.sign(payload);
     return {
        message: 'أهلاً بعودتك الميمونة لـ ZaLo Smart! 🌟',
