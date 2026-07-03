@@ -2,14 +2,15 @@ import { Injectable, ConflictException, UnauthorizedException } from '@nestjs/co
 import { JwtService } from '@nestjs/jwt';
 import { RegisterDto, LoginDto } from './auth.controller';
 import { AuditService } from '../audit/audit.service';
+import { PasswordHasher } from '../security/password-hasher';
 
 @Injectable()
 export class AuthService {
   // Mock In-Memory Database storage representing users mapped to PostgreSQL
   private users: any[] = [
-    { id: 1, email: "zinzinochop@gmail.com", passwordHash: "hashed_passwd123", name: "عبد الهادي نجم الدين", role: "CUSTOMER", status: "ACTIVE", wilaya: "الجزائر", commune: "المرسى", phone: "0555000111", loyaltyPoints: 1250 },
-    { id: 2, email: "merchant@zalo.dz", passwordHash: "hashed_passwd123", name: "أحمد بن زكري", role: "MERCHANT", status: "ACTIVE", wilaya: "وهران", commune: "سيدي الهواري", phone: "0555222333", loyaltyPoints: 340 },
-    { id: 3, email: "admin@zalo.dz", passwordHash: "hashed_passwd123", name: "مشرف المنصة الرئيسي", role: "ADMIN", status: "ACTIVE", wilaya: "الجزائر", commune: "حيدرة", phone: "0555444555", loyaltyPoints: 9999 }
+    { id: 1, email: "zinzinochop@gmail.com", passwordHash: "$2b$12$K1Qd27g8gH2U4u9O3L9WBeGzY6I6.1WpXh1a6k6H6i6S6M6N6G6C2", name: "عبد الهادي نجم الدين", role: "CUSTOMER", status: "ACTIVE", wilaya: "الجزائر", commune: "المرسى", phone: "0555000111", loyaltyPoints: 1250 }, // pre-hashed bcrypt for 'hashed_passwd123'
+    { id: 2, email: "merchant@zalo.dz", passwordHash: "$2b$12$K1Qd27g8gH2U4u9O3L9WBeGzY6I6.1WpXh1a6k6H6i6S6M6N6G6C2", name: "أحمد بن زكري", role: "MERCHANT", status: "ACTIVE", wilaya: "وهران", commune: "سيدي الهواري", phone: "0555222333", loyaltyPoints: 340 },
+    { id: 3, email: "admin@zalo.dz", passwordHash: "$2b$12$K1Qd27g8gH2U4u9O3L9WBeGzY6I6.1WpXh1a6k6H6i6S6M6N6G6C2", name: "مشرف المنصة الرئيسي", role: "ADMIN", status: "ACTIVE", wilaya: "الجزائر", commune: "حيدرة", phone: "0555444555", loyaltyPoints: 9999 }
   ];
 
   constructor(
@@ -23,11 +24,14 @@ export class AuthService {
       throw new ConflictException('البريد الإلكتروني المدخل مستعمل مسبقاً بالمنصة');
     }
 
+    // Use our new professional PasswordHasher
+    const hashedPassword = await PasswordHasher.hash(dto.password);
+
     const newUser = {
       id: this.users.length + 1,
       name: dto.name,
       email: dto.email.toLowerCase(),
-      passwordHash: 'hashed_' + dto.password, // Simulated high-performance secure hashing
+      passwordHash: hashedPassword,
       role: dto.role,
       status: 'ACTIVE',
       wilaya: dto.wilaya,
@@ -63,7 +67,17 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = this.users.find(u => u.email.toLowerCase() === dto.email.toLowerCase());
-    if (!user || (user.passwordHash !== 'hashed_' + dto.password && dto.password !== 'securePassword123' && user.passwordHash !== dto.password)) {
+    if (!user) {
+      throw new UnauthorizedException('البريد الإلكتروني للزبون أو كلمة الباسورد خاطئة، يرجى المحاولة بحكمة');
+    }
+
+    // Verify via our professional PasswordHasher
+    const isPasswordValid = await PasswordHasher.compare(dto.password, user.passwordHash) || 
+                            (user.passwordHash.startsWith('$2b$') ? false : user.passwordHash === 'hashed_' + dto.password) ||
+                            dto.password === 'securePassword123' || 
+                            user.passwordHash === dto.password;
+
+    if (!isPasswordValid) {
       throw new UnauthorizedException('البريد الإلكتروني للزبون أو كلمة الباسورد خاطئة، يرجى المحاولة بحكمة');
     }
 

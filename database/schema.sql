@@ -233,3 +233,43 @@ CREATE INDEX idx_stores_status ON stores(status);
 CREATE INDEX idx_stores_wilaya ON stores(wilaya);
 CREATE INDEX idx_users_email ON users(email);
 CREATE INDEX idx_notifications_unread ON notifications(user_id) WHERE is_read = FALSE;
+
+-- 14. SESSION MANAGEMENT & SECURITY AUDITING (إدارة الجلسات ومراقبة المحاولات الأمنية)
+-- قاعدة بيانات الجلسات في Supabase
+CREATE TABLE sessions (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    last_activity TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- مراقبة محاولات تسجيل الدخول
+CREATE TABLE login_attempts (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(150) NOT NULL,
+    ip_address VARCHAR(45) NOT NULL,
+    attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_successful BOOLEAN DEFAULT FALSE,
+    user_agent TEXT
+);
+
+-- سجل المحاولات الفاشلة وحظر الـ IP
+CREATE TABLE failed_logins (
+    id SERIAL PRIMARY KEY,
+    ip_address VARCHAR(45) NOT NULL,
+    count INT DEFAULT 1,
+    last_attempt TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_blocked BOOLEAN DEFAULT FALSE,
+    blocked_until TIMESTAMP
+);
+
+CREATE INDEX idx_sessions_token ON sessions(token);
+CREATE INDEX idx_sessions_user ON sessions(user_id);
+CREATE INDEX idx_login_attempts_email ON login_attempts(email);
+CREATE INDEX idx_failed_logins_ip ON failed_logins(ip_address);
+
