@@ -11,6 +11,7 @@ import { AuditService } from './audit/audit.service';
 import { MerchantModule } from './merchant/merchant.module';
 import { DeliveryModule } from './delivery/delivery.module';
 import { SupabaseModule } from './supabase/supabase.module';
+import { SecurityModule } from './security/security.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SupabaseModule } from './supabase/supabase.module';
     MerchantModule,
     DeliveryModule,
     SupabaseModule,
+    SecurityModule,
   ],
   providers: [AuditService],
   exports: [AuditService],

@@ -273,3 +273,47 @@ CREATE INDEX idx_sessions_user ON sessions(user_id);
 CREATE INDEX idx_login_attempts_email ON login_attempts(email);
 CREATE INDEX idx_failed_logins_ip ON failed_logins(ip_address);
 
+-- رموز التحقق والمصادقة الثنائية وإدارة الأجهزة
+CREATE TABLE two_factor_secrets (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    secret VARCHAR(255) NOT NULL,
+    is_enabled BOOLEAN DEFAULT FALSE,
+    backup_codes TEXT[],
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE password_reset_tokens (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(150) NOT NULL,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE email_verification_tokens (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(150) NOT NULL,
+    token VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    expires_at TIMESTAMP NOT NULL,
+    is_used BOOLEAN DEFAULT FALSE
+);
+
+CREATE TABLE user_devices (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    device_fingerprint VARCHAR(255) NOT NULL,
+    device_name VARCHAR(150),
+    last_ip VARCHAR(45),
+    last_login TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_trusted BOOLEAN DEFAULT TRUE
+);
+
+CREATE INDEX idx_two_factor_user ON two_factor_secrets(user_id);
+CREATE INDEX idx_password_reset_token ON password_reset_tokens(token);
+CREATE INDEX idx_email_verification_token ON email_verification_tokens(token);
+CREATE INDEX idx_user_devices_fingerprint ON user_devices(device_fingerprint);
+
+
