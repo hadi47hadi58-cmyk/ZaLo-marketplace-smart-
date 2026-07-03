@@ -154,25 +154,31 @@ val copyWebAssets by tasks.registering(Copy::class) {
     duplicatesStrategy = DuplicatesStrategy.INCLUDE
 
     doLast {
-        var supabaseUrl = System.getenv("SUPABASE_URL") ?: ""
-        var supabaseKey = System.getenv("SUPABASE_KEY") ?: ""
+        var supabaseUrl = ""
+        var supabaseKey = ""
 
-        // Try reading from local .env file if system environment variables are empty
-        if (supabaseUrl.isEmpty() || supabaseKey.isEmpty()) {
-            if (localEnvFile.exists()) {
-                localEnvFile.readLines().forEach { line ->
-                    val parts = line.split("=", limit = 2)
-                    if (parts.size == 2) {
-                        val key = parts[0].trim()
-                        val value = parts[1].trim().removeSurrounding("\"").removeSurrounding("'")
-                        if (key == "SUPABASE_URL" && supabaseUrl.isEmpty()) {
-                            supabaseUrl = value
-                        } else if (key == "SUPABASE_KEY" && supabaseKey.isEmpty()) {
-                            supabaseKey = value
-                        }
+        // Try reading from local .env file first
+        if (localEnvFile.exists()) {
+            localEnvFile.readLines().forEach { line ->
+                val parts = line.split("=", limit = 2)
+                if (parts.size == 2) {
+                    val key = parts[0].trim()
+                    val value = parts[1].trim().removeSurrounding("\"").removeSurrounding("'")
+                    if (key == "SUPABASE_URL" && supabaseUrl.isEmpty()) {
+                        supabaseUrl = value
+                    } else if (key == "SUPABASE_KEY" && supabaseKey.isEmpty()) {
+                        supabaseKey = value
                     }
                 }
             }
+        }
+
+        // Fall back to system environment variables if not defined in .env
+        if (supabaseUrl.isEmpty()) {
+            supabaseUrl = System.getenv("SUPABASE_URL") ?: ""
+        }
+        if (supabaseKey.isEmpty()) {
+            supabaseKey = System.getenv("SUPABASE_KEY") ?: ""
         }
 
         // Inject the actual credentials into the web asset copy for the Android build

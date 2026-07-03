@@ -5,7 +5,7 @@ import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 // Supabase Credentials (loaded dynamically from window context, process.env, or falling back to build placeholders)
 const SUPABASE_URL = window.SUPABASE_URL || (typeof process !== 'undefined' && process.env?.SUPABASE_URL) || "https://xwwzadxsqmmxerbolovz.supabase.co";
-const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || (typeof process !== 'undefined' && process.env?.SUPABASE_KEY) || "sb_publishable_qJ60bIG-VZXemJ5L0GhY3w_1I7718wl";
+const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY || (typeof process !== 'undefined' && process.env?.SUPABASE_KEY) || "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh3d3phZHhzcW1teGVyYm9sb3Z6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI0MDkzNTAsImV4cCI6MjA5Nzk4NTM1MH0.j8UJu80Gtkr1ocxG0fhbFaNja8EiRFGu53sdEFyxck4";
 
 // Expose public config variables on window for use by other scripts (like sub-client registration)
 window.SUPABASE_URL = SUPABASE_URL;
