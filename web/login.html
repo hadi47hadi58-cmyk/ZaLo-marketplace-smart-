@@ -331,59 +331,306 @@
         font-size: 11px !important;
       }
     }
+
+    /* Manus Styling Additions */
+    .manus-profile-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 20px;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-bottom: 20px;
+    }
+    .manus-profile-card:hover {
+      background: rgba(26, 92, 42, 0.15);
+      border-color: var(--gold);
+      transform: translateY(-2px);
+    }
+    .manus-profile-card .profile-details {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .manus-profile-card .profile-avatar-container {
+      position: relative;
+      width: 46px;
+      height: 46px;
+    }
+    .manus-profile-card .profile-avatar {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid var(--gold);
+    }
+    .manus-profile-card .provider-icon {
+      position: absolute;
+      bottom: -4px;
+      left: -4px;
+      background: var(--green);
+      color: #fff;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      border: 1.5px solid var(--card);
+    }
+    .manus-profile-card .profile-text-content {
+      text-align: right;
+    }
+    .manus-profile-card .profile-title {
+      font-size: 13px;
+      color: var(--text2);
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+    .manus-profile-card .profile-email {
+      font-size: 14px;
+      color: #fff;
+      font-weight: 800;
+    }
+    .manus-profile-card .arrow-icon {
+      color: var(--text2);
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    .manus-profile-card:hover .arrow-icon {
+      color: var(--gold);
+      transform: translateX(-4px);
+    }
+
+    /* Manus Buttons */
+    .manus-btn {
+      width: 100%;
+      padding: 14px 18px;
+      border-radius: 16px;
+      font-family: inherit;
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.03);
+      color: #fff;
+    }
+    .manus-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+    .manus-btn .btn-text-wrapper {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .manus-btn .btn-icon-img {
+      width: 22px;
+      height: 22px;
+      object-fit: contain;
+    }
+    .manus-btn .btn-icon {
+      font-size: 18px;
+      width: 22px;
+      text-align: center;
+    }
+    .manus-btn .arrow-left {
+      font-size: 12px;
+      opacity: 0.5;
+      transition: transform 0.2s;
+    }
+    .manus-btn:hover .arrow-left {
+      opacity: 1;
+      transform: translateX(-3px);
+    }
+
+    /* Button Colors specifically for Manus design */
+    .manus-btn.google-btn {
+      background: #ffffff !important;
+      color: #1a1a1a !important;
+      border: none !important;
+    }
+    .manus-btn.google-btn:hover {
+      background: #f4f4f4 !important;
+    }
+    .manus-btn.facebook-btn {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    .manus-btn.facebook-btn:hover {
+      background: rgba(255, 255, 255, 0.09) !important;
+    }
+    .manus-btn.microsoft-btn {
+      background: rgba(255, 255, 255, 0.05) !important;
+      border-color: rgba(255, 255, 255, 0.12) !important;
+    }
+    .manus-btn.microsoft-btn:hover {
+      background: rgba(255, 255, 255, 0.09) !important;
+    }
+    .manus-btn.apple-btn {
+      background: #000000 !important;
+      color: #ffffff !important;
+      border: 1px solid #222 !important;
+    }
+    .manus-btn.apple-btn:hover {
+      background: #111111 !important;
+    }
+    .manus-btn.email-btn {
+      background: var(--green) !important;
+      color: #fff !important;
+      border: 1.5px solid var(--gold) !important;
+      box-shadow: 0 8px 20px rgba(26, 92, 42, 0.25);
+    }
+    .manus-btn.email-btn:hover {
+      background: var(--green-light) !important;
+    }
+
+    /* Collapsible Form Container */
+    .collapsible-form {
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      opacity: 0;
+      margin-top: 0;
+    }
+    .collapsible-form.active {
+      max-height: 500px;
+      opacity: 1;
+      margin-top: 16px;
+    }
   </style>
 </head>
 <body>
 
 <div class="wrapper">
 
-  <!-- LOGO BRAND AREA -->
-  <div class="logo-area" style="margin-top: 16px; text-align: center;">
-    <img src="assets/logo.svg" alt="ZaLo" style="width: 150px; height: 150px; object-fit: contain; margin: 0 auto; display: block;" />
-    <p class="brand-subtitle" style="margin-top: 8px;">نظام تسجيل الدخول الذكي الموحد</p>
+  <!-- LOGO BRAND AREA (Manus Inspired Premium Header) -->
+  <div class="logo-area" style="margin-top: 24px; text-align: center; margin-bottom: 24px;">
+    <div class="logo-outer" style="width: 110px; height: 110px; border: 2px dashed var(--gold); border-radius: 50%; padding: 4px; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; background: rgba(26,92,42,0.15);">
+      <div class="logo-inner" style="width: 96px; height: 96px; background: var(--green); border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 30px rgba(26,92,42,0.45);">
+        <img src="assets/logo.svg" alt="ZaLo" style="width: 60px; height: 60px; object-fit: contain; transform: scale(1.1);" />
+      </div>
+    </div>
+    <h1 class="brand-title" style="font-size: 26px; font-weight: 900; color: #fff; margin-bottom: 4px;">مرحبًا بك في <span style="color: var(--gold2); font-family: 'Cairo', sans-serif;">ZaLo</span></h1>
+    <p class="brand-subtitle" style="font-size: 13px; color: var(--text2); font-weight: 600;">بوابة الهوية الذكية والمصادقة الموحدة</p>
   </div>
 
-  <div class="card">
-    <!-- Account Detected Badge -->
-    <div class="badge-container">
-      <a href="index.html" class="detected-badge badge-customer" id="roleBadge" style="text-decoration: none;">
+  <div class="card" style="background: var(--card); border: 1.5px solid var(--border); border-radius: 28px; padding: 24px 20px; box-shadow: 0 32px 80px rgba(0,0,0,0.65);">
+    
+    <!-- Account Detected Badge (Dynamic Real-time Info) -->
+    <div class="badge-container" style="display: flex; justify-content: center; margin-bottom: 22px;">
+      <a href="index.html" class="detected-badge badge-customer" id="roleBadge" style="text-decoration: none; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 800;">
         <i class="fa-solid fa-house" id="badgeIcon"></i>
-        <span id="badgeText">الواجهة الرئيسية</span>
+        <span id="badgeText">الواجهة الرئيسية للتسوق</span>
       </a>
     </div>
 
-    <div class="error-msg" id="errorMessage"></div>
+    <div class="error-msg" id="errorMessage" style="display:none; margin-bottom: 16px;"></div>
 
-    <form id="unifiedLoginForm">
-      <div class="form-group">
-        <label class="form-label">البريد الإلكتروني للذكاء الموحد</label>
-        <div class="input-wrapper">
-          <i class="fa-solid fa-envelope input-icon"></i>
-          <input type="email" class="form-input" id="loginEmail" placeholder="example@domain.com" required autocomplete="email">
+    <!-- Manus Fast Profile Card (Smart Connection) -->
+    <div class="manus-profile-card" id="manusProfileCard">
+      <div class="profile-details">
+        <div class="profile-avatar-container">
+          <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=100&h=100" id="manusAvatar" alt="Avatar" class="profile-avatar">
+          <span class="provider-icon" style="background: var(--green);"><i class="fa-solid fa-bolt"></i></span>
+        </div>
+        <div class="profile-text-content">
+          <div class="profile-title" id="manusProfileTitle">المتابعة باسم حسابك المكتشف</div>
+          <div class="profile-email" id="manusEmail">دخول سريع كزبون</div>
         </div>
       </div>
+      <i class="fa-solid fa-chevron-left arrow-icon"></i>
+    </div>
 
-      <div class="form-group">
-        <label class="form-label">كلمة المرور الآمنة</label>
-        <div class="input-wrapper">
-          <i class="fa-solid fa-lock input-icon"></i>
-          <input type="password" class="form-input" id="loginPass" placeholder="••••••••" required autocomplete="current-password">
+    <!-- Divider "أو" (Or) -->
+    <div class="separator" style="display: flex; align-items: center; text-align: center; margin: 24px 0; color: var(--text2); font-size: 13px; font-weight: 600;">أو المتابعة عبر</div>
+
+    <!-- Manus Action Buttons Stack -->
+    <div class="manus-buttons-container">
+      
+      <!-- Google Sign In Button (Fully Functional) -->
+      <button type="button" class="manus-btn google-btn" id="googleBtn">
+        <div class="btn-text-wrapper">
+          <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="Google" class="btn-icon-img">
+          <span>متابعة باستخدام Google</span>
         </div>
-      </div>
-
-      <button type="submit" class="submit-btn" id="submitBtn">
-        <span>تأكيد وتسجيل الدخول الموحد</span> <i class="fa-solid fa-arrow-left"></i>
+        <i class="fa-solid fa-chevron-left arrow-left"></i>
       </button>
 
-      <div class="separator">أو الدخول الآمن عبر Google</div>
-
-      <button type="button" class="google-btn" id="googleBtn">
-        <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="G" style="width:18px;height:18px;border-radius:50%">
-        <span>الدخول السريع عبر Google</span>
+      <!-- Facebook Sign In Button (Premium feel) -->
+      <button type="button" class="manus-btn facebook-btn" id="facebookBtn">
+        <div class="btn-text-wrapper">
+          <i class="fa-brands fa-facebook btn-icon" style="color: #1877f2;"></i>
+          <span>متابعة باستخدام Facebook</span>
+        </div>
+        <i class="fa-solid fa-chevron-left arrow-left"></i>
       </button>
-    </form>
 
-    <div style="text-align: center; margin-top: 20px; font-size: 13px; display: flex; flex-direction: column; gap: 12px; align-items: center;">
+      <!-- Microsoft Sign In Button (Premium feel) -->
+      <button type="button" class="manus-btn microsoft-btn" id="microsoftBtn">
+        <div class="btn-text-wrapper">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="btn-icon-img">
+          <span>متابعة باستخدام Microsoft</span>
+        </div>
+        <i class="fa-solid fa-chevron-left arrow-left"></i>
+      </button>
+
+      <!-- Apple Sign In Button (Premium feel) -->
+      <button type="button" class="manus-btn apple-btn" id="appleBtn">
+        <div class="btn-text-wrapper">
+          <i class="fa-brands fa-apple btn-icon" style="color: #fff;"></i>
+          <span>متابعة باستخدام Apple</span>
+        </div>
+        <i class="fa-solid fa-chevron-left arrow-left"></i>
+      </button>
+
+      <!-- Email Toggle Button -->
+      <button type="button" class="manus-btn email-btn" id="toggleEmailFormBtn">
+        <div class="btn-text-wrapper">
+          <i class="fa-solid fa-envelope btn-icon" style="color: #fff;"></i>
+          <span>متابعة باستخدام البريد الإلكتروني</span>
+        </div>
+        <i class="fa-solid fa-chevron-down arrow-left" id="emailToggleArrow" style="transition: transform 0.3s;"></i>
+      </button>
+
+    </div>
+
+    <!-- Collapsible Standard Email Form Container -->
+    <div class="collapsible-form" id="collapsibleFormContainer">
+      <form id="unifiedLoginForm">
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 700; color: var(--gold2); margin-bottom: 6px;">البريد الإلكتروني للذكاء الموحد</label>
+          <div class="input-wrapper" style="position: relative;">
+            <i class="fa-solid fa-envelope input-icon" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 14px;"></i>
+            <input type="email" class="form-input" id="loginEmail" placeholder="example@domain.com" required autocomplete="email" style="width: 100%; padding: 12px 38px 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.25); color: #fff;">
+          </div>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 16px;">
+          <label class="form-label" style="display: block; font-size: 13px; font-weight: 700; color: var(--gold2); margin-bottom: 6px;">كلمة المرور الآمنة</label>
+          <div class="input-wrapper" style="position: relative;">
+            <i class="fa-solid fa-lock input-icon" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 14px;"></i>
+            <input type="password" class="form-input" id="loginPass" placeholder="••••••••" required autocomplete="current-password" style="width: 100%; padding: 12px 38px 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.25); color: #fff;">
+          </div>
+        </div>
+
+        <button type="submit" class="submit-btn" id="submitBtn" style="width: 100%; background: var(--green); border: 1px solid var(--gold); color: #fff; font-size: 15px; font-weight: 800; padding: 13px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+          <span>تأكيد وتسجيل الدخول الموحد</span> <i class="fa-solid fa-arrow-left"></i>
+        </button>
+      </form>
+    </div>
+
+    <!-- Extra links and diagnostic session action -->
+    <div style="text-align: center; margin-top: 24px; font-size: 13px; display: flex; flex-direction: column; gap: 14px; align-items: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 16px;">
       <a href="#" id="toggleModeBtn" style="color: var(--gold2); text-decoration: none; font-weight: 800;">ليس لديك حساب؟ سجل حساباً جديداً الآن ←</a>
       <button id="clearSessionBtn" type="button" style="background: transparent; border: 1px solid rgba(255,255,255,0.15); color: #888; border-radius: 8px; font-size: 11px; padding: 6px 12px; cursor: pointer; font-family: 'Cairo', sans-serif;">🧹 تنظيف وإعادة تعيين جلسة الاتصال (Clean Auth Session)</button>
     </div>
@@ -394,6 +641,81 @@
 <!-- Supabase Integration -->
 <script type="module">
   import { supabase } from './js/supabase-config.js';
+
+  // Manus Collapsible and Interactive Handlers
+  document.addEventListener('DOMContentLoaded', () => {
+    const toggleBtn = document.getElementById('toggleEmailFormBtn');
+    const collapsibleForm = document.getElementById('collapsibleFormContainer');
+    const emailToggleArrow = document.getElementById('emailToggleArrow');
+    const manusCard = document.getElementById('manusProfileCard');
+    const manusAvatar = document.getElementById('manusAvatar');
+    const manusEmail = document.getElementById('manusEmail');
+    const manusProfileTitle = document.getElementById('manusProfileTitle');
+
+    if (toggleBtn && collapsibleForm && emailToggleArrow) {
+      toggleBtn.addEventListener('click', () => {
+        collapsibleForm.classList.toggle('active');
+        if (collapsibleForm.classList.contains('active')) {
+          emailToggleArrow.style.transform = 'rotate(180deg)';
+        } else {
+          emailToggleArrow.style.transform = 'rotate(0deg)';
+        }
+      });
+    }
+
+    const lastEmail = localStorage.getItem('user_email');
+    if (manusCard && manusAvatar && manusEmail && manusProfileTitle) {
+      if (lastEmail) {
+        manusEmail.textContent = lastEmail;
+        manusProfileTitle.textContent = 'المتابعة كحسابك النشط المعتمد';
+        const cleanName = lastEmail.split('@')[0].toUpperCase();
+        manusAvatar.src = `https://ui-avatars.com/api/?name=${cleanName}&background=1a5c2a&color=fff&bold=true`;
+      } else {
+        manusEmail.textContent = 'تسجيل دخول سريع كمشتري زائر';
+        manusProfileTitle.textContent = 'المتابعة كزبون جديد';
+        manusAvatar.src = `https://ui-avatars.com/api/?name=ZaLo&background=c9a84c&color=071a0b&bold=true`;
+      }
+
+      manusCard.addEventListener('click', () => {
+        if (lastEmail) {
+          const emailInput = document.getElementById('loginEmail');
+          if (emailInput) {
+            emailInput.value = lastEmail;
+            performDetection(lastEmail);
+          }
+        }
+        if (collapsibleForm) {
+          collapsibleForm.classList.add('active');
+        }
+        if (emailToggleArrow) {
+          emailToggleArrow.style.transform = 'rotate(180deg)';
+        }
+        const emailInput = document.getElementById('loginEmail');
+        if (emailInput) emailInput.focus();
+      });
+    }
+
+    // Interactive placeholder login warnings
+    const fbBtn = document.getElementById('facebookBtn');
+    const msBtn = document.getElementById('microsoftBtn');
+    const appleBtn = document.getElementById('appleBtn');
+
+    if (fbBtn) {
+      fbBtn.addEventListener('click', () => {
+        alert("تسجيل دخول Facebook غير مفعّل في هذه النسخة حالياً. يرجى استخدام Google أو البريد الإلكتروني للمصادقة.");
+      });
+    }
+    if (msBtn) {
+      msBtn.addEventListener('click', () => {
+        alert("تسجيل دخول Microsoft غير مفعّل في هذه النسخة حالياً. يرجى استخدام Google أو البريد الإلكتروني للمصادقة.");
+      });
+    }
+    if (appleBtn) {
+      appleBtn.addEventListener('click', () => {
+        alert("تسجيل دخول Apple غير مفعّل في هذه النسخة حالياً. يرجى استخدام Google أو البريد الإلكتروني للمصادقة.");
+      });
+    }
+  });
 
   // Session Cleanup action
   const clearBtn = document.getElementById('clearSessionBtn');
