@@ -1,10 +1,10 @@
 import { Controller, Get, Post, Body, UseGuards, Request, HttpStatus, Patch, Param } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth, ApiProperty } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBearerAuth, ApiProperty } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { RolesGuard } from '../auth/roles.guard';
 import { SetMetadata } from '@nestjs/common';
 import { AuditService } from '../audit/audit.service';
-import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 export class MerchantVerifyDto {
   @ApiProperty({ description: 'رقم السجل التجاري الإلكتروني للنشاط', example: '16/00-0984321B22' })

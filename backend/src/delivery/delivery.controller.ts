@@ -1,5 +1,5 @@
-import { Controller, Get, Param, Param as GetParam, HttpStatus, HttpException, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { Controller, Get, Param, HttpStatus, HttpException } from '@nestjs/common';
+import { ApiTags, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('نظام تتبع وإثبات شحنات الولاية - Delivery Courier Tracking')
 @Controller('delivery')
