@@ -312,11 +312,8 @@
 
   async function fallbackToWebOAuth() {
     try {
-      // Dynamic Redirect URL to support both GitHub Pages subfolders and local development
-      let redirectUrl = "https://hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/web/index.html";
-      if (window.location.hostname === 'localhost' || window.location.hostname.includes('run.app') || window.location.hostname.includes('127.0.0.1')) {
-        redirectUrl = window.location.origin + window.location.pathname.replace('login-customer.html', 'index.html');
-      }
+      // Dynamic Redirect URL to support custom domains, GitHub Pages root or subfolders, and local development
+      let redirectUrl = window.location.origin + window.location.pathname.replace('login-customer.html', 'index.html');
       
       const { data, error } = await supabase.auth.signInWithOAuth({
         provider: 'google',

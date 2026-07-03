@@ -1466,7 +1466,7 @@ async function checkRoleAndRedirect() {
   } else if (role === 'merchant') {
     window.location.href = 'dashboard.html';
   } else if (role === 'customer') {
-    window.location.href = 'customer-home.html';
+    console.log("checkRoleAndRedirect: المستخدم زبون عادي (Customer)، سيبقى في الواجهة الرئيسية للتسوق والطلب.");
   }
 }
 
@@ -1580,10 +1580,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fallbackToWebOAuth() {
     try {
+      // Dynamic Redirect URL to support custom domains, GitHub Pages root or subfolders
       let redirectUrl = window.location.origin + window.location.pathname;
-      if (window.location.hostname.includes('github.io')) {
-        redirectUrl = "https://hadi47hadi58-cmyk.github.io/ZaLo-marketplace-smart-/web/index.html";
-      }
       
       const { error } = await supabase.auth.signInWithOAuth({
         provider: 'google',
