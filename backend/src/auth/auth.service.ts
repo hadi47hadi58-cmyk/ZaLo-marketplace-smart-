@@ -50,7 +50,7 @@ export class AuthService {
       `تم تسجيل حساب مستخدم جديد بنجاح بدور: ${newUser.role} في ولاية: ${newUser.wilaya}`
     );
 
-    const payload = { email: newUser.email, sub: newUser.id, role: newUser.role, name: newUser.name };
+    const token = this.jwtService.sign(payload);
     return {
       message: 'تم تسجيل الحساب بنجاح، أهلاً بك في فضاء ZaLo الذكي ✨',
       user: {
@@ -61,7 +61,8 @@ export class AuthService {
         wilaya: newUser.wilaya,
         commune: newUser.commune
       },
-      accessToken: this.jwtService.sign(payload)
+      accessToken: token,
+      access_token: token
     };
   }
 
@@ -88,19 +89,20 @@ export class AuthService {
       `تسجيل دخول حساب مستقر من رتبة: ${user.role} تحت عنوان: ${user.wilaya}`
     );
 
-    const payload = { email: user.email, sub: user.id, role: user.role, name: user.name };
+    const token = this.jwtService.sign(payload);
     return {
-      message: 'أهلاً بعودتك الميمونة لـ ZaLo Smart! 🌟',
-      user: {
-        id: user.id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        wilaya: user.wilaya,
-        commune: user.commune,
-        loyaltyPoints: user.loyaltyPoints
-      },
-      accessToken: this.jwtService.sign(payload)
+       message: 'أهلاً بعودتك الميمونة لـ ZaLo Smart! 🌟',
+       user: {
+         id: user.id,
+         name: user.name,
+         email: user.email,
+         role: user.role,
+         wilaya: user.wilaya,
+         commune: user.commune,
+         loyaltyPoints: user.loyaltyPoints
+       },
+       accessToken: token,
+       access_token: token
     };
   }
 
