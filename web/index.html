@@ -2042,6 +2042,12 @@ function showRealtimeToast(icon, title, desc, actionText, actionCallback) {
   const container = document.getElementById('realtime-notification-container');
   if (!container) return;
 
+  // Limit concurrent notification toasts to a maximum of 3 to avoid screen overlapping
+  while (container.children.length >= 3) {
+    const oldest = container.firstChild;
+    if (oldest) oldest.remove();
+  }
+
   const toast = document.createElement('div');
   toast.className = 'rt-toast';
   

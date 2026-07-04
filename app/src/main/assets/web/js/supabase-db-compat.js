@@ -663,6 +663,8 @@ export async function deleteDoc(docRef) {
 // 5. Reactive Listener (onSnapshot)
 export function onSnapshot(queryOrDoc, callback, errCallback) {
     let active = true;
+    let isFirstTrigger = true;
+    let previousDocs = new Map(); // id -> stringified data
     
     const trigger = async () => {
         if (!active) return;
@@ -672,10 +674,64 @@ export function onSnapshot(queryOrDoc, callback, errCallback) {
                 if (active) callback(docSnap);
             } else {
                 const docsSnap = await getDocs(queryOrDoc);
+                const currentDocs = docsSnap.docs || [];
+                
+                let docChangesList = [];
+                
+                if (isFirstTrigger) {
+                    // Initial load: all current docs are 'added'
+                    docChangesList = currentDocs.map(d => ({ type: 'added', doc: d }));
+                    // Save to previousDocs map
+                    currentDocs.forEach(d => {
+                        const dataVal = d.data ? d.data() : {};
+                        previousDocs.set(d.id, JSON.stringify(dataVal));
+                    });
+                    isFirstTrigger = false;
+                } else {
+                    // Subsequent ticks: compare with previousDocs
+                    const currentDocsMap = new Map();
+                    
+                    currentDocs.forEach(d => {
+                        const dataVal = d.data ? d.data() : {};
+                        const dataStr = JSON.stringify(dataVal);
+                        currentDocsMap.set(d.id, dataStr);
+                        
+                        if (!previousDocs.has(d.id)) {
+                            // Document is newly added
+                            docChangesList.push({ type: 'added', doc: d });
+                        } else {
+                            // Document existed, check if modified
+                            const prevDataStr = previousDocs.get(d.id);
+                            if (prevDataStr !== dataStr) {
+                                docChangesList.push({ type: 'modified', doc: d });
+                            }
+                        }
+                    });
+                    
+                    // Check for removed documents
+                    for (const [prevId, prevDataStr] of previousDocs.entries()) {
+                        if (!currentDocsMap.has(prevId)) {
+                            // Construct a dummy removed doc
+                            docChangesList.push({ 
+                                type: 'removed', 
+                                doc: { 
+                                    id: prevId, 
+                                    exists: false, 
+                                    exists() { return false; }, 
+                                    data: () => JSON.parse(prevDataStr) 
+                                } 
+                            });
+                        }
+                    }
+                    
+                    // Update previousDocs to the current state
+                    previousDocs = currentDocsMap;
+                }
+                
                 const snap = {
                     empty: docsSnap.empty,
                     docs: docsSnap.docs,
-                    docChanges: () => docsSnap.docs.map(d => ({ type: 'added', doc: d })),
+                    docChanges: () => docChangesList,
                     forEach(cb) { docsSnap.docs.forEach(cb); }
                 };
                 if (active) callback(snap);
