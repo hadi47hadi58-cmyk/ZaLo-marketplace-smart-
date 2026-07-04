@@ -1,7 +1,8 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, SetMetadata } from '@nestjs/common';
+import { Controller, Post, Body, HttpCode, HttpStatus, SetMetadata, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { ApiTags, ApiOperation, ApiResponse, ApiProperty } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBearerAuth } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, MinLength, IsEnum, IsOptional, IsString } from 'class-validator';
+import { JwtAuthGuard } from './jwt-auth.guard';
 
 // Auth DTO Definitions
 export class RegisterDto {
@@ -66,5 +67,21 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'البريد الإلكتروني أو كلمة المرور خاطئة' })
   async login(@Body() loginDto: LoginDto) {
     return this.authService.login(loginDto);
+  }
+
+  @Post('logout')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'تسجيل الخروج وإبطال جلسة العمل الحالية' })
+  @ApiResponse({ status: 200, description: 'تم تسجيل الخروج وإبطال الرمز بنجاح' })
+  @ApiResponse({ status: 401, description: 'غير مصرح بالدخول أو الرمز غير صالح' })
+  async logout(@Request() req) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      return { message: 'رمز الوصول غير موجود بالترويسة' };
+    }
+    const token = authHeader.split(' ')[1];
+    return this.authService.logout(token);
   }
 }
