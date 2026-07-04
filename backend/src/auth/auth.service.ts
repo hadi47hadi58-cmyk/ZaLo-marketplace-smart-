@@ -3,45 +3,57 @@ import { JwtService } from '@nestjs/jwt';
 import { RegisterDto, LoginDto } from './auth.controller';
 import { AuditService } from '../audit/audit.service';
 import { PasswordHasher } from '../security/password-hasher';
+import { SupabaseService } from '../supabase/supabase.service';
 
 @Injectable()
 export class AuthService {
-  // Mock In-Memory Database storage representing users mapped to PostgreSQL
-  private users: any[] = [
-    { id: 1, email: "zinzinochop@gmail.com", passwordHash: "$2b$12$K1Qd27g8gH2U4u9O3L9WBeGzY6I6.1WpXh1a6k6H6i6S6M6N6G6C2", name: "عبد الهادي نجم الدين", role: "CUSTOMER", status: "ACTIVE", wilaya: "الجزائر", commune: "المرسى", phone: "0555000111", loyaltyPoints: 1250 }, // pre-hashed bcrypt for 'hashed_passwd123'
-    { id: 2, email: "merchant@zalo.dz", passwordHash: "$2b$12$K1Qd27g8gH2U4u9O3L9WBeGzY6I6.1WpXh1a6k6H6i6S6M6N6G6C2", name: "أحمد بن زكري", role: "MERCHANT", status: "ACTIVE", wilaya: "وهران", commune: "سيدي الهواري", phone: "0555222333", loyaltyPoints: 340 },
-    { id: 3, email: "admin@zalo.dz", passwordHash: "$2b$12$K1Qd27g8gH2U4u9O3L9WBeGzY6I6.1WpXh1a6k6H6i6S6M6N6G6C2", name: "مشرف المنصة الرئيسي", role: "ADMIN", status: "ACTIVE", wilaya: "الجزائر", commune: "حيدرة", phone: "0555444555", loyaltyPoints: 9999 }
-  ];
-
   constructor(
     private jwtService: JwtService,
-    private auditService: AuditService
+    private auditService: AuditService,
+    private supabaseService: SupabaseService,
   ) {}
 
   async register(dto: RegisterDto) {
-    const exists = this.users.find(u => u.email.toLowerCase() === dto.email.toLowerCase());
+    const supabase = this.supabaseService.getClient();
+
+    // 1. Check if user already exists
+    const { data: exists, error: checkError } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', dto.email.toLowerCase())
+      .maybeSingle();
+
+    if (checkError) {
+      throw new ConflictException('خطأ في الاتصال بقاعدة البيانات أثناء التحقق من الحساب');
+    }
+
     if (exists) {
       throw new ConflictException('البريد الإلكتروني المدخل مستعمل مسبقاً بالمنصة');
     }
 
-    // Use our new professional PasswordHasher
+    // 2. Hash the password securely via PasswordHasher
     const hashedPassword = await PasswordHasher.hash(dto.password);
 
-    const newUser = {
-      id: this.users.length + 1,
-      name: dto.name,
-      email: dto.email.toLowerCase(),
-      passwordHash: hashedPassword,
-      role: dto.role,
-      status: 'ACTIVE',
-      wilaya: dto.wilaya,
-      commune: dto.commune,
-      phone: dto.phone || null,
-      loyaltyPoints: 0,
-      createdAt: new Date().toISOString()
-    };
+    // 3. Insert user into PostgreSQL users table
+    const { data: newUser, error: insertError } = await supabase
+      .from('users')
+      .insert({
+        name: dto.name,
+        email: dto.email.toLowerCase(),
+        password_hash: hashedPassword,
+        role: dto.role,
+        status: 'ACTIVE',
+        wilaya: dto.wilaya,
+        commune: dto.commune,
+        phone: dto.phone || null,
+        loyalty_points: 0,
+      })
+      .select()
+      .single();
 
-    this.users.push(newUser);
+    if (insertError || !newUser) {
+      throw new ConflictException('تعذر تسجيل الحساب حالياً، يرجى التحقق من المدخلات والمحاولة مجدداً');
+    }
     
     // Register audit trace
     this.auditService.log(
@@ -68,19 +80,25 @@ export class AuthService {
   }
 
   async login(dto: LoginDto) {
-    const user = this.users.find(u => u.email.toLowerCase() === dto.email.toLowerCase());
-    if (!user) {
-      throw new UnauthorizedException('البريد الإلكتروني للزبون أو كلمة الباسورد خاطئة، يرجى المحاولة بحكمة');
+    const supabase = this.supabaseService.getClient();
+
+    // 1. Fetch user by email securely
+    const { data: user, error: fetchError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', dto.email.toLowerCase())
+      .maybeSingle();
+
+    if (fetchError || !user) {
+      // Standardize generic unauthorized error to prevent email harvesting/enumeration
+      throw new UnauthorizedException('البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى إعادة المحاولة');
     }
 
-    // Verify via our professional PasswordHasher
-    const isPasswordValid = await PasswordHasher.compare(dto.password, user.passwordHash) || 
-                            (user.passwordHash.startsWith('$2b$') ? false : user.passwordHash === 'hashed_' + dto.password) ||
-                            dto.password === 'securePassword123' || 
-                            user.passwordHash === dto.password;
+    // 2. Verify password strictly via PasswordHasher.compare (No backdoors allowed)
+    const isPasswordValid = await PasswordHasher.compare(dto.password, user.password_hash);
 
     if (!isPasswordValid) {
-      throw new UnauthorizedException('البريد الإلكتروني للزبون أو كلمة الباسورد خاطئة، يرجى المحاولة بحكمة');
+      throw new UnauthorizedException('البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى إعادة المحاولة');
     }
 
     // Log administrative action
@@ -101,7 +119,7 @@ export class AuthService {
          role: user.role,
          wilaya: user.wilaya,
          commune: user.commune,
-         loyaltyPoints: user.loyaltyPoints
+         loyaltyPoints: user.loyalty_points
        },
        accessToken: token,
        access_token: token
@@ -109,6 +127,20 @@ export class AuthService {
   }
 
   async findUserById(id: number) {
-    return this.users.find(u => u.id === id);
+    const supabase = this.supabaseService.getClient();
+    const { data, error } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error || !data) return null;
+    return {
+      ...data,
+      passwordHash: data.password_hash,
+      loyaltyPoints: data.loyalty_points,
+      createdAt: data.created_at,
+      updatedAt: data.updated_at
+    };
   }
 }

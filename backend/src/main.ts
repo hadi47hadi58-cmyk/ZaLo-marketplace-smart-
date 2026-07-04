@@ -2,13 +2,17 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import helmet from 'helmet';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  // Enable CORS for mobile WebView companion and desktop browsers
+  // Implement helmet for robust security headers
+  app.use(helmet());
+
+  // Configure Cors to only allow production domains
   app.enableCors({
-    origin: '*',
+    origin: ['https://app.zalo.dz', 'https://admin.zalo.dz'],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
   });

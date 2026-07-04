@@ -12,6 +12,8 @@ import { MerchantModule } from './merchant/merchant.module';
 import { DeliveryModule } from './delivery/delivery.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { SecurityModule } from './security/security.module';
+import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -26,6 +28,10 @@ import { SecurityModule } from './security/security.module';
       autoLoadEntities: true,
       synchronize: true, // Auto aligns ORM entities with Postgres columns during runtime
     }),
+    ThrottlerModule.forRoot([{
+      ttl: 60000, // 60 seconds
+      limit: 15,  // Limit each IP to 15 requests per minute
+    }]),
     AuthModule,
     UsersModule,
     ProductsModule,
@@ -38,7 +44,13 @@ import { SecurityModule } from './security/security.module';
     SupabaseModule,
     SecurityModule,
   ],
-  providers: [AuditService],
+  providers: [
+    AuditService,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    }
+  ],
   exports: [AuditService],
 })
 export class AppModule {}
