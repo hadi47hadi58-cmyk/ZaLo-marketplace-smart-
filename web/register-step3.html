@@ -586,10 +586,19 @@
     errorMsg.classList.remove('show');
 
     try {
-      // Create user in Supabase Auth
+      // Create user in Supabase Auth with metadata so the trigger can deduce their role
       const { data, error: signUpError } = await supabase.auth.signUp({
         email: email,
-        password: password
+        password: password,
+        options: {
+          data: {
+            full_name: fullName,
+            phone: phone,
+            wilaya: wilaya,
+            commune: commune,
+            type: userType
+          }
+        }
       });
       if (signUpError) throw signUpError;
       const uid = data.user.id;

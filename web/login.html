@@ -602,7 +602,7 @@
 
 <!-- Supabase Integration -->
 <script type="module">
-  import { supabase } from './js/supabase-config.js';
+  import { supabase } from './js/supabase-db-compat.js';
 
   // Manus Collapsible and Interactive Handlers
   document.addEventListener('DOMContentLoaded', () => {
@@ -808,48 +808,12 @@
       // Ensure local state stores correct details
       localStorage.setItem('user_email', email);
 
-      // Route 1: Admin
-      if (AD_LIST.includes(email)) {
-        sessionStorage.setItem('admin_logged_in_session', 'true');
-        window.location.href = 'admin.html';
-        return;
+      // Automated dynamic role redirection
+      if (typeof window.checkRoleAndRedirect === 'function') {
+        await window.checkRoleAndRedirect();
+      } else {
+        window.location.href = 'index.html';
       }
-
-      // Route 2: Active Store / Product manager
-      const { data: shopSnap } = await supabase.from('shops').select('*').eq('id', user.id).maybeSingle();
-      if (shopSnap) {
-        window.location.href = 'dashboard.html';
-        return;
-      }
-
-      // Route 3: Pending approved Merchant requests
-      const { data: requests } = await supabase.from('merchant_requests').select('*').eq('email', email);
-      if (requests && requests.length > 0) {
-        const reqData = requests[0];
-        const shopData = {
-          id: user.id,
-          storeName: reqData.storeName || "متجري الشريك المعتمد",
-          ownerName: reqData.ownerName || "تاجر شريك",
-          email: user.email,
-          phone: reqData.phone || "",
-          whatsapp: reqData.whatsapp || reqData.phone || "",
-          wilaya: reqData.wilaya || "",
-          commune: reqData.commune || "",
-          address: reqData.address || "",
-          category: reqData.category || "عام",
-          workHours: "08:00 - 20:00",
-          description: reqData.description || "",
-          status: 'active',
-          subscription: 'basic',
-          createdAt: new Date().toISOString()
-        };
-        await supabase.from('shops').upsert(shopData);
-        window.location.href = 'dashboard.html';
-        return;
-      }
-
-      // Route 4: Normal customer
-      window.location.href = 'customer-home.html';
 
     } catch (error) {
       console.error(error);
@@ -912,16 +876,12 @@
       
       if (error) throw error;
 
-      // Check if this email is an administrator
-      const email = (data.user && data.user.email) ? data.user.email.toLowerCase().trim() : "";
-      if (AD_LIST.includes(email)) {
-        sessionStorage.setItem('admin_logged_in_session', 'true');
-        window.location.href = "admin.html";
-        return;
+      // Automated dynamic role redirection
+      if (typeof window.checkRoleAndRedirect === 'function') {
+        await window.checkRoleAndRedirect();
+      } else {
+        window.location.href = "index.html";
       }
-      
-      // Success! Redirect to registration step or main homepage
-      window.location.href = "register-step1.html";
     } catch (error) {
       console.error("Supabase ID Token Auth failed:", error);
       showError("حدث خطأ أثناء الاتصال بـ Supabase باستخدام حساب جوجل: " + (error.message || error));

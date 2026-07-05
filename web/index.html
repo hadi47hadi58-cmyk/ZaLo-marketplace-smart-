@@ -1364,108 +1364,11 @@ async function initAuthHub(maxWaitMs = 3500) {
   });
 }
 
-// دالة ذكية للتحقق من دور المستخدم وتوجيهه إلى الصفحة المناسبة بعد تسجيل الدخول.
-// تقوم بالانتظار لفترة قصيرة حتى يستقر الـ Trigger الخاص بقاعدة البيانات
-// في إنشاء الملف الشخصي (Profile) لتفادي أي أخطاء أو حلقات توجيه مفرغة.
-async function checkRoleAndRedirect() {
-  console.log("checkRoleAndRedirect: بدء فحص الجلسة والدور للتوجيه...");
-  
-  // 1. الانتظار للحصول على الجلسة الحالية (Session) بانتظار بسيط (مثلاً 2000ms كحد أقصى)
-  let session = null;
-  try {
-    const { data: { session: currentSession } } = await supabase.auth.getSession();
-    session = currentSession;
-  } catch (err) {
-    console.warn("checkRoleAndRedirect: فشل جلب الجلسة المباشرة:", err);
-  }
-  
-  // إذا لم تتوفر الجلسة فوراً، ننتظرها عبر دالة initAuthHub بحد أقصى 2000ms
-  if (!session) {
-    console.log("checkRoleAndRedirect: لم يتم العثور على جلسة فورية، جاري الانتظار عبر initAuthHub...");
-    session = await initAuthHub(2000);
-  }
-  
-  if (!session || !session.user) {
-    console.warn("checkRoleAndRedirect: لا توجد جلسة نشطة للمستخدم، لن يتم التوجيه.");
-    return;
-  }
-  
-  const user = session.user;
-  const email = user.email ? user.email.toLowerCase().trim() : "";
-  console.log(`checkRoleAndRedirect: تم العثور على المستخدم ${email}، جاري جلب الصلاحية...`);
-  
-  // التحقق أولاً من قائمة المسؤولين الثابتة كبديل فوري في حال تطابق البريد الإلكتروني
-  if (AD_LIST.includes(email)) {
-    console.log("checkRoleAndRedirect: تم التعرف على البريد كمسؤول (Admin) من القائمة الثابتة.");
-    sessionStorage.setItem('admin_logged_in_session', 'true');
-    window.location.href = 'admin.html';
-    return;
-  }
-  
-  let role = null;
-  
-  try {
-    // المحاولة الأولى لجلب الملف الشخصي من جدول profiles
-    console.log("checkRoleAndRedirect: المحاولة الأولى لجلب الملف الشخصي...");
-    const { data: firstTryProfile, error: firstTryError } = await supabase
-      .from('profiles')
-      .select('role')
-      .eq('id', user.id)
-      .maybeSingle();
-      
-    if (firstTryError) {
-      console.warn("checkRoleAndRedirect: خطأ في المحاولة الأولى لجلب الملف الشخصي:", firstTryError.message);
-    }
-    
-    if (firstTryProfile && firstTryProfile.role) {
-      role = firstTryProfile.role;
-      console.log(`checkRoleAndRedirect: تم جلب الدور بنجاح من المحاولة الأولى: ${role}`);
-    } else {
-      // إذا لم يُعثر على الملف الشخصي أو الدور بعد (بسبب تأخر الـ Trigger الخاص بـ Security Definer)
-      // ننتظر 1000ms ونعيد المحاولة مرة واحدة فقط كما هو مطلوب بدقة
-      console.log("checkRoleAndRedirect: لم يتم العثور على الدور فوراً (قد يتأخر الـ Trigger). جاري الانتظار 1000ms قبل إعادة المحاولة...");
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      console.log("checkRoleAndRedirect: المحاولة الثانية والأخيرة لجلب الملف الشخصي...");
-      const { data: secondTryProfile, error: secondTryError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .maybeSingle();
-        
-      if (secondTryError) {
-        console.warn("checkRoleAndRedirect: خطأ في المحاولة الثانية لجلب الملف الشخصي:", secondTryError.message);
-      }
-      
-      if (secondTryProfile && secondTryProfile.role) {
-        role = secondTryProfile.role;
-        console.log(`checkRoleAndRedirect: تم جلب الدور بنجاح في المحاولة الثانية: ${role}`);
-      } else {
-        console.warn("checkRoleAndRedirect: لم يتم العثور على ملف شخصي بعد المحاولتين. تعيين الدور الافتراضي: customer");
-        role = 'customer';
-      }
-    }
-  } catch (err) {
-    console.error("checkRoleAndRedirect: خطأ أثناء معالجة جلب الدور:", err);
-    role = 'customer'; // القيمة الافتراضية الآمنة في حال حدوث استثناء غير متوقع
-  }
-  
-  // التوجيه النهائي الآمن بناءً على الدور المؤكد فقط لمنع أي حلقات تكرار
-  console.log(`checkRoleAndRedirect: التوجيه النهائي للمستخدم ذو الدور: ${role}`);
-  if (role === 'admin') {
-    sessionStorage.setItem('admin_logged_in_session', 'true');
-    window.location.href = 'admin.html';
-  } else if (role === 'merchant') {
-    window.location.href = 'dashboard.html';
-  } else if (role === 'customer') {
-    console.log("checkRoleAndRedirect: المستخدم زبون عادي (Customer)، سيبقى في الواجهة الرئيسية للتسوق والطلب.");
-  }
-}
-
-// تصدير وتوفير الدوال للنطاقات الأخرى لضمان التوافقية
-window.checkRoleAndRedirect = checkRoleAndRedirect;
+// window.checkRoleAndRedirect is now fully provided and managed by supabase-db-compat.js
 window.runSmartRoleRedirection = async function(session) {
-  await checkRoleAndRedirect();
+  if (typeof window.checkRoleAndRedirect === 'function') {
+    await window.checkRoleAndRedirect();
+  }
 };
 
 // Attach listeners for unified-login screen once DOM is ready
