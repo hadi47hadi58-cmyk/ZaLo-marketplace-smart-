@@ -7,6 +7,120 @@ import { telemetry } from './telemetry-logger.js';
 
 export { supabase, telemetry };
 
+// --- Automated Role-Based Routing & Session Integration ---
+window.checkRoleAndRedirect = async function() {
+    console.log("[Role Routing] Initiating automated role-based check and redirection...");
+    
+    // 1. Get active session safely
+    let session = null;
+    try {
+        const { data: { session: currentSession } } = await supabase.auth.getSession();
+        session = currentSession;
+    } catch (e) {
+        console.warn("[Role Routing] Failed to fetch instant session:", e.message);
+    }
+
+    if (!session || !session.user) {
+        console.log("[Role Routing] No active session found. Redirection bypassed.");
+        return;
+    }
+
+    const user = session.user;
+    const email = user.email ? user.email.toLowerCase().trim() : '';
+    
+    // 2. Immediate ADMIN list check
+    const AD_LIST = [
+      'zinzinochop@gmail.com',
+      'admin@zalo.dz',
+      'admin@zalo.com',
+      'manager@zalo.dz',
+      'manager@zalo.com'
+    ];
+
+    let role = null;
+
+    if (AD_LIST.includes(email) || email.endsWith('@zalo-admin.com')) {
+        role = 'ADMIN';
+    } else {
+        // 3. Robust retry fetch from public.users with fallbacks
+        let retries = 4;
+        while (retries > 0 && !role) {
+            try {
+                // Try fetching from public.users table (linked via supabase_uid)
+                const { data: dbUser, error: dbError } = await supabase
+                    .from('users')
+                    .select('role')
+                    .eq('supabase_uid', user.id)
+                    .maybeSingle();
+
+                if (dbUser && dbUser.role) {
+                    role = dbUser.role.toUpperCase();
+                    console.log(`[Role Routing] Fetched role from public.users: ${role}`);
+                    break;
+                }
+
+                // Fallback: try fetching from public.profiles table (legacy compat)
+                const { data: profileUser, error: profError } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .maybeSingle();
+
+                if (profileUser && profileUser.role) {
+                    role = profileUser.role.toUpperCase();
+                    console.log(`[Role Routing] Fetched role from public.profiles: ${role}`);
+                    break;
+                }
+            } catch (err) {
+                console.warn("[Role Routing] Error querying roles in attempt:", err);
+            }
+
+            retries--;
+            if (!role && retries > 0) {
+                console.log(`[Role Routing] Role not settled yet. Retrying in 500ms... (${retries} retries left)`);
+                await new Promise(r => setTimeout(r, 500));
+            }
+        }
+    }
+
+    // Default to CUSTOMER if still not found
+    if (!role) {
+        role = 'CUSTOMER';
+        console.log("[Role Routing] No database role resolved. Defaulting to: CUSTOMER");
+    }
+
+    // 4. Securely store in localStorage & sessionStorage
+    localStorage.setItem('zalo_user_role', role);
+    if (role === 'ADMIN') {
+        sessionStorage.setItem('admin_logged_in_session', 'true');
+    }
+
+    // 5. Smart Non-Looping Redirects
+    const currentPath = window.location.pathname;
+    const isAlreadyOnAdmin = currentPath.endsWith('admin.html');
+    const isAlreadyOnDashboard = currentPath.endsWith('dashboard.html');
+    const isAlreadyOnIndex = currentPath.endsWith('index.html') || currentPath === '/' || currentPath.endsWith('/');
+
+    console.log(`[Role Routing] Active Role: ${role} | Location: ${currentPath}`);
+
+    if (role === 'ADMIN') {
+        if (!isAlreadyOnAdmin) {
+            console.log("[Role Routing] Redirecting Admin to admin.html");
+            window.location.replace('admin.html');
+        }
+    } else if (role === 'MERCHANT') {
+        if (!isAlreadyOnDashboard) {
+            console.log("[Role Routing] Redirecting Merchant to dashboard.html");
+            window.location.replace('dashboard.html');
+        }
+    } else { // CUSTOMER
+        if (isAlreadyOnAdmin || isAlreadyOnDashboard) {
+            console.log("[Role Routing] Redirecting Customer to index.html");
+            window.location.replace('index.html');
+        }
+    }
+};
+
 // --- Global Auto-Sync Hook to keep NestJS, local tokens, and Supabase 100% in Sync ---
 supabase.auth.onAuthStateChange(async (event, session) => {
     console.log("[Global Sync] Supabase Auth event changed:", event);
@@ -23,36 +137,9 @@ supabase.auth.onAuthStateChange(async (event, session) => {
         };
         localStorage.setItem('nestjs_user', JSON.stringify(userObj));
 
-        // Determine user role
-        const email = session.user.email ? session.user.email.toLowerCase().trim() : '';
-        const AD_LIST = [
-          'zinzinochop@gmail.com',
-          'admin@zalo.dz',
-          'admin@zalo.com',
-          'manager@zalo.dz',
-          'manager@zalo.com'
-        ];
-        
-        if (AD_LIST.includes(email)) {
-          localStorage.setItem('zalo_user_role', 'ADMIN');
-          sessionStorage.setItem('admin_logged_in_session', 'true');
-        } else {
-          try {
-            // Check profiles role or default to CUSTOMER
-            const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
-            if (profile && profile.role) {
-              localStorage.setItem('zalo_user_role', profile.role.toUpperCase());
-            } else {
-              if (!localStorage.getItem('zalo_user_role')) {
-                localStorage.setItem('zalo_user_role', 'CUSTOMER');
-              }
-            }
-          } catch (e) {
-            console.warn("[Global Sync] Error retrieving role from profile:", e);
-            if (!localStorage.getItem('zalo_user_role')) {
-              localStorage.setItem('zalo_user_role', 'CUSTOMER');
-            }
-          }
+        // Immediately trigger automated role check and redirection
+        if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
+            await window.checkRoleAndRedirect();
         }
     } else {
         // Logged out
