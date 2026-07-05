@@ -1,8 +1,9 @@
-import { Controller, Post, Body, HttpCode, HttpStatus, SetMetadata, UseGuards, Request } from '@nestjs/common';
+import { Controller, Post, Get, Body, HttpCode, HttpStatus, SetMetadata, UseGuards, Request } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { ApiTags, ApiOperation, ApiResponse, ApiProperty, ApiBearerAuth } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, MinLength, IsEnum, IsOptional, IsString } from 'class-validator';
 import { JwtAuthGuard } from './jwt-auth.guard';
+import { SessionCleanupService } from './session-cleanup.service';
 
 // Auth DTO Definitions
 export class RegisterDto {
@@ -49,7 +50,32 @@ export class LoginDto {
 @ApiTags('التوثيق والتحقق من الهوية - Authentication')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private cleanupService: SessionCleanupService
+  ) {}
+
+  @Get('health')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'فحص سلامة الجلسات وعمليات التنظيف (System Health & Session Pruning Status)' })
+  @ApiResponse({ status: 200, description: 'تم استرداد بيانات السلامة وعدد الجلسات بنجاح' })
+  async health() {
+    return this.cleanupService.getSystemHealth();
+  }
+
+  @Post('cleanup')
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'تشغيل يدوي فوري لتطهير وتنظيف الجلسات المنتهية والزومبي' })
+  @ApiResponse({ status: 200, description: 'تم التطهير والتنظيف الفوري بنجاح' })
+  async triggerManualCleanup() {
+    const stats = await this.cleanupService.cleanupExpiredSessions();
+    const health = await this.cleanupService.getSystemHealth();
+    return {
+      message: '🧹 تم تشغيل وتطهير الجلسات المنتهية والصلاحيات المتروكة يدوياً بنجاح!',
+      stats,
+      health
+    };
+  }
 
   @Post('register')
   @HttpCode(HttpStatus.CREATED)

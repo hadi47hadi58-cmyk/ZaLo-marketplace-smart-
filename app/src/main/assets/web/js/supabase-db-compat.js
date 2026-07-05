@@ -7,6 +7,63 @@ import { telemetry } from './telemetry-logger.js';
 
 export { supabase, telemetry };
 
+// --- Global Auto-Sync Hook to keep NestJS, local tokens, and Supabase 100% in Sync ---
+supabase.auth.onAuthStateChange(async (event, session) => {
+    console.log("[Global Sync] Supabase Auth event changed:", event);
+    if (session) {
+        const token = session.access_token;
+        localStorage.setItem('nestjs_token', token);
+        localStorage.setItem('zalo_session_jwt', token);
+        localStorage.setItem('zalo_user_email', session.user.email);
+        
+        const userObj = {
+            id: session.user.id,
+            email: session.user.email,
+            name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || ''
+        };
+        localStorage.setItem('nestjs_user', JSON.stringify(userObj));
+
+        // Determine user role
+        const email = session.user.email ? session.user.email.toLowerCase().trim() : '';
+        const AD_LIST = [
+          'zinzinochop@gmail.com',
+          'admin@zalo.dz',
+          'admin@zalo.com',
+          'manager@zalo.dz',
+          'manager@zalo.com'
+        ];
+        
+        if (AD_LIST.includes(email)) {
+          localStorage.setItem('zalo_user_role', 'ADMIN');
+          sessionStorage.setItem('admin_logged_in_session', 'true');
+        } else {
+          try {
+            // Check profiles role or default to CUSTOMER
+            const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).maybeSingle();
+            if (profile && profile.role) {
+              localStorage.setItem('zalo_user_role', profile.role.toUpperCase());
+            } else {
+              if (!localStorage.getItem('zalo_user_role')) {
+                localStorage.setItem('zalo_user_role', 'CUSTOMER');
+              }
+            }
+          } catch (e) {
+            console.warn("[Global Sync] Error retrieving role from profile:", e);
+            if (!localStorage.getItem('zalo_user_role')) {
+              localStorage.setItem('zalo_user_role', 'CUSTOMER');
+            }
+          }
+        }
+    } else {
+        // Logged out
+        localStorage.removeItem('nestjs_token');
+        localStorage.removeItem('zalo_session_jwt');
+        localStorage.removeItem('nestjs_user');
+        localStorage.removeItem('zalo_user_role');
+        sessionStorage.removeItem('admin_logged_in_session');
+    }
+});
+
 // 1. Core / Initializers
 export function initializeApp() {
     return { name: "ZaLo-Unified-Compat" };
