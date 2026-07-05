@@ -575,7 +575,7 @@ html,body{font-family:'Cairo',sans-serif;background:var(--bg);color:var(--text);
   <div class="smi" onclick="closeSide();G('cats')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-folder-open"></i></span><div><div class="sn">جميع الأقسام</div></div></div>
   <div class="smi" onclick="closeSide();G('all-prods')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-box"></i></span><div><div class="sn">جميع المنتجات</div></div></div>
   <div class="sm-sec" id="sm-driver-sec">للتجار والسائقين</div>
-  <div class="smi" id="sm-unified-login-item" onclick="closeSide();openLink('login.html')"><span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
+  <div class="smi" id="sm-unified-login-item" onclick="closeSide();G('login')"><span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div></div>
   <div class="smi" id="sm-driver-portal-item" onclick="closeSide();G('driver-portal')"><span class="si" style="color:var(--g1)"><i class="fa-solid fa-motorcycle"></i></span><div><div class="sn">بوابة السائقين والمندوبين</div><div class="sd">تتبع وتسليم طلبيات الولايات الـ69</div></div></div>
   <div class="sm-sec">تواصل معنا وإدارة</div>
   <div class="smi" onclick="closeSide();openWA('0698694010','مرحباً إدارة ZaLo')"><span class="si" style="color:#25d366"><i class="fa-brands fa-whatsapp"></i></span><div><div class="sn">اتصل بنا (واتساب)</div><div class="sd">0698694010</div></div></div>
@@ -2004,14 +2004,14 @@ onAuthStateChanged(auth, async (u) => {
     // Revert to signed-out state
     if (loginSidebarItem) {
       loginSidebarItem.innerHTML = `<span class="si" style="color:var(--gold)"><i class="fa-solid fa-lock"></i></span><div><div class="sn">تسجيل دخول موحد ZaLo</div></div>`;
-      loginSidebarItem.onclick = () => { closeSide(); openLink('login.html'); };
+      loginSidebarItem.onclick = () => { closeSide(); G('login'); };
     }
     const logoutItem = document.getElementById('sm-logout-item');
     if (logoutItem) logoutItem.remove();
     
     if (bottomLoginBtn) {
       bottomLoginBtn.innerHTML = `<div class="bni"><i class="fa-solid fa-circle-user"></i></div><div class="bnl">الدخول</div>`;
-      bottomLoginBtn.onclick = () => openLink('login.html');
+      bottomLoginBtn.onclick = () => G('login');
     }
   }
 });

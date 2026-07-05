@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
 import { AuditService } from '../audit/audit.service';
+import { SessionCleanupService } from './session-cleanup.service';
 
 @Global()
 @Module({
@@ -16,7 +17,7 @@ import { AuditService } from '../audit/audit.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, AuditService],
+  providers: [AuthService, JwtStrategy, AuditService, SessionCleanupService],
   exports: [AuthService, PassportModule, JwtModule],
 })
 export class AuthModule {}

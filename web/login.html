@@ -496,14 +496,13 @@
 
     /* Collapsible Form Container */
     .collapsible-form {
-      max-height: 0;
-      overflow: hidden;
-      transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-      opacity: 0;
-      margin-top: 0;
+      max-height: none;
+      overflow: visible;
+      opacity: 1;
+      margin-top: 16px;
     }
     .collapsible-form.active {
-      max-height: 500px;
+      max-height: none;
       opacity: 1;
       margin-top: 16px;
     }
@@ -551,60 +550,7 @@
       <i class="fa-solid fa-chevron-left arrow-icon"></i>
     </div>
 
-    <!-- Divider "أو" (Or) -->
-    <div class="separator" style="display: flex; align-items: center; text-align: center; margin: 24px 0; color: var(--text2); font-size: 13px; font-weight: 600;">أو المتابعة عبر</div>
-
-    <!-- Manus Action Buttons Stack -->
-    <div class="manus-buttons-container">
-      
-      <!-- Google Sign In Button (Fully Functional) -->
-      <button type="button" class="manus-btn google-btn" id="googleBtn">
-        <div class="btn-text-wrapper">
-          <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="Google" class="btn-icon-img">
-          <span>متابعة باستخدام Google</span>
-        </div>
-        <i class="fa-solid fa-chevron-left arrow-left"></i>
-      </button>
-
-      <!-- Facebook Sign In Button (Premium feel) -->
-      <button type="button" class="manus-btn facebook-btn" id="facebookBtn">
-        <div class="btn-text-wrapper">
-          <i class="fa-brands fa-facebook btn-icon" style="color: #1877f2;"></i>
-          <span>متابعة باستخدام Facebook</span>
-        </div>
-        <i class="fa-solid fa-chevron-left arrow-left"></i>
-      </button>
-
-      <!-- Microsoft Sign In Button (Premium feel) -->
-      <button type="button" class="manus-btn microsoft-btn" id="microsoftBtn">
-        <div class="btn-text-wrapper">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg" alt="Microsoft" class="btn-icon-img">
-          <span>متابعة باستخدام Microsoft</span>
-        </div>
-        <i class="fa-solid fa-chevron-left arrow-left"></i>
-      </button>
-
-      <!-- Apple Sign In Button (Premium feel) -->
-      <button type="button" class="manus-btn apple-btn" id="appleBtn">
-        <div class="btn-text-wrapper">
-          <i class="fa-brands fa-apple btn-icon" style="color: #fff;"></i>
-          <span>متابعة باستخدام Apple</span>
-        </div>
-        <i class="fa-solid fa-chevron-left arrow-left"></i>
-      </button>
-
-      <!-- Email Toggle Button -->
-      <button type="button" class="manus-btn email-btn" id="toggleEmailFormBtn">
-        <div class="btn-text-wrapper">
-          <i class="fa-solid fa-envelope btn-icon" style="color: #fff;"></i>
-          <span>متابعة باستخدام البريد الإلكتروني</span>
-        </div>
-        <i class="fa-solid fa-chevron-down arrow-left" id="emailToggleArrow" style="transition: transform 0.3s;"></i>
-      </button>
-
-    </div>
-
-    <!-- Collapsible Standard Email Form Container -->
+    <!-- Collapsible Standard Email Form Container (Always visible now) -->
     <div class="collapsible-form" id="collapsibleFormContainer">
       <form id="unifiedLoginForm">
         <div class="form-group" style="margin-bottom: 16px;">
@@ -627,6 +573,21 @@
           <span>تأكيد وتسجيل الدخول الموحد</span> <i class="fa-solid fa-arrow-left"></i>
         </button>
       </form>
+    </div>
+
+    <!-- Divider "أو" (Or) -->
+    <div class="separator" style="display: flex; align-items: center; text-align: center; margin: 24px 0; color: var(--text2); font-size: 13px; font-weight: 600;">أو المتابعة عبر</div>
+
+    <!-- Manus Action Buttons Stack -->
+    <div class="manus-buttons-container">
+      <!-- Google Sign In Button (Fully Functional) -->
+      <button type="button" class="manus-btn google-btn" id="googleBtn">
+        <div class="btn-text-wrapper">
+          <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="Google" class="btn-icon-img">
+          <span>متابعة باستخدام Google</span>
+        </div>
+        <i class="fa-solid fa-chevron-left arrow-left"></i>
+      </button>
     </div>
 
     <!-- Extra links and diagnostic session action -->
@@ -652,17 +613,6 @@
     const manusEmail = document.getElementById('manusEmail');
     const manusProfileTitle = document.getElementById('manusProfileTitle');
 
-    if (toggleBtn && collapsibleForm && emailToggleArrow) {
-      toggleBtn.addEventListener('click', () => {
-        collapsibleForm.classList.toggle('active');
-        if (collapsibleForm.classList.contains('active')) {
-          emailToggleArrow.style.transform = 'rotate(180deg)';
-        } else {
-          emailToggleArrow.style.transform = 'rotate(0deg)';
-        }
-      });
-    }
-
     const lastEmail = localStorage.getItem('user_email');
     if (manusCard && manusAvatar && manusEmail && manusProfileTitle) {
       if (lastEmail) {
@@ -684,35 +634,8 @@
             performDetection(lastEmail);
           }
         }
-        if (collapsibleForm) {
-          collapsibleForm.classList.add('active');
-        }
-        if (emailToggleArrow) {
-          emailToggleArrow.style.transform = 'rotate(180deg)';
-        }
         const emailInput = document.getElementById('loginEmail');
         if (emailInput) emailInput.focus();
-      });
-    }
-
-    // Interactive placeholder login warnings
-    const fbBtn = document.getElementById('facebookBtn');
-    const msBtn = document.getElementById('microsoftBtn');
-    const appleBtn = document.getElementById('appleBtn');
-
-    if (fbBtn) {
-      fbBtn.addEventListener('click', () => {
-        alert("تسجيل دخول Facebook غير مفعّل في هذه النسخة حالياً. يرجى استخدام Google أو البريد الإلكتروني للمصادقة.");
-      });
-    }
-    if (msBtn) {
-      msBtn.addEventListener('click', () => {
-        alert("تسجيل دخول Microsoft غير مفعّل في هذه النسخة حالياً. يرجى استخدام Google أو البريد الإلكتروني للمصادقة.");
-      });
-    }
-    if (appleBtn) {
-      appleBtn.addEventListener('click', () => {
-        alert("تسجيل دخول Apple غير مفعّل في هذه النسخة حالياً. يرجى استخدام Google أو البريد الإلكتروني للمصادقة.");
       });
     }
   });
