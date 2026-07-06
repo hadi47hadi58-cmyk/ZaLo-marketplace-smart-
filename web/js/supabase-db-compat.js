@@ -31,6 +31,8 @@ window.checkRoleAndRedirect = async function() {
     // 2. Immediate ADMIN list check
     const AD_LIST = [
       'zinzinochop@gmail.com',
+      'zinochop2024@gmail.com',
+      'hadi47hadi58@gmail.com',
       'admin@zalo.dz',
       'admin@zalo.com',
       'manager@zalo.dz',
@@ -395,6 +397,17 @@ export const where = (field, op, val) => {
 export const limit = (n) => ({ type: 'limit', value: n });
 export const orderBy = (field, direction = 'asc') => ({ type: 'orderBy', field, direction });
 
+// Helper for queries with timeout
+async function withTimeout(promise, ms = 3500) {
+    return new Promise((resolve, reject) => {
+        const id = setTimeout(() => reject(new Error("Timeout")), ms);
+        promise.then(
+            (res) => { clearTimeout(id); resolve(res); },
+            (err) => { clearTimeout(id); reject(err); }
+        );
+    });
+}
+
 // 4. Data Operations (getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc)
 export async function getDoc(docRef) {
     // If querying specific profile, first try getting profile from NestJS
@@ -413,14 +426,17 @@ export async function getDoc(docRef) {
         }
     }
 
-    const { data, error } = await supabase
-        .from(docRef.table)
-        .select('*')
-        .eq('id', docRef.id)
-        .maybeSingle();
-
-    if (error) {
-        console.error(`getDoc error for ${docRef.table} [${docRef.id}]:`, error.message);
+    let data = null;
+    let error = null;
+    try {
+        const { data: resData, error: resErr } = await withTimeout(
+            supabase.from(docRef.table).select('*').eq('id', docRef.id).maybeSingle(),
+            3500
+        );
+        data = resData;
+        error = resErr;
+    } catch (e) {
+        console.warn(`getDoc timeout or error for ${docRef.table}:`, e.message);
     }
 
     return {
@@ -529,9 +545,36 @@ export async function getDocs(queryObj) {
         q = q.limit(queryObj.limitCount);
     }
 
-    const { data, error } = await q;
-    if (error) {
-        console.error(`getDocs error for ${table}:`, error.message);
+    let data = null;
+    let error = null;
+
+    try {
+        const result = await withTimeout(q, 3500);
+        data = result.data;
+        error = result.error;
+        
+        if (error || !data || data.length === 0) {
+            if (error) console.error(`getDocs error or empty for ${table}:`, error.message);
+            const fallbackKey = table === 'shops' ? 'zalo_fallback_shops' : (table === 'products' ? 'zalo_fallback_products' : null);
+            if (fallbackKey) {
+                const raw = localStorage.getItem(fallbackKey);
+                if (raw) {
+                    data = JSON.parse(raw);
+                    error = null;
+                    console.log(`[ZaLo Compat Engine] Used local storage fallback for ${table} after error/empty response.`);
+                }
+            }
+        }
+    } catch (timeoutErr) {
+        console.warn(`[ZaLo Compat Engine] Query for ${table} timed out. Falling back to local storage...`);
+        const fallbackKey = table === 'shops' ? 'zalo_fallback_shops' : (table === 'products' ? 'zalo_fallback_products' : null);
+        if (fallbackKey) {
+            const raw = localStorage.getItem(fallbackKey);
+            if (raw) {
+                data = JSON.parse(raw);
+                error = null;
+            }
+        }
     }
 
     const docs = (data || []).map(row => ({

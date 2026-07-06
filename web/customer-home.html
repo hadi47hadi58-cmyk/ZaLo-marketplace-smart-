@@ -272,12 +272,22 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
   
+  // Set customer info immediately to remove the infinite loading state
+  document.getElementById('customer-email').textContent = user.email || 'مستخدم ZaLo';
+  document.getElementById('customer-id-tag').textContent = user.id.slice(0, 8);
+  updateApplicationUI('active'); // set a friendly default so button is active
+  
   try {
-    const { data: profile, error } = await supabase
+    // Attempt to query profile with a local timeout wrapper of 3 seconds
+    const profilePromise = supabase
       .from('profiles')
       .select('*')
       .eq('id', user.id)
       .maybeSingle();
+      
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error("Timeout")), 3000));
+    
+    const { data: profile, error } = await Promise.race([profilePromise, timeoutPromise]).catch(() => ({ data: null, error: null }));
       
     if (profile && profile.role && profile.role !== 'customer') {
       console.log("PageGuard: Access restricted for non-customer:", profile.role);
@@ -287,24 +297,21 @@ onAuthStateChanged(auth, async (user) => {
       return;
     }
     
-    // Display customer info
-    document.getElementById('customer-email').textContent = user.email || 'مستخدم ZaLo';
-    document.getElementById('customer-id-tag').textContent = user.id.slice(0, 8);
-    
     if (profile) {
       updateApplicationUI(profile.status);
     } else {
-      // Auto-insert profile for consistency if missing
-      await supabase.from('profiles').upsert({
+      // Auto-insert profile for consistency if missing, but do not block UI if it fails
+      supabase.from('profiles').upsert({
         id: user.id,
         email: user.email,
         role: 'customer',
         status: 'active'
-      });
+      }).catch(e => console.warn("Auto-insert profile skipped:", e));
       updateApplicationUI('active');
     }
   } catch (e) {
     console.warn("Error running page guard checks:", e);
+    updateApplicationUI('active');
   }
 });
 </script>

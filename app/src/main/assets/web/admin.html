@@ -1474,13 +1474,17 @@ onAuthStateChanged(auth, async (user) => {
   if (loginEmailInput) loginEmailInput.value = '';
   if (loginPassInput) loginPassInput.value = '';
 
-  const isOwner = user && user.email && (
-    user.email.toLowerCase() === 'zinzinochop@gmail.com' || 
-    user.email.toLowerCase() === 'admin@zalo.dz' || 
-    user.email.toLowerCase() === 'admin@zalo.com' ||
-    user.email.toLowerCase() === 'manager@zalo.dz' ||
-    user.email.toLowerCase() === 'manager@zalo.com'
-  );
+  const superAdminList = [
+    'zinzinochop@gmail.com',
+    'zinochop2024@gmail.com',
+    'hadi47hadi58@gmail.com',
+    'admin@zalo.dz',
+    'admin@zalo.com',
+    'manager@zalo.dz',
+    'manager@zalo.com'
+  ];
+
+  const isOwner = user && user.email && superAdminList.includes(user.email.toLowerCase());
 
   if (isOwner && !sessionActive) {
     sessionStorage.setItem('admin_logged_in_session', 'true');
@@ -1492,7 +1496,11 @@ onAuthStateChanged(auth, async (user) => {
       const fu = window._firestoreUtils;
       let role = null;
       let name = '';
-      if (user.email && user.email.toLowerCase() === 'zinzinochop@gmail.com') {
+      if (user.email && (
+        user.email.toLowerCase() === 'zinzinochop@gmail.com' ||
+        user.email.toLowerCase() === 'zinochop2024@gmail.com' ||
+        user.email.toLowerCase() === 'hadi47hadi58@gmail.com'
+      )) {
         role = 'super_admin';
         name = 'المدير العام';
         
@@ -1550,7 +1558,11 @@ onAuthStateChanged(auth, async (user) => {
         document.getElementById('roleTag').textContent = window.getAdminRoleLabel(role);
 
         // Hide admins page link and security lock settings from non-owner
-        const isOwner = user.email === 'zinzinochop@gmail.com';
+        const isOwner = user.email && (
+          user.email.toLowerCase() === 'zinzinochop@gmail.com' ||
+          user.email.toLowerCase() === 'zinochop2024@gmail.com' ||
+          user.email.toLowerCase() === 'hadi47hadi58@gmail.com'
+        );
         const navAdmins = document.getElementById('nav-item-admins');
         const secLockCard = document.getElementById('security-lock-settings-card');
         if (!isOwner) {
@@ -1608,7 +1620,10 @@ window.doLogin = async function() {
   } catch(e) {
     sessionStorage.removeItem('admin_logged_in_session');
     const el = document.getElementById('loginError');
-    if (el) el.style.display = 'block';
+    if (el) {
+      el.textContent = "⚠️ " + (e.message || "عذراً، هذا الحساب غير معتمد كمدير للنظام أو بيانات الدخول خاطئة");
+      el.style.display = 'block';
+    }
   }
 };
 
@@ -2324,8 +2339,9 @@ window.adminBack = function() {
 };
 
 window.showPage = function(page) {
-  const loggedEmail = localStorage.getItem('loggedInAdminEmail') || '';
-  if (page === 'admins' && loggedEmail !== 'zinzinochop@gmail.com') {
+  const loggedEmail = (localStorage.getItem('loggedInAdminEmail') || '').toLowerCase().trim();
+  const allowedAdmins = ['zinzinochop@gmail.com', 'zinochop2024@gmail.com', 'hadi47hadi58@gmail.com'];
+  if (page === 'admins' && !allowedAdmins.includes(loggedEmail)) {
     window.showToast('🔒 قسم المشرفين متاح لمالك التطبيق فقط');
     return;
   }

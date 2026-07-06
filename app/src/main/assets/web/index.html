@@ -1664,6 +1664,12 @@ const SEED_PRODUCTS = [
 ];
 
 async function ensureDatabaseSeeded() {
+  // Always store fallback data locally in case Supabase is blocked or slow
+  try {
+    localStorage.setItem('zalo_fallback_shops', JSON.stringify(SEED_SHOPS));
+    localStorage.setItem('zalo_fallback_products', JSON.stringify(SEED_PRODUCTS));
+  } catch(e) { console.warn("Could not save local fallbacks:", e); }
+
   try {
     const { data: existingShops, error: checkError } = await supabase.from('shops').select('id').limit(1);
     if (checkError) throw checkError;
@@ -1690,6 +1696,8 @@ await ensureDatabaseSeeded();
 
 const AD_LIST = [
   'zinzinochop@gmail.com',
+  'zinochop2024@gmail.com',
+  'hadi47hadi58@gmail.com',
   'admin@zalo.dz',
   'admin@zalo.com',
   'manager@zalo.dz',
