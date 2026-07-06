@@ -8,27 +8,29 @@ import { telemetry } from './telemetry-logger.js';
 export { supabase, telemetry };
 
 // --- Automated Role-Based Routing & Session Integration ---
-window.checkRoleAndRedirect = async function() {
-    console.log("[Role Routing] Initiating automated role-based check and redirection...");
+// دالة التحقق والتوجيه التلقائي للمستخدم بناءً على رتبته (ADMIN, MERCHANT, CUSTOMER)
+// تجلب هذه الدالة الدور مباشرة من جدول public.users مع فحص القائمة البيضاء للمشرفين
+window.handleUserRedirect = async function() {
+    console.log("[Role Routing] بدء التحقق من دور المستخدم وتوجيهه...");
     
-    // 1. Get active session safely
+    // 1. جلب الجلسة الحالية بشكل آمن
     let session = null;
     try {
         const { data: { session: currentSession } } = await supabase.auth.getSession();
         session = currentSession;
     } catch (e) {
-        console.warn("[Role Routing] Failed to fetch instant session:", e.message);
+        console.warn("[Role Routing] فشل في جلب الجلسة النشطة فوريًا:", e.message);
     }
 
     if (!session || !session.user) {
-        console.log("[Role Routing] No active session found. Redirection bypassed.");
+        console.log("[Role Routing] لم يتم العثور على جلسة مستخدم نشطة. إلغاء توجيه المسار.");
         return;
     }
 
     const user = session.user;
     const email = user.email ? user.email.toLowerCase().trim() : '';
     
-    // 2. Immediate ADMIN list check
+    // 2. فحص فوري لقائمة المشرفين البيضاء (Admin Whitelist Check)
     const AD_LIST = [
       'zinzinochop@gmail.com',
       'zinochop2024@gmail.com',
@@ -44,11 +46,11 @@ window.checkRoleAndRedirect = async function() {
     if (AD_LIST.includes(email) || email.endsWith('@zalo-admin.com')) {
         role = 'ADMIN';
     } else {
-        // 3. Robust retry fetch from public.users with fallbacks
+        // 3. محاولة جلب الدور من جدول public.users مع إمكانية التكرار في حال تأخر الاستجابة
         let retries = 4;
         while (retries > 0 && !role) {
             try {
-                // Try fetching from public.users table (linked via supabase_uid)
+                // محاولة القراءة من جدول المستخدمين الرئيسي (public.users) المرتبط عبر supabase_uid
                 const { data: dbUser, error: dbError } = await supabase
                     .from('users')
                     .select('role')
@@ -57,11 +59,11 @@ window.checkRoleAndRedirect = async function() {
 
                 if (dbUser && dbUser.role) {
                     role = dbUser.role.toUpperCase();
-                    console.log(`[Role Routing] Fetched role from public.users: ${role}`);
+                    console.log(`[Role Routing] تم جلب الدور بنجاح من جدول المستخدمين الرئيسي: ${role}`);
                     break;
                 }
 
-                // Fallback: try fetching from public.profiles table (legacy compat)
+                // خطة احتياطية للتوافق: جلب الدور من جدول Profiles القديم
                 const { data: profileUser, error: profError } = await supabase
                     .from('profiles')
                     .select('role')
@@ -70,57 +72,65 @@ window.checkRoleAndRedirect = async function() {
 
                 if (profileUser && profileUser.role) {
                     role = profileUser.role.toUpperCase();
-                    console.log(`[Role Routing] Fetched role from public.profiles: ${role}`);
+                    console.log(`[Role Routing] تم جلب الدور بنجاح من جدول الملفات التعريفي الاحتياطي: ${role}`);
                     break;
                 }
             } catch (err) {
-                console.warn("[Role Routing] Error querying roles in attempt:", err);
+                console.warn("[Role Routing] خطأ أثناء الاستعلام عن الرتبة في قاعدة البيانات:", err);
             }
 
             retries--;
             if (!role && retries > 0) {
-                console.log(`[Role Routing] Role not settled yet. Retrying in 500ms... (${retries} retries left)`);
+                console.log(`[Role Routing] لم يكتمل تحديد الرتبة بعد. جاري إعادة المحاولة خلال 500ms... (المتبقي ${retries} محاولات)`);
                 await new Promise(r => setTimeout(r, 500));
             }
         }
     }
 
-    // Default to CUSTOMER if still not found
+    // تعيين الدور الافتراضي كزبون في حال تعذر الحصول على الرتبة من الجداول
     if (!role) {
         role = 'CUSTOMER';
-        console.log("[Role Routing] No database role resolved. Defaulting to: CUSTOMER");
+        console.log("[Role Routing] تعذر حل الرتبة من قاعدة البيانات. الدور الافتراضي: CUSTOMER");
     }
 
-    // 4. Securely store in localStorage & sessionStorage
+    // 4. حفظ الدور بأمان في التخزين المحلي لتسهيل استخدامه في الواجهة الأمامية
     localStorage.setItem('zalo_user_role', role);
     if (role === 'ADMIN') {
         sessionStorage.setItem('admin_logged_in_session', 'true');
     }
 
-    // 5. Smart Non-Looping Redirects
+    // 5. التوجيه الذكي لمنع التكرار اللانهائي (Smart Non-Looping Redirects)
     const currentPath = window.location.pathname;
-    const isAlreadyOnAdmin = currentPath.endsWith('admin.html');
-    const isAlreadyOnDashboard = currentPath.endsWith('dashboard.html');
+    
+    // فحص المسار الحالي للتأكد من عدم التكرار اللانهائي
+    const isAlreadyOnAdmin = currentPath.endsWith('admin.html') || currentPath.endsWith('admin-dashboard.html');
+    const isAlreadyOnDashboard = currentPath.endsWith('dashboard.html') || currentPath.endsWith('merchant-dashboard.html');
     const isAlreadyOnIndex = currentPath.endsWith('index.html') || currentPath === '/' || currentPath.endsWith('/');
 
-    console.log(`[Role Routing] Active Role: ${role} | Location: ${currentPath}`);
+    console.log(`[Role Routing] الدور النشط الحالي: ${role} | المسار الحالي: ${currentPath}`);
 
     if (role === 'ADMIN') {
         if (!isAlreadyOnAdmin) {
-            console.log("[Role Routing] Redirecting Admin to admin.html");
-            window.location.replace('admin.html');
+            console.log("[Role Routing] جاري توجيه المدير إلى صفحة لوحة التحكم الإدارية (admin-dashboard.html)...");
+            window.location.replace('/admin-dashboard.html');
         }
     } else if (role === 'MERCHANT') {
         if (!isAlreadyOnDashboard) {
-            console.log("[Role Routing] Redirecting Merchant to dashboard.html");
-            window.location.replace('dashboard.html');
+            console.log("[Role Routing] جاري توجيه التاجر إلى صفحة لوحة التحكم التجارية (merchant-dashboard.html)...");
+            window.location.replace('/merchant-dashboard.html');
         }
     } else { // CUSTOMER
         if (isAlreadyOnAdmin || isAlreadyOnDashboard) {
-            console.log("[Role Routing] Redirecting Customer to index.html");
-            window.location.replace('index.html');
+            console.log("[Role Routing] جاري توجيه الزبون إلى الصفحة الرئيسية (index.html)...");
+            window.location.replace('/index.html');
         }
     }
+};
+
+// للحفاظ على التوافق الكامل مع أي أجزاء أخرى تستدعي checkRoleAndRedirect
+window.checkRoleAndRedirect = async function() {
+    console.log("[Role Routing] استدعاء مواءمة checkRoleAndRedirect عبر دالة handleUserRedirect الموحدة...");
+    await window.handleUserRedirect();
 };
 
 // --- Global Auto-Sync Hook to keep NestJS, local tokens, and Supabase 100% in Sync ---
@@ -141,7 +151,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
 
         // Immediately trigger automated role check and redirection
         if (event === 'SIGNED_IN' || event === 'INITIAL_SESSION') {
-            await window.checkRoleAndRedirect();
+            await window.handleUserRedirect();
         }
     } else {
         // Logged out
