@@ -312,35 +312,94 @@ CREATE TABLE IF NOT EXISTS public.user_devices (
 -- ==========================================
 CREATE INDEX IF NOT EXISTS idx_users_email_lowercase ON public.users (LOWER(email));
 CREATE INDEX IF NOT EXISTS idx_users_supabase_uid ON public.users (supabase_uid);
-CREATE INDEX IF NOT EXISTS idx_products_category ON public.products (category);
-CREATE INDEX IF NOT EXISTS idx_products_store_id ON public.products (store_id);
-CREATE INDEX IF NOT EXISTS idx_orders_customer ON public.orders (customer_id);
-CREATE INDEX IF NOT EXISTS idx_orders_store ON public.orders (store_id);
-CREATE INDEX IF NOT EXISTS idx_orders_id ON public.orders (id);
+CREATE INDEX IF NOT EXISTS idx_profiles_email_lowercase ON public.profiles (LOWER(email));
+
+-- فهارس تحسين الاستعلامات على الروابط والـ Foreign Keys لمنع البطء (Performance Indexes on FKs)
+CREATE INDEX IF NOT EXISTS idx_merchant_documents_merchant ON public.merchant_documents (merchant_id);
+CREATE INDEX IF NOT EXISTS idx_stores_merchant ON public.stores (merchant_id);
 CREATE INDEX IF NOT EXISTS idx_stores_status ON public.stores (status);
 CREATE INDEX IF NOT EXISTS idx_stores_wilaya ON public.stores (wilaya);
+
+CREATE INDEX IF NOT EXISTS idx_products_store_id ON public.products (store_id);
+CREATE INDEX IF NOT EXISTS idx_products_category ON public.products (category);
+
+CREATE INDEX IF NOT EXISTS idx_orders_customer ON public.orders (customer_id);
+CREATE INDEX IF NOT EXISTS idx_orders_store ON public.orders (store_id);
+CREATE INDEX IF NOT EXISTS idx_orders_status ON public.orders (status);
+
+CREATE INDEX IF NOT EXISTS idx_order_items_order ON public.order_items (order_id);
+CREATE INDEX IF NOT EXISTS idx_order_items_product ON public.order_items (product_id);
+
+CREATE INDEX IF NOT EXISTS idx_payment_proofs_order ON public.payment_proofs (order_id);
+CREATE INDEX IF NOT EXISTS idx_payment_proofs_customer ON public.payment_proofs (customer_id);
+
+CREATE INDEX IF NOT EXISTS idx_order_lifecycle_order ON public.order_lifecycle (order_id);
+
+CREATE INDEX IF NOT EXISTS idx_reviews_product ON public.reviews (product_id);
+CREATE INDEX IF NOT EXISTS idx_reviews_customer ON public.reviews (customer_id);
+
+CREATE INDEX IF NOT EXISTS idx_complaints_order ON public.complaints (order_id);
+CREATE INDEX IF NOT EXISTS idx_complaints_user ON public.complaints (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_subscriptions_merchant ON public.subscriptions (merchant_id);
+
+CREATE INDEX IF NOT EXISTS idx_notifications_unread ON public.notifications (user_id) WHERE is_read = FALSE;
+
 CREATE INDEX IF NOT EXISTS idx_sessions_token ON public.sessions (token);
 CREATE INDEX IF NOT EXISTS idx_sessions_user ON public.sessions (user_id);
+
 CREATE INDEX IF NOT EXISTS idx_login_attempts_email ON public.login_attempts (email);
 CREATE INDEX IF NOT EXISTS idx_failed_logins_ip ON public.failed_logins (ip_address);
 CREATE INDEX IF NOT EXISTS idx_two_factor_user ON public.two_factor_secrets (user_id);
 CREATE INDEX IF NOT EXISTS idx_password_reset_token ON public.password_reset_tokens (token);
 CREATE INDEX IF NOT EXISTS idx_email_verification_token ON public.email_verification_tokens (token);
 CREATE INDEX IF NOT EXISTS idx_user_devices_fingerprint ON public.user_devices (device_fingerprint);
-CREATE INDEX IF NOT EXISTS idx_notifications_unread ON public.notifications (user_id) WHERE is_read = FALSE;
+CREATE INDEX IF NOT EXISTS idx_user_devices_user ON public.user_devices (user_id);
 
 
 -- ==========================================
 -- 4. ROW LEVEL SECURITY (RLS) POLICIES (سياسات الحماية والخصوصية العميقة)
 -- ==========================================
 
--- تفعيل ميزة RLS على الجداول الحساسة
+-- تفعيل ميزة RLS على جميع الجداول لضمان الأمان الأقصى لمنصة Supabase
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.merchant_documents ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.stores ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.products ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_items ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.payment_proofs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.order_lifecycle ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.reviews ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.complaints ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.user_devices ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.two_factor_secrets ENABLE ROW LEVEL SECURITY;
 
--- سياسات الوصول الآمن لجدول المستخدمين
+-- دالة مساعدة سريعة للتحقق من رتبة المستخدم الحالية
+CREATE OR REPLACE FUNCTION public.get_current_user_role()
+RETURNS VARCHAR AS $$
+DECLARE
+    u_role VARCHAR;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
+-- 1) سياسات الحسابات المتوافقة (Profiles Policies)
+DROP POLICY IF EXISTS "Profiles viewable by authenticated users" ON public.profiles;
+CREATE POLICY "Profiles viewable by authenticated users" ON public.profiles
+    FOR SELECT TO authenticated USING (TRUE);
+
+DROP POLICY IF EXISTS "Users can update their own profile" ON public.profiles;
+CREATE POLICY "Users can update their own profile" ON public.profiles
+    FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
+
+
+-- 2) سياسات جدول المستخدمين الرئيسي (Users Table Policies)
 DROP POLICY IF EXISTS "Users can view their own profile only" ON public.users;
 CREATE POLICY "Users can view their own profile only" ON public.users
     FOR SELECT TO authenticated USING (auth.uid() = supabase_uid);
@@ -349,23 +408,36 @@ DROP POLICY IF EXISTS "Users can update their own profile only" ON public.users;
 CREATE POLICY "Users can update their own profile only" ON public.users
     FOR UPDATE TO authenticated USING (auth.uid() = supabase_uid) WITH CHECK (auth.uid() = supabase_uid);
 
--- سياسات الوصول لجدول الجلسات
-DROP POLICY IF EXISTS "Users can view their own sessions only" ON public.sessions;
-CREATE POLICY "Users can view their own sessions only" ON public.sessions
-    FOR SELECT TO authenticated USING (auth.uid() = (SELECT supabase_uid FROM public.users WHERE id = user_id));
+DROP POLICY IF EXISTS "Admins can view all users" ON public.users;
+CREATE POLICY "Admins can view all users" ON public.users
+    FOR ALL TO authenticated USING (public.get_current_user_role() = 'ADMIN');
 
-DROP POLICY IF EXISTS "Users can delete their own sessions only" ON public.sessions;
-CREATE POLICY "Users can delete their own sessions only" ON public.sessions
-    FOR DELETE TO authenticated USING (auth.uid() = (SELECT supabase_uid FROM public.users WHERE id = user_id));
 
--- سياسات المتاجر والتحكم للتجار
+-- 3) سياسات وثائق التحقق للتجار (Merchant Documents Policies)
+DROP POLICY IF EXISTS "Merchants can view and upload their own documents" ON public.merchant_documents;
+CREATE POLICY "Merchants can view and upload their own documents" ON public.merchant_documents
+    FOR ALL TO authenticated USING (
+        merchant_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+DROP POLICY IF EXISTS "Admins can view and manage all merchant documents" ON public.merchant_documents;
+CREATE POLICY "Admins can view and manage all merchant documents" ON public.merchant_documents
+    FOR ALL TO authenticated USING (public.get_current_user_role() = 'ADMIN');
+
+
+-- 4) سياسات المتاجر والتحكم للتجار (Stores Policies)
+DROP POLICY IF EXISTS "Everyone can view approved stores" ON public.stores;
+CREATE POLICY "Everyone can view approved stores" ON public.stores
+    FOR SELECT USING (status = 'APPROVED'::public.store_status OR public.get_current_user_role() = 'ADMIN');
+
 DROP POLICY IF EXISTS "Merchants can manage their own stores" ON public.stores;
 CREATE POLICY "Merchants can manage their own stores" ON public.stores
     FOR ALL TO authenticated USING (
         merchant_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
     );
 
--- سياسات المنتجات والكاتالوج المفتوح للعموم مع السماح للتجار بالتعديل
+
+-- 5) سياسات المنتجات (Products Policies)
 DROP POLICY IF EXISTS "Everyone can view active products" ON public.products;
 CREATE POLICY "Everyone can view active products" ON public.products
     FOR SELECT USING (is_active = TRUE);
@@ -384,6 +456,131 @@ CREATE POLICY "Merchants can manage their own products" ON public.products
             JOIN public.users u ON s.merchant_id = u.id
             WHERE u.supabase_uid = auth.uid()
         )
+    );
+
+
+-- 6) سياسات الطلبات (Orders Policies)
+DROP POLICY IF EXISTS "Customers can manage their own orders" ON public.orders;
+CREATE POLICY "Customers can manage their own orders" ON public.orders
+    FOR ALL TO authenticated USING (
+        customer_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    ) WITH CHECK (
+        customer_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+DROP POLICY IF EXISTS "Merchants can view orders of their store" ON public.orders;
+CREATE POLICY "Merchants can view orders of their store" ON public.orders
+    FOR SELECT TO authenticated USING (
+        store_id IN (
+            SELECT s.id FROM public.stores s
+            JOIN public.users u ON s.merchant_id = u.id
+            WHERE u.supabase_uid = auth.uid()
+        )
+    );
+
+DROP POLICY IF EXISTS "Admins can manage all orders" ON public.orders;
+CREATE POLICY "Admins can manage all orders" ON public.orders
+    FOR ALL TO authenticated USING (public.get_current_user_role() = 'ADMIN');
+
+
+-- 7) سياسات عناصر سلة المشتريات للطلب (Order Items Policies)
+DROP POLICY IF EXISTS "Users can view order items of their orders" ON public.order_items;
+CREATE POLICY "Users can view order items of their orders" ON public.order_items
+    FOR SELECT TO authenticated USING (
+        order_id IN (
+            SELECT id FROM public.orders -- الـ RLS في جدول الطلبات يضمن التقييد التلقائي
+        )
+    );
+
+DROP POLICY IF EXISTS "Customers can insert order items" ON public.order_items;
+CREATE POLICY "Customers can insert order items" ON public.order_items
+    FOR INSERT TO authenticated WITH CHECK (
+        order_id IN (
+            SELECT id FROM public.orders
+        )
+    );
+
+
+-- 8) سياسات إثباتات الدفع المرفوعة (Payment Proofs Policies)
+DROP POLICY IF EXISTS "Customers can manage their own payment proofs" ON public.payment_proofs;
+CREATE POLICY "Customers can manage their own payment proofs" ON public.payment_proofs
+    FOR ALL TO authenticated USING (
+        customer_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+DROP POLICY IF EXISTS "Merchants can view payment proofs of their store" ON public.payment_proofs;
+CREATE POLICY "Merchants can view payment proofs of their store" ON public.payment_proofs
+    FOR SELECT TO authenticated USING (
+        order_id IN (
+            SELECT o.id FROM public.orders o
+            JOIN public.stores s ON o.store_id = s.id
+            JOIN public.users u ON s.merchant_id = u.id
+            WHERE u.supabase_uid = auth.uid()
+        )
+    );
+
+
+-- 9) سياسات نظام المراجعات والتقييمات (Reviews Policies)
+DROP POLICY IF EXISTS "Everyone can view reviews" ON public.reviews;
+CREATE POLICY "Everyone can view reviews" ON public.reviews
+    FOR SELECT USING (TRUE);
+
+DROP POLICY IF EXISTS "Customers can insert and manage their reviews" ON public.reviews;
+CREATE POLICY "Customers can insert and manage their reviews" ON public.reviews
+    FOR ALL TO authenticated USING (
+        customer_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+
+-- 10) سياسات حماية المستهلك والشكاوى (Complaints Policies)
+DROP POLICY IF EXISTS "Users can view and create their own complaints" ON public.complaints;
+CREATE POLICY "Users can view and create their own complaints" ON public.complaints
+    FOR ALL TO authenticated USING (
+        user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+DROP POLICY IF EXISTS "Admins can manage all complaints" ON public.complaints;
+CREATE POLICY "Admins can manage all complaints" ON public.complaints
+    FOR ALL TO authenticated USING (public.get_current_user_role() = 'ADMIN');
+
+
+-- 11) سياسات الاشتراكات المميزة (Subscriptions Policies)
+DROP POLICY IF EXISTS "Merchants can manage their own subscriptions" ON public.subscriptions;
+CREATE POLICY "Merchants can manage their own subscriptions" ON public.subscriptions
+    FOR ALL TO authenticated USING (
+        merchant_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+DROP POLICY IF EXISTS "Admins can manage all subscriptions" ON public.subscriptions;
+CREATE POLICY "Admins can manage all subscriptions" ON public.subscriptions
+    FOR ALL TO authenticated USING (public.get_current_user_role() = 'ADMIN');
+
+
+-- 12) سياسات التنبيهات الفورية (Notifications Policies)
+DROP POLICY IF EXISTS "Users can manage their own notifications" ON public.notifications;
+CREATE POLICY "Users can manage their own notifications" ON public.notifications
+    FOR ALL TO authenticated USING (
+        user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+
+-- 13) سياسات سجلات التدقيق الإداري (Audit Logs Policies)
+DROP POLICY IF EXISTS "Only Admins can view audit logs" ON public.audit_logs;
+CREATE POLICY "Only Admins can view audit logs" ON public.audit_logs
+    FOR ALL TO authenticated USING (public.get_current_user_role() = 'ADMIN');
+
+
+-- 14) سياسات إدارة الجلسات (Sessions Table Policies)
+DROP POLICY IF EXISTS "Users can view their own sessions only" ON public.sessions;
+CREATE POLICY "Users can view their own sessions only" ON public.sessions
+    FOR SELECT TO authenticated USING (
+        user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
+    );
+
+DROP POLICY IF EXISTS "Users can delete their own sessions only" ON public.sessions;
+CREATE POLICY "Users can delete their own sessions only" ON public.sessions
+    FOR DELETE TO authenticated USING (
+        user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid())
     );
 
 
