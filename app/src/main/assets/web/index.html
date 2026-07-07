@@ -1835,11 +1835,19 @@ onAuthStateChanged(auth, async (u) => {
         if (AD_LIST.includes(userEmail.toLowerCase().trim())) {
           window.location.href = 'admin.html';
         } else {
-          supabase.from('shops').select('*').eq('id', u.uid).maybeSingle().then(({ data }) => {
-            if (data) {
+          supabase.from('profiles').select('*').eq('id', u.id).maybeSingle().then(({ data: profile }) => {
+            if (profile && profile.role === 'merchant') {
               window.location.href = 'dashboard.html';
+            } else if (profile && profile.role === 'admin') {
+              window.location.href = 'admin.html';
             } else {
-              window.location.href = 'customer-home.html';
+              supabase.from('shops').select('*').eq('id', u.id).maybeSingle().then(({ data: shop }) => {
+                if (shop) {
+                  window.location.href = 'dashboard.html';
+                } else {
+                  window.location.href = 'customer-home.html';
+                }
+              });
             }
           });
         }
@@ -1877,11 +1885,19 @@ onAuthStateChanged(auth, async (u) => {
         if (AD_LIST.includes(userEmail.toLowerCase().trim())) {
           window.location.href = 'admin.html';
         } else {
-          supabase.from('shops').select('*').eq('id', u.uid).maybeSingle().then(({ data }) => {
-            if (data) {
+          supabase.from('profiles').select('*').eq('id', u.id).maybeSingle().then(({ data: profile }) => {
+            if (profile && profile.role === 'merchant') {
               window.location.href = 'dashboard.html';
+            } else if (profile && profile.role === 'admin') {
+              window.location.href = 'admin.html';
             } else {
-              window.location.href = 'customer-home.html';
+              supabase.from('shops').select('*').eq('id', u.id).maybeSingle().then(({ data: shop }) => {
+                if (shop) {
+                  window.location.href = 'dashboard.html';
+                } else {
+                  window.location.href = 'customer-home.html';
+                }
+              });
             }
           });
         }

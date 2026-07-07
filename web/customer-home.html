@@ -208,13 +208,18 @@ function updateApplicationUI(status) {
     btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> قيد المراجعة حالياً...`;
     container.style.display = 'block';
     container.style.color = 'var(--gold)';
-    container.textContent = '⏳ تم إيداع طلب الشراكة بنجاح وهو قيد الدراسة من قبل الإدارة العليا.';
+    container.innerHTML = '⏳ تم إيداع طلب الشراكة بنجاح وهو قيد الدراسة من قبل الإدارة العليا.';
   } else if (status === 'active') {
     btn.disabled = true;
     btn.innerHTML = `<i class="fa-solid fa-circle-check"></i> شريك نشط`;
     container.style.display = 'block';
     container.style.color = '#4ade80';
-    container.textContent = '✅ حسابك شريك معتمد ونشط بالمنصة! يمكنك الدخول كتاجر.';
+    container.innerHTML = `
+      <div style="margin-bottom: 12px; line-height: 1.5;">✅ حسابك شريك معتمد ونشط بالمنصة! يمكنك الدخول كتاجر.</div>
+      <button onclick="window.location.href='dashboard.html'" class="btn-primary" style="background: #22c55e; color: #fff; width: 100%; border: none; font-weight: bold; padding: 12px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; box-shadow: 0 4px 15px rgba(34,197,94,0.3);">
+        <i class="fa-solid fa-gauge-high"></i> الدخول إلى لوحة تحكم متجري 📦
+      </button>
+    `;
   } else {
     btn.disabled = false;
     btn.innerHTML = `<i class="fa-solid fa-briefcase"></i> تقديم طلب انضمام كتاجر`;
