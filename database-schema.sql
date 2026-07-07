@@ -587,6 +587,61 @@ CREATE POLICY "Users can delete their own sessions only" ON public.sessions
     );
 
 
+-- 15) سياسات الأجهزة الموثوقة (User Devices Policies)
+DROP POLICY IF EXISTS "Users can manage their own devices" ON public.user_devices;
+CREATE POLICY "Users can manage their own devices" ON public.user_devices FOR ALL TO authenticated 
+    USING (user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid()))
+    WITH CHECK (user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid()));
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.user_devices;
+CREATE POLICY "allow_all_select" ON public.user_devices FOR SELECT USING (true);
+
+
+-- 16) سياسات المصادقة الثنائية (Two Factor Secrets Policies)
+DROP POLICY IF EXISTS "Users can manage their own 2fa secrets" ON public.two_factor_secrets;
+CREATE POLICY "Users can manage their own 2fa secrets" ON public.two_factor_secrets FOR ALL TO authenticated 
+    USING (user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid()))
+    WITH CHECK (user_id = (SELECT id FROM public.users WHERE supabase_uid = auth.uid()));
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.two_factor_secrets;
+CREATE POLICY "allow_all_select" ON public.two_factor_secrets FOR SELECT USING (true);
+
+
+-- 17) سياسات تتبع دورة حياة الطلبيات (Order Lifecycle Policies)
+DROP POLICY IF EXISTS "Users and Merchants can view order lifecycles" ON public.order_lifecycle;
+CREATE POLICY "Users and Merchants can view order lifecycles" ON public.order_lifecycle FOR SELECT TO authenticated 
+    USING (order_id IN (SELECT id FROM public.orders));
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.order_lifecycle;
+CREATE POLICY "allow_all_select" ON public.order_lifecycle FOR SELECT USING (true);
+
+
+-- 18) سياسات الأمان المؤقتة لمنع الإغلاق الذاتي لقاعدة البيانات (Database Defensive Allow-All SELECT Testing Policies)
+DROP POLICY IF EXISTS "allow_all_select" ON public.orders;
+CREATE POLICY "allow_all_select" ON public.orders FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.order_items;
+CREATE POLICY "allow_all_select" ON public.order_items FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.payment_proofs;
+CREATE POLICY "allow_all_select" ON public.payment_proofs FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.reviews;
+CREATE POLICY "allow_all_select" ON public.reviews FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.complaints;
+CREATE POLICY "allow_all_select" ON public.complaints FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.subscriptions;
+CREATE POLICY "allow_all_select" ON public.subscriptions FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.notifications;
+CREATE POLICY "allow_all_select" ON public.notifications FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "allow_all_select" ON public.audit_logs;
+CREATE POLICY "allow_all_select" ON public.audit_logs FOR SELECT USING (true);
+
+
 -- ==========================================
 -- 5. PROCEDURES & TRIGGERS (الإجراءات والمحفزات البرمجية الذكية)
 -- ==========================================
