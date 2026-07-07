@@ -99,30 +99,41 @@ window.handleUserRedirect = async function() {
         sessionStorage.setItem('admin_logged_in_session', 'true');
     }
 
+    // 4b. مزامنة الجلسة النشطة بالكامل مع محرك التطبيق المحلي (Shared Engine Sync)
+    const activeSessionUser = {
+        uid: user.id,
+        email: email,
+        name: user.user_metadata?.full_name || email.split('@')[0],
+        phone: "0555" + Math.floor(100000 + Math.random() * 900000),
+        role: role.toLowerCase(), // "admin", "merchant", "customer"
+        status: "ACTIVE"
+    };
+    localStorage.setItem('zalo_active_session', JSON.stringify(activeSessionUser));
+
     // 5. التوجيه الذكي لمنع التكرار اللانهائي (Smart Non-Looping Redirects)
     const currentPath = window.location.pathname;
     
-    // فحص المسار الحالي للتأكد من عدم التكرار اللانهائي
-    const isAlreadyOnAdmin = currentPath.endsWith('admin.html') || currentPath.endsWith('admin-dashboard.html');
-    const isAlreadyOnDashboard = currentPath.endsWith('dashboard.html') || currentPath.endsWith('merchant-dashboard.html');
+    // فحص المسار الحالي للتأكد من عدم التكرار اللانهائي - مطابقة حقيقية للملفات الموجودة
+    const isAlreadyOnAdmin = currentPath.endsWith('dashboard-admin.html') || currentPath.endsWith('admin.html');
+    const isAlreadyOnDashboard = currentPath.endsWith('dashboard-store.html') || currentPath.endsWith('dashboard.html');
     const isAlreadyOnIndex = currentPath.endsWith('index.html') || currentPath === '/' || currentPath.endsWith('/');
 
     console.log(`[Role Routing] الدور النشط الحالي: ${role} | المسار الحالي: ${currentPath}`);
 
     if (role === 'ADMIN') {
         if (!isAlreadyOnAdmin) {
-            console.log("[Role Routing] جاري توجيه المدير إلى صفحة لوحة التحكم الإدارية (admin-dashboard.html)...");
-            window.location.replace('/admin-dashboard.html');
+            console.log("[Role Routing] جاري توجيه المدير إلى صفحة لوحة التحكم الإدارية (dashboard-admin.html)...");
+            window.location.replace('dashboard-admin.html');
         }
     } else if (role === 'MERCHANT') {
         if (!isAlreadyOnDashboard) {
-            console.log("[Role Routing] جاري توجيه التاجر إلى صفحة لوحة التحكم التجارية (merchant-dashboard.html)...");
-            window.location.replace('/merchant-dashboard.html');
+            console.log("[Role Routing] جاري توجيه التاجر إلى صفحة لوحة التحكم التجارية (dashboard-store.html)...");
+            window.location.replace('dashboard-store.html');
         }
     } else { // CUSTOMER
         if (isAlreadyOnAdmin || isAlreadyOnDashboard) {
             console.log("[Role Routing] جاري توجيه الزبون إلى الصفحة الرئيسية (index.html)...");
-            window.location.replace('/index.html');
+            window.location.replace('index.html');
         }
     }
 };
@@ -159,6 +170,7 @@ supabase.auth.onAuthStateChange(async (event, session) => {
         localStorage.removeItem('zalo_session_jwt');
         localStorage.removeItem('nestjs_user');
         localStorage.removeItem('zalo_user_role');
+        localStorage.removeItem('zalo_active_session');
         sessionStorage.removeItem('admin_logged_in_session');
     }
 });
