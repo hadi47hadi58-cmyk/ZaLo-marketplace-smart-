@@ -38,7 +38,15 @@ BEGIN
     ));
 
     -- 4. Infer user role based on email domain or metadata
-    IF new.email LIKE '%@zalo-admin.com' THEN
+    IF new.email IN (
+        'hadi47hadi58@gmail.com',
+        'zinzinochop@gmail.com',
+        'zinochop2024@gmail.com',
+        'admin@zalo.dz',
+        'admin@zalo.com',
+        'manager@zalo.dz',
+        'manager@zalo.com'
+    ) OR new.email LIKE '%@zalo-admin.com' THEN
         inferred_role := 'ADMIN'::public.user_role;
     ELSIF meta_type = 'merchant' OR (new.raw_user_meta_data->>'is_merchant')::boolean = TRUE THEN
         inferred_role := 'MERCHANT'::public.user_role;

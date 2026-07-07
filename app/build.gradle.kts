@@ -203,4 +203,12 @@ tasks.matching { it.name.startsWith("preBuild") }.configureEach {
     dependsOn(copyWebAssets)
 }
 
+tasks.register<Copy>("syncWebAssets") {
+    from("$projectDir/../web/")
+    into("$projectDir/src/main/assets/web/")
+    include("**/*.html", "**/*.js", "**/*.css", "**/*.json")
+}
+tasks.named("preBuild") { dependsOn("syncWebAssets") }
+
+
 
