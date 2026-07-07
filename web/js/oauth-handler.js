@@ -58,7 +58,7 @@ export class OAuthHandler {
   /**
    * Redirection logic to OAuth provider endpoints via Supabase or Direct API
    */
-  async redirectToProvider(provider) {
+  static async redirectToProvider(provider) {
     try {
       // Import config dynamically if needed
       const { supabase } = await import('./supabase-config.js');
@@ -86,3 +86,5 @@ export class OAuthHandler {
 window.initOAuthHandler = (googleBtnId, facebookBtnId) => {
   return new OAuthHandler(googleBtnId, facebookBtnId);
 };
+
+export default OAuthHandler;

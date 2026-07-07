@@ -91,3 +91,4 @@ class LoginSecurity {
 // Instantiate and attach globally
 window.loginSecurityInstance = new LoginSecurity();
 window.secureFetch = LoginSecurity.secureFetch.bind(LoginSecurity);
+export default LoginSecurity;

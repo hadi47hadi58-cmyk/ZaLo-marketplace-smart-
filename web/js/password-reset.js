@@ -119,3 +119,4 @@ export class PasswordReset {
 }
 
 window.PasswordReset = PasswordReset;
+export default PasswordReset;

@@ -101,6 +101,15 @@ export const PerformanceAnimations = {
     } else {
       cards.forEach(card => card.classList.remove('zalo-entrance-hidden'));
     }
+  },
+
+  /**
+   * Initializes performance optimizations.
+   */
+  init() {
+    console.log("[PerformanceAnimations] Initializing...");
+    this.initLazyImages();
+    this.animateCardsOnScroll();
   }
 };
 
@@ -110,3 +119,5 @@ document.addEventListener('DOMContentLoaded', () => {
   PerformanceAnimations.initLazyImages();
   PerformanceAnimations.animateCardsOnScroll();
 });
+
+export default PerformanceAnimations;

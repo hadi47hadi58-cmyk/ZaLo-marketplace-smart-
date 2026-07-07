@@ -97,3 +97,4 @@ class PasswordValidator {
 }
 
 window.PasswordValidator = PasswordValidator;
+export default PasswordValidator;

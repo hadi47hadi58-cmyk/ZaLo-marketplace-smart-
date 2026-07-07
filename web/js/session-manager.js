@@ -86,6 +86,31 @@ export class SessionManager {
       window.location.href = 'login.html';
     }
   }
+
+  /**
+   * Starts a secure session by storing user details and token.
+   */
+  startSession(response) {
+    if (!response) return;
+    const token = response.access_token || response.token;
+    const user = response.user || response;
+    const role = user.role || response.role || 'CUSTOMER';
+    const email = user.email || response.email || '';
+    const name = user.name || response.name || '';
+
+    if (token) {
+      localStorage.setItem(this.jwtKey, token);
+    }
+    localStorage.setItem(this.roleKey, role.toUpperCase());
+    localStorage.setItem('zalo_user_email', email);
+    localStorage.setItem('zalo_user_name', name);
+    localStorage.setItem('user_email', email);
+    localStorage.setItem('zalo_user_role', role.toUpperCase());
+
+    if (role.toUpperCase() === 'ADMIN') {
+      sessionStorage.setItem('admin_logged_in_session', 'true');
+    }
+  }
 }
 
 // Instantiate and initiate auto-redirect routines
@@ -94,3 +119,5 @@ window.sessionManagerInstance = new SessionManager();
 document.addEventListener('DOMContentLoaded', () => {
   window.sessionManagerInstance.handleAutoRedirection();
 });
+
+export default window.sessionManagerInstance;

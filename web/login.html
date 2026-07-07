@@ -554,6 +554,7 @@
     <!-- Collapsible Standard Email Form Container (Always visible now) -->
     <div class="collapsible-form" id="collapsibleFormContainer">
       <form id="unifiedLoginForm">
+        <!-- Email Input -->
         <div class="form-group" style="margin-bottom: 16px;">
           <label class="form-label" style="display: block; font-size: 13px; font-weight: 700; color: var(--gold2); margin-bottom: 6px;">البريد الإلكتروني للذكاء الموحد</label>
           <div class="input-wrapper" style="position: relative;">
@@ -562,30 +563,55 @@
           </div>
         </div>
 
+        <!-- Password Input -->
         <div class="form-group" style="margin-bottom: 16px;">
-          <label class="form-label" style="display: block; font-size: 13px; font-weight: 700; color: var(--gold2); margin-bottom: 6px;">كلمة المرور الآمنة</label>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; direction: rtl;">
+            <label class="form-label" style="font-size: 13px; font-weight: 700; color: var(--gold2);">كلمة المرور الآمنة</label>
+            <a href="#" id="forgot-password-link" style="color: var(--gold2); font-size: 11.5px; font-weight: 700; text-decoration: none;">نسيت كلمة المرور؟</a>
+          </div>
           <div class="input-wrapper" style="position: relative;">
             <i class="fa-solid fa-lock input-icon" style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); color: var(--text2); font-size: 14px;"></i>
             <input type="password" class="form-input" id="loginPass" placeholder="••••••••" required autocomplete="current-password" style="width: 100%; padding: 12px 38px 12px 14px; border-radius: 14px; border: 1px solid var(--border); background: rgba(0,0,0,0.25); color: #fff;">
           </div>
+          <!-- Password Strength Meter -->
+          <meter id="password-strength-bar" min="0" max="4" low="2" high="3" optimum="4" style="width: 100%; height: 6px; margin-top: 8px; display: none;"></meter>
         </div>
 
-        <button type="submit" class="submit-btn" id="submitBtn" style="width: 100%; background: var(--green); border: 1px solid var(--gold); color: #fff; font-size: 15px; font-weight: 800; padding: 13px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+        <!-- Remember Me Checkbox -->
+        <div class="form-group" style="margin-bottom: 20px; display: flex; align-items: center; gap: 8px; direction: rtl;">
+          <input type="checkbox" id="remember-me-checkbox" style="width: 18px; height: 18px; accent-color: var(--green); cursor: pointer; border-radius: 4px; background: rgba(0,0,0,0.25); border: 1px solid var(--border);">
+          <label for="remember-me-checkbox" style="font-size: 13px; color: var(--text2); cursor: pointer; font-weight: 700; user-select: none;">تذكرني على هذا الجهاز الآمن 🔒</label>
+        </div>
+
+        <!-- Main Submission Button -->
+        <button type="submit" class="submit-btn" id="submitBtn" style="width: 100%; background: var(--green); border: 1px solid var(--gold); color: #fff; font-size: 15px; font-weight: 800; padding: 13px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s;">
           <span>تأكيد وتسجيل الدخول الموحد</span> <i class="fa-solid fa-arrow-left"></i>
         </button>
       </form>
     </div>
 
+    <!-- 2FA Container -->
+    <div id="two-factor-container" style="display: none; margin-top: 16px;"></div>
+
     <!-- Divider "أو" (Or) -->
-    <div class="separator" style="display: flex; align-items: center; text-align: center; margin: 24px 0; color: var(--text2); font-size: 13px; font-weight: 600;">أو المتابعة عبر</div>
+    <div class="separator" style="display: flex; align-items: center; text-align: center; margin: 24px 0; color: var(--text2); font-size: 13px; font-weight: 600;">أو المتابعة عبر الهوية الحيوية والاجتماعية</div>
 
     <!-- Manus Action Buttons Stack -->
-    <div class="manus-buttons-container">
+    <div class="manus-buttons-container" style="display: flex; flex-direction: column; gap: 12px;">
+      <!-- Biometric Login Button -->
+      <button type="button" class="manus-btn biometric-btn" id="biometric-login-btn" style="width: 100%; background: rgba(26,92,42,0.1); border: 1px solid var(--border); color: #fff; font-size: 14px; font-weight: 800; padding: 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.2s;">
+        <div class="btn-text-wrapper" style="display: flex; align-items: center; gap: 8px;">
+          <i class="fa-solid fa-fingerprint" style="color: var(--gold); font-size: 18px;"></i>
+          <span>المتابعة عبر بصمة الأصبع الحيوية</span>
+        </div>
+        <i class="fa-solid fa-chevron-left arrow-left"></i>
+      </button>
+
       <!-- Google Sign In Button (Fully Functional) -->
-      <button type="button" class="manus-btn google-btn" id="googleBtn">
-        <div class="btn-text-wrapper">
-          <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="Google" class="btn-icon-img">
-          <span>متابعة باستخدام Google</span>
+      <button type="button" class="manus-btn google-btn" id="googleBtn" style="width: 100%; background: rgba(255,255,255,0.05); border: 1px solid var(--border); color: #fff; font-size: 14px; font-weight: 800; padding: 12px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; gap: 8px; transition: all 0.2s;">
+        <div class="btn-text-wrapper" style="display: flex; align-items: center; gap: 8px;">
+          <img src="https://images.unsplash.com/photo-1573804633927-bfcbcd909acd?auto=format&fit=crop&w=32&h=32" alt="Google" class="btn-icon-img" style="width: 18px; height: 18px; border-radius: 50%;">
+          <span>المتابعة باستخدام حساب Google</span>
         </div>
         <i class="fa-solid fa-chevron-left arrow-left"></i>
       </button>
@@ -600,308 +626,30 @@
 
 </div>
 
-<!-- Supabase Integration -->
-<script type="module">
-  import { supabase } from './js/supabase-db-compat.js';
-
-  // Manus Collapsible and Interactive Handlers
-  document.addEventListener('DOMContentLoaded', () => {
-    const toggleBtn = document.getElementById('toggleEmailFormBtn');
-    const collapsibleForm = document.getElementById('collapsibleFormContainer');
-    const emailToggleArrow = document.getElementById('emailToggleArrow');
-    const manusCard = document.getElementById('manusProfileCard');
-    const manusAvatar = document.getElementById('manusAvatar');
-    const manusEmail = document.getElementById('manusEmail');
-    const manusProfileTitle = document.getElementById('manusProfileTitle');
-
-    const lastEmail = localStorage.getItem('user_email');
-    if (manusCard && manusAvatar && manusEmail && manusProfileTitle) {
-      if (lastEmail) {
-        manusEmail.textContent = lastEmail;
-        manusProfileTitle.textContent = 'المتابعة كحسابك النشط المعتمد';
-        const cleanName = lastEmail.split('@')[0].toUpperCase();
-        manusAvatar.src = `https://ui-avatars.com/api/?name=${cleanName}&background=1a5c2a&color=fff&bold=true`;
-      } else {
-        manusEmail.textContent = 'تسجيل دخول سريع كمشتري زائر';
-        manusProfileTitle.textContent = 'المتابعة كزبون جديد';
-        manusAvatar.src = `https://ui-avatars.com/api/?name=ZaLo&background=c9a84c&color=071a0b&bold=true`;
-      }
-
-      manusCard.addEventListener('click', () => {
-        if (lastEmail) {
-          const emailInput = document.getElementById('loginEmail');
-          if (emailInput) {
-            emailInput.value = lastEmail;
-            performDetection(lastEmail);
-          }
-        }
-        const emailInput = document.getElementById('loginEmail');
-        if (emailInput) emailInput.focus();
-      });
-    }
-  });
-
-  // Session Cleanup action
-  const clearBtn = document.getElementById('clearSessionBtn');
-  if (clearBtn) {
-    clearBtn.addEventListener('click', async () => {
-      try {
-        localStorage.clear();
-        sessionStorage.clear();
-        for (let key in localStorage) {
-          if (key.startsWith('sb-')) {
-            localStorage.removeItem(key);
-          }
-        }
-        await supabase.auth.signOut();
-        alert("تم تنظيف جلسة العمل وذاكرة التخزين المؤقت بنجاح. يرجى المحاولة مجدداً.");
-        window.location.reload();
-      } catch (err) {
-        console.error("Session cleanup failed:", err);
-        localStorage.clear();
-        sessionStorage.clear();
-        window.location.reload();
-      }
-    });
+<!-- Importmap Definitions for Seamless Modular Loading -->
+<script type="importmap">
+{
+  "imports": {
+    "/js/session-manager.js": "./js/session-manager.js",
+    "/js/login-handler.js": "./js/login-handler.js",
+    "/js/two-factor-auth.js": "./js/two-factor-auth.js",
+    "/js/password-validator.js": "./js/password-validator.js",
+    "/js/biometric-auth.js": "./js/biometric-auth.js",
+    "/js/oauth-handler.js": "./js/oauth-handler.js",
+    "/js/password-reset.js": "./js/password-reset.js",
+    "/js/remember-me.js": "./js/remember-me.js",
+    "/js/login-security.js": "./js/login-security.js",
+    "/js/design-system.js": "./js/design-system.js",
+    "/js/performance-animations.js": "./js/performance-animations.js",
+    "/js/permissions-manager.js": "./js/permissions-manager.js",
+    "/js/login-analytics.js": "./js/login-analytics.js",
+    "/js/telemetry-logger.js": "./js/telemetry-logger.js"
   }
-
-  const form = document.getElementById('unifiedLoginForm');
-  const emailInput = document.getElementById('loginEmail');
-  const errorEl = document.getElementById('errorMessage');
-  const submitBtn = document.getElementById('submitBtn');
-
-  const roleBadge = document.getElementById('roleBadge');
-  const badgeIcon = document.getElementById('badgeIcon');
-  const badgeText = document.getElementById('badgeText');
-
-  const AD_LIST = [
-    'zinzinochop@gmail.com',
-    'zinochop2024@gmail.com',
-    'hadi47hadi58@gmail.com',
-    'admin@zalo.dz',
-    'admin@zalo.com',
-    'manager@zalo.dz',
-    'manager@zalo.com'
-  ];
-
-  function showError(msg) {
-    errorEl.innerHTML = msg;
-    errorEl.style.display = 'block';
-  }
-
-  // Update design badge state
-  function updateBadge(role) {
-    roleBadge.className = 'detected-badge';
-    if (role === 'admin') {
-      roleBadge.classList.add('badge-admin');
-      badgeIcon.className = 'fa-solid fa-user-shield';
-      badgeText.innerHTML = '🛡️ حساب إداري (المدير المعتمد)';
-    } else if (role === 'merchant') {
-      roleBadge.classList.add('badge-merchant');
-      badgeIcon.className = 'fa-solid fa-store';
-      badgeText.innerHTML = '🏪 حساب تاجر وشريك معتمد';
-    } else {
-      roleBadge.classList.add('badge-customer');
-      badgeIcon.className = 'fa-solid fa-house';
-      badgeText.innerHTML = 'الواجهة الرئيسية';
-    }
-  }
-
-  // Real-time detection logic on typing
-  let queryTimer = null;
-  async function performDetection(email) {
-    email = email.trim().toLowerCase();
-    if (!email || !email.includes('@')) {
-      updateBadge('customer');
-      return;
-    }
-
-    // 1. Direct admin check
-    if (AD_LIST.includes(email)) {
-      updateBadge('admin');
-      return;
-    }
-
-    // 2. Direct merchant email triggers
-    if (email.includes('merchant') || email.includes('shop') || email === 'merchant@zalo.com') {
-      updateBadge('merchant');
-      return;
-    }
-
-    // 3. Smart check Supabase for matching shops or merchant_requests
-    try {
-      const { data: shops } = await supabase.from('shops').select('email').eq('email', email);
-      if (shops && shops.length > 0) {
-        updateBadge('merchant');
-        return;
-      }
-
-      const { data: requests } = await supabase.from('merchant_requests').select('email').eq('email', email);
-      if (requests && requests.length > 0) {
-        updateBadge('merchant');
-        return;
-      }
-    } catch (err) {
-      console.warn("Supabase lookup silenced:", err);
-    }
-
-    updateBadge('customer');
-  }
-
-  emailInput.addEventListener('input', () => {
-    const val = emailInput.value;
-    clearTimeout(queryTimer);
-    queryTimer = setTimeout(() => {
-      performDetection(val);
-    }, 400);
-  });
-
-  let isSignUpMode = false;
-  const toggleModeBtn = document.getElementById('toggleModeBtn');
-  if (toggleModeBtn) {
-    toggleModeBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      isSignUpMode = !isSignUpMode;
-      const btnSpan = submitBtn.querySelector('span') || submitBtn;
-      if (isSignUpMode) {
-        btnSpan.textContent = 'إنشاء حساب جديد وتأكيد الدخول';
-        toggleModeBtn.textContent = 'لديك حساب بالفعل؟ سجل دخولك الآن ←';
-        if (badgeText) badgeText.textContent = '✨ إنشاء حساب زبون جديد';
-      } else {
-        btnSpan.textContent = 'تأكيد وتسجيل الدخول الموحد';
-        toggleModeBtn.textContent = 'ليس لديك حساب؟ سجل حساباً جديداً الآن ←';
-        performDetection(emailInput.value);
-      }
-    });
-  }
-
-  // Form submission and routing
-  form.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    errorEl.style.display = 'none';
-    const email = emailInput.value.trim().toLowerCase();
-    const pass = document.getElementById('loginPass').value;
-
-    submitBtn.disabled = true;
-    submitBtn.style.opacity = '0.7';
-
-    try {
-      let data, error;
-      if (isSignUpMode) {
-        const signupRes = await supabase.auth.signUp({
-          email: email,
-          password: pass
-        });
-        data = signupRes.data;
-        error = signupRes.error;
-        if (error) throw error;
-      } else {
-        const signinRes = await supabase.auth.signInWithPassword({
-          email: email,
-          password: pass
-        });
-        data = signinRes.data;
-        error = signinRes.error;
-        if (error) throw error;
-      }
-      
-      const user = data.user;
-
-      // Ensure local state stores correct details
-      localStorage.setItem('user_email', email);
-
-      // Automated dynamic role redirection
-      if (typeof window.checkRoleAndRedirect === 'function') {
-        await window.checkRoleAndRedirect();
-      } else {
-        window.location.href = 'index.html';
-      }
-
-    } catch (error) {
-      console.error(error);
-      let arabicError = isSignUpMode 
-        ? "فشل إنشاء الحساب الجديد. قد يكون البريد الإلكتروني مسجلاً بالفعل أو كلمة المرور قصيرة جداً (6 أحرف على الأقل)."
-        : "البريد الإلكتروني أو كلمة المرور غير صحيحة، يرجى التحقق وإعادة المحاولة.";
-      showError(arabicError);
-      submitBtn.disabled = false;
-      submitBtn.style.opacity = '1';
-    }
-  });
-
-  // Handle Google Sign-in action
-  document.getElementById('googleBtn').addEventListener('click', async () => {
-    errorEl.style.display = 'none';
-    if (window.AndroidInterface && typeof window.AndroidInterface.requestGoogleSignIn === 'function') {
-      try {
-        window.AndroidInterface.requestGoogleSignIn();
-      } catch (err) {
-        console.error("Native Google sign-in failure, calling Web OAuth fallback:", err);
-        fallbackToWebOAuth();
-      }
-    } else {
-      fallbackToWebOAuth();
-    }
-  });
-
-  async function fallbackToWebOAuth() {
-    try {
-      // Dynamic Redirect URL to support custom domains, GitHub Pages root or subfolders, and local development
-      let redirectUrl = window.location.origin + window.location.pathname.replace('login.html', 'index.html');
-      
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: redirectUrl
-        }
-      });
-      if (error) throw error;
-    } catch (error) {
-      console.error(error);
-      showError("حدث قصور أثناء مصادقة الحساب مع خوادم Google.");
-    }
-  }
-
-  // Define global callbacks for Android native integration
-  window.onGoogleIdTokenReceived = async function(idToken) {
-    errorEl.style.display = 'none';
-    try {
-      const submitBtn = document.getElementById('submitBtn');
-      if (submitBtn) {
-        submitBtn.disabled = true;
-        submitBtn.style.opacity = '0.5';
-      }
-      
-      const { data, error } = await supabase.auth.signInWithIdToken({
-        provider: 'google',
-        token: idToken
-      });
-      
-      if (error) throw error;
-
-      // Automated dynamic role redirection
-      if (typeof window.checkRoleAndRedirect === 'function') {
-        await window.checkRoleAndRedirect();
-      } else {
-        window.location.href = "index.html";
-      }
-    } catch (error) {
-      console.error("Supabase ID Token Auth failed:", error);
-      showError("حدث خطأ أثناء الاتصال بـ Supabase باستخدام حساب جوجل: " + (error.message || error));
-      const submitBtn = document.getElementById('submitBtn');
-      if (submitBtn) {
-        submitBtn.disabled = false;
-        submitBtn.style.opacity = '1';
-      }
-    }
-  };
-
-  window.onGoogleIdTokenFailed = function(reason) {
-    console.warn("Google native sign-in failed/cancelled:", reason);
-    if (reason !== 'cancelled') {
-      showError("فشل تسجيل الدخول باستخدام حساب جوجل: " + reason);
-    }
-  };
+}
 </script>
+
+<!-- Centralized Bootstrap & Orchestration System -->
+<script type="module" src="./js/main-login-bootstrap.js"></script>
 
 </body>
 </html>

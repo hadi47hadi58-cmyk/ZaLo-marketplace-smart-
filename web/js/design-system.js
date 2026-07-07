@@ -170,6 +170,14 @@ export const DesignSystem = {
     }
 
     console.log(`%c[ZaLo Accessibility] تم الانتهاء من التدقيق بنجاح. تم رصد ومعالجة وتصحيح (${violations}) من الملاحظات.`, 'color: #c9a84c; font-weight: bold;');
+  },
+
+  /**
+   * Initializes the design system.
+   */
+  init() {
+    console.log("[DesignSystem] Initializing design system...");
+    this.runAccessibilityAudit();
   }
 };
 
@@ -179,3 +187,5 @@ window.DesignSystem = DesignSystem;
 window.addEventListener('load', () => {
   DesignSystem.runAccessibilityAudit();
 });
+
+export default DesignSystem;

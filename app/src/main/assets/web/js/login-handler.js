@@ -109,6 +109,49 @@ export class LoginHandler {
       window.location.href = 'customer-home.html';
     }
   }
+
+  /**
+   * Static authenticate method to support main-login-bootstrap.js flow.
+   */
+  static async authenticate({ email, password }) {
+    try {
+      const { nestjsLogin } = await import('./nestjs-bridge.js');
+      const response = await nestjsLogin(email, password);
+      if (response && response.access_token) {
+        return {
+          success: true,
+          token: response.access_token,
+          role: response.user?.role || 'CUSTOMER',
+          email: response.user?.email || email,
+          name: response.user?.name || '',
+          redirectUrl: (response.user?.role || 'CUSTOMER').toUpperCase() === 'ADMIN' ? 'admin.html' : ((response.user?.role || 'CUSTOMER').toUpperCase() === 'MERCHANT' ? 'dashboard.html' : 'customer-home.html')
+        };
+      }
+      return { success: false, message: 'لم يتم استلام توكن أمني صالح من الخادم.' };
+    } catch (err) {
+      console.warn('[LoginHandler] Primary authentication failed, using local failover bypass:', err);
+      try {
+        const { supabase } = await import('./supabase-config.js');
+        const res = await supabase.auth.signInWithPassword({ email, password });
+        if (res && !res.error) {
+          const user = res.data.user;
+          const session = res.data.session;
+          const role = user?.user_metadata?.role || localStorage.getItem('zalo_user_role') || 'CUSTOMER';
+          return {
+            success: true,
+            token: session?.access_token || 'mock-token',
+            role: role,
+            email: user?.email || email,
+            name: user?.user_metadata?.full_name || '',
+            redirectUrl: role.toUpperCase() === 'ADMIN' ? 'admin.html' : (role.toUpperCase() === 'MERCHANT' ? 'dashboard.html' : 'customer-home.html')
+          };
+        }
+        return { success: false, message: res.error?.message || err.message || 'البريد الإلكتروني أو كلمة المرور غير صحيحة.' };
+      } catch (bypassErr) {
+        return { success: false, message: bypassErr.message || err.message || 'فشل الاتصال بالخادم.' };
+      }
+    }
+  }
 }
 
 // Add CSS Shake Animation style for error messages dynamically
@@ -126,3 +169,4 @@ if (!document.getElementById('shake-keyframes-style')) {
 }
 
 window.LoginHandler = LoginHandler;
+export default LoginHandler;

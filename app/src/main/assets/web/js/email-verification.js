@@ -102,3 +102,4 @@ export class EmailVerification {
 }
 
 window.EmailVerification = EmailVerification;
+export default EmailVerification;

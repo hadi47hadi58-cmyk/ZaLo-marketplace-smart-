@@ -63,6 +63,13 @@ export const PermissionsManager = {
         console.warn(`[RBAC System] Securing component: Hidden/Disabled unauthorized action [${requiredPermission}]`);
       }
     });
+  },
+
+  /**
+   * Applies permission enforcement on UI.
+   */
+  apply() {
+    this.enforceUIPermissions();
   }
 };
 
@@ -72,3 +79,5 @@ window.PermissionsManager = PermissionsManager;
 document.addEventListener('DOMContentLoaded', () => {
   PermissionsManager.enforceUIPermissions();
 });
+
+export default PermissionsManager;

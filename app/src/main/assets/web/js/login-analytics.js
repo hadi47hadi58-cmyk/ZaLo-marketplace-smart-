@@ -96,3 +96,4 @@ class LoginAnalytics {
 window.initLoginAnalytics = (formId, usernameInputId) => {
   return new LoginAnalytics(formId, usernameInputId);
 };
+export default LoginAnalytics;

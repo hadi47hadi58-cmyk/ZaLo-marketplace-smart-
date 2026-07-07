@@ -4,8 +4,8 @@
  */
 
 export class RememberMe {
-  private static readonly EMAIL_STORAGE_KEY = 'zalo_remembered_email';
-  private static readonly PREFERENCE_STORAGE_KEY = 'zalo_remember_preference';
+  static EMAIL_STORAGE_KEY = 'zalo_remembered_email';
+  static PREFERENCE_STORAGE_KEY = 'zalo_remember_preference';
 
   /**
    * Pre-fills the email field if remember me preference was set.
@@ -41,6 +41,21 @@ export class RememberMe {
       localStorage.setItem(this.PREFERENCE_STORAGE_KEY, 'false');
     }
   }
+
+  /**
+   * Stores a remembered token.
+   */
+  static storeToken(token) {
+    localStorage.setItem('zalo_remembered_token', token);
+  }
+
+  /**
+   * Retrieves the remembered token.
+   */
+  static retrieveToken() {
+    return localStorage.getItem('zalo_remembered_token');
+  }
 }
 
 window.RememberMe = RememberMe;
+export default RememberMe;
