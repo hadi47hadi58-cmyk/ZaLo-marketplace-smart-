@@ -1,21 +1,63 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# ZaLo Marketplace Smart — منصة التجارة الإلكترونية المتكاملة
 
-# Run and deploy your AI Studio app
+**إصدار:** v18 (Release Candidate 1) | **الحالة:** جاهز للاختبار والعرض
 
-This contains everything you need to run your app locally.
+## 📌 نظرة عامة (Overview)
+منصة ذكية تربط التجار والعملاء وشركات التوصيل في حلقة واحدة، مزودة بنظام أمان متقدم (2FA، بصمة جهاز، RLS)، ولوحة تحكم آنية، وتطبيق هجين (Web + Android).
 
-View your app in AI Studio: https://ai.studio/apps/a2046c09-4575-419f-a470-98e8bb5c1a3b
+*هذا المشروع هو ملكية فكرية حصرية لـ [ZaLo / nadjemi].*
 
-## Run Locally
+---
 
-**Prerequisites:**  [Android Studio](https://developer.android.com/studio)
+## ⚙️ المتطلبات الأساسية (Prerequisites) — للاستخدام الداخلي فقط
+لتشغيل هذا المشروع بنجاح، يجب توفير المكونات التالية (تُمنح فقط للفريق الداخلي المعتمد):
+- **Node.js** (v20 أو أعلى)
+- **PostgreSQL** (v15 أو أعلى)
+- **Android Studio** (لمطوري التطبيق)
+- **ملف `.env`** مُوقّع من الإدارة (يحتوي على مفاتيح JWT، قاعدة البيانات، وبوابات الدفع). هذا الملف لا يُرفع إلى المستودع العام.
 
+---
 
-1. Open Android Studio
-2. Select **Open** and choose the directory containing this project
-3. Allow Android Studio to fix any incompatibilities as it imports the project.
-4. Create a file named `.env` in the project directory and set `GEMINI_API_KEY` in that file to your Gemini API key (see `.env.example` for an example)
-5. Remove this line from the app's `build.gradle.kts` file: `signingConfig = signingConfigs.getByName("debugConfig")`
-6. Run the app on an emulator or physical device
+## 🚀 خطوات التثبيت (للفريق الداخلي فقط)
+*ملاحظة أمنية هامة: لا يمكن تشغيل المشروع دون الحصول على مفاتيح البيئة من فريق DevSecOps عبر قناة آمنة.*
+
+1. استنساخ المستودع (بإذن مسبق).
+2. تثبيت تبعيات الباك-إند وتشغيله:
+   ```bash
+   cd backend
+   npm install
+   npm run start:dev
+   ```
+
+3. تثبيت تبعيات الواجهة الأمامية (اختياري لتشغيل الاختبارات):
+   ```bash
+   cd ../web
+   npm install
+   ```
+4. إعداد قاعدة البيانات المحلية:
+   ```bash
+   psql -U postgres -d zalo_db -f database/schema.sql
+   ```
+5. فتح الويب: استخدام Live Server لتشغيل web/index.html.
+6. بناء الأندرويد: يتطلب توقيع إصدار بمفاتيح موقعة من قبل الإدارة.
+
+---
+
+🛡️ السياسات الأمنية المعتمدة
+
+· قاعدة البيانات: مُفعّل RLS على 21 جدولاً، مع سياسات وصول دقيقة (تاجر ← متجره، عميل ← جلساته).
+· المصادقة: دعم 2FA، بصمة الجهاز، وتقييد محاولات الدخول (Throttler).
+· الامتثال: يحتوي على سياسة الخصوصية (privacy.html) وشروط الخدمة (terms.html) وفقاً للقانون الجزائري.
+
+---
+
+📞 جهات الاتصال
+
+للاستفسارات التجارية أو عروض الشراكة، يُرجى التواصل عبر:
+
+· البريد الإلكتروني: [haadii.1986@gmail.com]
+· الهاتف: [+213656872505]
+
+---
+
+© 2026 [ZaLo]. جميع الحقوق محفوظة.
