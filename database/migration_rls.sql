@@ -50,13 +50,13 @@ DROP POLICY IF EXISTS "Users can view their own sessions only" ON sessions;
 CREATE POLICY "Users can view their own sessions only" ON sessions
     FOR SELECT
     TO authenticated
-    USING (auth.uid() = user_id);
+    USING (user_id = (SELECT id FROM users WHERE supabase_uid = auth.uid()));
 
 DROP POLICY IF EXISTS "Users can delete their own sessions only" ON sessions;
 CREATE POLICY "Users can delete their own sessions only" ON sessions
     FOR DELETE
     TO authenticated
-    USING (auth.uid() = user_id);
+    USING (user_id = (SELECT id FROM users WHERE supabase_uid = auth.uid()));
 
 
 -- Products Table Policies (Allow merchants to manage their own products linked via store_id)
