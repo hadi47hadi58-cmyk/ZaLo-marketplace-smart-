@@ -71,6 +71,18 @@
                     </table>
                 </div>
             </div>
+            
+            <!-- قسم إدارة طلبات الشراكة التجارية والترقية -->
+            <div class="bg-[#0f1c36]/40 border border-slate-700/50 rounded-3xl p-6 space-y-4 text-right">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                    <span class="text-[10px] bg-slate-800 text-amber-400 px-3 py-1 rounded-full font-bold border border-amber-500/10">طلبات جديدة</span>
+                    <h3 class="text-base font-black text-white text-right"><i class="fa-solid fa-file-signature text-amber-500 ml-1"></i> طلبات الشراكة والترقية إلى تاجر</h3>
+                </div>
+
+                <div class="overflow-x-auto w-full" id="requestsContainer">
+                    <p class="text-xs text-slate-400">جاري تحميل طلبات الشركاء والتحقق من التراخيص...</p>
+                </div>
+            </div>
 
             <!-- CCP / BaridiMob Receipt Verifier Simulator -->
             <div class="p-6 bg-[#0f1c36]/30 border border-slate-700/40 rounded-3xl space-y-4 text-right">
@@ -104,5 +116,117 @@
 
     <!-- Shared JS Engine -->
     <script src="js/app.js"></script>
+
+    <script type="module">
+      import sessionManager from './js/session-manager.js';
+
+      async function loadRequests() {
+        const session = sessionManager.getSession();
+        if (!session || session.role !== 'admin') {
+          document.getElementById('requestsContainer').innerHTML = '<p class="text-xs text-red-400">⛔ غير مصرح لك برؤية هذه الصفحة</p>';
+          return;
+        }
+
+        try {
+          const response = await fetch('/api/merchant-requests', {
+            headers: { 'Authorization': `Bearer ${session.token}` },
+          });
+          const requests = await response.json();
+
+          if (!response.ok || !requests || !requests.length) {
+            document.getElementById('requestsContainer').innerHTML = '<p class="text-xs text-slate-400 py-4 text-center">📭 لا توجد طلبات شراكة حالياً</p>';
+            return;
+          }
+
+          let html = '<table class="w-full text-right text-xs" style="min-width: 600px;">';
+          html += `<thead>
+                    <tr class="text-slate-400 border-b border-slate-800">
+                      <th class="pb-3 text-right">المستفيد / البريد</th>
+                      <th class="pb-3 text-right">اسم المتجر المقترح</th>
+                      <th class="pb-3 text-right">رقم الهاتف</th>
+                      <th class="pb-3 text-right">السجل / التعريف المالي</th>
+                      <th class="pb-3 text-right">الحالة الحالية</th>
+                      <th class="pb-3 class="text-center" style="text-align: center;">الإجراءات المتاحة</th>
+                    </tr>
+                  </thead>
+                  <tbody>`;
+          
+          for (const req of requests) {
+            const statusColor = req.status === 'pending' ? 'text-amber-400 bg-amber-500/10 border-amber-500/30' : req.status === 'approved' ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30' : 'text-red-400 bg-red-500/10 border-red-500/30';
+            const statusText = req.status === 'pending' ? '⏳ قيد المراجعة' : req.status === 'approved' ? '✅ مقبول ومعتمد' : '❌ مرفوض';
+            const registerInfo = (req.commercial_register || req.tax_number) ? `${req.commercial_register || 'بدون سجل'} / ${req.tax_number || 'بدون تعريف'}` : 'غير مدخل';
+            const descriptionSnippet = req.description ? `<p class="text-[10px] text-slate-400 mt-1 max-w-xs">${req.description}</p>` : '';
+            
+            html += `<tr class="border-t border-slate-700/50 text-white font-semibold">`;
+            html += `<td class="p-3 text-right">
+                      <p class="font-bold text-white">${req.users?.email || 'مستخدم مجهول'}</p>
+                      <p class="text-[10px] text-slate-400">${req.users?.name || 'الاسم غير متوفر'}</p>
+                     </td>`;
+            html += `<td class="p-3 text-right">
+                      <p class="text-sm font-bold text-emerald-400">${req.store_name}</p>
+                      ${descriptionSnippet}
+                     </td>`;
+            html += `<td class="p-3 text-right font-mono">${req.phone}</td>`;
+            html += `<td class="p-3 text-right text-slate-300 font-mono">${registerInfo}</td>`;
+            html += `<td class="p-3 text-right">
+                      <span class="text-[10px] px-2.5 py-1 rounded-full border ${statusColor} font-bold">${statusText}</span>
+                     </td>`;
+            html += `<td class="p-3 text-center">`;
+            
+            if (req.status === 'pending') {
+              html += `<div class="flex gap-2 justify-center">
+                        <button onclick="handleRequest('${req.id}', 'approve')" class="bg-emerald-500 hover:bg-emerald-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold transition">✅ تفعيل وترقية</button>
+                        <button onclick="handleRequest('${req.id}', 'reject')" class="bg-red-500 hover:bg-red-600 text-white text-[10px] px-2.5 py-1.5 rounded-lg font-bold transition">❌ رفض الطلب</button>
+                       </div>`;
+            } else {
+              html += `<span class="text-slate-500 text-[11px] font-normal">تمت المعالجة: <br><span class="text-[10px] text-slate-400">${req.admin_notes || ''}</span></span>`;
+            }
+            html += `</td></tr>`;
+          }
+          html += '</tbody></table>';
+          document.getElementById('requestsContainer').innerHTML = html;
+        } catch (err) {
+          console.error(err);
+          document.getElementById('requestsContainer').innerHTML = '<p class="text-xs text-red-400 py-4 text-center">❌ تعذر الاتصال بالخادم لجلب طلبات الشراكة التجارية.</p>';
+        }
+      }
+
+      // دالة عالمية لمعالجة الطلب
+      window.handleRequest = async (requestId, action) => {
+        const session = sessionManager.getSession();
+        if (!confirm(`هل أنت متأكد من ${action === 'approve' ? 'تفعيل وترقية' : 'رفض'} هذا الطلب؟`)) return;
+
+        let adminNotes = '';
+        if (action === 'reject') {
+          adminNotes = prompt('✏️ اكتب سبب الرفض (سيظهر للمستخدم):');
+          if (adminNotes === null) return;
+        }
+
+        try {
+          const response = await fetch(`/api/merchant-requests/${requestId}/${action}`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${session.token}`,
+            },
+            body: JSON.stringify({ adminNotes }),
+          });
+
+          if (response.ok) {
+            alert(`✅ تم ${action === 'approve' ? 'تفعيل' : 'رفض'} الطلب بنجاح!`);
+            loadRequests(); // تحديث القائمة
+          } else {
+            const err = await response.json();
+            alert(`❌ فشل: ${err.message || 'حدث خطأ غير متوقع'}`);
+          }
+        } catch (err) {
+          console.error(err);
+          alert('❌ فشل الاتصال بالخادم لمعالجة الطلب.');
+        }
+      };
+
+      // تحميل الطلبات عند فتح الصفحة
+      document.addEventListener('DOMContentLoaded', loadRequests);
+    </script>
 </body>
 </html>

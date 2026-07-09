@@ -18,6 +18,18 @@ export class SessionManager {
   }
 
   /**
+   * Retrieves the current session object.
+   */
+  getSession() {
+    return {
+      token: localStorage.getItem(this.jwtKey),
+      role: (localStorage.getItem(this.roleKey) || '').toLowerCase(),
+      email: localStorage.getItem('zalo_user_email'),
+      name: localStorage.getItem('zalo_user_name')
+    };
+  }
+
+  /**
    * Retrieves the current user's role.
    */
   getUserRole() {
