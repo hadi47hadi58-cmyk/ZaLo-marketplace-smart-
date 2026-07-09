@@ -646,6 +646,43 @@
   <!-- Main Registration Form -->
   <form id="step1Form" onsubmit="handleNextStep(event)">
     
+    <!-- Email Verification Fields -->
+    <div class="form-group">
+      <label for="email">البريد الإلكتروني</label>
+      <div style="display: flex; gap: 8px;">
+        <div class="input-wrapper" style="flex: 1; margin-bottom: 0;">
+          <input 
+            type="text" 
+            id="email" 
+            placeholder="example@zalo.dz"
+            required
+            autocomplete="email"
+          >
+          <i class="fa-solid fa-envelope field-icon" style="top: 50%;"></i>
+        </div>
+        <button type="button" id="send-verification-btn" class="btn btn-next" style="width: auto; padding: 0 16px; min-height: 48px; margin: 0; background: var(--primary-light); font-size: 13px;">
+          إرسال الرمز
+        </button>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label for="verification-code">رمز التحقق</label>
+      <div style="display: flex; gap: 8px;">
+        <div class="input-wrapper" style="flex: 1; margin-bottom: 0;">
+          <input 
+            type="text" 
+            id="verification-code" 
+            placeholder="أدخل رمز التحقق..."
+          >
+          <i class="fa-solid fa-shield-halved field-icon" style="top: 50%;"></i>
+        </div>
+        <button type="button" id="verify-code-btn" class="btn btn-next" style="width: auto; padding: 0 20px; min-height: 48px; margin: 0; background: var(--primary-dark); font-size: 13px;">
+          تأكيد
+        </button>
+      </div>
+    </div>
+    
     <!-- Phone Field -->
     <div class="form-group">
       <label for="phone">رقم الهاتف الجوال</label>
@@ -708,7 +745,7 @@
 
     <!-- Submit button area -->
     <div class="buttons-container">
-      <button type="submit" class="btn btn-next" id="nextBtn">
+      <button type="submit" class="btn btn-next" id="next-step-btn" disabled>
         <span>التالي</span>
         <i class="fa-solid fa-arrow-left"></i>
       </button>
@@ -1239,9 +1276,12 @@
       return;
     }
 
-    const nextBtn = document.getElementById('nextBtn');
-    nextBtn.disabled = true;
-    nextBtn.querySelector('span').textContent = 'جاري الحفظ والتحقق...';
+    const nextBtn = document.getElementById('next-step-btn') || document.getElementById('nextBtn');
+    if (nextBtn) {
+      nextBtn.disabled = true;
+      const span = nextBtn.querySelector('span');
+      if (span) span.textContent = 'جاري الحفظ والتحقق...';
+    }
     
     try {
       const profileData = {
@@ -1281,8 +1321,11 @@
     } catch (err) {
       console.error("Supabase Profile Sync failed:", err);
       window.showStatus("فشل تحديث البيانات الشخصية: " + (err.message || "خطأ داخلي في الخادم"), "error");
-      nextBtn.disabled = false;
-      nextBtn.querySelector('span').textContent = 'التالي';
+      if (nextBtn) {
+        nextBtn.disabled = false;
+        const span = nextBtn.querySelector('span');
+        if (span) span.textContent = 'التالي';
+      }
     }
   };
 
@@ -1294,6 +1337,61 @@
   } else {
     checkUserSession();
   }
+</script>
+
+<script type="module">
+  import emailVerification from './js/email-verification.js';
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // تفعيل زر "إرسال رمز التحقق"
+    const sendBtn = document.getElementById('send-verification-btn');
+    const emailInput = document.getElementById('email');
+    const codeInput = document.getElementById('verification-code');
+    const verifyBtn = document.getElementById('verify-code-btn');
+
+    if (sendBtn && emailInput) {
+      sendBtn.addEventListener('click', async () => {
+        const email = emailInput.value;
+        if (!email) { alert('يرجى إدخال البريد الإلكتروني'); return; }
+        sendBtn.disabled = true;
+        sendBtn.textContent = 'جاري الإرسال...';
+        const result = await emailVerification.sendCode(email);
+        if (result.success) {
+          alert('تم إرسال رمز التحقق إلى بريدك الإلكتروني');
+          sendBtn.textContent = 'تم الإرسال';
+        } else {
+          alert('فشل الإرسال: ' + result.message);
+          sendBtn.disabled = false;
+          sendBtn.textContent = 'إرسال الرمز';
+        }
+      });
+    }
+
+    if (verifyBtn && codeInput && emailInput) {
+      verifyBtn.addEventListener('click', async () => {
+        const email = emailInput.value;
+        const code = codeInput.value;
+        if (!email) { alert('يرجى إدخال البريد الإلكتروني أولاً'); return; }
+        if (!code) { alert('يرجى إدخال رمز التحقق'); return; }
+        verifyBtn.disabled = true;
+        verifyBtn.textContent = 'جاري التأكيد...';
+        const result = await emailVerification.verifyCode(email, code);
+        if (result.success) {
+          alert('تم التحقق من البريد بنجاح!');
+          verifyBtn.textContent = 'مؤكد ✓';
+          // تفعيل زر المتابعة أو التوجيه للخطوة التالية
+          const nextStepBtn = document.getElementById('next-step-btn');
+          if (nextStepBtn) {
+            nextStepBtn.disabled = false;
+          }
+        } else {
+          alert('رمز غير صحيح: ' + result.message);
+          verifyBtn.disabled = false;
+          verifyBtn.textContent = 'تأكيد';
+        }
+      });
+    }
+  });
 </script>
 
 </body>
