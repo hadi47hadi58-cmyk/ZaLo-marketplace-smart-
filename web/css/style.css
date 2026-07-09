@@ -198,4 +198,68 @@ input:focus, select:focus, textarea:focus {
     font-size: 20px !important;
 }
 
+/* --- ZaLo Unified Brand Overrides for Dashboard & Catalog Pages --- */
+.zalo-branded-body {
+    font-family: 'Cairo', sans-serif !important;
+    background-color: #070a08 !important;
+    color: #f8fafc !important;
+}
+
+.zalo-branded-header {
+    background-color: rgba(15, 24, 17, 0.95) !important;
+    border-bottom: 2px solid var(--brand-gold, #d4af37) !important;
+    backdrop-filter: blur(12px) !important;
+}
+
+.zalo-branded-card, 
+.bg-\[\#0f1c36\]\/90, 
+.bg-\[\#0f1c36\]\/50, 
+.bg-\[\#0f1c36\]\/40, 
+.bg-\[\#0f1c36\]\/30 {
+    background-color: rgba(15, 24, 17, 0.6) !important;
+    border-color: rgba(212, 175, 55, 0.2) !important;
+}
+
+.zalo-branded-card-solid,
+.bg-slate-900, 
+.bg-slate-900\/60, 
+.bg-slate-950,
+.bg-slate-950\/40 {
+    background-color: #0f1811 !important;
+    border-color: rgba(212, 175, 55, 0.15) !important;
+}
+
+.border-slate-700\/50, 
+.border-slate-800, 
+.border-white\/10 {
+    border-color: rgba(212, 175, 55, 0.15) !important;
+}
+
+.text-\[\#D4AF37\],
+.text-sky-400, 
+.text-emerald-400, 
+.text-amber-500,
+.text-zalo-gold {
+    color: var(--brand-gold, #d4af37) !important;
+}
+
+.bg-emerald-500\/10, 
+.bg-amber-500\/10,
+.bg-sky-400\/10 {
+    background-color: rgba(212, 175, 55, 0.1) !important;
+    border-color: rgba(212, 175, 55, 0.3) !important;
+}
+
+/* Form input styling overrides */
+input, select, textarea {
+    background-color: #070a08 !important;
+    border: 1px solid rgba(212, 175, 55, 0.25) !important;
+    color: #ffffff !important;
+}
+input:focus, select:focus, textarea:focus {
+    border-color: var(--brand-gold, #d4af37) !important;
+    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.2) !important;
+}
+
+
 
