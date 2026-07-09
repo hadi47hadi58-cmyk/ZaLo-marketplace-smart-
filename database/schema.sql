@@ -876,7 +876,7 @@ SELECT cron.schedule(
 -- =====================================================
 CREATE TABLE IF NOT EXISTS merchant_requests (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    user_id UUID NOT NULL REFERENCES users(supabase_uid) ON DELETE CASCADE,
     store_name TEXT NOT NULL,
     phone VARCHAR(20) NOT NULL,
     commercial_register TEXT, 

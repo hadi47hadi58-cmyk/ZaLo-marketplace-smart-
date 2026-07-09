@@ -12,6 +12,7 @@ import { MerchantModule } from './merchant/merchant.module';
 import { DeliveryModule } from './delivery/delivery.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { SecurityModule } from './security/security.module';
+import { MerchantRequestsModule } from './merchant-requests/merchant-requests.module';
 import { ThrottlerModule, ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 
@@ -43,6 +44,7 @@ import { APP_GUARD } from '@nestjs/core';
     DeliveryModule,
     SupabaseModule,
     SecurityModule,
+    MerchantRequestsModule,
   ],
   providers: [
     AuditService,
