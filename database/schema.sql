@@ -869,3 +869,40 @@ SELECT cron.schedule(
     '0 3 * * *',             -- وقت التنفيذ (يومياً الساعة 3:00 صباحاً)
     'SELECT public.cleanup_stale_sessions();'
 );
+
+
+-- =====================================================
+-- جدول طلبات الترقية إلى تاجر (النسخة النهائية)
+-- =====================================================
+CREATE TABLE IF NOT EXISTS merchant_requests (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    store_name TEXT NOT NULL,
+    phone VARCHAR(20) NOT NULL,
+    commercial_register TEXT, 
+    tax_number TEXT,
+    description TEXT,
+    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'rejected')),
+    admin_notes TEXT,
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- فهرس لتسريع البحث
+CREATE INDEX IF NOT EXISTS idx_merchant_requests_status ON merchant_requests(status);
+
+-- تفعيل الأمان (RLS)
+ALTER TABLE merchant_requests ENABLE ROW LEVEL SECURITY;
+
+-- سياسة: المستخدم يرى طلبه فقط
+CREATE POLICY "user_see_own_requests" ON merchant_requests
+    FOR SELECT USING (user_id = auth.uid());
+
+-- سياسة: المستخدم ينشئ طلباً لنفسه فقط
+CREATE POLICY "user_insert_own_request" ON merchant_requests
+    FOR INSERT WITH CHECK (user_id = auth.uid());
+
+-- سياسة: المدير يرى ويدير كل الطلبات (يفترض أن المدير دوره 'admin')
+CREATE POLICY "admin_manage_all_requests" ON merchant_requests
+    FOR ALL USING (auth.role() = 'admin');
+
